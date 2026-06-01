@@ -1,0 +1,4 @@
+interface:
+  display_name: "Travel Deal Finder"
+  short_description: "Compare flexible travel deals across booking sites"
+  default_prompt: "Use $travel-deal-finder to find the best travel deals for my destination, dates, travelers, hotel, and car rental needs."
