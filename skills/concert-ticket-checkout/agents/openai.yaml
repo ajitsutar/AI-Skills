@@ -1,0 +1,4 @@
+interface:
+  display_name: "Concert Ticket Checkout"
+  short_description: "Browser-assisted concert ticket checkout"
+  default_prompt: "Use $concert-ticket-checkout to find concert tickets for an artist, seat count, max price, restrictions, and optional exact date/time, stopping before authentication, payment, or final purchase action."
