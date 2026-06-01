@@ -16,7 +16,7 @@ Each skill lives under `skills/<skill-name>` and keeps the standard Codex skill 
 - `references/`
 - `scripts/`
 
-## Install Locally
+## Use With Codex
 
 Copy a skill folder into your Codex skills directory:
 
@@ -25,6 +25,55 @@ Copy-Item -Recurse skills\<skill-name> $env:CODEX_HOME\skills\
 ```
 
 If `CODEX_HOME` is not set, use your Codex home directory and copy the selected skill into its `skills` folder.
+
+## Use With Claude Code
+
+Claude Code can use these skills because each skill is a directory with a `SKILL.md` file and optional supporting files.
+
+For personal skills available across projects:
+
+```powershell
+New-Item -ItemType Directory -Force $HOME\.claude\skills
+Copy-Item -Recurse .\skills\create-karaoke-video $HOME\.claude\skills\
+Copy-Item -Recurse .\skills\travel-deal-finder $HOME\.claude\skills\
+```
+
+For project skills checked into a specific repo:
+
+```powershell
+New-Item -ItemType Directory -Force .\.claude\skills
+Copy-Item -Recurse .\skills\create-karaoke-video .\.claude\skills\
+Copy-Item -Recurse .\skills\travel-deal-finder .\.claude\skills\
+```
+
+On macOS, Linux, or WSL, use the same target paths with `cp -R`:
+
+```bash
+mkdir -p ~/.claude/skills
+cp -R skills/create-karaoke-video ~/.claude/skills/
+cp -R skills/travel-deal-finder ~/.claude/skills/
+```
+
+Restart Claude Code after copying the folders, then ask:
+
+```text
+List all available Skills
+```
+
+Claude Code invokes skills automatically from the `description` field in `SKILL.md`. You do not need to type `$create-karaoke-video` or `$travel-deal-finder`; those names are Codex-friendly invocation hints and are not required by Claude Code.
+
+The `agents/openai.yaml` files are Codex metadata. Claude Code users can leave them in place, but Claude Code does not require them.
+
+Claude Code subagents can also use these skills. To preload one into a subagent, add a `skills` field to the subagent frontmatter:
+
+```yaml
+---
+name: travel-researcher
+description: Finds and compares travel deals
+skills:
+  - travel-deal-finder
+---
+```
 
 ## Safety Process
 
