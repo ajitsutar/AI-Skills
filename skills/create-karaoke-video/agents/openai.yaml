@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Karaoke Video"
+  short_description: "Karaoke videos from audio and lyrics"
+  default_prompt: "Use $create-karaoke-video to create a YouTube-ready synced karaoke video from my audio file and pasted lyrics."
