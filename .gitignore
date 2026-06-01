@@ -1,0 +1,59 @@
+# Local secrets and credentials
+.env
+.env.*
+*.pem
+*.key
+*.p12
+*.pfx
+*credential*
+*credentials*
+*secret*
+*token*
+
+# Codex and task artifacts
+work/
+outputs/
+tmp/
+temp/
+.cache/
+
+# User-provided or generated media
+*.mp3
+*.m4a
+*.wav
+*.flac
+*.aac
+*.ogg
+*.mp4
+*.mov
+*.mkv
+*.avi
+*.ass
+*.srt
+*.lrc
+
+# Archives and large bundles
+*.zip
+*.7z
+*.tar
+*.tar.gz
+*.rar
+
+# Python
+__pycache__/
+*.py[cod]
+.pytest_cache/
+.mypy_cache/
+.ruff_cache/
+.venv/
+venv/
+
+# Node
+node_modules/
+package-lock.json
+
+# OS and editor files
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
