@@ -1,6 +1,6 @@
 # AI Skills
 
-Public-ready exports of reusable Codex skills.
+Public-ready exports of reusable Codex/Claude Code compatible agent skills.
 
 ## Included Skills
 
