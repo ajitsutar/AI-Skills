@@ -6,6 +6,7 @@ Public-ready exports of reusable Codex skills.
 
 - `create-karaoke-video`: Create YouTube-ready karaoke videos from audio and user-provided lyrics, with optional vocal removal, timing, ASS subtitles, and MP4 rendering.
 - `concert-ticket-checkout`: Assist with browser-based concert ticket searches, seat comparison, cart setup, checkout review, and user-supervised purchasing boundaries.
+- `linkedin-knowledge-digest`: Filter LinkedIn feed and inbox activity into concise knowledge-bearing digests with clickable source links while excluding career milestones, hiring posts, self-promotion, and low-value outreach.
 - `travel-deal-finder`: Compare current travel deals across flights, hotels, packages, and rental cars with clear ranking rules and source verification.
 
 ## Layout
@@ -36,6 +37,7 @@ For personal skills available across projects:
 ```powershell
 New-Item -ItemType Directory -Force $HOME\.claude\skills
 Copy-Item -Recurse .\skills\create-karaoke-video $HOME\.claude\skills\
+Copy-Item -Recurse .\skills\linkedin-knowledge-digest $HOME\.claude\skills\
 Copy-Item -Recurse .\skills\travel-deal-finder $HOME\.claude\skills\
 ```
 
@@ -44,6 +46,7 @@ For project skills checked into a specific repo:
 ```powershell
 New-Item -ItemType Directory -Force .\.claude\skills
 Copy-Item -Recurse .\skills\create-karaoke-video .\.claude\skills\
+Copy-Item -Recurse .\skills\linkedin-knowledge-digest .\.claude\skills\
 Copy-Item -Recurse .\skills\travel-deal-finder .\.claude\skills\
 ```
 
@@ -52,6 +55,7 @@ On macOS, Linux, or WSL, use the same target paths with `cp -R`:
 ```bash
 mkdir -p ~/.claude/skills
 cp -R skills/create-karaoke-video ~/.claude/skills/
+cp -R skills/linkedin-knowledge-digest ~/.claude/skills/
 cp -R skills/travel-deal-finder ~/.claude/skills/
 ```
 
@@ -61,7 +65,7 @@ Restart Claude Code after copying the folders, then ask:
 List all available Skills
 ```
 
-Claude Code invokes skills automatically from the `description` field in `SKILL.md`. You do not need to type `$create-karaoke-video` or `$travel-deal-finder`; those names are Codex-friendly invocation hints and are not required by Claude Code.
+Claude Code invokes skills automatically from the `description` field in `SKILL.md`. You do not need to type `$create-karaoke-video`, `$linkedin-knowledge-digest`, or `$travel-deal-finder`; those names are Codex-friendly invocation hints and are not required by Claude Code.
 
 The `agents/openai.yaml` files are Codex metadata. Claude Code users can leave them in place, but Claude Code does not require them.
 
