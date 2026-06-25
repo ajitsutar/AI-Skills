@@ -20,6 +20,8 @@ Collect or infer these inputs:
 - Priority signals: people, companies, schools, communities, industries, technical topics, roles, or keywords.
 - Exclusion rules: categories the user does not want to see.
 - Link requirement: whether every referenced person, post, article, company, or message needs a clickable link.
+- State policy for recurring runs: canonical state path, writable workspace, duplicate horizon, and whether to stop if state cannot be updated.
+- Browser policy for authenticated scans: approved browser, allowed automation path, dedicated-window requirement, and forbidden fallbacks.
 
 If authenticated access is unavailable, do not guess. Ask the user to restore access or provide pasted/exported LinkedIn content.
 
@@ -29,6 +31,7 @@ If authenticated access is unavailable, do not guess. Ask the user to restore ac
    - Use the authenticated browser/session when available.
    - If browser automation is used, scroll enough to sample multiple feed bands.
    - Check inbox/messages only if the user requested inbox triage.
+   - For recurring automations, read the canonical state before scanning. If the run cannot read or later update required state, stop before producing a content digest that could duplicate old items.
 
 2. Build a background priority map.
    - Identify the user's specified priority people, organizations, groups, topics, and recently interacted-with contacts.
@@ -44,7 +47,8 @@ If authenticated access is unavailable, do not guess. Ask the user to restore ac
    - Prefer the exact LinkedIn post URL for feed items.
    - Include LinkedIn profile links for people and company links for organizations.
    - Include external article/report links when visible.
-   - If a link is visible or obtainable, do not mention the item without a clickable link.
+   - If the user requires hard links, every digest bullet must include an exact content or action URL: post, article, report, news story, event, message thread, or source URL. A profile-only link is not sufficient.
+   - If no content/action link is visible or recoverable, exclude the item entirely and do not mention it by name.
 
 5. Rank by value.
    - Favor items with strong engagement, credible sources, high-quality comments, novelty, relevance to the user's priority signals, and practical implications.
@@ -55,6 +59,23 @@ If authenticated access is unavailable, do not guess. Ask the user to restore ac
    - Lead with the most valuable knowledge items.
    - Explain why each item is worth reading in one sentence.
    - Separate inbox triage from feed/article recommendations.
+
+7. Update state after delivery.
+   - For recurring runs, treat the run as successful only after extraction, delivery, and state update all succeed.
+   - Update state only after the delivery tool returns success. Record delivery timestamp, delivery link when available, and every included content/action URL.
+   - If delivery fails or state update fails, do not advance `last_successful_run_at`.
+
+## Production Automation Guardrails
+
+Use these stricter rules when building or running an unattended LinkedIn digest automation:
+
+- Preflight state. Verify the canonical state file is inside a writable workspace before scanning. If the current environment is read-only or state writes would require approval, skip the scan and send only a concise block notice when the configured notification channel is already available.
+- Preserve duplicate prevention. Maintain `last_successful_run_at`, `last_digest_sent_at`, `last_slack_message_link` or equivalent delivery pointer, and a bounded `seen` list of recently reported content/action URLs with titles, sources, and timestamps. Keep roughly the latest 200 URLs or 60 days, whichever is smaller.
+- Use a single authenticated browser path. When the user specifies Chrome and local AppleScript, use only that approved path. Do not fall back to other browsers, Computer Use, screenshots, GUI clicking, extension repair, profile inspection, or browser-profile workarounds.
+- Isolate the browser session. Create or reuse only one automation-owned window with one LinkedIn tab. Do not navigate, select, close, scroll, or execute JavaScript in the user's pre-existing browser windows or tabs.
+- Scan incrementally. Use the previous successful run plus an overlap window, but do not rely on one stale feed item as a stop condition because LinkedIn Top feed is not chronological. Check at least several feed bands and cap the scan at a reasonable number of bands.
+- Audit links immediately before delivery. Remove every bullet that lacks an actual content/action link. Profile links may support attribution but must not be the only link for an item.
+- Keep failure behavior conservative. If authenticated LinkedIn access, extraction, delivery, or state update fails, leave run state untouched.
 
 ## Digest Format
 
@@ -86,7 +107,7 @@ Before finalizing, check:
 
 - Every included item teaches something, points to a useful article/report, or has a clear action.
 - No visible career milestone, job-anniversary, new-job, generic congratulations, hiring-only, or self-promotion item slipped in.
-- Each named person, company, post, article, or message has a clickable link when available.
+- Each included bullet has a clickable content/action link when hard-link mode is active.
 - The digest is short enough to read quickly.
 - Ranking reflects the user's interests without revealing private heuristics unnecessarily.
 
