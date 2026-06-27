@@ -9,11 +9,14 @@ State and duplicate-prevention policy:
 - Use [CANONICAL_STATE_PATH] as the canonical state file. Read it before scanning.
 - Store `last_successful_run_at`, `last_digest_sent_at`, a delivery link or message id when available, and a bounded `seen` list of recently reported content/action URLs with titles, sources, and `reported_at` timestamps.
 - Keep roughly the latest 200 URLs or 60 days, whichever is smaller.
+- Reading and updating a canonical state file inside a writable workspace is explicitly allowed when normal non-escalated Codex filesystem tools are available. Do not classify workspace state reads/writes as browser shell commands or approval-gated actions.
+- Use `apply_patch` or another non-escalated workspace file edit for state updates. Do not use shell redirection, escalated shell writes, or out-of-workspace state writes.
 - If the state file cannot be read or updated without approval, do not send a content digest that could duplicate prior items. Send only a concise block notice when [DELIVERY_TARGET] is already available without approval; otherwise leave a local/chat note.
 - Update state only after delivery succeeds. If extraction, delivery, or state update fails, do not advance `last_successful_run_at`.
 
 Authenticated browser policy:
 - Use only [APPROVED_BROWSER_AND_AUTOMATION_PATH] for LinkedIn access. Do not use unapproved browsers, browser profiles, Computer Use, screenshots, GUI clicking, extension repair, or other fallbacks.
+- Scope any approved-command-only restriction to Chrome/browser automation commands. It must not block non-escalated workspace file reads or `apply_patch` edits for the canonical state file.
 - Use exactly one automation-owned browser window with one LinkedIn tab. Do not navigate, select, close, scroll, or execute JavaScript in the user's pre-existing browser windows or tabs.
 - Close only the automation-owned window when the run finishes or fails.
 
