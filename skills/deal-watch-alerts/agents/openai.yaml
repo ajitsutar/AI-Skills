@@ -1,0 +1,4 @@
+interface:
+  display_name: "Deal Watch Alerts"
+  short_description: "Verify deals and send safe alerts"
+  default_prompt: "Use $deal-watch-alerts to check configured item deals, verify variants, suppress duplicates, and send alerts when thresholds match."
