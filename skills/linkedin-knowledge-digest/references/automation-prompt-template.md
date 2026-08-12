@@ -18,8 +18,8 @@ State and duplicate-prevention policy:
 - Use [CANONICAL_STATE_PATH] as the canonical state file. Read it before scanning.
 - Store `last_successful_run_at`, `last_digest_sent_at`, a delivery link or message id when available, optional `pending_digest`, and a bounded `seen` list of recently reported content/action URLs with titles, sources, and `reported_at` timestamps.
 - Keep roughly the latest 200 URLs or 60 days, whichever is smaller.
-- Reading and updating a canonical state file inside a writable workspace is explicitly allowed when normal non-escalated Codex filesystem tools are available. Do not classify workspace state reads/writes as browser shell commands or approval-gated actions.
-- Use `apply_patch` or another non-escalated workspace file edit for state updates. Do not use shell redirection, escalated shell writes, or out-of-workspace state writes.
+- Reading and updating a canonical state file inside a writable workspace is allowed when the agent's normal non-escalated filesystem tools are available. Do not classify workspace state reads/writes as browser shell commands or approval-gated actions.
+- Use the agent's normal structured file-edit tool for state updates (for example, Edit or Write in Claude Code, or `apply_patch` in Codex). Do not use shell redirection, escalated shell writes, or out-of-workspace state writes.
 - If `pending_digest` is non-null at the start of a run, treat its URLs as possibly already delivered. Stop before scanning/sending and report the unresolved transaction through the approved blocker channel.
 - Immediately before delivery, use one non-escalated state edit to set `pending_digest` to the run id, preparation time, and every outgoing URL with title/source. Re-read the file and verify it exactly matches the outgoing digest. This prepared-state edit is the writeability test; do not create a separate probe file.
 - Send exactly once. After delivery succeeds, move pending URLs into `seen`, record the returned delivery link/id and time, advance successful timestamps, prune state, and clear `pending_digest`. Re-read and verify the finalized state.
@@ -27,7 +27,7 @@ State and duplicate-prevention policy:
 
 Authenticated browser policy:
 - Use only [APPROVED_BROWSER_AND_AUTOMATION_PATH] for LinkedIn access. Do not use unapproved browsers, browser profiles, Computer Use, screenshots, GUI clicking, extension repair, or other fallbacks.
-- Scope any approved-command-only restriction to Chrome/browser automation commands. It must not block non-escalated workspace file reads or `apply_patch` edits for the canonical state file.
+- Scope any approved-command-only restriction to Chrome/browser automation commands. It must not block non-escalated workspace file reads or structured edits for the canonical state file.
 - Use exactly one automation-owned browser window with one LinkedIn tab. Do not navigate, select, close, scroll, or execute JavaScript in the user's pre-existing browser windows or tabs.
 - Close only the automation-owned window when the run finishes or fails.
 

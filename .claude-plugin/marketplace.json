@@ -1,0 +1,15 @@
+{
+  "name": "ajitsutar-ai-skills",
+  "description": "Ajit Sutar's reusable Claude Code agents and skills.",
+  "owner": {
+    "name": "Ajit Sutar"
+  },
+  "plugins": [
+    {
+      "name": "ai-skills",
+      "source": "./",
+      "description": "Reusable agents and skills for ticket checkout, karaoke video creation, deal alerts, LinkedIn digests, and travel comparison.",
+      "repository": "https://github.com/ajitsutar/AI-Skills"
+    }
+  ]
+}

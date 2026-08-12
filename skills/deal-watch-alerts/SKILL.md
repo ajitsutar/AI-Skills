@@ -1,6 +1,6 @@
 ---
 name: deal-watch-alerts
-description: Build, run, or maintain configurable deal-watch automations for products, tickets, travel, or other purchasable items. Use when Codex or Claude Code needs to check current prices across retailer, marketplace, or deal-aggregator sites; verify selected variants and condition details; compare against price thresholds; suppress duplicate alerts with memory; and optionally notify by chat, email, SMS/email gateway, or another configured channel.
+description: Build, run, or maintain configurable deal-watch automations for products, tickets, travel, or other purchasable items. Use when an agent needs to check current prices across retailer, marketplace, or deal-aggregator sites; verify selected variants and condition details; compare against price thresholds; suppress duplicate alerts with memory; and optionally notify by chat, email, SMS/email gateway, or another configured channel.
 ---
 
 # Deal Watch Alerts
@@ -10,6 +10,8 @@ description: Build, run, or maintain configurable deal-watch automations for pro
 Use this skill to turn a user-defined watch target into a repeatable deal check with strict verification before notification. The core job is to prevent false positives: only alert when the same currently selected, buyable offer satisfies every required attribute, condition rule, availability rule, and threshold.
 
 ## Quick Workflow
+
+Resolve bundled resources relative to this `SKILL.md`, never relative to the current working directory. In Claude Code, `${CLAUDE_SKILL_DIR}` is the skill directory. In other agents, resolve the equivalent directory from the loaded skill path.
 
 1. Parse or create the watch configuration.
    - Read `references/config-schema.md` when creating, updating, or normalizing configurable parameters.
@@ -78,4 +80,4 @@ Never notify again just because an already-alerted deal remains in stock at the 
 
 ## Portable Use
 
-For Codex, install this folder under a skills directory or reference it explicitly as `$deal-watch-alerts`. For Claude Code or another agent, include the folder in the workspace and instruct the agent to read `deal-watch-alerts/SKILL.md` before running the watch.
+Install this folder in the agent's supported skills directory or load it through the repository's plugin package. Claude Code agents can preload it by listing `ai-skills:deal-watch-alerts` in an agent's `skills` field.

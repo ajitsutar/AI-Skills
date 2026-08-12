@@ -1,13 +1,15 @@
 ---
 name: create-karaoke-video
-description: Create YouTube-ready karaoke videos from MP3, M4A, WAV, or similar audio and user-provided lyrics, with optional vocal removal, lyric cross-checking, vocal-based timing, ASS subtitle generation, and MP4 rendering. Use when the user invokes $create-karaoke-video or provides audio plus lyrics and asks for a karaoke video, sing-along video, lyric video, synced/timed lyrics, vocal removal, instrumental/no-vocals track, or YouTube-ready karaoke output.
+description: Create YouTube-ready karaoke videos from MP3, M4A, WAV, or similar audio and user-provided lyrics, with optional vocal removal, lyric cross-checking, vocal-based timing, ASS subtitle generation, and MP4 rendering. Use when the user invokes this skill or provides audio plus lyrics and asks for a karaoke video, sing-along video, lyric video, synced/timed lyrics, vocal removal, instrumental/no-vocals track, or YouTube-ready karaoke output.
 ---
 
 # Create Karaoke Video
 
-## New Chat Use
+## New Session Use
 
-This skill is designed for reuse from any new Codex chat. If the user explicitly invokes `$create-karaoke-video`, follow this workflow without requiring them to repeat setup instructions.
+This skill is designed for reuse from any new agent session. If the user explicitly invokes it, follow this workflow without requiring them to repeat setup instructions.
+
+Resolve bundled resources relative to this `SKILL.md`, never relative to the current working directory. In Claude Code, `${CLAUDE_SKILL_DIR}` is the skill directory. In other agents, resolve the equivalent directory from the loaded skill path.
 
 Minimum useful inputs:
 
@@ -18,7 +20,7 @@ Minimum useful inputs:
 Prompt template to offer users:
 
 ```text
-Use $create-karaoke-video to create a YouTube-ready karaoke video from this audio file:
+Use the create-karaoke-video skill to create a YouTube-ready karaoke video from this audio file:
 <audio path or attachment>
 
 Remove vocals: yes
@@ -52,7 +54,7 @@ Use `scripts/separate_vocals.py` as a wrapper around Demucs when vocal removal i
 Typical command:
 
 ```powershell
-python <skill>/scripts/separate_vocals.py "song.mp3" --outdir "work/separated"
+python "<skill-dir>/scripts/separate_vocals.py" "song.mp3" --outdir "work/separated"
 ```
 
 If Demucs is unavailable, install or request approval to install it when the task requires vocal removal:
@@ -83,10 +85,12 @@ If only `start,text` is available, the renderer uses the next line start as the 
 
 Use `scripts/render_karaoke_video.py` after audio and timings are ready.
 
+Preflight Python, Pillow, and FFmpeg (or `imageio-ffmpeg`) before rendering. Install missing dependencies only with the user's approval when the environment requires it. Demucs is required only for vocal separation.
+
 Example:
 
 ```powershell
-python <skill>/scripts/render_karaoke_video.py `
+python "<skill-dir>/scripts/render_karaoke_video.py" `
   --audio "work/separated/htdemucs/song/no_vocals.wav" `
   --lyrics "work/lyrics.txt" `
   --timings "work/timings.csv" `

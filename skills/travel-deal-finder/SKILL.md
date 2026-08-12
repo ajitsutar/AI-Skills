@@ -7,6 +7,8 @@ description: Find, compare, and summarize current travel deals across flights, h
 
 ## Core Workflow
 
+Resolve bundled resources relative to this `SKILL.md`, never relative to the current working directory. In Claude Code, `${CLAUDE_SKILL_DIR}` is the skill directory. In other agents, resolve the equivalent directory from the loaded skill path.
+
 1. Gather the minimum trip shape before searching: origin when flights are needed, destination, exact or flexible dates, adults, children with ages, rooms/beds, hotel needs, car rental needs, budget, must-have constraints, loyalty memberships, and whether packages are acceptable.
 2. Ask only for blocking missing inputs. If a reasonable assumption is safe, proceed and state it, such as using the user's locale/currency or treating kids as seat-holding children rather than lap infants.
 3. Browse live sources. Travel prices change constantly, so verify current pricing with web or browser tools and include source links and a checked timestamp in the answer.
@@ -63,7 +65,7 @@ Minimal offer JSON:
 Run:
 
 ```bash
-python scripts/rank_offers.py offers.json
+python "<skill-dir>/scripts/rank_offers.py" offers.json
 ```
 
 ## Output Template

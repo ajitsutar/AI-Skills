@@ -1,6 +1,6 @@
 ---
 name: linkedin-knowledge-digest
-description: Create concise, high-signal LinkedIn digests from an authenticated browser session or pasted LinkedIn content. Use when the user wants to automate LinkedIn feed, article, post, or inbox triage; summarize knowledge-bearing posts; filter out career milestones, self-promotion, sales spam, and low-value social updates; produce a Slack/email/Markdown-ready digest with clickable links; or create a reusable LinkedIn monitoring workflow for Codex, Claude Code, OpenClaw, or similar local agents.
+description: Create concise, high-signal LinkedIn digests from an authenticated browser session or pasted LinkedIn content. Use when the user wants to automate LinkedIn feed, article, post, or inbox triage; summarize knowledge-bearing posts; filter out career milestones, self-promotion, sales spam, and low-value social updates; produce a Slack/email/Markdown-ready digest with clickable links; or create a reusable LinkedIn monitoring workflow for local agents.
 ---
 
 # LinkedIn Knowledge Digest
@@ -8,6 +8,8 @@ description: Create concise, high-signal LinkedIn digests from an authenticated 
 ## Overview
 
 Build a LinkedIn digest that helps the user learn what matters without drowning in feed noise. Prioritize posts, articles, reports, and inbox messages that contain transferable knowledge, credible analysis, or timely market/technical signal.
+
+Resolve bundled resources relative to this `SKILL.md`, never relative to the current working directory. In Claude Code, `${CLAUDE_SKILL_DIR}` is the skill directory. In other agents, resolve the equivalent directory from the loaded skill path.
 
 Do not expose private ranking criteria unless the user asks. Use the user's priority people, organizations, roles, topics, and recency preferences as background scoring signals.
 

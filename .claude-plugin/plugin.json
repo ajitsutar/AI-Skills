@@ -1,0 +1,8 @@
+{
+  "name": "ai-skills",
+  "description": "Reusable agents and skills for ticket checkout, karaoke video creation, deal alerts, LinkedIn digests, and travel comparison.",
+  "author": {
+    "name": "Ajit Sutar"
+  },
+  "repository": "https://github.com/ajitsutar/AI-Skills"
+}

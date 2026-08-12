@@ -1,6 +1,6 @@
 ---
 name: concert-ticket-checkout
-description: Assist with browser-based concert ticket searches, seat comparison, cart setup, checkout review, and user-supervised purchasing on Ticketmaster, AXS, Live Nation, venue sites, and similar ticketing platforms. Use when the user asks Codex to find or buy concert tickets, compare seats or prices, use their browser/login/passkey, monitor availability, prepare checkout, or help with a ticket purchase while preserving authentication, payment, CAPTCHA, queue, and final-purchase boundaries.
+description: Assist with browser-based concert ticket searches, seat comparison, cart setup, checkout review, and user-supervised purchasing on Ticketmaster, AXS, Live Nation, venue sites, and similar ticketing platforms. Use when the user asks an agent to find or buy concert tickets, compare seats or prices, use their browser/login/passkey, monitor availability, prepare checkout, or help with a ticket purchase while preserving authentication, payment, CAPTCHA, queue, and final-purchase boundaries.
 ---
 
 # Concert Ticket Checkout
