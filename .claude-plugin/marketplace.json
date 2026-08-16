@@ -8,7 +8,7 @@
     {
       "name": "ai-skills",
       "source": "./",
-      "description": "Reusable agents and skills for ticket checkout, karaoke video creation, deal alerts, LinkedIn digests, and travel comparison.",
+      "description": "Reusable agents and skills for ticket checkout, karaoke and guitar-practice media, deal alerts, LinkedIn digests, and travel comparison.",
       "repository": "https://github.com/ajitsutar/AI-Skills"
     }
   ]

@@ -1,0 +1,27 @@
+name: Validate skills
+
+on:
+  push:
+  pull_request:
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+      - name: Install lightweight test dependencies
+        run: python -m pip install "numpy==2.4.6" "soundfile==0.14.0"
+      - name: Compile helpers
+        run: python -m py_compile skills/create-guitar-karaoke/scripts/*.py
+      - name: Run guitar workflow tests
+        run: python skills/create-guitar-karaoke/scripts/test_build_guitar_karaoke.py
+      - name: Scan export safety
+        run: python scripts/safety_scan.py
+      - name: Validate plugin JSON
+        run: python -c "import json; json.load(open('.claude-plugin/plugin.json')); json.load(open('.claude-plugin/marketplace.json'))"

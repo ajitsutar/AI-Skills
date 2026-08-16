@@ -28,6 +28,11 @@ temp/
 *.mov
 *.mkv
 *.avi
+*.ckpt
+*.onnx
+*.pth
+*.pt
+*.safetensors
 *.ass
 *.srt
 *.lrc

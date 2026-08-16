@@ -1,0 +1,5 @@
+audio-separator[cpu]==0.44.5
+mutagen==1.48.1
+numpy==2.4.6
+Pillow==12.3.0
+soundfile==0.14.0

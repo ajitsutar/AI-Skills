@@ -1,0 +1,4 @@
+interface:
+  display_name: "Create Guitar Karaoke"
+  short_description: "Create guitar-muted practice tracks and videos"
+  default_prompt: "Use $create-guitar-karaoke to remove an aggregate guitar estimate from the whole song or selected sections, or remove a verified supplied lead, rhythm, or custom stem, while keeping vocals and creating the requested audio or video deliverables."
