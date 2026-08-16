@@ -32,15 +32,28 @@ FORBIDDEN_EXTENSIONS = {
     ".pth",
     ".pt",
     ".safetensors",
+    ".ass",
+    ".srt",
+    ".lrc",
     ".zip",
     ".7z",
     ".rar",
+    ".tar",
+    ".gz",
 }
 
 TEXT_PATTERNS = [
-    ("private key block", re.compile(r"BEGIN (RSA|OPENSSH|DSA|EC|PGP) PRIVATE KEY")),
+    (
+        "private key block",
+        re.compile(r"BEGIN (?:RSA |OPENSSH |DSA |EC |PGP |ENCRYPTED )?PRIVATE KEY"),
+    ),
     ("OpenAI-style key", re.compile(r"sk-[A-Za-z0-9]{20,}")),
     ("GitHub token", re.compile(r"(ghp_[A-Za-z0-9]{20,}|github_pat_[A-Za-z0-9_]+)")),
+    ("Anthropic-style key", re.compile(r"sk-ant-[A-Za-z0-9_-]{20,}")),
+    ("Google API key", re.compile(r"AIza[0-9A-Za-z_-]{30,}")),
+    ("GitLab token", re.compile(r"glpat-[A-Za-z0-9_-]{20,}")),
+    ("npm token", re.compile(r"npm_[A-Za-z0-9]{20,}")),
+    ("Stripe live secret", re.compile(r"sk_live_[A-Za-z0-9]{16,}")),
     ("Slack token", re.compile(r"xox[baprs]-[A-Za-z0-9-]+")),
     ("AWS access key", re.compile(r"AKIA[0-9A-Z]{16}")),
     ("bearer token", re.compile(r"bearer\s+[A-Za-z0-9._-]{16,}", re.IGNORECASE)),
@@ -77,7 +90,7 @@ def scan() -> list[str]:
 
         rel = path.relative_to(ROOT)
         suffixes = {suffix.lower() for suffix in path.suffixes}
-        if suffixes & FORBIDDEN_EXTENSIONS:
+        if suffixes & FORBIDDEN_EXTENSIONS and not path.name.casefold().endswith(".env.example"):
             findings.append(f"forbidden extension: {rel}")
             continue
 

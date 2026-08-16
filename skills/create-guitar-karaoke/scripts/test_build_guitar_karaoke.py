@@ -94,6 +94,7 @@ class StemTests(unittest.TestCase):
                     "clip_wav": str(root / "tile_a.wav"),
                     "clip_start_frame": 0,
                     "clip_source_frames": 120,
+                    "clip_written_frames": 120,
                     "core_start_frame": 0,
                     "core_end_frame": 100,
                     "input_scale": 0.5,
@@ -102,6 +103,7 @@ class StemTests(unittest.TestCase):
                     "clip_wav": str(root / "tile_b.wav"),
                     "clip_start_frame": 80,
                     "clip_source_frames": 120,
+                    "clip_written_frames": 120,
                     "core_start_frame": 100,
                     "core_end_frame": 200,
                     "input_scale": 0.5,
@@ -175,6 +177,51 @@ class SafetyAndCacheTests(unittest.TestCase):
             with self.assertRaises(SystemExit):
                 guitar.load_manifest(root)
 
+    def test_manifest_generated_paths_are_bound_to_work_dir(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            work = root / "work"
+            clips = work / "clips"
+            stems = work / "stems"
+            clips.mkdir(parents=True)
+            stems.mkdir()
+            clip = clips / "tile.wav"
+            clip.write_bytes(b"clip")
+            manifest = {
+                "schema_version": guitar.MANIFEST_SCHEMA_VERSION,
+                "source": str(root / "source.wav"),
+                "source_sha256": "0" * 64,
+                "work_dir": str(work),
+                "master_wav": str(work / "master.wav"),
+                "master_wav_sha256": "1" * 64,
+                "sample_rate": 44_100,
+                "frames": 100,
+                "scope": "whole",
+                "stem_kind": "aggregate-guitar",
+                "stem_source": guitar.MODEL_LABEL,
+                "fade_seconds": 0.35,
+                "models_dir": str(work / "models"),
+                "stems_dir": str(stems),
+                "windows": [],
+                "tiles": [{
+                    "clip_wav": str(clip),
+                    "clip_start_frame": 0,
+                    "clip_source_frames": 100,
+                    "clip_written_frames": 100,
+                    "core_start_frame": 0,
+                    "core_end_frame": 100,
+                    "input_scale": 1.0,
+                    "clip_sha256": guitar.hash_file(clip),
+                }],
+            }
+            (work / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            self.assertEqual(guitar.load_manifest(work)["work_dir"], str(work))
+
+            manifest["work_dir"] = str(root / "elsewhere")
+            (work / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
+            with self.assertRaises(SystemExit):
+                guitar.load_manifest(work)
+
     def test_output_cannot_replace_input(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
@@ -210,9 +257,72 @@ class SafetyAndCacheTests(unittest.TestCase):
             self.assertFalse(guitar.cache_is_valid(tile, stem, "model", "config", "0.44.5"))
 
             stem.write_bytes(b"stem")
+            attestation["settings"]["use_soundfile"] = False
+            guitar.attestation_path(stem).write_text(json.dumps(attestation), encoding="utf-8")
+            self.assertFalse(guitar.cache_is_valid(tile, stem, "model", "config", "0.44.5"))
+
+            attestation = guitar.attestation_core(tile, "model", "config", "0.44.5")
+            attestation["stem_sha256"] = guitar.hash_file(stem)
+            guitar.attestation_path(stem).write_text(json.dumps(attestation), encoding="utf-8")
             clip.write_bytes(b"changed clip")
             with self.assertRaises(SystemExit):
                 guitar.cache_is_valid(tile, stem, "model", "config", "0.44.5")
+
+    def test_external_stem_source_must_remain_attested(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source_path = root / "source-stem.wav"
+            decoded_path = root / "decoded-stem.wav"
+            stem = np.zeros((100, 2), dtype="float32")
+            sf.write(source_path, stem, 100, subtype="FLOAT")
+            sf.write(decoded_path, stem, 100, subtype="FLOAT")
+            manifest = {
+                "frames": 100,
+                "sample_rate": 100,
+                "stem_source": "external",
+                "external_stem_source": str(source_path),
+                "external_stem_source_sha256": guitar.hash_file(source_path),
+                "external_stem_wav": str(decoded_path),
+                "external_stem_wav_sha256": guitar.hash_file(decoded_path),
+                "external_stem_offset_seconds": 0.0,
+                "external_stem_gain": 1.0,
+            }
+            source_path.unlink()
+            with self.assertRaises(SystemExit):
+                guitar.load_estimate(manifest)
+
+    def test_invalid_model_cache_is_removed_before_refresh(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            stems = root / "stems"
+            stems.mkdir()
+            tile = {"clip_wav": str(root / "clip.wav")}
+            manifest = {"stems_dir": str(stems), "tiles": [tile]}
+            stem = guitar.expected_guitar_stem(manifest, tile)
+            sidecar = guitar.attestation_path(stem)
+            stem.write_bytes(b"stale stem")
+            sidecar.write_text("{}", encoding="utf-8")
+            unrelated = stems / "unrelated.wav"
+            unrelated.write_bytes(b"keep")
+
+            guitar.clear_invalid_model_cache(manifest, [tile])
+
+            self.assertFalse(stem.exists())
+            self.assertFalse(sidecar.exists())
+            self.assertTrue(unrelated.exists())
+
+    def test_generated_model_stem_format_is_verified(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            stem = Path(directory) / "stem.wav"
+            sf.write(stem, np.zeros((128, 2), dtype="float32"), 44_100, subtype="FLOAT")
+            guitar.validate_model_stem_file(stem, {"clip_written_frames": 128})
+            with self.assertRaises(SystemExit):
+                guitar.validate_model_stem_file(stem, {"clip_written_frames": 127})
+
+    def test_sha256_fields_cannot_be_blank(self) -> None:
+        with self.assertRaises(SystemExit):
+            guitar.require_sha256("", "test hash")
+        self.assertEqual(guitar.require_sha256("A" * 64, "test hash"), "a" * 64)
 
     def test_nonaggregate_label_requires_external_stem(self) -> None:
         script = Path(guitar.__file__).resolve()

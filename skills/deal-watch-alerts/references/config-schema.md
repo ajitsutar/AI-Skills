@@ -10,6 +10,16 @@ memory:
   file: "./deal_alert_memory.json"
   duplicate_policy: "stable_key"
   treat_lower_price_as_new: true
+  strip_tracking_parameters: true
+  key_fields:
+    - "store"
+    - "product_id_or_url"
+    - "item_id"
+    - "model"
+    - "variant"
+    - "condition"
+    - "seller"
+    - "currency"
 sources:
   - name: "Amazon"
     type: "retailer"
@@ -61,6 +71,10 @@ notifications:
 
 - `watch_name`: stable name for automation logs, memory files, and summaries.
 - `memory.file`: path to JSON memory. Use an absolute path for recurring automations.
+- `memory.duplicate_policy`: currently only `stable_key` is supported.
+- `memory.treat_lower_price_as_new`: must be YAML/JSON boolean `true` or `false`, not a quoted string. When true, only a price below the best prior alert for the same offer is new; increases remain duplicate.
+- `memory.strip_tracking_parameters`: must be a boolean. It removes fragments and common ad/tracking query parameters from fallback URL identity while preserving meaningful query parameters.
+- `memory.key_fields`: non-empty list of fields that define the same offer. `price` is handled by the lower-price policy and is ignored here; `currency` is always added. The configured fields must produce at least one populated non-currency identity value. Add `shipping` or `availability` only when a change should define a materially different offer.
 - `sources[].type`: use `retailer`, `marketplace`, `deal_aggregator`, `search`, or `api`.
 - `sources[].urls`: direct product, search, or saved-filter URLs. Prefer direct product URLs when variants matter.
 - `sources[].search_queries`: exact search queries to use when direct URLs fail or when discovery is needed.
@@ -79,7 +93,9 @@ Build a stable key from fields that define whether a user would consider the ale
 store | product_id_or_final_url | item_id | selected_variant_fields | condition | seller | item_price
 ```
 
-Include price if lower prices should trigger new alerts. Exclude volatile fields such as session IDs, tracking parameters, estimated tax, page-load timestamps, or ad click IDs.
+Do not put `price` in `key_fields`; `treat_lower_price_as_new` handles it directionally so a decrease can alert while an increase does not. Currency is always part of identity. The helper canonicalizes case/whitespace and structured variants, sorts meaningful URL query parameters, and excludes fragments and common tracking parameters by default. Never use session IDs, estimated tax, page-load timestamps, or ad click IDs as identity.
+
+For concurrent or recurring runs, call `deal_memory.py claim` immediately before sending and `commit` after any confirmed delivery. Release only when every attempted provider proves it accepted nothing; leave partial or ambiguous transactions committed or pending as described in `notification-playbook.md`. Claim expiry is advisory and never clears a claim automatically. Pass the same `--config` to `key`, `check`, `claim`, `commit`, and `record`; changing policy between operations changes the keys.
 
 ## Candidate Result Shape
 

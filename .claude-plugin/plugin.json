@@ -1,5 +1,6 @@
 {
   "name": "ai-skills",
+  "version": "1.0.0",
   "description": "Reusable agents and skills for ticket checkout, karaoke and guitar-practice media, deal alerts, LinkedIn digests, and travel comparison.",
   "author": {
     "name": "Ajit Sutar"

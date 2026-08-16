@@ -15,6 +15,7 @@ Approval and failure policy:
 - If a required action is unavailable under this policy, stop gracefully, leave successful-run state unchanged, and send only [APPROVED_BLOCKER_NOTIFICATION].
 
 State and duplicate-prevention policy:
+- Configure this automation for single-flight execution: at most one active run may use [CANONICAL_STATE_PATH], and a trigger that arrives while a run is active must be skipped rather than overlapped. If the scheduler cannot guarantee that, stop without enabling unattended delivery.
 - Use [CANONICAL_STATE_PATH] as the canonical state file. Read it before scanning.
 - Store `last_successful_run_at`, `last_digest_sent_at`, a delivery link or message id when available, optional `pending_digest`, and a bounded `seen` list of recently reported content/action URLs with titles, sources, and `reported_at` timestamps.
 - Keep roughly the latest 200 URLs or 60 days, whichever is smaller.
@@ -23,19 +24,20 @@ State and duplicate-prevention policy:
 - If `pending_digest` is non-null at the start of a run, treat its URLs as possibly already delivered. Stop before scanning/sending and report the unresolved transaction through the approved blocker channel.
 - Immediately before delivery, use one non-escalated state edit to set `pending_digest` to the run id, preparation time, and every outgoing URL with title/source. Re-read the file and verify it exactly matches the outgoing digest. This prepared-state edit is the writeability test; do not create a separate probe file.
 - Send exactly once. After delivery succeeds, move pending URLs into `seen`, record the returned delivery link/id and time, advance successful timestamps, prune state, and clear `pending_digest`. Re-read and verify the finalized state.
-- If delivery fails, do not retry through another tool and do not advance successful timestamps; clear only `pending_digest` when safe. If finalization fails after delivery succeeds, leave `pending_digest` intact so the next run cannot duplicate the digest.
+- If delivery fails, do not retry through another tool and do not advance successful timestamps. Clear `pending_digest` only when the delivery tool proves that no message was accepted; retain it when the outcome is ambiguous. If finalization fails after delivery succeeds, leave `pending_digest` intact so the next run cannot duplicate the digest.
 
 Authenticated browser policy:
 - Use only [APPROVED_BROWSER_AND_AUTOMATION_PATH] for LinkedIn access. Do not use unapproved browsers, browser profiles, Computer Use, screenshots, GUI clicking, extension repair, or other fallbacks.
 - Scope any approved-command-only restriction to Chrome/browser automation commands. It must not block non-escalated workspace file reads or structured edits for the canonical state file.
-- Use exactly one automation-owned browser window with one LinkedIn tab. Do not navigate, select, close, scroll, or execute JavaScript in the user's pre-existing browser windows or tabs.
+- Launch exactly one new automation-owned browser window at the start of each run and keep one LinkedIn tab in it. Do not navigate, select, close, scroll, or execute JavaScript in the user's pre-existing browser windows or tabs.
 - Close only the automation-owned window when the run finishes or fails.
+- Do not bypass CAPTCHA, rate limits, authentication checkpoints, bot detection, account restrictions, or LinkedIn access controls. Stop for user action when a checkpoint appears.
 
 Durable extraction transport:
 - Use the bounded helper `scripts/linkedin_digest_candidates.js` for feed bands and `scripts/linkedin_messages_candidates.js` when inbox triage is in scope, or preserve their limits in equivalent code. Deduplicate across bands; cap posts, news, content URLs, and text; and keep the complete payload below [MAX_TRANSPORT_BYTES].
 - Every browser JavaScript expression passed through AppleScript or another bridge must return primitive JSON text via `JSON.stringify(...)`. Never return an object, array, promise, `undefined`, or another non-primitive result.
 - If the browser command continues in a background session/process, poll it until exit and append every output chunk. Parse and validate the complete JSON result before filtering. When a run-scoped object store is available, save the validated compact payload there and render only exit status, byte count, feed-band count, and candidate counts. Do not print the raw extraction payload into conversation history.
-- Required failures include a nonzero browser exit, invalid top-level/required-feed JSON, missing completion metadata, an oversized payload, or fewer than [MIN_FEED_BANDS] successfully inspected feed bands. Do not open a second browser window or rerun the scan after a required failure in the same automation run.
+- Required failures include a nonzero browser exit, invalid top-level/required-feed JSON, a false validated-page flag, missing or inconsistent cumulative feed-band metadata, an oversized payload, or fewer than [MIN_FEED_BANDS] successfully inspected feed bands. Do not open a second browser window or rerun the scan after a required failure in the same automation run.
 - Treat connections and inbox as optional ranking/context sources. Normalize a missing or malformed optional source to `{ok:false, items:[]}` and continue with valid public-feed sections.
 
 Incremental scan policy:

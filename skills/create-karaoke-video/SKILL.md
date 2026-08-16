@@ -1,6 +1,6 @@
 ---
 name: create-karaoke-video
-description: Create YouTube-ready karaoke videos from MP3, M4A, WAV, or similar audio and user-provided lyrics, with optional vocal removal, lyric cross-checking, vocal-based timing, ASS subtitle generation, and MP4 rendering. Use when the user invokes this skill or provides audio plus lyrics and asks for a karaoke video, sing-along video, lyric video, synced/timed lyrics, vocal removal, instrumental/no-vocals track, or YouTube-ready karaoke output.
+description: Create YouTube-ready karaoke or synchronized lyric videos from audio plus user-provided lyrics, with optional vocal removal, vocal-based timing, ASS subtitle generation, and MP4 rendering. Use when the user invokes this skill or asks for a karaoke, sing-along, lyric, or synced-lyrics video; do not trigger for an audio-only vocal-removal request with no video or lyrics goal.
 ---
 
 # Create Karaoke Video
@@ -9,7 +9,7 @@ description: Create YouTube-ready karaoke videos from MP3, M4A, WAV, or similar 
 
 This skill is designed for reuse from any new agent session. If the user explicitly invokes it, follow this workflow without requiring them to repeat setup instructions.
 
-Resolve bundled resources relative to this `SKILL.md`, never relative to the current working directory. In Claude Code, `${CLAUDE_SKILL_DIR}` is the skill directory. In other agents, resolve the equivalent directory from the loaded skill path.
+Resolve bundled resources relative to the directory containing this `SKILL.md`, never relative to the current working directory.
 
 Minimum useful inputs:
 
@@ -44,8 +44,10 @@ Use this skill to create a finished karaoke video from an audio file and lyrics.
    - Prefer user-provided timestamps, LRC, SRT, ASS, or line timing notes.
    - If only lyrics are provided, derive line timings from the original/vocal stem using speech or singing transcription, waveform inspection, and manual adjustment.
    - Do not invent exact timings without checking the audio. A rough evenly spaced render is only acceptable as a draft and must be labeled as such.
+   - The plain lyrics file is authoritative. Timing-file text is validation metadata only and must never replace it.
+   - Require one timing event per non-blank lyric line. Resolve a mismatch instead of guessing; use `--allow-timing-text-mismatch` only when line-order mapping has been deliberately verified.
 4. Render the video with `scripts/render_karaoke_video.py`.
-5. Verify: duration, audio stream, readable captions at several timestamps, no lyric overlap, and YouTube-compatible MP4.
+5. Verify: the renderer must decode the finished MP4, confirm audio and video streams, and compare duration. Also inspect readable captions at several timestamps and confirm no lyric overlap.
 
 ## Vocal Removal
 
@@ -57,10 +59,12 @@ Typical command:
 python "<skill-dir>/scripts/separate_vocals.py" "song.mp3" --outdir "work/separated"
 ```
 
-If Demucs is unavailable, install or request approval to install it when the task requires vocal removal:
+The separator publishes the complete track directory under a cross-process lock and refuses an existing track by default. For an intentional rerun, add `--overwrite`; never delete or replace the source audio.
+
+Current Demucs releases require Python 3.10 or newer. If Demucs is unavailable, create or use an isolated environment and install it only with the user's approval when the task requires vocal removal:
 
 ```powershell
-python -m pip install demucs
+python -m pip install "demucs>=4.1,<5"
 ```
 
 Use the separated `no_vocals` or instrumental stem for the final video. Keep the original audio available for transcription and timing because vocals are easier to align before removal.
@@ -85,7 +89,7 @@ If only `start,text` is available, the renderer uses the next line start as the 
 
 Use `scripts/render_karaoke_video.py` after audio and timings are ready.
 
-Preflight Python, Pillow, and FFmpeg (or `imageio-ffmpeg`) before rendering. Install missing dependencies only with the user's approval when the environment requires it. Demucs is required only for vocal separation.
+Preflight Python 3.10+, Pillow, FFmpeg with the `ass` filter, and ffprobe before rendering. `imageio-ffmpeg` is a fallback for FFmpeg, but a build without libass cannot burn captions. Install missing dependencies in an isolated environment and only with the user's approval. Demucs is required only for vocal separation.
 
 Example:
 
@@ -98,7 +102,7 @@ python "<skill-dir>/scripts/render_karaoke_video.py" `
   --output "outputs/song-karaoke.mp4"
 ```
 
-The renderer creates a 1920x1080 MP4 with burned-in karaoke captions and a matching `.ass` subtitle file next to the output.
+The renderer accepts CSV, LRC, SRT, or ASS timing input and creates a 1920x1080 MP4 with burned-in karaoke captions and a matching `.ass` subtitle file next to the output. It refuses existing outputs unless `--overwrite` is explicitly supplied, renders through temporary files, publishes the subtitle first and the verified MP4 last under a cross-process lock, and performs decode/stream/duration verification before publication.
 
 ## Quality Rules
 
@@ -108,3 +112,4 @@ The renderer creates a 1920x1080 MP4 with burned-in karaoke captions and a match
 - Check at least three representative frames after rendering.
 - Save user-facing deliverables under the current task's `outputs` folder when available.
 - Mention any uncertainty in lyric timing or vocal-separation quality.
+- Rendering does not authorize uploading or publishing the video; perform any external upload only when the user explicitly asks for it.

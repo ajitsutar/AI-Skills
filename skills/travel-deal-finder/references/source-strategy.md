@@ -55,5 +55,9 @@ Then rank value:
 - Prefer current pages over search snippets.
 - Capture source URLs for every finalist.
 - Treat "from" prices and member-only teasers as unverified until the exact dates and party size are loaded.
+- Compare offers in one currency. Preserve original prices when converting with a current cited exchange rate, or group currencies separately.
+- Keep offers with missing or teaser-only totals unranked; never treat missing values as zero.
 - Re-check the final winner on the booking source immediately before recommending it.
 - State assumptions clearly when a site does not expose child-age pricing, taxes, fees, or membership-only totals.
+- Stop at research and source links. Do not authenticate, enter traveler or payment data, accept terms, or submit a booking.
+- Do not bypass CAPTCHAs, queues, rate limits, login gates, region restrictions, or anti-bot controls.

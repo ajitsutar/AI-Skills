@@ -42,9 +42,14 @@ LRC is also accepted:
 
 Blank lyric lines are ignored for timing. Use blank lines in the plain lyrics file only for grouping or readability.
 
+## SRT And ASS Timing
+
+The renderer also accepts standard SRT cues and ASS `Dialogue` events. Every format must contain exactly one timing event per non-blank line in the authoritative plain lyrics file. Timing-file text is checked for alignment but is never substituted for the user's lyric text. If the text differs intentionally while event order has been manually verified, pass `--allow-timing-text-mismatch`.
+
 ## Alignment Notes
 
 - Use the user-provided lyric text for displayed captions.
+- Require strictly increasing starts, positive ends within the audio duration, and no event end after the next line starts. Reject invalid or overlapping input instead of stretching lines to a minimum duration.
 - Split very long lyric lines into shorter phrase lines before timing.
 - If rendering word-style highlighting from line timings, distribute highlight duration across words by character length. This is approximate but visually useful.
 - For fast taans, sargam, ad libs, or vocal runs, create short phonetic/sargam lines instead of repeating the chorus unless the singer is actually repeating it.
@@ -52,9 +57,12 @@ Blank lyric lines are ignored for timing. Use blank lines in the plain lyrics fi
 
 ## Rendering Checks
 
+The vocal-separation helper uses an isolated Demucs job directory and publishes one complete track directory under a cross-process lock. It preserves an existing output unless `--overwrite` is explicitly requested.
+
 After rendering, inspect:
 
 - MP4 duration matches the audio.
+- MP4 fully decodes and contains both audio and video streams.
 - Audio is the intended mode: instrumental/no-vocals, original, or both.
 - Captions are readable in the first verse, chorus, and late section.
 - No line overlaps or text overflow on 1920x1080.

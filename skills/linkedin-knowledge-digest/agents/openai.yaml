@@ -1,3 +1,4 @@
-display_name: LinkedIn Knowledge Digest
-short_description: Filter LinkedIn into useful reads.
-default_prompt: Create a concise LinkedIn knowledge digest from my authenticated browser session and deliver it to my preferred destination.
+interface:
+  display_name: "LinkedIn Knowledge Digest"
+  short_description: "Filter LinkedIn into useful knowledge reads"
+  default_prompt: "Use $linkedin-knowledge-digest to create a concise, link-backed digest from my authenticated LinkedIn session or supplied content."

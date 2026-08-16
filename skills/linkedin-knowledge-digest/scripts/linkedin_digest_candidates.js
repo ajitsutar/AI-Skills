@@ -6,17 +6,69 @@
   const MAX_POST_TEXT = 900;
   const MAX_CONTENT_URLS = 6;
   const clean = (value) => (value || "").replace(/\s+/g, " ").trim();
-  const session = window.__codexLinkedInDigestSession ||= {
+  const isHttpUrl = (url) => url.protocol === "https:" || url.protocol === "http:";
+  const normalizedHost = (hostname) => (hostname || "")
+    .toLowerCase()
+    .replace(/\.$/, "")
+    .replace(/^www\./, "");
+  const isLinkedInHost = (hostname) => {
+    const host = normalizedHost(hostname);
+    return host === "linkedin.com" || host.endsWith(".linkedin.com");
+  };
+  const safePageUrl = () => {
+    try {
+      const url = new URL(location.href);
+      if (!isHttpUrl(url)) return "";
+      return `${url.origin}${url.pathname}`;
+    } catch {
+      return "";
+    }
+  };
+  const failure = (error) => JSON.stringify({
+    schemaVersion: 1,
+    payloadType: "linkedin_digest_band",
+    ok: false,
+    error,
+    capturedAt: new Date().toISOString(),
+    title: document.title || "",
+    url: safePageUrl(),
+    posts: [],
+    news: []
+  });
+  let pageUrl;
+  try {
+    pageUrl = new URL(location.href);
+  } catch {
+    return failure("invalid_page_url");
+  }
+  if (!isHttpUrl(pageUrl) || !isLinkedInHost(pageUrl.hostname)) {
+    return failure("linkedin_page_required");
+  }
+  if (/^\/(login|checkpoint|authwall)(?:\/|$)/.test(pageUrl.pathname)) {
+    return failure("linkedin_authentication_required");
+  }
+  if (!(pageUrl.pathname === "/" || /^\/feed(?:\/|$)/.test(pageUrl.pathname))) {
+    return failure("linkedin_feed_page_required");
+  }
+  if (!document.querySelector('[data-testid="mainFeed"], main')) {
+    return failure("linkedin_feed_not_ready");
+  }
+  const session = window.__agentLinkedInDigestSession ||= {
     postUrls: Object.create(null),
     newsUrls: Object.create(null),
     emittedPosts: 0,
-    emittedNews: 0
+    emittedNews: 0,
+    bandsInspected: 0
   };
+  session.bandsInspected += 1;
   const decodeLinkedInSafetyUrl = (href) => {
     try {
       const parsed = new URL(href, location.href);
-      if (!/linkedin\.com\/safety\/go\//.test(parsed.href)) return "";
-      return parsed.searchParams.get("url") || "";
+      if (!isHttpUrl(parsed) || !isLinkedInHost(parsed.hostname)) return "";
+      if (!/^\/safety\/go\/?/.test(parsed.pathname)) return "";
+      const target = new URL(parsed.searchParams.get("url") || "");
+      if (!isHttpUrl(target)) return "";
+      return target.href;
     } catch {
       return "";
     }
@@ -28,9 +80,11 @@
     } catch {
       return "";
     }
-    const full = url.href.split("?")[0];
-    const host = url.hostname.replace(/^www\./, "");
-    if (/linkedin\.com$/.test(host)) {
+    if (!isHttpUrl(url)) return "";
+    const host = normalizedHost(url.hostname);
+    if (isLinkedInHost(host)) {
+      url.hash = "";
+      const full = `${url.origin}${url.pathname}`;
       if (/\/news\/story\//.test(url.pathname)) return full;
       if (/\/pulse\//.test(url.pathname)) return full;
       if (/\/learning\//.test(url.pathname)) return full;
@@ -47,17 +101,18 @@
         } catch {
           return "";
         }
-        const targetHost = targetUrl.hostname.replace(/^www\./, "");
+        if (!isHttpUrl(targetUrl)) return "";
+        const targetHost = normalizedHost(targetUrl.hostname);
         if (["b.tech", "m.tech"].includes(targetHost)) return "";
-        if (targetHost.includes(".")) return url.href;
+        if (targetHost.includes(".")) return targetUrl.href;
       }
       return "";
     }
-    if (host.includes(".") && !/linkedin\.com$/.test(host)) return url.href;
+    if (host.includes(".")) return url.href;
     return "";
   };
   const authorFromText = (text) => {
-    const match = text.match(/^Feed post\s+(Suggested\s+)?(.+?)\s+•/);
+    const match = text.match(/^Feed post\s+(Suggested\s+)?(.+?)\s+\u2022/);
     return clean(match ? match[2] : "");
   };
   const skipText = (text) => {
@@ -124,11 +179,15 @@
     ok: true,
     capturedAt: new Date().toISOString(),
     title: document.title,
-    url: location.href,
+    url: safePageUrl(),
     workspaceScrollTop: document.getElementById("workspace")?.scrollTop || 0,
     posts,
     news,
     sessionTotals: { posts: session.emittedPosts, news: session.emittedNews },
+    completionMetadata: {
+      feedBandsInspected: session.bandsInspected,
+      pageValidated: true
+    },
     capped: {
       posts: session.emittedPosts >= MAX_TOTAL_POSTS,
       news: session.emittedNews >= MAX_TOTAL_NEWS

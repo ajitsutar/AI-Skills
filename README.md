@@ -13,7 +13,7 @@ Shareable source exports of reusable Agent Skills, packaged as a native Claude C
 
 ## Layout
 
-Each skill lives under `skills/<skill-name>` and keeps the standard Codex skill structure:
+Each skill lives under `skills/<skill-name>` and keeps the shared Agent Skills structure understood by Codex and Claude Code:
 
 - `SKILL.md`
 - `agents/openai.yaml`
@@ -28,20 +28,21 @@ Claude-specific packaging lives alongside the skills:
 
 ## Use With Codex
 
-Copy a skill folder into your Codex skills directory:
+Current Codex releases discover personal skills under `~/.agents/skills`. Copy one skill or all six there.
 
 ```powershell
-Copy-Item -Recurse skills\<skill-name> $env:CODEX_HOME\skills\
+New-Item -ItemType Directory -Force "$HOME\.agents\skills" | Out-Null
+Copy-Item -Recurse "skills\<skill-name>" "$HOME\.agents\skills\"
 ```
 
 On macOS or Linux:
 
 ```bash
-mkdir -p "${CODEX_HOME:-$HOME/.codex}/skills"
-cp -R "skills/<skill-name>" "${CODEX_HOME:-$HOME/.codex}/skills/"
+mkdir -p "$HOME/.agents/skills"
+cp -R "skills/<skill-name>" "$HOME/.agents/skills/"
 ```
 
-If `CODEX_HOME` is not set, use your Codex home directory and copy the selected skill into its `skills` folder.
+Some older Codex desktop installations discover personal skills from `$CODEX_HOME/skills` (commonly `~/.codex/skills`). Use that as a legacy fallback only when it is the location shown by the running app; do not install the same skill name in both roots. Codex does not merge duplicate skill names, so duplicate copies can both appear in selectors. Restart Codex only if a newly copied skill does not appear automatically.
 
 ## Use With Claude Code (Recommended)
 
@@ -63,16 +64,16 @@ Verify installation with `/skills`, `/agents`, and `/doctor`. Plugin skills use 
 /ai-skills:linkedin-knowledge-digest
 ```
 
-The matching agents are:
+The matching Claude plugin agents have these scoped names:
 
-- `@ai-skills:concert-ticket-agent`
-- `@ai-skills:deal-watch-agent`
-- `@ai-skills:guitar-karaoke-agent`
-- `@ai-skills:karaoke-video-agent`
-- `@ai-skills:linkedin-digest-agent`
-- `@ai-skills:travel-deal-agent`
+- `ai-skills:concert-ticket-agent`
+- `ai-skills:deal-watch-agent`
+- `ai-skills:guitar-karaoke-agent`
+- `ai-skills:karaoke-video-agent`
+- `ai-skills:linkedin-digest-agent`
+- `ai-skills:travel-deal-agent`
 
-Claude can delegate automatically from each agent's description, or the user can invoke an agent explicitly with `@agent-name`. Each agent preloads only its corresponding skill to keep context focused.
+Claude can delegate automatically from each agent's description. To guarantee one runs, type `@` and choose its scoped name from the agent picker. A manual mention uses `@agent-` followed by the scoped name, for example `@agent-ai-skills:guitar-karaoke-agent`. Each agent preloads only its corresponding skill to keep context focused.
 
 For local development from a clone, start Claude Code with:
 
@@ -86,7 +87,7 @@ In PowerShell, the same command is:
 claude --plugin-dir .
 ```
 
-Then use `/reload-plugins` after edits. Plugin installations use the repository commit SHA as the version, so updates do not require maintaining a separate version string.
+Then use `/reload-plugins` after edits. The plugin uses semantic versions; bump the version in both `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` when publishing a new release so Claude Code can detect updates consistently.
 
 ## Standalone Claude Skills
 
@@ -134,19 +135,33 @@ Before publishing or updating this repository:
 1. Export only skill source files and supporting references.
 2. Do not include local task folders, browser/session data, generated outputs, audio/video files, lyrics supplied by users, credentials, keys, tokens, cookies, or personal paths.
 3. Replace copyrighted or user-specific examples with generic placeholders.
-4. Run the safety scan:
+4. Validate the shared skill contract, resource links, Codex metadata, Claude plugin mappings, script syntax, and text hygiene:
+
+```powershell
+python scripts/validate_portability.py
+```
+
+5. Run the safety scan:
 
 ```powershell
 python scripts/safety_scan.py
 ```
 
-5. Validate the Claude package with Anthropic's CLI:
+6. When the Claude CLI is installed, validate the Claude package with Anthropic's CLI:
 
 ```bash
-claude plugin validate .
+claude plugin validate . --strict
 ```
 
-The scan is a guardrail, not a substitute for review. Manually inspect every match before publishing.
+The repository's CI runs the portability checks and focused helper tests on both Windows and Linux, plus Claude's strict plugin validator on Linux. These checks are guardrails, not substitutes for review.
+
+## Portability Contract
+
+- Shared `SKILL.md` files use only the portable `name` and `description` frontmatter fields and avoid host-specific command substitution.
+- Supporting resources are resolved relative to the directory containing `SKILL.md`, not the caller's working directory.
+- Codex-specific presentation metadata lives only in each skill's `agents/openai.yaml`.
+- Claude Code plugin agents live only in the repository-level `agents/` directory and preload the corresponding namespaced plugin skill.
+- Optional browser, web, messaging, media, or model capabilities are declared as runtime prerequisites in prose; neither host is assumed to provide them automatically.
 
 ## Dependencies
 

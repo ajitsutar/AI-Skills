@@ -13,6 +13,7 @@ description: Assist with browser-based concert ticket searches, seat comparison,
 4. Pause and hand control to the user for passkeys, login approvals, CAPTCHAs, payment entry, wallet prompts, identity checks, and any security-sensitive confirmation.
 5. Do not click the final purchase, place-order, confirm-payment, or accept-nonrefundable button unless the user explicitly confirms the exact event, date, venue, section/row/seats or GA area, quantity, all-in price, merchant, and delivery restrictions in the current checkout.
 6. If the user asks for a test run or says not to buy, stop before authentication or checkout submission and summarize what was found.
+7. If no live web or browser capability is available, do not claim current inventory or pricing. Provide official source links or a manual search checklist and stop before cart or checkout work.
 
 ## Input Parameters
 
@@ -28,7 +29,7 @@ location: optional city, venue, region, or distance radius
 ticket_type: optional primary, verified resale, resale allowed, VIP allowed, or cheapest acceptable
 ```
 
-If `artist`, `number_of_seats`, or `price_max` is missing, ask for the missing value before reserving seats. For search-only tasks, proceed with visible assumptions and mark the missing fields clearly.
+If `artist`, `number_of_seats`, or `price_max` is missing, ask for the missing value before reserving seats. If `location` is missing and the artist has plausible events in more than one region, ask for a location before reserving seats. For search-only tasks, proceed with visible assumptions and mark the missing fields clearly.
 
 Date handling:
 
@@ -39,7 +40,8 @@ Date handling:
 
 Restrictions handling:
 
-- Treat obstructed view, limited view, restricted view, side/rear view, wheelchair-only when accessibility was not requested, single seats when adjacent seats are required, and ambiguous warnings as disqualifying unless the user set `restrictions: unrestricted`.
+- Treat obstructed view, limited view, restricted view, side/rear view, single seats when adjacent seats are required, and ambiguous warnings as disqualifying unless the user set `restrictions: unrestricted`.
+- Treat wheelchair-only, companion, or other accessibility-restricted inventory as disqualifying unless the user explicitly requested that accommodation and confirms eligibility. `restrictions: unrestricted` never overrides this accessibility check.
 - If a site does not expose restriction details until checkout, re-check the final checkout details before asking for purchase approval.
 
 ## Workflow
@@ -66,9 +68,11 @@ Purchase review:
 - Quantity:
 - Seats/section:
 - Ticket type: primary/resale/verified resale
+- All-in price per ticket:
 - All-in total:
-- Price max:
+- Price max and whether it is per-ticket or total:
 - Restrictions checked:
+- Accessibility eligibility checked:
 - Merchant:
 - Delivery/transfer restrictions:
 - Refund/cancellation notes:
@@ -76,10 +80,20 @@ Purchase review:
 Waiting for explicit approval before final purchase.
 ```
 
+## Availability Monitoring
+
+- Start monitoring only when the user explicitly asks and a recurring monitor or scheduler is available. Otherwise perform one current check and explain that unattended monitoring is unavailable.
+- Resolve the exact event, venue/city, acceptable dates, quantity, all-in price ceiling, ticket type, resale policy, view restrictions, check interval, deadline, and notification destination before starting.
+- Prefer official ticket alerts. For repeated checks, use a conservative interval, obey site rate limits and terms, and stop when the site blocks automation or requests authentication or CAPTCHA.
+- Never hold inventory, remain in a queue, keep an authenticated session active, add tickets to a cart, or attempt a purchase as part of unattended monitoring.
+- Store only the search criteria, deadline, source URLs, and a minimal last-seen listing fingerprint for duplicate suppression. Never store credentials, cookies, payment data, or identity information.
+- In every alert, include the checked time and timezone, source link, seat/section or GA area, quantity, visible all-in price or fee uncertainty, restrictions, and a reminder that the user must re-verify availability before checkout.
+
 ## Browser Handoffs
 
-- Use the user's Chrome/browser when the task needs existing login, cookies, passkeys, wallet state, or an already-open queue.
+- Use authenticated browser state only when the host exposes it and its browser-isolation rules permit it. Use a dedicated automation window when required, and never navigate, close, or modify unrelated tabs or windows.
 - Use a non-authenticated browser or web search for discovery when login is not needed.
+- If a safe interactive browser is unavailable, limit the task to public discovery and give the user direct links for manual checkout.
 - Tell the user exactly when to take over, for example: "Please complete the passkey prompt, then tell me when the page is back."
 - After the user completes a handoff, re-check the visible page state before continuing.
 - If a site detects automation, blocks interaction, or enters a waiting room, stop automation and explain the current state. Do not attempt evasive behavior.

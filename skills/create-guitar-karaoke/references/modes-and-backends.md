@@ -68,6 +68,7 @@ Never label a mid/side or EQ heuristic as exact semantic separation.
 - Convert `MM:SS`, `HH:MM:SS`, or seconds to sample positions only after decoding the master.
 - Confirm that a music-video edit has not added an intro, dialogue, or silence.
 - For a supplied external stem, verify sample rate, channel count, polarity, gain, and transient alignment against the master. With zero offset, the helper requires the exact decoded frame count. Use `--stem-offset` only after measuring where stem frame zero lands, and `--stem-gain` only after measuring a mixture-consistent scale. A stem derived from another master or edit may comb-filter or leave audible guitar.
+- Keep the supplied source stem available through the mix stage. The helper revalidates both the original stem file and its decoded working WAV against the preparation hashes before subtraction.
 - Lead solos may overlap vocals. Use the guitar stem and time mask; do not mute the entire mix or cut vocal passages.
 
 ## Why Subtraction Uses the Original Master

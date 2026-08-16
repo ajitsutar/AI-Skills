@@ -9,7 +9,7 @@ description: Create concise, high-signal LinkedIn digests from an authenticated 
 
 Build a LinkedIn digest that helps the user learn what matters without drowning in feed noise. Prioritize posts, articles, reports, and inbox messages that contain transferable knowledge, credible analysis, or timely market/technical signal.
 
-Resolve bundled resources relative to this `SKILL.md`, never relative to the current working directory. In Claude Code, `${CLAUDE_SKILL_DIR}` is the skill directory. In other agents, resolve the equivalent directory from the loaded skill path.
+Resolve bundled resources relative to the directory containing this `SKILL.md`, never relative to the current working directory.
 
 Do not expose private ranking criteria unless the user asks. Use the user's priority people, organizations, roles, topics, and recency preferences as background scoring signals.
 
@@ -69,7 +69,7 @@ If authenticated access is unavailable, do not guess. Ask the user to restore ac
    - For recurring runs, treat the run as successful only after extraction, delivery, and state update all succeed.
    - Immediately before delivery, write a `pending_digest` record containing a run identifier, preparation time, and every outgoing content/action URL. Re-read it and verify it exactly matches the outgoing digest.
    - Send exactly once. After the delivery tool returns success, move the pending URLs into `seen`, record the delivery timestamp and link/id, advance `last_successful_run_at`, prune old state, and clear `pending_digest`.
-   - If delivery fails, do not retry through an alternate delivery path and do not advance successful-run state. Clear only `pending_digest` when safe.
+   - If delivery fails, do not retry through an alternate delivery path and do not advance successful-run state. Clear `pending_digest` only when the delivery tool proves that no message was accepted; retain it when the outcome is ambiguous.
    - If finalization fails after delivery succeeds, leave `pending_digest` intact. The next run must stop rather than risk sending the same digest twice.
 
 ## Production Automation Guardrails
@@ -77,11 +77,13 @@ If authenticated access is unavailable, do not guess. Ask the user to restore ac
 Use these stricter rules when building or running an unattended LinkedIn digest automation:
 
 - Preserve automation identity. When the user requests same-task continuity, keep exactly one active thread-bound/heartbeat automation and update it by id. Do not silently replace it with a detached scheduled job. Check for superseded duplicates before and after automation changes.
+- Require single-flight execution. Configure the scheduler to allow at most one active run for each canonical state file and to skip, rather than overlap, a new trigger while that run is active. If the scheduler cannot guarantee non-overlap, do not enable unattended delivery; limit the workflow to a user-supervised one-shot run.
 - Keep a zero-surprise approval boundary. Use only the access, browser, delivery, and workspace operations the user approved. If a required operation is unavailable, stop gracefully and leave successful-run state unchanged.
 - Preflight canonical state. Keep it inside the configured writable workspace and use normal non-escalated file tools. Do not infer failure from stale permission metadata; use the prepared `pending_digest` edit as the authoritative writeability test immediately before delivery.
 - Preserve duplicate prevention. Maintain `last_successful_run_at`, `last_digest_sent_at`, a delivery link/id, optional `pending_digest`, and a bounded `seen` list of recently reported content/action URLs with titles, sources, and timestamps. Keep roughly the latest 200 URLs or 60 days, whichever is smaller.
 - Use a single authenticated browser path. When the user specifies Chrome and local AppleScript, use only that approved path. Do not fall back to other browsers, Computer Use, screenshots, GUI clicking, extension repair, profile inspection, or browser-profile workarounds.
-- Isolate the browser session. Create or reuse only one automation-owned window with one LinkedIn tab. Do not navigate, select, close, scroll, or execute JavaScript in the user's pre-existing browser windows or tabs. Close only the owned window.
+- Isolate the browser session. Launch one new automation-owned window at the start of each run and keep one LinkedIn tab in that window. Do not navigate, select, close, scroll, or execute JavaScript in the user's pre-existing browser windows or tabs. Close only the owned window.
+- Respect service and access boundaries. Do not bypass CAPTCHA, rate limits, authentication checkpoints, bot detection, account restrictions, or LinkedIn access controls. Stop and hand control back to the user when a checkpoint requires their action.
 - Make extraction bounded and durable. Use `scripts/linkedin_digest_candidates.js` and, when inbox triage is requested, `scripts/linkedin_messages_candidates.js`, or preserve their limits in equivalent extraction code. Deduplicate across bands and cap emitted posts, news, links, and text so the complete result remains comfortably below the orchestration transport limit.
 - Return primitive JSON text. Browser JavaScript passed through AppleScript or similar bridges must return `JSON.stringify(...)`, not an object, array, promise, `undefined`, or another non-primitive result.
 - Accumulate long-running output completely. When browser extraction yields a background session/process, poll it until exit and combine every chunk before parsing. Validate required feed JSON and completion metadata before filtering. When the orchestration platform supports a run-scoped object store, save the validated compact payload there and render only small transport metadata; do not depend on a large raw payload being rendered in conversation history.
@@ -105,7 +107,7 @@ _Source: LinkedIn feed/inbox scan. Filtered for knowledge-bearing items only._
 *2) Priority-network signal*
 - [Person](https://www.linkedin.com/in/...) - Useful insight from this person's post or comment. Link: [post](https://www.linkedin.com/feed/update/...)
 
-*3) Inbox triage*
+*3) Inbox triage (include only when the delivery privacy policy permits it)*
 - Review: [Sender](https://www.linkedin.com/in/...) - Why this may need attention and suggested action.
 - Ignore: spam/low-value categories, summarized without over-detailing.
 
@@ -131,5 +133,5 @@ Read `references/automation-prompt-template.md` when creating a reusable schedul
 
 ## Included Extraction Helpers
 
-- `scripts/linkedin_digest_candidates.js` extracts bounded, deduplicated, knowledge-bearing feed candidates and returns primitive JSON text.
+- `scripts/linkedin_digest_candidates.js` extracts bounded, deduplicated, knowledge-bearing feed candidates and returns primitive JSON text with a validated-page flag and cumulative feed-band count.
 - `scripts/linkedin_messages_candidates.js` extracts a bounded local inbox candidate list and returns primitive JSON text. Apply the delivery privacy policy before exporting any result.

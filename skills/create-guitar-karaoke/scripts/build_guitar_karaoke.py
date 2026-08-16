@@ -29,9 +29,21 @@ EXPECTED_CONFIG_SHA256 = "b558996f1e25eb48798bd6502505a5de94c4f966d6edfb1a0420f0
 SEPARATOR_VERSION = "0.44.5"
 TARGET_SAMPLE_RATE = 44_100
 MIN_MODEL_CLIP_SECONDS = 11.0
-TOOL_VERSION = "1.0.0"
+TOOL_VERSION = "1.0.1"
 MANIFEST_SCHEMA_VERSION = 2
 REPORT_SCHEMA_VERSION = 1
+ATTESTATION_SCHEMA_VERSION = 1
+SEPARATOR_SETTINGS = {
+    "model_filename": MODEL_FILENAME,
+    "output_format": "WAV",
+    "sample_rate": TARGET_SAMPLE_RATE,
+    "normalization": 1.0,
+    "amplification": 0.0,
+    "use_soundfile": True,
+    "mdxc_overlap": 8,
+    "mdxc_batch_size": 1,
+    "mdxc_pitch_shift": 0,
+}
 
 
 def audio_modules():
@@ -70,6 +82,16 @@ def hash_file(path: Path) -> str:
         while block := handle.read(8 * 1024 * 1024):
             digest.update(block)
     return digest.hexdigest()
+
+
+def require_sha256(value: Any, label: str) -> str:
+    if (
+        not isinstance(value, str)
+        or len(value) != 64
+        or any(character not in "0123456789abcdefABCDEF" for character in value)
+    ):
+        raise SystemExit(f"{label} must be a complete SHA-256 digest. Rerun --stage prepare.")
+    return value.lower()
 
 
 def program_version(command: list[str]) -> str:
@@ -474,13 +496,16 @@ def prepare(args: argparse.Namespace, ffmpeg: str) -> dict[str, Any]:
 
 
 def load_manifest(work_dir: Path) -> dict[str, Any]:
-    path = work_dir.expanduser().resolve() / "manifest.json"
+    resolved_work_dir = work_dir.expanduser().resolve()
+    path = resolved_work_dir / "manifest.json"
     if not path.is_file():
         raise SystemExit(f"Manifest not found: {path}. Run --stage prepare first.")
     try:
         manifest = json.loads(path.read_text(encoding="utf-8"))
     except (OSError, json.JSONDecodeError) as exc:
         raise SystemExit(f"Manifest is unreadable or invalid JSON: {path}") from exc
+    if not isinstance(manifest, dict):
+        raise SystemExit(f"Manifest must contain a JSON object: {path}")
     schema = manifest.get("schema_version")
     if schema != MANIFEST_SCHEMA_VERSION:
         raise SystemExit(
@@ -508,6 +533,105 @@ def load_manifest(work_dir: Path) -> dict[str, Any]:
     if missing:
         raise SystemExit(
             "Manifest is missing required fields: " + ", ".join(missing) + ". Rerun prepare."
+        )
+
+    manifest["source_sha256"] = require_sha256(
+        manifest["source_sha256"], "Manifest source_sha256"
+    )
+    manifest["master_wav_sha256"] = require_sha256(
+        manifest["master_wav_sha256"], "Manifest master_wav_sha256"
+    )
+    try:
+        recorded_work_dir = Path(manifest["work_dir"]).expanduser().resolve()
+        master_path = Path(manifest["master_wav"]).expanduser().resolve()
+        stems_dir = Path(manifest["stems_dir"]).expanduser().resolve()
+    except (TypeError, ValueError, OSError) as exc:
+        raise SystemExit("Manifest contains an invalid generated path. Rerun prepare.") from exc
+    if recorded_work_dir != resolved_work_dir:
+        raise SystemExit(
+            "Manifest work_dir does not match the directory from which it was loaded. "
+            "Rerun prepare in this work directory."
+        )
+    if master_path != resolved_work_dir / "master.wav":
+        raise SystemExit("Manifest master_wav is outside the expected work state. Rerun prepare.")
+    if stems_dir != resolved_work_dir / "stems":
+        raise SystemExit("Manifest stems_dir is outside the expected work state. Rerun prepare.")
+
+    tiles = manifest["tiles"]
+    if not isinstance(tiles, list):
+        raise SystemExit("Manifest tiles must be a list. Rerun prepare.")
+    if manifest["stem_source"] == "external":
+        external_required = {
+            "external_stem_source",
+            "external_stem_source_sha256",
+            "external_stem_wav",
+            "external_stem_wav_sha256",
+            "external_stem_offset_seconds",
+            "external_stem_gain",
+        }
+        external_missing = sorted(external_required.difference(manifest))
+        if external_missing:
+            raise SystemExit(
+                "External-stem manifest fields are missing: "
+                + ", ".join(external_missing)
+                + ". Rerun prepare."
+            )
+        manifest["external_stem_source_sha256"] = require_sha256(
+            manifest["external_stem_source_sha256"], "Manifest external_stem_source_sha256"
+        )
+        manifest["external_stem_wav_sha256"] = require_sha256(
+            manifest["external_stem_wav_sha256"], "Manifest external_stem_wav_sha256"
+        )
+        try:
+            Path(manifest["external_stem_source"]).expanduser().resolve()
+            external_wav = Path(manifest["external_stem_wav"]).expanduser().resolve()
+        except (TypeError, ValueError, OSError) as exc:
+            raise SystemExit("Manifest external-stem path is invalid. Rerun prepare.") from exc
+        if external_wav != resolved_work_dir / "external-stem.wav":
+            raise SystemExit(
+                "Manifest external_stem_wav is outside the expected work state. Rerun prepare."
+            )
+        if tiles:
+            raise SystemExit("An external-stem manifest must not contain model tiles. Rerun prepare.")
+    elif manifest["stem_source"] == MODEL_LABEL:
+        if not tiles:
+            raise SystemExit("Model manifest contains no prepared tiles. Rerun prepare.")
+        clips_dir = resolved_work_dir / "clips"
+        tile_required = {
+            "clip_wav",
+            "clip_start_frame",
+            "clip_source_frames",
+            "clip_written_frames",
+            "core_start_frame",
+            "core_end_frame",
+            "input_scale",
+            "clip_sha256",
+        }
+        for index, tile in enumerate(tiles, start=1):
+            if not isinstance(tile, dict):
+                raise SystemExit(f"Manifest tile {index} must be an object. Rerun prepare.")
+            tile_missing = sorted(tile_required.difference(tile))
+            if tile_missing:
+                raise SystemExit(
+                    f"Manifest tile {index} is missing fields: "
+                    + ", ".join(tile_missing)
+                    + ". Rerun prepare."
+                )
+            tile["clip_sha256"] = require_sha256(
+                tile["clip_sha256"], f"Manifest tile {index} clip_sha256"
+            )
+            try:
+                clip_path = Path(tile["clip_wav"]).expanduser().resolve()
+            except (TypeError, ValueError, OSError) as exc:
+                raise SystemExit(f"Manifest tile {index} has an invalid clip path.") from exc
+            if not is_within(clip_path, clips_dir):
+                raise SystemExit(
+                    f"Manifest tile {index} points outside the expected clips directory. "
+                    "Rerun prepare."
+                )
+    else:
+        raise SystemExit(
+            f"Unsupported manifest stem_source {manifest['stem_source']!r}. Rerun prepare."
         )
     return manifest
 
@@ -555,19 +679,12 @@ def attestation_core(
     tile: dict[str, Any], checkpoint_hash: str, config_hash: str, version: str
 ) -> dict[str, Any]:
     return {
+        "attestation_schema_version": ATTESTATION_SCHEMA_VERSION,
         "clip_sha256": validated_clip_hash(tile),
         "model_checkpoint_sha256": checkpoint_hash,
         "model_config_sha256": config_hash,
         "audio_separator_version": version,
-        "settings": {
-            "model_filename": MODEL_FILENAME,
-            "sample_rate": TARGET_SAMPLE_RATE,
-            "normalization": 1.0,
-            "amplification": 0.0,
-            "mdxc_overlap": 8,
-            "mdxc_batch_size": 1,
-            "mdxc_pitch_shift": 0,
-        },
+        "settings": dict(SEPARATOR_SETTINGS),
     }
 
 
@@ -619,6 +736,36 @@ def verify_manifest_model_assets(manifest: dict[str, Any]) -> tuple[str, str, st
             "Run --stage separate first."
         )
     return checkpoint_hash, config_hash, version
+
+
+def clear_invalid_model_cache(manifest: dict[str, Any], tiles: list[dict[str, Any]]) -> None:
+    stems_dir = Path(manifest["stems_dir"]).resolve()
+    for tile in tiles:
+        stem_path = expected_guitar_stem(manifest, tile)
+        for path in (stem_path, attestation_path(stem_path)):
+            resolved = path.resolve()
+            if not is_within(resolved, stems_dir):
+                raise SystemExit(f"Refusing to clear a cache path outside stems_dir: {resolved}")
+            path.unlink(missing_ok=True)
+
+
+def validate_model_stem_file(stem_path: Path, tile: dict[str, Any]) -> None:
+    _, sf = audio_modules()
+    try:
+        info = sf.info(stem_path)
+    except (OSError, RuntimeError) as exc:
+        raise SystemExit(f"Generated model stem is unreadable: {stem_path}") from exc
+    expected_frames = int(tile["clip_written_frames"])
+    if (
+        info.samplerate != TARGET_SAMPLE_RATE
+        or info.channels != 2
+        or info.frames != expected_frames
+    ):
+        raise SystemExit(
+            f"Unexpected generated model stem format: {stem_path} is "
+            f"{info.frames} frames, {info.channels} channel(s) at {info.samplerate} Hz; "
+            f"expected {expected_frames} frames, 2 channels at {TARGET_SAMPLE_RATE} Hz."
+        )
 
 
 def separate(args: argparse.Namespace, manifest: dict[str, Any], ffmpeg: str) -> None:
@@ -697,32 +844,36 @@ def separate(args: argparse.Namespace, manifest: dict[str, Any], ffmpeg: str) ->
             f"Insufficient free disk space for separation: need about "
             f"{required_free / 2**30:.2f} GiB, have {free_bytes / 2**30:.2f} GiB."
         )
+    # An invalid or force-refreshed output must not survive a separator run and then be
+    # re-attested merely because the backend did not overwrite a near-silent stem.
+    clear_invalid_model_cache(manifest, missing)
     command = [separator, *[tile["clip_wav"] for tile in missing]]
     command.extend(
         [
             "--model_filename",
-            MODEL_FILENAME,
+            str(SEPARATOR_SETTINGS["model_filename"]),
             "--model_file_dir",
             str(models_dir),
             "--output_dir",
             str(stems_dir),
             "--output_format",
-            "WAV",
+            str(SEPARATOR_SETTINGS["output_format"]),
             "--sample_rate",
-            str(TARGET_SAMPLE_RATE),
+            str(SEPARATOR_SETTINGS["sample_rate"]),
             "--normalization",
-            "1.0",
+            str(SEPARATOR_SETTINGS["normalization"]),
             "--amplification",
-            "0.0",
-            "--use_soundfile",
+            str(SEPARATOR_SETTINGS["amplification"]),
             "--mdxc_overlap",
-            "8",
+            str(SEPARATOR_SETTINGS["mdxc_overlap"]),
             "--mdxc_batch_size",
-            "1",
+            str(SEPARATOR_SETTINGS["mdxc_batch_size"]),
             "--mdxc_pitch_shift",
-            "0",
+            str(SEPARATOR_SETTINGS["mdxc_pitch_shift"]),
         ]
     )
+    if SEPARATOR_SETTINGS["use_soundfile"]:
+        command.append("--use_soundfile")
     run(command, env=environment)
 
     absent = [expected_guitar_stem(manifest, tile) for tile in missing]
@@ -734,6 +885,7 @@ def separate(args: argparse.Namespace, manifest: dict[str, Any], ffmpeg: str) ->
         )
     for tile in missing:
         stem_path = expected_guitar_stem(manifest, tile)
+        validate_model_stem_file(stem_path, tile)
         attestation = attestation_core(tile, checkpoint_hash, config_hash, version)
         attestation["stem_sha256"] = hash_file(stem_path)
         write_manifest(attestation_path(stem_path), attestation)
@@ -809,16 +961,24 @@ def load_estimate(manifest: dict[str, Any]):
     sample_rate = int(manifest["sample_rate"])
     if manifest["stem_source"] == "external":
         external_path = Path(manifest["external_stem_wav"])
-        recorded_hash = manifest.get("external_stem_wav_sha256")
-        if not external_path.is_file() or not recorded_hash:
+        recorded_hash = require_sha256(
+            manifest.get("external_stem_wav_sha256"), "External decoded stem SHA-256"
+        )
+        if not external_path.is_file():
             raise SystemExit("Decoded external stem or its SHA-256 is missing. Rerun prepare.")
         if hash_file(external_path) != recorded_hash:
             raise SystemExit("Decoded external stem no longer matches its preparation SHA-256.")
         source_path = Path(manifest["external_stem_source"])
-        recorded_source_hash = manifest.get("external_stem_source_sha256")
-        if source_path.is_file() and recorded_source_hash:
-            if hash_file(source_path) != recorded_source_hash:
-                raise SystemExit("External stem source no longer matches its preparation SHA-256.")
+        recorded_source_hash = require_sha256(
+            manifest.get("external_stem_source_sha256"), "External source stem SHA-256"
+        )
+        if not source_path.is_file():
+            raise SystemExit(
+                "External stem source is missing; keep it available through the mix stage "
+                "so its preparation SHA-256 can be verified."
+            )
+        if hash_file(source_path) != recorded_source_hash:
+            raise SystemExit("External stem source no longer matches its preparation SHA-256.")
         stem, stem_rate = sf.read(
             external_path, dtype="float32", always_2d=True
         )
@@ -860,6 +1020,12 @@ def load_estimate(manifest: dict[str, Any]):
         stem, stem_rate = sf.read(stem_path, dtype="float32", always_2d=True)
         if stem_rate != sample_rate or stem.shape[1] != 2:
             raise SystemExit(f"Unexpected model stem format: {stem.shape}@{stem_rate}")
+        expected_frames = int(tile["clip_written_frames"])
+        if len(stem) != expected_frames:
+            raise SystemExit(
+                f"Model stem frame count no longer matches its prepared clip: "
+                f"{len(stem)} != {expected_frames} for {stem_path}. Run --stage separate."
+            )
         stem_peak = float(np.max(np.abs(stem))) if len(stem) else 0.0
         if stem_peak >= 0.999999:
             raise SystemExit(
@@ -1101,8 +1267,12 @@ def mix(args: argparse.Namespace, manifest: dict[str, Any], ffmpeg: str) -> dict
         )
 
     master_path = Path(manifest["master_wav"])
-    recorded_master_hash = manifest.get("master_wav_sha256")
-    if recorded_master_hash and hash_file(master_path) != recorded_master_hash:
+    recorded_master_hash = require_sha256(
+        manifest.get("master_wav_sha256"), "Decoded master SHA-256"
+    )
+    if not master_path.is_file():
+        raise SystemExit("Decoded master is missing. Rerun --stage prepare.")
+    if hash_file(master_path) != recorded_master_hash:
         raise SystemExit("Decoded master no longer matches its preparation hash.")
     master, sample_rate = sf.read(manifest["master_wav"], dtype="float32", always_2d=True)
     if sample_rate != int(manifest["sample_rate"]) or len(master) != frames:
@@ -1250,12 +1420,16 @@ def mix(args: argparse.Namespace, manifest: dict[str, Any], ffmpeg: str) -> dict
 
 def validate_resume_arguments(args: argparse.Namespace, manifest: dict[str, Any]) -> None:
     source = args.input.expanduser().resolve()
+    if not source.is_file():
+        raise SystemExit(f"Resume input audio does not exist: {source}")
     if source != Path(manifest["source"]).resolve():
         raise SystemExit(
             f"Resume input does not match the manifest: {source} != {manifest['source']}"
         )
-    recorded_source_hash = manifest.get("source_sha256")
-    if recorded_source_hash and hash_file(source) != recorded_source_hash:
+    recorded_source_hash = require_sha256(
+        manifest.get("source_sha256"), "Source audio SHA-256"
+    )
+    if hash_file(source) != recorded_source_hash:
         raise SystemExit("Resume input contents no longer match the preparation manifest.")
     if args.scope is not None and args.scope != manifest["scope"]:
         raise SystemExit(

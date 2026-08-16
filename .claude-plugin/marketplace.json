@@ -7,6 +7,7 @@
   "plugins": [
     {
       "name": "ai-skills",
+      "version": "1.0.0",
       "source": "./",
       "description": "Reusable agents and skills for ticket checkout, karaoke and guitar-practice media, deal alerts, LinkedIn digests, and travel comparison.",
       "repository": "https://github.com/ajitsutar/AI-Skills"

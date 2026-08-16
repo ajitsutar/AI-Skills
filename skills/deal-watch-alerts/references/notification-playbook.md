@@ -11,8 +11,19 @@ Send external notifications only when all are true:
 - candidate is not a duplicate according to memory and in-thread history
 - the user explicitly authorized the configured channel
 - the notification body follows channel limits and privacy requirements
+- an atomic memory `claim` succeeded for this canonical offer
 
 If any check fails, report in chat only.
+
+For recurring or potentially concurrent runs, use this sequence with the same memory path, deal JSON, and `--config` on every applicable command:
+
+1. Run `deal_memory.py claim` immediately before sending. Stop when status is `duplicate` or `already_claimed`.
+2. Use the returned `deal_key` as the notification provider's idempotency key when supported.
+3. Send only through user-authorized channels, tracking the result for each one. One claim protects the complete multi-channel notification transaction.
+4. If any channel confirms delivery, run `deal_memory.py commit --claim-id <id>` and record all successful, failed, and skipped channels in the notes. Treat partial delivery as delivered; do not automatically retry failed channels.
+5. Run `deal_memory.py release --claim-id <id>` only when every attempted provider proves that no notification was accepted. If any result is ambiguous, retain the claim and stop for manual provider-state review. A claim remains blocking after its advisory expiry; expiration never proves nondelivery.
+
+The compatibility `record` command is safe for a single non-concurrent run, but a separate `check` followed by `record` is not a safe notification gate for recurring workers.
 
 ## Chat Report
 
@@ -67,7 +78,7 @@ Use webhooks only when the user provides or configures a destination. Do not exp
 
 ## Memory Update
 
-Update memory only after a successful external notification. Record:
+A pre-send pending claim is a short-lived reservation, not an alert record. Add to `alerts_sent` only after a successful authorized notification. Record:
 
 - stable deal key
 - store
@@ -80,4 +91,4 @@ Update memory only after a successful external notification. Record:
 - notification date/time
 - notes with the verification summary
 
-If external notification fails, do not mark the deal as alerted unless the user explicitly says the chat report alone counts as an alert.
+If every external notification provably fails before acceptance, release the pending claim and do not mark the deal as alerted. If one channel succeeds and another fails, commit once with per-channel status and do not resend automatically. If any provider outcome is unknown, leave the claim in place so a later run fails closed until the user verifies provider state. A configured chat connector counts as delivery only when the host confirms that the chat message was posted; otherwise chat alone counts only when the user explicitly says so.
