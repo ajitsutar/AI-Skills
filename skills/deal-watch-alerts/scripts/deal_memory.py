@@ -54,6 +54,7 @@ TRACKING_QUERY_PREFIXES = ("utm_",)
 @dataclass(frozen=True)
 class KeyPolicy:
     identity_fields: tuple[str, ...] = DEFAULT_IDENTITY_FIELDS
+    required_identity_fields: tuple[str, ...] = ()
     treat_lower_price_as_new: bool = True
     strip_tracking_parameters: bool = True
 
@@ -85,8 +86,23 @@ def policy_from_config(config: dict[str, Any] | None) -> KeyPolicy:
         normalized_fields.append(field)
     if "currency" not in normalized_fields:
         normalized_fields.append("currency")
+
+    required_fields = memory.get("required_key_fields", ())
+    if not isinstance(required_fields, (list, tuple)) or not all(
+        isinstance(field, str) for field in required_fields
+    ):
+        raise ValueError("memory.required_key_fields must be a list of field names")
+    normalized_required = []
+    for field in required_fields:
+        field = field.strip()
+        if not field or field == "price" or field in normalized_required:
+            continue
+        if field not in normalized_fields:
+            raise ValueError(f"required key field is not present in memory.key_fields: {field}")
+        normalized_required.append(field)
     return KeyPolicy(
         identity_fields=tuple(normalized_fields),
+        required_identity_fields=tuple(normalized_required),
         treat_lower_price_as_new=_config_bool(memory, "treat_lower_price_as_new", True),
         strip_tracking_parameters=_config_bool(memory, "strip_tracking_parameters", True),
     )
@@ -200,6 +216,14 @@ def identity_payload(deal: dict[str, Any], policy: KeyPolicy | None = None) -> d
         if not _is_empty(value):
             payload[field] = _canonical(value)
 
+    missing_required = [
+        field
+        for field in policy.required_identity_fields
+        if _is_empty(_field_value(deal, field, policy))
+    ]
+    if missing_required:
+        raise ValueError(f"deal is missing required key fields: {', '.join(missing_required)}")
+
     identifying = any(
         not _is_empty(deal.get(field))
         for field in ("product_id", "asin", "sku", "item_number", "event_id", "product_url", "final_url", "url", "item_id", "model", "label")
@@ -232,7 +256,13 @@ def build_key(deal: dict[str, Any], policy: KeyPolicy | None = None) -> str:
 
 
 def _empty_memory() -> dict[str, Any]:
-    return {"version": KEY_VERSION, "last_updated": None, "alerts_sent": [], "pending_claims": []}
+    return {
+        "version": KEY_VERSION,
+        "last_updated": None,
+        "alerts_sent": [],
+        "pending_claims": [],
+        "claim_releases": [],
+    }
 
 
 def canonical_memory_path(path: Path) -> Path:
@@ -250,7 +280,8 @@ def _load_json(path: Path, default: Any) -> Any:
         return default
     if not path.is_file():
         raise ValueError(f"memory path is not a file: {path}")
-    with path.open("r", encoding="utf-8") as handle:
+    # utf-8-sig accepts both regular UTF-8 and the BOM emitted by some Windows tools.
+    with path.open("r", encoding="utf-8-sig") as handle:
         return json.load(handle)
 
 
@@ -259,14 +290,37 @@ def read_memory(path: Path) -> dict[str, Any]:
     memory = _load_json(path, _empty_memory())
     if not isinstance(memory, dict):
         raise ValueError("memory file must contain a JSON object")
-    memory.setdefault("version", KEY_VERSION)
+    version = memory.get("version")
+    if version is None:
+        memory["version"] = KEY_VERSION
+    elif isinstance(version, bool) or not isinstance(version, int) or version < 1:
+        raise ValueError("memory version must be a positive integer; manual review is required")
+    elif version > KEY_VERSION:
+        raise ValueError(
+            f"memory version {version} is newer than supported version {KEY_VERSION}; manual review is required"
+        )
     memory.setdefault("last_updated", None)
     memory.setdefault("alerts_sent", [])
     memory.setdefault("pending_claims", [])
+    memory.setdefault("claim_releases", [])
     if not isinstance(memory["alerts_sent"], list):
         raise ValueError("memory alerts_sent must be a list")
     if not isinstance(memory["pending_claims"], list):
         raise ValueError("memory pending_claims must be a list")
+    if not isinstance(memory["claim_releases"], list):
+        raise ValueError("memory claim_releases must be a list")
+
+    alert_keys: set[str] = set()
+    for index, alert in enumerate(memory["alerts_sent"], start=1):
+        if not isinstance(alert, dict):
+            raise ValueError(f"sent alert {index} must be an object; manual review is required")
+        deal_key = alert.get("deal_key")
+        if not isinstance(deal_key, str) or not deal_key:
+            raise ValueError(f"sent alert {index} is missing a valid deal_key; manual review is required")
+        if deal_key in alert_keys:
+            raise ValueError(f"duplicate sent alert deal_key {deal_key!r}; manual review is required")
+        alert_keys.add(deal_key)
+
     claim_ids: set[str] = set()
     for index, claim in enumerate(memory["pending_claims"], start=1):
         if not isinstance(claim, dict):
@@ -288,6 +342,20 @@ def read_memory(path: Path) -> dict[str, Any]:
             raise ValueError(f"pending claim {index} has an invalid timestamp; manual review is required") from exc
         if expires_at <= claimed_at:
             raise ValueError(f"pending claim {index} expires before it was claimed; manual review is required")
+
+    for index, release in enumerate(memory["claim_releases"], start=1):
+        if not isinstance(release, dict):
+            raise ValueError(f"claim release {index} must be an object; manual review is required")
+        required = ("claim_id", "released_at", "reason")
+        missing = [field for field in required if not isinstance(release.get(field), str) or not release[field]]
+        if missing:
+            raise ValueError(
+                f"claim release {index} is missing valid {', '.join(missing)}; manual review is required"
+            )
+        try:
+            _now(release["released_at"])
+        except ValueError as exc:
+            raise ValueError(f"claim release {index} has an invalid timestamp; manual review is required") from exc
     return memory
 
 
@@ -398,6 +466,58 @@ def _record_offer_key(record: dict[str, Any], policy: KeyPolicy) -> str | None:
         return None
 
 
+def _variant_value(record: dict[str, Any], field: str) -> Any:
+    variant = record.get("variant")
+    if isinstance(variant, dict) and not _is_empty(variant.get(field)):
+        return variant.get(field)
+    return record.get(field)
+
+
+def _legacy_record_may_match(alert: dict[str, Any], deal: dict[str, Any], policy: KeyPolicy) -> bool:
+    """Fail closed only when an unkeyable legacy alert plausibly describes this offer."""
+    for field in ("store", "seller", "condition"):
+        prior = alert.get(field)
+        current = deal.get(field)
+        if not _is_empty(prior) and not _is_empty(current) and _canonical(prior) != _canonical(current):
+            return False
+
+    for field in ("screen_size", "ram_gb", "storage_gb", "color"):
+        prior = _variant_value(alert, field)
+        current = _variant_value(deal, field)
+        if not _is_empty(prior) and not _is_empty(current) and _canonical(prior) != _canonical(current):
+            return False
+
+    prior_item = alert.get("item_id")
+    current_item = deal.get("item_id")
+    if not _is_empty(prior_item) and not _is_empty(current_item):
+        return _canonical(prior_item) == _canonical(current_item)
+
+    prior_model = alert.get("model") or alert.get("label")
+    current_model = deal.get("model") or deal.get("label")
+    if not _is_empty(prior_model) and not _is_empty(current_model) and _canonical(prior_model) == _canonical(current_model):
+        return True
+
+    id_fields = ("product_id", "asin", "sku", "item_number", "event_id")
+    prior_ids = {_normalize_text(alert.get(field)) for field in id_fields if not _is_empty(alert.get(field))}
+    current_ids = {_normalize_text(deal.get(field)) for field in id_fields if not _is_empty(deal.get(field))}
+    if prior_ids & current_ids:
+        return True
+
+    prior_url = alert.get("product_url") or alert.get("final_url") or alert.get("url")
+    current_url = deal.get("product_url") or deal.get("final_url") or deal.get("url")
+    for product_id in prior_ids | current_ids:
+        if len(product_id) >= 4 and (
+            (prior_url and product_id in _normalize_text(prior_url))
+            or (current_url and product_id in _normalize_text(current_url))
+        ):
+            return True
+    if prior_url and current_url:
+        prior_parts = urlsplit(_normalize_url(prior_url, policy.strip_tracking_parameters))
+        current_parts = urlsplit(_normalize_url(current_url, policy.strip_tracking_parameters))
+        return (prior_parts.netloc, prior_parts.path) == (current_parts.netloc, current_parts.path)
+    return False
+
+
 def classify_deal(memory: dict[str, Any], deal: dict[str, Any], policy: KeyPolicy | None = None) -> dict[str, Any]:
     policy = policy or KeyPolicy()
     deal_key = build_key(deal, policy)
@@ -407,6 +527,23 @@ def classify_deal(memory: dict[str, Any], deal: dict[str, Any], policy: KeyPolic
         return {"deal_key": deal_key, "offer_key": offer_key, "duplicate": True, "reason": "exact_deal_key"}
 
     same_offer = [alert for alert in alerts if _record_offer_key(alert, policy) == offer_key]
+    ambiguous_legacy = [
+        alert
+        for alert in alerts
+        if _record_offer_key(alert, policy) is None and _legacy_record_may_match(alert, deal, policy)
+    ]
+    if ambiguous_legacy:
+        return {
+            "deal_key": deal_key,
+            "offer_key": offer_key,
+            "duplicate": True,
+            "reason": "legacy_record_requires_migration",
+            "warning": (
+                "A plausible prior alert cannot be canonicalized under the current key policy; "
+                "notification is blocked until the legacy record is migrated or reviewed."
+            ),
+            "legacy_deal_keys": [str(alert.get("deal_key")) for alert in ambiguous_legacy],
+        }
     if not same_offer:
         return {"deal_key": deal_key, "offer_key": offer_key, "duplicate": False, "reason": "new_offer"}
     if not policy.treat_lower_price_as_new:
@@ -611,25 +748,54 @@ def commit_claim(
         return record
 
 
-def release_claim(path: Path, claim_id: str) -> bool:
+def release_claim(
+    path: Path,
+    claim_id: str,
+    *,
+    confirmed_no_delivery: bool = False,
+    reason: str | None = None,
+) -> bool:
+    if not confirmed_no_delivery:
+        raise ValueError("claim release requires explicit confirmation that no provider accepted delivery")
+    reason = " ".join((reason or "").split())
+    if not reason:
+        raise ValueError("claim release requires a non-empty nondelivery reason")
     path = canonical_memory_path(path)
     with memory_lock(path):
         memory = read_memory(path)
-        original = len(memory["pending_claims"])
+        released_claims = [
+            claim
+            for claim in memory["pending_claims"]
+            if isinstance(claim, dict) and claim.get("claim_id") == claim_id
+        ]
         memory["pending_claims"] = [
             claim
             for claim in memory["pending_claims"]
             if not (isinstance(claim, dict) and claim.get("claim_id") == claim_id)
         ]
-        released = len(memory["pending_claims"]) != original
+        released = bool(released_claims)
         if released:
-            memory["last_updated"] = _now().isoformat()
+            released_at = _now().isoformat()
+            claim = released_claims[0]
+            memory["claim_releases"].append(
+                {
+                    "claim_id": claim_id,
+                    "deal_key": claim.get("deal_key"),
+                    "offer_key": claim.get("offer_key"),
+                    "released_at": released_at,
+                    "reason": reason,
+                }
+            )
+            memory["last_updated"] = released_at
             _write_json_atomic(path, memory)
         return released
 
 
 def _read_deal_arg(value: str) -> dict[str, Any]:
-    if value.startswith("@"):
+    stripped = value.lstrip()
+    if stripped.startswith("{"):
+        data = json.loads(stripped)
+    elif value.startswith("@"):
         data = _load_json(Path(value[1:]), None)
     else:
         maybe_path = Path(value)
@@ -698,8 +864,13 @@ def cmd_commit(args: argparse.Namespace) -> int:
 
 
 def cmd_release(args: argparse.Namespace) -> int:
-    released = release_claim(Path(args.memory), args.claim_id)
-    print(json.dumps({"claim_id": args.claim_id, "released": released}, indent=2))
+    released = release_claim(
+        Path(args.memory),
+        args.claim_id,
+        confirmed_no_delivery=args.confirm_no_delivery,
+        reason=args.reason,
+    )
+    print(json.dumps({"claim_id": args.claim_id, "released": released, "reason": args.reason}, indent=2))
     return 0
 
 
@@ -747,9 +918,16 @@ def build_parser() -> argparse.ArgumentParser:
     commit_parser.add_argument("--notes", default=None, help="verification and delivery notes")
     commit_parser.set_defaults(func=cmd_commit)
 
-    release_parser = subparsers.add_parser("release", help="release a claim after notification failure")
+    release_parser = subparsers.add_parser("release", help="release a claim after proven notification failure")
     release_parser.add_argument("--memory", required=True, help="memory JSON path")
     release_parser.add_argument("--claim-id", required=True)
+    release_parser.add_argument(
+        "--confirm-no-delivery",
+        action="store_true",
+        required=True,
+        help="attest that every attempted provider proved it accepted no notification",
+    )
+    release_parser.add_argument("--reason", required=True, help="provider evidence supporting safe release")
     release_parser.set_defaults(func=cmd_release)
 
     record_parser = subparsers.add_parser("record", help="record a sent alert (single-run compatibility mode)")

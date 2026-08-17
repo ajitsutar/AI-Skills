@@ -6,6 +6,15 @@ Use this reference when creating or updating a reusable deal-watch configuration
 
 ```yaml
 watch_name: "short-human-name"
+browser:
+  mode: "headless"
+  isolation: "dedicated_profile"
+  profile_id: "short-human-name"
+  overlap_policy: "fail_closed"
+  continue_on_source_error: true
+  navigation_timeout_seconds: 45
+  settle_seconds: 3
+  checkpoint_file: "./deal_scan_checkpoint.json"
 memory:
   file: "./deal_alert_memory.json"
   duplicate_policy: "stable_key"
@@ -20,6 +29,14 @@ memory:
     - "condition"
     - "seller"
     - "currency"
+  required_key_fields:
+    - "store"
+    - "product_id_or_url"
+    - "item_id"
+    - "model"
+    - "variant"
+    - "condition"
+    - "seller"
 sources:
   - name: "Amazon"
     type: "retailer"
@@ -70,11 +87,19 @@ notifications:
 ## Field Guidance
 
 - `watch_name`: stable name for automation logs, memory files, and summaries.
+- `browser.mode`: use `headless` for unattended checks unless the user explicitly requires a visible browser.
+- `browser.isolation`: use `dedicated_profile` for a watch-specific authenticated profile or `per_run_profile` for an isolated run copy. Never point at the user's everyday browser profile.
+- `browser.profile_id`: stable, watch-specific identifier. Different automations must not share one profile.
+- `browser.overlap_policy`: use `fail_closed` when a profile is already active, or `isolated_copy` only when the launcher can safely create independent run profiles. Do not coordinate unrelated watches with one global browser lock.
+- `browser.continue_on_source_error`: when true, checkpoint the failed source, restart the isolated worker if needed, and continue. Browser-isolation or authentication-integrity failures still stop the run.
+- `browser.navigation_timeout_seconds` and `browser.settle_seconds`: bound page waits. A timeout or blank page becomes `unverifiable`, never `no_match`.
+- `browser.checkpoint_file`: absolute path for recurring automations. Write source status after every source so a later failure does not erase completed coverage.
 - `memory.file`: path to JSON memory. Use an absolute path for recurring automations.
 - `memory.duplicate_policy`: currently only `stable_key` is supported.
 - `memory.treat_lower_price_as_new`: must be YAML/JSON boolean `true` or `false`, not a quoted string. When true, only a price below the best prior alert for the same offer is new; increases remain duplicate.
 - `memory.strip_tracking_parameters`: must be a boolean. It removes fragments and common ad/tracking query parameters from fallback URL identity while preserving meaningful query parameters.
 - `memory.key_fields`: non-empty list of fields that define the same offer. `price` is handled by the lower-price policy and is ignored here; `currency` is always added. The configured fields must produce at least one populated non-currency identity value. Add `shipping` or `availability` only when a change should define a materially different offer.
+- `memory.required_key_fields`: optional subset of `key_fields` that must be populated before computing, claiming, or committing an alert key. Use it for seller, condition, selected variant, and other evidence whose absence could otherwise create an unstable key. Omit only fields genuinely optional for that watch.
 - `sources[].type`: use `retailer`, `marketplace`, `deal_aggregator`, `search`, or `api`.
 - `sources[].urls`: direct product, search, or saved-filter URLs. Prefer direct product URLs when variants matter.
 - `sources[].search_queries`: exact search queries to use when direct URLs fail or when discovery is needed.
@@ -96,6 +121,8 @@ store | product_id_or_final_url | item_id | selected_variant_fields | condition 
 Do not put `price` in `key_fields`; `treat_lower_price_as_new` handles it directionally so a decrease can alert while an increase does not. Currency is always part of identity. The helper canonicalizes case/whitespace and structured variants, sorts meaningful URL query parameters, and excludes fragments and common tracking parameters by default. Never use session IDs, estimated tax, page-load timestamps, or ad click IDs as identity.
 
 For concurrent or recurring runs, call `deal_memory.py claim` immediately before sending and `commit` after any confirmed delivery. Release only when every attempted provider proves it accepted nothing; leave partial or ambiguous transactions committed or pending as described in `notification-playbook.md`. Claim expiry is advisory and never clears a claim automatically. Pass the same `--config` to `key`, `check`, `claim`, `commit`, and `record`; changing policy between operations changes the keys.
+
+The memory helper and browser worker solve different races. Memory claims suppress duplicate notifications. Browser isolation prevents profile corruption and cross-run page interference. Configure both; never rely on the memory lock to make a shared Chrome profile safe.
 
 ## Candidate Result Shape
 

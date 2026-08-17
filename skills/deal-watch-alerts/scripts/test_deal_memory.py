@@ -79,6 +79,24 @@ class DealKeyTests(unittest.TestCase):
             deal_memory.build_offer_key(deal(shipping="$9.99"), policy),
         )
 
+    def test_required_key_fields_fail_closed_when_evidence_is_missing(self):
+        policy = deal_memory.policy_from_config(
+            {
+                "memory": {
+                    "key_fields": ["store", "product_id_or_url", "seller", "currency"],
+                    "required_key_fields": ["store", "product_id_or_url", "seller"],
+                }
+            }
+        )
+        with self.assertRaisesRegex(ValueError, "seller"):
+            deal_memory.build_key(deal(seller=""), policy)
+
+    def test_required_key_fields_must_be_identity_fields(self):
+        with self.assertRaisesRegex(ValueError, "not present"):
+            deal_memory.policy_from_config(
+                {"memory": {"key_fields": ["store", "currency"], "required_key_fields": ["seller"]}}
+            )
+
 
 class DealMemoryTests(unittest.TestCase):
     def test_only_lower_price_is_new_by_default(self):
@@ -161,6 +179,51 @@ class DealMemoryTests(unittest.TestCase):
             with self.assertRaisesRegex(ValueError, "manual review"):
                 deal_memory.claim_deal(memory, deal(), lease_seconds=60)
 
+    def test_future_memory_version_and_malformed_alert_fail_closed(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            memory = Path(temporary) / "memory.json"
+            memory.write_text(json.dumps({"version": deal_memory.KEY_VERSION + 1}), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "newer than supported"):
+                deal_memory.read_memory(memory)
+
+            memory.write_text(json.dumps({"alerts_sent": [{"price": "100"}]}), encoding="utf-8")
+            with self.assertRaisesRegex(ValueError, "deal_key"):
+                deal_memory.read_memory(memory)
+
+    def test_utf8_bom_memory_is_accepted(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            memory = Path(temporary) / "memory.json"
+            memory.write_bytes(b"\xef\xbb\xbf" + json.dumps({"alerts_sent": [], "pending_claims": []}).encode("utf-8"))
+
+            loaded = deal_memory.read_memory(memory)
+
+            self.assertEqual(loaded["alerts_sent"], [])
+            self.assertEqual(loaded["pending_claims"], [])
+
+    def test_plausible_legacy_alert_blocks_notification_until_migrated(self):
+        legacy = deal(price=100)
+        legacy.pop("currency")
+        legacy["deal_key"] = "example:widget-1|Widget|Blue|Large|100"
+        memory = {"alerts_sent": [legacy], "pending_claims": []}
+
+        result = deal_memory.classify_deal(memory, deal(price=90))
+
+        self.assertTrue(result["duplicate"])
+        self.assertEqual(result["reason"], "legacy_record_requires_migration")
+        self.assertEqual(result["legacy_deal_keys"], [legacy["deal_key"]])
+        self.assertIn("blocked", result["warning"])
+
+    def test_materially_different_legacy_offer_is_not_blocked(self):
+        legacy = deal(price=100)
+        legacy.pop("currency")
+        legacy["deal_key"] = "example:widget-1|Widget|Blue|Large|100"
+        memory = {"alerts_sent": [legacy], "pending_claims": []}
+
+        result = deal_memory.classify_deal(memory, deal(seller="Another Seller"))
+
+        self.assertFalse(result["duplicate"])
+        self.assertEqual(result["reason"], "new_offer")
+
     def test_memory_path_is_canonicalized_before_locking(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)
@@ -187,9 +250,22 @@ class DealMemoryTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             memory = Path(temporary) / "memory.json"
             claimed = deal_memory.claim_deal(memory, deal(), lease_seconds=60)
-            self.assertTrue(deal_memory.release_claim(memory, claimed["claim_id"]))
+            with self.assertRaisesRegex(ValueError, "explicit confirmation"):
+                deal_memory.release_claim(memory, claimed["claim_id"])
+            self.assertTrue(
+                deal_memory.release_claim(
+                    memory,
+                    claimed["claim_id"],
+                    confirmed_no_delivery=True,
+                    reason="Provider returned a definitive rejection before acceptance.",
+                )
+            )
             retried = deal_memory.claim_deal(memory, deal(), lease_seconds=60)
             self.assertEqual(retried["status"], "claimed")
+            stored = json.loads(memory.read_text(encoding="utf-8"))
+            self.assertEqual(len(stored["claim_releases"]), 1)
+            self.assertEqual(stored["claim_releases"][0]["claim_id"], claimed["claim_id"])
+            self.assertIn("definitive rejection", stored["claim_releases"][0]["reason"])
 
     def test_concurrent_records_are_not_lost_or_corrupted(self):
         with tempfile.TemporaryDirectory() as temporary:

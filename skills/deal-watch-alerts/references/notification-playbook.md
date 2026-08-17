@@ -21,7 +21,7 @@ For recurring or potentially concurrent runs, use this sequence with the same me
 2. Use the returned `deal_key` as the notification provider's idempotency key when supported.
 3. Send only through user-authorized channels, tracking the result for each one. One claim protects the complete multi-channel notification transaction.
 4. If any channel confirms delivery, run `deal_memory.py commit --claim-id <id>` and record all successful, failed, and skipped channels in the notes. Treat partial delivery as delivered; do not automatically retry failed channels.
-5. Run `deal_memory.py release --claim-id <id>` only when every attempted provider proves that no notification was accepted. If any result is ambiguous, retain the claim and stop for manual provider-state review. A claim remains blocking after its advisory expiry; expiration never proves nondelivery.
+5. Run `deal_memory.py release --claim-id <id> --confirm-no-delivery --reason "<provider evidence>"` only when every attempted provider proves that no notification was accepted. The helper records a release audit entry. If any result is ambiguous, retain the claim and stop for manual provider-state review. A claim remains blocking after its advisory expiry; expiration never proves nondelivery.
 
 The compatibility `record` command is safe for a single non-concurrent run, but a separate `check` followed by `record` is not a safe notification gate for recurring workers.
 
@@ -91,4 +91,4 @@ A pre-send pending claim is a short-lived reservation, not an alert record. Add 
 - notification date/time
 - notes with the verification summary
 
-If every external notification provably fails before acceptance, release the pending claim and do not mark the deal as alerted. If one channel succeeds and another fails, commit once with per-channel status and do not resend automatically. If any provider outcome is unknown, leave the claim in place so a later run fails closed until the user verifies provider state. A configured chat connector counts as delivery only when the host confirms that the chat message was posted; otherwise chat alone counts only when the user explicitly says so.
+If every external notification provably fails before acceptance, release the pending claim with the explicit nondelivery flag and a concise provider-evidence reason; do not mark the deal as alerted. If one channel succeeds and another fails, commit once with per-channel status and do not resend automatically. If any provider outcome is unknown, leave the claim in place so a later run fails closed until the user verifies provider state. A configured chat connector counts as delivery only when the host confirms that the chat message was posted; otherwise chat alone counts only when the user explicitly says so.
