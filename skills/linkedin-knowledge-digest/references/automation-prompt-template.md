@@ -32,9 +32,13 @@ Authenticated browser policy:
 - Launch exactly one new automation-owned browser window at the start of each run and keep one LinkedIn tab in it. Do not navigate, select, close, scroll, or execute JavaScript in the user's pre-existing browser windows or tabs.
 - Close only the automation-owned window when the run finishes or fails.
 - Do not bypass CAPTCHA, rate limits, authentication checkpoints, bot detection, account restrictions, or LinkedIn access controls. Stop for user action when a checkpoint appears.
+- During automation setup, run `scripts/materialize_linkedin_scan_transport.js` once to copy the bounded JavaScript helpers into [AUTOMATION_WORKSPACE] and create [SCAN_MANIFEST_PATH]. Validate that manifest with `scripts/validate_linkedin_scan_transport.js`.
+- In recurring runs, load the tested JSON array from [SCAN_MANIFEST_PATH] and pass each complete line verbatim as its own `osascript -e` argument. Do not regenerate or rewrite AppleScript in the automation turn.
+- Never inline, interpolate, escape, or embed JavaScript source inside AppleScript. Every `execute ... javascript` expression must use JavaScript loaded by AppleScript from a workspace file with `read (POSIX file "...")`.
 
 Durable extraction transport:
 - Use the bounded helper `scripts/linkedin_digest_candidates.js` for feed bands and `scripts/linkedin_messages_candidates.js` when inbox triage is in scope, or preserve their limits in equivalent code. Deduplicate across bands; cap posts, news, content URLs, and text; and keep the complete payload below [MAX_TRANSPORT_BYTES].
+- Feed candidates expose `contentUrls`, not a singular `postUrl`. Select the exact substantive post/article/report URL from that collection and apply the final link audit to the selected URL.
 - Every browser JavaScript expression passed through AppleScript or another bridge must return primitive JSON text via `JSON.stringify(...)`. Never return an object, array, promise, `undefined`, or another non-primitive result.
 - If the browser command continues in a background session/process, poll it until exit and append every output chunk. Parse and validate the complete JSON result before filtering. When a run-scoped object store is available, save the validated compact payload there and render only exit status, byte count, feed-band count, and candidate counts. Do not print the raw extraction payload into conversation history.
 - Required failures include a nonzero browser exit, invalid top-level/required-feed JSON, a false validated-page flag, missing or inconsistent cumulative feed-band metadata, an oversized payload, or fewer than [MIN_FEED_BANDS] successfully inspected feed bands. Do not open a second browser window or rerun the scan after a required failure in the same automation run.
