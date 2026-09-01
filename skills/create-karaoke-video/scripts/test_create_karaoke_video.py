@@ -99,7 +99,7 @@ class KaraokeRendererTests(unittest.TestCase):
 
             filter_value = captured["command"][captured["command"].index("-vf") + 1]
             self.assertEqual(filter_value, "ass=filename=captions.ass")
-            self.assertEqual(Path(captured["cwd"]), root)
+            self.assertEqual(Path(captured["cwd"]).resolve(), root.resolve())
             self.assertNotIn("Guns N' Roses", filter_value)
 
     def test_output_collision_and_overwrite_gate(self):
