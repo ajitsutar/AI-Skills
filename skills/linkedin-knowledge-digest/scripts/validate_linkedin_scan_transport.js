@@ -1,7 +1,10 @@
 const fs = require("fs");
 const path = require("path");
 
-const { HELPER_NAMES } = require("./materialize_linkedin_scan_transport");
+const {
+  HELPER_NAMES,
+  ORCHESTRATOR_NAME
+} = require("./materialize_linkedin_scan_transport");
 
 const manifestPath = process.argv[2];
 if (!manifestPath) {
@@ -38,6 +41,9 @@ for (const helper of HELPER_NAMES) {
   if (!helperPath || !fs.existsSync(helperPath)) failures.push(`helper not found: ${helper}`);
 }
 
+const orchestratorPath = path.join(path.dirname(path.resolve(manifestPath)), ORCHESTRATOR_NAME);
+if (!fs.existsSync(orchestratorPath)) failures.push(`orchestrator not found: ${ORCHESTRATOR_NAME}`);
+
 if (failures.length) {
   console.error(failures.join("\n"));
   process.exit(1);
@@ -48,5 +54,6 @@ console.log(JSON.stringify({
   manifestPath: path.resolve(manifestPath),
   lines: lines.length,
   helpers: HELPER_NAMES.length,
+  orchestrator: ORCHESTRATOR_NAME,
   approvedPrefix: lines[0]
 }));

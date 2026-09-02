@@ -24,10 +24,23 @@ Collect or infer these inputs:
 - Link requirement: whether every referenced person, post, article, company, or message needs a clickable link.
 - State policy for recurring runs: canonical state path, writable workspace, duplicate horizon, and whether to stop if state cannot be updated.
 - Browser policy for authenticated scans: approved browser, allowed automation path, dedicated-window requirement, and forbidden fallbacks.
+- LinkedIn access status: whether the user has an approved LinkedIn developer application and the exact read scopes granted to it.
 - Automation continuity: whether recurring runs must remain attached to the current task/thread or run as standalone jobs.
 - Delivery privacy policy: which private inbox fields, if any, may cross into the selected delivery service.
 
 If authenticated access is unavailable, do not guess. Ask the user to restore access or provide pasted/exported LinkedIn content.
+
+## Access Strategy
+
+Prefer access methods in this order:
+
+1. An official LinkedIn API for which the user's application has the required approved read scope and the intended use is permitted.
+2. User-provided exports, pasted posts, saved links, or other content the user is authorized to process.
+3. Browser extraction only when the user has separately confirmed that LinkedIn permits the automation for this account and use case.
+
+OpenID Connect `profile` and `email` scopes identify the authenticated member; they do not provide the member's home feed or inbox. Publishing access such as `w_member_social` also does not grant read access. Do not represent restricted member, organization, messaging, compliance, or marketing APIs as generally available. Verify the application's granted products and scopes before selecting an API route.
+
+Do not recommend headless Chrome as a way to conceal or bypass website automation. Headless mode still performs automated access and normally requires a separate browser process and isolated user-data directory. Use it only for an authorized test or integration where LinkedIn permits the access and the user does not need the already-running Chrome session.
 
 ## Workflow
 
@@ -86,10 +99,11 @@ Use these stricter rules when building or running an unattended LinkedIn digest 
 - Respect service and access boundaries. Do not bypass CAPTCHA, rate limits, authentication checkpoints, bot detection, account restrictions, or LinkedIn access controls. Stop and hand control back to the user when a checkpoint requires their action.
 - Keep AppleScript static and small. Never inline, interpolate, escape, or embed JavaScript source inside generated AppleScript. Materialize the scan transport once with `scripts/materialize_linkedin_scan_transport.js`; it copies the helper files into the automation workspace and writes a tested JSON array of complete AppleScript source lines with absolute runtime paths.
 - Execute the materialized AppleScript manifest verbatim. Pass each stored line as its own `osascript -e` argument under the approved `tell application "Google Chrome"` prefix. Do not regenerate or rewrite AppleScript in an automation run. Validate the manifest with `scripts/validate_linkedin_scan_transport.js` after materialization and whenever its helpers change.
+- Use `scripts/linkedin_scan_orchestrator.js` for Codex browser runs. Load and evaluate it inside the same orchestration cell that launches and polls `osascript`, then render only its compact result. It reads state before opening Chrome, validates all required feed payloads, degrades optional sources independently, applies state and recency filtering, and removes private inbox details from its output.
 - Make extraction bounded and durable. Use `scripts/linkedin_digest_candidates.js` and, when inbox triage is requested, `scripts/linkedin_messages_candidates.js`, or preserve their limits in equivalent extraction code. Deduplicate across bands and cap emitted posts, news, links, and text so the complete result remains comfortably below the orchestration transport limit.
 - Treat each feed candidate's `contentUrls` as a collection. Do not assume the feed helper returns a singular `postUrl`; select and audit the exact substantive content URL from `contentUrls`.
 - Return primitive JSON text. Browser JavaScript passed through AppleScript or similar bridges must return `JSON.stringify(...)`, not an object, array, promise, `undefined`, or another non-primitive result.
-- Accumulate long-running output completely. When browser extraction yields a background session/process, poll it until exit and combine every chunk before parsing. Validate required feed JSON and completion metadata before filtering. When the orchestration platform supports a run-scoped object store, save the validated compact payload there and render only small transport metadata; do not depend on a large raw payload being rendered in conversation history.
+- Accumulate long-running output completely. When browser extraction yields a background session/process, poll it until exit and combine every chunk before parsing. Validate required feed JSON and completion metadata before filtering. Keep parsing and compaction in that same orchestration cell and render only the compact public candidate summary. A run-scoped object store may be used as an optional cache, but later steps must never depend on retrieving it; cross-cell object stores are not a transaction boundary.
 - Degrade optional sources independently. Feed extraction is required. A malformed or unavailable optional connections/inbox result must not suppress or trigger a retry of an otherwise valid public-feed digest; normalize it to an explicit unavailable result and continue.
 - Scan incrementally. Use the previous successful run plus an overlap window, but do not rely on one stale feed item as a stop condition because LinkedIn Top feed is not chronological. Check at least several feed bands and cap the scan at a reasonable number of bands.
 - Audit links immediately before delivery. Remove every bullet that lacks an actual content/action link. Profile links may support attribution but must not be the only link for an item.
@@ -142,3 +156,4 @@ Read `references/automation-prompt-template.md` when creating a reusable schedul
 - `scripts/linkedin_feed_reset.js` and `scripts/linkedin_feed_scroll.js` reset the bounded feed session and advance one feed band while returning primitive JSON text.
 - `scripts/materialize_linkedin_scan_transport.js` copies the helpers into the automation workspace and creates the static AppleScript manifest used by recurring runs.
 - `scripts/validate_linkedin_scan_transport.js` verifies window isolation, cleanup paths, helper availability, and the no-inline-JavaScript invariant.
+- `scripts/linkedin_scan_orchestrator.js` performs state preflight, manifest execution, complete chunk collection, transport validation, public-candidate compaction, and privacy-safe optional-source degradation in one orchestration call.

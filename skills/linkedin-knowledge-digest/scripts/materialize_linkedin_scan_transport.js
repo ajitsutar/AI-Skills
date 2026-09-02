@@ -8,6 +8,7 @@ const HELPER_NAMES = [
   "linkedin_connections_candidates.js",
   "linkedin_messages_candidates.js"
 ];
+const ORCHESTRATOR_NAME = "linkedin_scan_orchestrator.js";
 
 function appleScriptString(value) {
   return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
@@ -69,6 +70,14 @@ function materialize(destinationDir) {
     if (!fs.existsSync(source)) throw new Error(`Missing bundled helper: ${helper}`);
     if (path.resolve(source) !== path.resolve(destination)) fs.copyFileSync(source, destination);
   }
+  const orchestratorSource = path.join(__dirname, ORCHESTRATOR_NAME);
+  const orchestratorDestination = path.join(destinationDir, ORCHESTRATOR_NAME);
+  if (!fs.existsSync(orchestratorSource)) {
+    throw new Error(`Missing bundled orchestrator: ${ORCHESTRATOR_NAME}`);
+  }
+  if (path.resolve(orchestratorSource) !== path.resolve(orchestratorDestination)) {
+    fs.copyFileSync(orchestratorSource, orchestratorDestination);
+  }
 
   const manifestPath = path.join(destinationDir, "linkedin_scan_applescript_lines.json");
   const lines = buildManifest(path.resolve(destinationDir));
@@ -87,8 +96,9 @@ if (require.main === module) {
     ok: true,
     manifestPath: result.manifestPath,
     lines: result.lines.length,
-    helpers: HELPER_NAMES.length
+    helpers: HELPER_NAMES.length,
+    orchestrator: ORCHESTRATOR_NAME
   }));
 }
 
-module.exports = { HELPER_NAMES, buildManifest, materialize };
+module.exports = { HELPER_NAMES, ORCHESTRATOR_NAME, buildManifest, materialize };
