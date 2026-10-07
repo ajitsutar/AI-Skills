@@ -1,0 +1,180 @@
+{
+  "schema_version": 3,
+  "mode": "paper",
+  "deployment_context": "personal",
+  "description": "Illustrative personal starting policy. DEMO symbols and thresholds require user configuration and approval; no live grant.",
+  "allow_leverage": false,
+  "allow_shorting": false,
+  "sleeves": {
+    "core": "0.80",
+    "swing": "0.10",
+    "intraday": "0.05"
+  },
+  "core_targets": {
+    "CORE_A": "0.30",
+    "CORE_B": "0.30",
+    "CORE_C": "0.20"
+  },
+  "allowed_symbols": [
+    "DEMO",
+    "CORE_A",
+    "CORE_B",
+    "CORE_C"
+  ],
+  "allowed_setups": [
+    "core_rebalance",
+    "sma_trend",
+    "opening_range_breakout"
+  ],
+  "setup_sleeves": {
+    "core_rebalance": [
+      "core"
+    ],
+    "sma_trend": [
+      "swing"
+    ],
+    "opening_range_breakout": [
+      "intraday"
+    ]
+  },
+  "live_validated_setups": [],
+  "autonomous_sleeves": [
+    "core",
+    "swing",
+    "intraday"
+  ],
+  "limits": {
+    "single_stock": "0.10",
+    "single_etf": "0.30",
+    "sector": "0.35",
+    "risk_per_trade": "0.001",
+    "open_risk": "0.005",
+    "daily_loss": "0.01",
+    "weekly_loss": "0.025",
+    "drawdown": "0.10",
+    "cash_floor": "0.05",
+    "max_quote_age_seconds": 15,
+    "max_snapshot_age_seconds": 60,
+    "max_spread_bps": 20,
+    "max_order_notional": "5000",
+    "max_price_deviation_bps": 100,
+    "max_positions": 12,
+    "max_orders_per_day": 10,
+    "max_daily_turnover": "15000",
+    "min_reward_risk": "2.0",
+    "min_daily_dollar_volume": "20000000",
+    "slippage_bps": 5,
+    "fee_per_share": "0.005",
+    "no_entry_minutes_before_close": 30,
+    "stress_loss_fraction": "0.20",
+    "portfolio_annualized_volatility": "0.25"
+  },
+  "configuration_status": "draft",
+  "requirements": {
+    "core_fundamental_review": true,
+    "portfolio_lookthrough": true,
+    "portfolio_covariance": true,
+    "candidate_max_age_days": 7,
+    "fund_holdings_max_age_days": 7,
+    "garch_max_age_hours": 120,
+    "garch_by_sleeve": {
+      "core": false,
+      "swing": true,
+      "intraday": true
+    },
+    "garch_periods_per_year": 252,
+    "garch_bar_interval": "1d",
+    "garch_target_period_volatility": "0.015",
+    "strategy_validation_required_modes": [
+      "approval",
+      "bounded_autonomous"
+    ]
+  },
+  "event_policies": {
+    "core": {
+      "scope": "entry_only",
+      "before_sessions": 1,
+      "after_sessions": 1,
+      "max_age_seconds": 3600,
+      "exchange": "XNYS",
+      "blocked_kinds": [
+        "earnings",
+        "merger_vote",
+        "regulatory_decision",
+        "material_corporate_action"
+      ]
+    },
+    "swing": {
+      "scope": "holding_window",
+      "before_sessions": 1,
+      "after_sessions": 1,
+      "max_age_seconds": 3600,
+      "exchange": "XNYS",
+      "blocked_kinds": [
+        "earnings",
+        "merger_vote",
+        "regulatory_decision",
+        "material_corporate_action"
+      ]
+    },
+    "intraday": {
+      "scope": "holding_window",
+      "before_sessions": 1,
+      "after_sessions": 1,
+      "max_age_seconds": 3600,
+      "exchange": "XNYS",
+      "blocked_kinds": [
+        "earnings",
+        "merger_vote",
+        "regulatory_decision",
+        "material_corporate_action"
+      ]
+    }
+  },
+  "stress_scenarios": [
+    {
+      "name": "Broad decline (illustrative)",
+      "default_shock": "-0.20"
+    },
+    {
+      "name": "Technology shock (illustrative)",
+      "default_shock": "-0.10",
+      "sectors": {
+        "technology": "-0.40"
+      }
+    }
+  ],
+  "strategy_registry": {
+    "sma_trend": {
+      "version": "unvalidated-baseline-1",
+      "approved_report_hash": null,
+      "criteria": {
+        "test_min_trades": 100,
+        "forward_paper_min_trades": 50,
+        "max_drawdown": 0.05,
+        "min_net_expectancy_per_trade": 0,
+        "min_excess_return": 0,
+        "minimum_stress_cost_multiplier": 2
+      },
+      "live_adapter_status": "research_only_no_live_adapter"
+    },
+    "opening_range_breakout": {
+      "version": "unvalidated-baseline-1",
+      "approved_report_hash": null,
+      "criteria": {
+        "test_min_trades": 100,
+        "forward_paper_min_trades": 50,
+        "max_drawdown": 0.05,
+        "min_net_expectancy_per_trade": 0,
+        "min_excess_return": 0,
+        "minimum_stress_cost_multiplier": 2
+      },
+      "signal_parameters": {
+        "opening_bars": 3,
+        "bar_minutes": 5
+      },
+      "implementation_sha256": "faf4a00017853c7ab71e6ffaa7fa9d73029c7d19ce6ad7e992736c5b96574376",
+      "max_entries_per_symbol_session": 1
+    }
+  }
+}

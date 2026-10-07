@@ -1,0 +1,8 @@
+{
+  "equity": "100000", "cash": "20000",
+  "holdings": {"CORE_A": "250", "CORE_B": "250", "CORE_C": "200"},
+  "targets": {"CORE_A": "0.30", "CORE_B": "0.30", "CORE_C": "0.20"},
+  "prices": {"CORE_A": "100", "CORE_B": "100", "CORE_C": "100"},
+  "cash_floor": "0.05", "band": "0.02", "min_trade": "50",
+  "max_turnover": "0.05", "allow_sales": false
+}

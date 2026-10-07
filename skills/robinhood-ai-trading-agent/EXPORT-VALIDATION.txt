@@ -1,0 +1,19 @@
+AI-Skills repository export verification
+UTC: 2026-10-07T22:06:53.000868+00:00
+Repository: https://github.com/ajitsutar/AI-Skills
+Base commit: 0c2696cdcc63eecc617c6c677cd96d05bc0ece7c
+Skill: robinhood-ai-trading-agent v3.1.0
+Claude plugin/catalog version: 1.1.0
+
+180 trading skill offline regression tests passed on Windows; zero skips.
+Repository portability validator passed for all seven skills, including JavaScript syntax checks.
+Repository safety scan passed.
+All 26 Python files have AST-equivalent code to the standalone v3.1 ZIP.
+The export uses repository-compatible metadata and retains the Robinhood name.
+The final package manifest is regenerated for these exact exported files.
+
+Not run locally: Claude CLI strict plugin validation (CLI unavailable), Linux tests,
+other skills' unchanged functional suites, or any authenticated broker integration.
+The existing CI retains strict Claude validation; the added trading tests run in
+the existing Windows/Linux matrix after the user publishes the changes.
+No remote repository changes, account connection, installation, trade or schedule.

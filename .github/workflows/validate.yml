@@ -44,6 +44,10 @@ jobs:
         run: node skills/linkedin-knowledge-digest/scripts/test_linkedin_candidates.js
       - name: Run LinkedIn scan orchestrator tests
         run: node skills/linkedin-knowledge-digest/scripts/test_linkedin_scan_orchestrator.js
+      - name: Install trading skill test dependencies
+        run: python -m pip install -r skills/robinhood-ai-trading-agent/requirements-tested.txt
+      - name: Run trading skill offline tests
+        run: python -m unittest discover -s skills/robinhood-ai-trading-agent/tests -v
       - name: Scan export safety
         run: python scripts/safety_scan.py
       - name: Validate plugin JSON

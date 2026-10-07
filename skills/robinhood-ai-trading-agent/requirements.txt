@@ -1,0 +1,7 @@
+numpy>=2.4,<3
+scipy>=1.17,<2
+exchange_calendars>=4.13,<5
+yfinance>=1.7,<2
+jsonschema>=4.26,<5
+requests>=2.32,<3
+tzdata>=2025.1

@@ -1,0 +1,8 @@
+{
+  "test_min_trades": 100,
+  "forward_paper_min_trades": 50,
+  "max_drawdown": 0.05,
+  "min_net_expectancy_per_trade": 0,
+  "min_excess_return": 0,
+  "minimum_stress_cost_multiplier": 2
+}

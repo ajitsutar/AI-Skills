@@ -1,0 +1,34 @@
+{
+  "schema_version": 1,
+  "data_kind": "fictional",
+  "symbol": "FICTION_DAILY",
+  "provider": "Bundled synthetic learning fixture",
+  "provider_field": "fictional-daily.csv:close",
+  "retrieved_at": "2026-10-07T16:00:00Z",
+  "csv_sha256": "049a463d266d1ca673b95694aebeef353f7ddfbf300ec71623ecec548d19f205",
+  "close_column": "close",
+  "timestamp_column": "timestamp",
+  "bar_interval": "1d",
+  "periods_per_year": 252,
+  "price_basis": "split_adjusted",
+  "adjustment_notes": "Fictional continuous prices; no real securities or corporate actions",
+  "corporate_actions": {
+    "status": "reviewed",
+    "window_start": "2025-01-02T21:00:00+00:00",
+    "window_end": "2026-04-08T21:00:00+00:00",
+    "evidence": [
+      "Offline generated fixture: not exchange prices or an official calendar"
+    ],
+    "events": []
+  },
+  "session_review": {
+    "status": "reviewed",
+    "window_start": "2025-01-02T21:00:00+00:00",
+    "window_end": "2026-04-08T21:00:00+00:00",
+    "evidence": [
+      "Offline generated fixture: not exchange prices or an official calendar"
+    ],
+    "calendar": "Fictional weekday sequence, not a market holiday calendar"
+  },
+  "large_move_reviews": []
+}

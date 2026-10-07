@@ -1,0 +1,8 @@
+{
+  "endpoint": "https://agent.robinhood.com/mcp/trading",
+  "account_alias": "REPLACE_WITH_LOCAL_ALIAS",
+  "account_routing_verified": false,
+  "source": "UNOBSERVED_TEMPLATE",
+  "checked_at": null,
+  "operations": {}
+}

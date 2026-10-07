@@ -1,0 +1,39 @@
+{
+  "schema_version": 1,
+  "description": "Editable research preferences, read by the skill; not execution policy or an automatic data scanner",
+  "long_term": {
+    "universe": {
+      "kind": "index",
+      "name": "S&P 500",
+      "constituents_source": null,
+      "constituents_as_of": null,
+      "frozen_security_list_path": null
+    },
+    "peer_basis": "industry_and_business_model_first_sector_as_context",
+    "horizon_years_assumption": [
+      3,
+      5
+    ],
+    "candidate_count_rule": "evidence_and_suitability_no_fixed_count",
+    "risk_profile": null,
+    "run_record": "templates/screen-review.md; optional structured run_spec documented in references/research-run-methodology.md",
+    "selection_method": "Declare filters, deeper-review selection and ranking for the request; no universal score or PEG gate",
+    "report_rule": "Classify first; separate Eligible comparison, Watch research priorities and speculative ideas"
+  },
+  "intraday": {
+    "universe": {
+      "kind": "explicit_watchlist",
+      "name": "Editable intraday watchlist (fictional example)",
+      "symbols": [
+        "DEMO"
+      ]
+    },
+    "registered_setup": "opening_range_breakout",
+    "bar_interval_minutes": 5,
+    "regular_session_only": true,
+    "require_long_term_value_eligibility": false,
+    "volatility_context": "daily_background_or_separately_validated_intraday_model",
+    "event_blackout_policy": "Define session-based windows and release conditions in the strategy card before entries"
+  },
+  "execution_authorized": false
+}
