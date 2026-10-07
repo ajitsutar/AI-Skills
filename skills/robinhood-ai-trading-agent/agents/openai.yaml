@@ -1,0 +1,4 @@
+interface:
+  display_name: "Robinhood Portfolio and Trading Agent"
+  short_description: "Portfolio research and supervised personal trading"
+  default_prompt: "Use $robinhood-ai-trading-agent to review my portfolio, configure its research universe and check readiness in paper mode."
