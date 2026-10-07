@@ -1,0 +1,119 @@
+OFFLINE LEARNING PACKAGE VALIDATION
+Date: October 6, 2026 (America/Los_Angeles)
+Python: 3.11.3 (tags/v3.11.3:f3909b8, Apr  4 2023, 23:49:59) [MSC v.1934 64 bit (AMD64)]
+All examples use fictional data. No broker connection or order submission.
+
+Numerical dependencies: NumPy 2.4.6; SciPy 1.17.1
+COMMAND: python -m unittest discover -s tests -v
+EXIT: 0
+
+test_daily_strategy_rejects_intraday_bars (test_models_and_replay.ReplayTests.test_daily_strategy_rejects_intraday_bars) ... ok
+test_forward_windows_do_not_overlap (test_models_and_replay.ReplayTests.test_forward_windows_do_not_overlap) ... ok
+test_future_bar_does_not_change_existing_signal (test_models_and_replay.ReplayTests.test_future_bar_does_not_change_existing_signal) ... ok
+test_gap_above_entry_limit_is_skipped (test_models_and_replay.ReplayTests.test_gap_above_entry_limit_is_skipped) ... ok
+test_missing_opening_bar_suppresses_signal (test_models_and_replay.ReplayTests.test_missing_opening_bar_suppresses_signal) ... ok
+test_more_costs_do_not_improve_same_trade (test_models_and_replay.ReplayTests.test_more_costs_do_not_improve_same_trade) ... ok
+test_next_bar_entry_and_stop_first_ambiguity (test_models_and_replay.ReplayTests.test_next_bar_entry_and_stop_first_ambiguity) ... ok
+test_no_fill_with_zero_volume (test_models_and_replay.ReplayTests.test_no_fill_with_zero_volume) ... ok
+test_opening_range_requires_completed_window (test_models_and_replay.ReplayTests.test_opening_range_requires_completed_window) ... ok
+test_read_rejects_duplicate_and_invalid_bars (test_models_and_replay.ReplayTests.test_read_rejects_duplicate_and_invalid_bars) ... ok
+test_constant_and_nonfinite_data_rejected (test_models_and_replay.VolatilityTests.test_constant_and_nonfinite_data_rejected) ... ok
+test_egarch_multistep_is_explicitly_unsupported (test_models_and_replay.VolatilityTests.test_egarch_multistep_is_explicitly_unsupported) ... ok
+test_egarch_one_step_uses_last_innovation (test_models_and_replay.VolatilityTests.test_egarch_one_step_uses_last_innovation) ... ok
+test_failed_fit_cannot_forecast (test_models_and_replay.VolatilityTests.test_failed_fit_cannot_forecast) ... ok
+test_fitting_synthetic_returns_produces_feasible_variance (test_models_and_replay.VolatilityTests.test_fitting_synthetic_returns_produces_feasible_variance) ... ok
+test_garch_multistep_keeps_expected_shock_variance (test_models_and_replay.VolatilityTests.test_garch_multistep_keeps_expected_shock_variance) ... ok
+test_gjr_uses_symmetric_future_negative_shock_expectation (test_models_and_replay.VolatilityTests.test_gjr_uses_symmetric_future_negative_shock_expectation) ... ok
+test_holdout_updates_from_observed_past_not_future (test_models_and_replay.VolatilityTests.test_holdout_updates_from_observed_past_not_future) ... ok
+test_zero_length_holdout_is_not_ok (test_models_and_replay.VolatilityTests.test_zero_length_holdout_is_not_ok) ... ok
+test_authorized_bounded_order (test_risk_and_execution.ExecutionTests.test_authorized_bounded_order) ... ok
+test_autonomous_warnings_block (test_risk_and_execution.ExecutionTests.test_autonomous_warnings_block) ... ok
+test_broker_approval_cannot_be_bypassed (test_risk_and_execution.ExecutionTests.test_broker_approval_cannot_be_bypassed) ... ok
+test_changed_broker_snapshot_needs_new_review (test_risk_and_execution.ExecutionTests.test_changed_broker_snapshot_needs_new_review) ... ok
+test_changed_exact_approval (test_risk_and_execution.ExecutionTests.test_changed_exact_approval) ... ok
+test_concurrent_claims_only_one_wins (test_risk_and_execution.ExecutionTests.test_concurrent_claims_only_one_wins) ... ok
+test_cumulative_fill_cannot_regress_or_overfill (test_risk_and_execution.ExecutionTests.test_cumulative_fill_cannot_regress_or_overfill) ... ok
+test_duplicate_across_restart (test_risk_and_execution.ExecutionTests.test_duplicate_across_restart) ... ok
+test_filled_requires_entire_quantity (test_risk_and_execution.ExecutionTests.test_filled_requires_entire_quantity) ... ok
+test_learning_context_blocks_even_with_live_mode (test_risk_and_execution.ExecutionTests.test_learning_context_blocks_even_with_live_mode) ... ok
+test_live_requires_human_record (test_risk_and_execution.ExecutionTests.test_live_requires_human_record) ... ok
+test_new_id_cannot_replay_same_signal_after_fill (test_risk_and_execution.ExecutionTests.test_new_id_cannot_replay_same_signal_after_fill) ... ok
+test_new_order_requires_snapshot_reconciliation_after_last_fill (test_risk_and_execution.ExecutionTests.test_new_order_requires_snapshot_reconciliation_after_last_fill) ... ok
+test_paper_never_returns_live_permission (test_risk_and_execution.ExecutionTests.test_paper_never_returns_live_permission) ... ok
+test_partial_cancel_retains_fills_and_is_idempotent (test_risk_and_execution.ExecutionTests.test_partial_cancel_retains_fills_and_is_idempotent) ... ok
+test_policy_change_invalidates_mandate (test_risk_and_execution.ExecutionTests.test_policy_change_invalidates_mandate) ... ok
+test_protection_is_required (test_risk_and_execution.ExecutionTests.test_protection_is_required) ... ok
+test_revoked_authorization (test_risk_and_execution.ExecutionTests.test_revoked_authorization) ... ok
+test_timeout_blocks_other_intents (test_risk_and_execution.ExecutionTests.test_timeout_blocks_other_intents) ... ok
+test_unvalidated_strategy_blocked (test_risk_and_execution.ExecutionTests.test_unvalidated_strategy_blocked) ... ok
+test_existing_destination_is_preserved (test_risk_and_execution.InstallerTests.test_existing_destination_is_preserved) ... ok
+test_recursive_copy_is_rejected (test_risk_and_execution.InstallerTests.test_recursive_copy_is_rejected) ... ok
+test_separate_temporary_copy_excludes_runtime_state (test_risk_and_execution.InstallerTests.test_separate_temporary_copy_excludes_runtime_state) ... ok
+test_cash_first_and_drift_band (test_risk_and_execution.PortfolioTests.test_cash_first_and_drift_band) ... ok
+test_external_deposit_is_not_profit (test_risk_and_execution.PortfolioTests.test_external_deposit_is_not_profit) ... ok
+test_flow_adjusted_drawdown (test_risk_and_execution.PortfolioTests.test_flow_adjusted_drawdown) ... ok
+test_no_funding_from_unfilled_sale (test_risk_and_execution.PortfolioTests.test_no_funding_from_unfilled_sale) ... ok
+test_small_budget_does_not_force_unaffordable_stock (test_risk_and_execution.PortfolioTests.test_small_budget_does_not_force_unaffordable_stock) ... ok
+test_breached_existing_stop_blocks_more_risk (test_risk_and_execution.RiskTests.test_breached_existing_stop_blocks_more_risk) ... ok
+test_core_cannot_be_sold_by_day_sleeve (test_risk_and_execution.RiskTests.test_core_cannot_be_sold_by_day_sleeve) ... ok
+test_core_requires_target (test_risk_and_execution.RiskTests.test_core_requires_target) ... ok
+test_crossed_quote (test_risk_and_execution.RiskTests.test_crossed_quote) ... ok
+test_daily_weekly_drawdown_loss_breakers (test_risk_and_execution.RiskTests.test_daily_weekly_drawdown_loss_breakers) ... ok
+test_early_close (test_risk_and_execution.RiskTests.test_early_close) ... ok
+test_fractional_and_tick_rejected (test_risk_and_execution.RiskTests.test_fractional_and_tick_rejected) ... ok
+test_halt (test_risk_and_execution.RiskTests.test_halt) ... ok
+test_missing_quote (test_risk_and_execution.RiskTests.test_missing_quote) ... ok
+test_nan_inf_and_missing_fail_closed (test_risk_and_execution.RiskTests.test_nan_inf_and_missing_fail_closed) ... ok
+test_no_fake_account_alias (test_risk_and_execution.RiskTests.test_no_fake_account_alias) ... ok
+test_non_trading_day (test_risk_and_execution.RiskTests.test_non_trading_day) ... ok
+test_pending_buy_counts_toward_sleeve (test_risk_and_execution.RiskTests.test_pending_buy_counts_toward_sleeve) ... ok
+test_pending_exit_not_repeated (test_risk_and_execution.RiskTests.test_pending_exit_not_repeated) ... ok
+test_policy_allocations_cannot_exceed_capital (test_risk_and_execution.RiskTests.test_policy_allocations_cannot_exceed_capital) ... ok
+test_position_cash_equity_mismatch (test_risk_and_execution.RiskTests.test_position_cash_equity_mismatch) ... ok
+test_price_deviation_is_bounded (test_risk_and_execution.RiskTests.test_price_deviation_is_bounded) ... ok
+test_risk_and_reward_caps (test_risk_and_execution.RiskTests.test_risk_and_reward_caps) ... ok
+test_sell_can_reduce_during_loss_breaker_and_kill_switch (test_risk_and_execution.RiskTests.test_sell_can_reduce_during_loss_breaker_and_kill_switch) ... ok
+test_size_includes_round_trip_friction (test_risk_and_execution.RiskTests.test_size_includes_round_trip_friction) ... ok
+test_spread (test_risk_and_execution.RiskTests.test_spread) ... ok
+test_stale_account (test_risk_and_execution.RiskTests.test_stale_account) ... ok
+test_stale_and_future_quote (test_risk_and_execution.RiskTests.test_stale_and_future_quote) ... ok
+test_stop_wrong_side (test_risk_and_execution.RiskTests.test_stop_wrong_side) ... ok
+test_unknown_order_halts (test_risk_and_execution.RiskTests.test_unknown_order_halts) ... ok
+test_unsettled_cash_cannot_buy (test_risk_and_execution.RiskTests.test_unsettled_cash_cannot_buy) ... ok
+test_valid_fixture (test_risk_and_execution.RiskTests.test_valid_fixture) ... ok
+
+----------------------------------------------------------------------
+Ran 74 tests in 0.799s
+
+OK
+
+COMMAND: python <skill-creator>/scripts/quick_validate.py <workspace>\outputs\robinhood-ai-trading-agent
+EXIT: 0
+Skill is valid!
+
+
+COMMAND: python scripts/learning_demo.py
+EXIT: 0
+PASS: paper permission, stale-quote rejection, retained partial fills and duplicate blocking
+COMMAND: python scripts/risk_engine.py templates/policy.example.json examples/snapshot.json examples/order.json --as-of 2026-10-06T14:00:00Z
+EXIT: 0
+COMMAND: python scripts/risk_engine.py templates/policy.example.json examples/snapshot.json examples/order.json --as-of 2026-10-06T15:00:00Z
+EXIT: 2
+COMMAND: python scripts/portfolio_manager.py examples/small-account.json
+EXIT: 0
+PASS: $500 fictional allocation keeps $455 cash before fees under sample target caps
+COMMAND: python scripts/strategy_lab.py examples/fictional-intraday.csv --strategy opening_range_breakout
+EXIT: 0
+PASS: opening_range_breakout replay completed; 3 artificial closed trades; no performance validation claimed
+COMMAND: python scripts/strategy_lab.py examples/fictional-daily.csv --strategy sma_trend
+EXIT: 0
+PASS: sma_trend replay completed; 13 artificial closed trades; no performance validation claimed
+COMMAND: python scripts/strategy_lab.py examples/fictional-daily.csv --strategy sma_trend --walk-forward
+EXIT: 0
+PASS: 13 independent capital-reset forward windows
+COMMAND: python scripts/garch_volatility.py examples/fictional-daily.csv --model auto --horizon 5
+EXIT: 0
+PASS: numerical fit/holdout/forecast on artificial CSV; selected garch
+PASS: all Python source compiles
+PASS: all Markdown local links resolve
+No live broker, calendar provider or market-data integration test was performed.

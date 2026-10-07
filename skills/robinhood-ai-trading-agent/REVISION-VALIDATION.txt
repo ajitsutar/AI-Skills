@@ -1,0 +1,8 @@
+Version 2.1.0 revision validation — October 7, 2026 (America/Los_Angeles)
+Scope: skill routing, instructions and packaging; no broker access or live actions.
+PASS: Skill is valid!
+PASS: all Python helpers byte-for-byte unchanged from the previously tested delivery
+Previous delivery contained the GARCH reference and calculator; main-file routing was implicit.
+PASS: documented GARCH baseline command; fictional 330 prices, 329 returns, 289 training and 40 holdout returns
+PASS: all local Markdown links resolve
+Full numerical suite was not rerun for this documentation-only revision; original 74-test transcript retained.

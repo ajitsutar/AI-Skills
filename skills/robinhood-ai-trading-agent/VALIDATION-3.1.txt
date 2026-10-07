@@ -1,0 +1,1825 @@
+Robinhood personal skill v3.1.0 release verification
+UTC: 2026-10-07T21:40:18.969999+00:00
+Python: 3.11.3
+180 tests passed in the source folder; zero skips.
+The same 180 tests passed from a separately extracted portable archive.
+All delivered source/fixture bytes matched that extracted copy.
+Skill format, syntax, JSON and CLI examples passed; paper/draft doctor exit 2 was expected.
+No brokerage connection, credential access, live trade or schedule was created.
+The final ZIP adds this completed validation receipt and its manifest; code/fixtures are unchanged from the extracted test.
+Historical v3.0 public history adapter smoke (not repeated in this release): SPY 2024, 252/252 XNYS sessions, complete coverage, unreviewed corporate actions, never an execution quote.
+Historical public smoke source CSV SHA256: 6f19f7c2396d4f1867d409ffb0a5c542cf913345ce72fd7511da8211136fb482
+
+[Skill format] exit=0
+Skill is valid!
+
+[Full regression suite] exit=0
+test_daily_strategy_rejects_intraday_bars (test_models_and_replay.ReplayTests.test_daily_strategy_rejects_intraday_bars) ... ok
+test_five_percent_sleeve_on_small_account_can_size_zero (test_models_and_replay.ReplayTests.test_five_percent_sleeve_on_small_account_can_size_zero) ... ok
+test_forward_windows_do_not_overlap (test_models_and_replay.ReplayTests.test_forward_windows_do_not_overlap) ... ok
+test_future_bar_does_not_change_existing_signal (test_models_and_replay.ReplayTests.test_future_bar_does_not_change_existing_signal) ... ok
+test_gap_above_entry_limit_is_skipped (test_models_and_replay.ReplayTests.test_gap_above_entry_limit_is_skipped) ... ok
+test_intraday_time_exit_and_illiquid_residual (test_models_and_replay.ReplayTests.test_intraday_time_exit_and_illiquid_residual) ... ok
+test_missing_next_intraday_bar_expires_entry (test_models_and_replay.ReplayTests.test_missing_next_intraday_bar_expires_entry) ... ok
+test_missing_opening_bar_suppresses_signal (test_models_and_replay.ReplayTests.test_missing_opening_bar_suppresses_signal) ... ok
+test_more_costs_do_not_improve_same_trade (test_models_and_replay.ReplayTests.test_more_costs_do_not_improve_same_trade) ... ok
+test_next_bar_entry_and_stop_first_ambiguity (test_models_and_replay.ReplayTests.test_next_bar_entry_and_stop_first_ambiguity) ... ok
+test_no_fill_with_zero_volume (test_models_and_replay.ReplayTests.test_no_fill_with_zero_volume) ... ok
+test_no_second_intraday_entry_after_exit_same_session (test_models_and_replay.ReplayTests.test_no_second_intraday_entry_after_exit_same_session) ... ok
+test_opening_range_requires_completed_window (test_models_and_replay.ReplayTests.test_opening_range_requires_completed_window) ... ok
+test_read_rejects_duplicate_and_invalid_bars (test_models_and_replay.ReplayTests.test_read_rejects_duplicate_and_invalid_bars) ... ok
+test_constant_and_nonfinite_data_rejected (test_models_and_replay.VolatilityTests.test_constant_and_nonfinite_data_rejected) ... ok
+test_egarch_multistep_is_explicitly_unsupported (test_models_and_replay.VolatilityTests.test_egarch_multistep_is_explicitly_unsupported) ... ok
+test_egarch_one_step_uses_last_innovation (test_models_and_replay.VolatilityTests.test_egarch_one_step_uses_last_innovation) ... ok
+test_failed_fit_cannot_forecast (test_models_and_replay.VolatilityTests.test_failed_fit_cannot_forecast) ... ok
+test_fitting_synthetic_returns_produces_feasible_variance (test_models_and_replay.VolatilityTests.test_fitting_synthetic_returns_produces_feasible_variance) ... ok
+test_garch_multistep_keeps_expected_shock_variance (test_models_and_replay.VolatilityTests.test_garch_multistep_keeps_expected_shock_variance) ... ok
+test_gjr_uses_symmetric_future_negative_shock_expectation (test_models_and_replay.VolatilityTests.test_gjr_uses_symmetric_future_negative_shock_expectation) ... ok
+test_holdout_updates_from_observed_past_not_future (test_models_and_replay.VolatilityTests.test_holdout_updates_from_observed_past_not_future) ... ok
+test_zero_length_holdout_is_not_ok (test_models_and_replay.VolatilityTests.test_zero_length_holdout_is_not_ok) ... ok
+test_nested_actual_schema_mapping_and_redaction (test_personal_components.BrokerAndSessionTests.test_nested_actual_schema_mapping_and_redaction) ... ok
+test_schema_bound_request_keeps_private_routing_out_of_report (test_personal_components.BrokerAndSessionTests.test_schema_bound_request_keeps_private_routing_out_of_report) ... ok
+test_schema_failure_does_not_echo_private_account (test_personal_components.BrokerAndSessionTests.test_schema_failure_does_not_echo_private_account) ... ok
+test_session_cannot_be_stolen_or_silently_revived (test_personal_components.BrokerAndSessionTests.test_session_cannot_be_stolen_or_silently_revived) ... ok
+test_supervisor_flags_time_exit_even_with_protection (test_personal_components.BrokerAndSessionTests.test_supervisor_flags_time_exit_even_with_protection) ... ok
+test_dst_changes_utc_open (test_personal_components.CalendarTests.test_dst_changes_utc_open) ... ok
+test_event_blackout_uses_sessions_across_weekend (test_personal_components.CalendarTests.test_event_blackout_uses_sessions_across_weekend) ... ok
+test_holiday_and_early_close (test_personal_components.CalendarTests.test_holiday_and_early_close) ... ok
+test_intraday_checks_completed_bars_only (test_personal_components.CalendarTests.test_intraday_checks_completed_bars_only) ... ok
+test_missing_session_is_not_a_complete_history (test_personal_components.CalendarTests.test_missing_session_is_not_a_complete_history) ... ok
+test_unknown_future_coverage_and_stale_calendar_block (test_personal_components.CalendarTests.test_unknown_future_coverage_and_stale_calendar_block) ... ok
+test_cash_duplicate_cannot_inflate_balance (test_personal_components.PortfolioAnalyticsTests.test_cash_duplicate_cannot_inflate_balance) ... ok
+test_covariance_catches_date_misalignment_and_reports_components (test_personal_components.PortfolioAnalyticsTests.test_covariance_catches_date_misalignment_and_reports_components) ... ok
+test_flow_time_return_removes_large_midperiod_deposit (test_personal_components.PortfolioAnalyticsTests.test_flow_time_return_removes_large_midperiod_deposit) ... ok
+test_fund_cash_is_explicit_and_share_classes_share_issuer_cap (test_personal_components.PortfolioAnalyticsTests.test_fund_cash_is_explicit_and_share_classes_share_issuer_cap) ... ok
+test_lookthrough_aggregates_direct_and_fund_exposure (test_personal_components.PortfolioAnalyticsTests.test_lookthrough_aggregates_direct_and_fund_exposure) ... ok
+test_lot_methods_are_explicit_and_quantity_conserved (test_personal_components.PortfolioAnalyticsTests.test_lot_methods_are_explicit_and_quantity_conserved) ... ok
+test_negative_quantity_and_mark_cannot_create_positive_stress_value (test_personal_components.PortfolioAnalyticsTests.test_negative_quantity_and_mark_cannot_create_positive_stress_value) ... ok
+test_stress_does_not_assume_stop_limits_loss (test_personal_components.PortfolioAnalyticsTests.test_stress_does_not_assume_stop_limits_loss) ... ok
+test_wash_review_flags_reinvestment_and_never_certifies_tax (test_personal_components.PortfolioAnalyticsTests.test_wash_review_flags_reinvestment_and_never_certifies_tax) ... ok
+test_analysts_use_latest_per_firm_and_ignore_future (test_personal_components.ResearchAnalyticsTests.test_analysts_use_latest_per_firm_and_ignore_future) ... ok
+test_dilution_reduces_per_share_scenario (test_personal_components.ResearchAnalyticsTests.test_dilution_reduces_per_share_scenario) ... ok
+test_fcf_does_not_call_sbc_a_cash_outflow (test_personal_components.ResearchAnalyticsTests.test_fcf_does_not_call_sbc_a_cash_outflow) ... ok
+test_negative_eps_revisions_use_absolute_change (test_personal_components.ResearchAnalyticsTests.test_negative_eps_revisions_use_absolute_change) ... ok
+test_normalization_keeps_realization_taxes_and_cash_costs_visible (test_personal_components.ResearchAnalyticsTests.test_normalization_keeps_realization_taxes_and_cash_costs_visible) ... ok
+test_peer_comparison_does_not_mix_fiscal_periods (test_personal_components.ResearchAnalyticsTests.test_peer_comparison_does_not_mix_fiscal_periods) ... ok
+test_peers_do_not_mix_basis_or_double_count_share_classes (test_personal_components.ResearchAnalyticsTests.test_peers_do_not_mix_basis_or_double_count_share_classes) ... ok
+test_sec_fact_cannot_use_later_restatement (test_personal_components.ResearchAnalyticsTests.test_sec_fact_cannot_use_later_restatement) ... ok
+test_broker_fixed_semantics_cannot_change_time_in_force (test_personal_runtime.PersonalIntegrationTests.test_broker_fixed_semantics_cannot_change_time_in_force) ... ok
+test_cancel_ack_does_not_release_reservation_or_authorize_retry (test_personal_runtime.PersonalIntegrationTests.test_cancel_ack_does_not_release_reservation_or_authorize_retry) ... ok
+test_cancel_requires_explicit_role_permission (test_personal_runtime.PersonalIntegrationTests.test_cancel_requires_explicit_role_permission) ... ok
+test_changed_broker_request_or_snapshot_blocks (test_personal_runtime.PersonalIntegrationTests.test_changed_broker_request_or_snapshot_blocks) ... ok
+test_changed_strategy_evidence_requires_new_approval (test_personal_runtime.PersonalIntegrationTests.test_changed_strategy_evidence_requires_new_approval) ... ok
+test_core_etf_uses_fund_review_and_lookthrough (test_personal_runtime.PersonalIntegrationTests.test_core_etf_uses_fund_review_and_lookthrough) ... ok
+test_core_stock_has_separate_fundamental_path (test_personal_runtime.PersonalIntegrationTests.test_core_stock_has_separate_fundamental_path) ... ok
+test_delayed_quote_and_unverified_product_block (test_personal_runtime.PersonalIntegrationTests.test_delayed_quote_and_unverified_product_block) ... ok
+test_doctor_reports_initial_paper_and_draft_and_preserves_existing (test_personal_runtime.PersonalIntegrationTests.test_doctor_reports_initial_paper_and_draft_and_preserves_existing) ... ok
+test_draft_policy_blocks_even_if_other_evidence_exists (test_personal_runtime.PersonalIntegrationTests.test_draft_policy_blocks_even_if_other_evidence_exists) ... ok
+test_event_blackout_blocks_independently_of_quote_green_flag (test_personal_runtime.PersonalIntegrationTests.test_event_blackout_blocks_independently_of_quote_green_flag) ... ok
+test_external_manual_activity_consumes_daily_budget (test_personal_runtime.PersonalIntegrationTests.test_external_manual_activity_consumes_daily_budget) ... ok
+test_fill_cannot_silently_violate_limit (test_personal_runtime.PersonalIntegrationTests.test_fill_cannot_silently_violate_limit) ... ok
+test_full_claim_and_fill_path_uses_real_readiness_functions (test_personal_runtime.PersonalIntegrationTests.test_full_claim_and_fill_path_uses_real_readiness_functions) ... ok
+test_garch_frequency_mismatch_blocks (test_personal_runtime.PersonalIntegrationTests.test_garch_frequency_mismatch_blocks) ... ok
+test_legacy_policy_cannot_bypass_personal_gate (test_personal_runtime.PersonalIntegrationTests.test_legacy_policy_cannot_bypass_personal_gate) ... ok
+test_live_core_unknown_fundamentals_block (test_personal_runtime.PersonalIntegrationTests.test_live_core_unknown_fundamentals_block) ... ok
+test_lost_heartbeat_blocks_entry (test_personal_runtime.PersonalIntegrationTests.test_lost_heartbeat_blocks_entry) ... ok
+test_missing_atomic_protection_cannot_open_day_trade (test_personal_runtime.PersonalIntegrationTests.test_missing_atomic_protection_cannot_open_day_trade) ... ok
+test_missing_readiness_never_claims (test_personal_runtime.PersonalIntegrationTests.test_missing_readiness_never_claims) ... ok
+test_negative_strategy_criteria_cannot_pass (test_personal_runtime.PersonalIntegrationTests.test_negative_strategy_criteria_cannot_pass) ... ok
+test_no_actual_breakout_blocks_strategy_named_order (test_personal_runtime.PersonalIntegrationTests.test_no_actual_breakout_blocks_strategy_named_order) ... ok
+test_personal_covariance_uses_projected_weights_and_caps_risk (test_personal_runtime.PersonalIntegrationTests.test_personal_covariance_uses_projected_weights_and_caps_risk) ... ok
+test_personal_interface_rejects_fake_clock (test_personal_runtime.PersonalIntegrationTests.test_personal_interface_rejects_fake_clock) ... ok
+test_promotion_rejects_overlap_fictional_data_and_future (test_personal_runtime.PersonalIntegrationTests.test_promotion_rejects_overlap_fictional_data_and_future) ... ok
+test_protection_cancel_needs_gap_handoff_plan (test_personal_runtime.PersonalIntegrationTests.test_protection_cancel_needs_gap_handoff_plan) ... ok
+test_protection_cannot_expire_before_time_exit (test_personal_runtime.PersonalIntegrationTests.test_protection_cannot_expire_before_time_exit) ... ok
+test_second_entry_does_not_reset_one_entry_rule (test_personal_runtime.PersonalIntegrationTests.test_second_entry_does_not_reset_one_entry_rule) ... ok
+test_signal_cannot_change_stop_to_pass_sizing (test_personal_runtime.PersonalIntegrationTests.test_signal_cannot_change_stop_to_pass_sizing) ... ok
+test_signal_future_bar_and_gap_block (test_personal_runtime.PersonalIntegrationTests.test_signal_future_bar_and_gap_block) ... ok
+test_supervisor_blocks_with_unprotected_existing_tactical_position (test_personal_runtime.PersonalIntegrationTests.test_supervisor_blocks_with_unprotected_existing_tactical_position) ... ok
+test_supplied_projected_prices_cannot_understate_risk (test_personal_runtime.PersonalIntegrationTests.test_supplied_projected_prices_cannot_understate_risk) ... ok
+test_unaudited_required_garch_blocks (test_personal_runtime.PersonalIntegrationTests.test_unaudited_required_garch_blocks) ... ok
+test_volatility_can_reduce_but_not_expand_risk_budget (test_personal_runtime.PersonalIntegrationTests.test_volatility_can_reduce_but_not_expand_risk_budget) ... ok
+test_authorized_bounded_order (test_risk_and_execution.ExecutionTests.test_authorized_bounded_order) ... ok
+test_autonomous_warnings_block (test_risk_and_execution.ExecutionTests.test_autonomous_warnings_block) ... ok
+test_broker_approval_cannot_be_bypassed (test_risk_and_execution.ExecutionTests.test_broker_approval_cannot_be_bypassed) ... ok
+test_changed_broker_snapshot_needs_new_review (test_risk_and_execution.ExecutionTests.test_changed_broker_snapshot_needs_new_review) ... ok
+test_changed_exact_approval (test_risk_and_execution.ExecutionTests.test_changed_exact_approval) ... ok
+test_concurrent_claims_only_one_wins (test_risk_and_execution.ExecutionTests.test_concurrent_claims_only_one_wins) ... ok
+test_contradictory_terminal_state_latches_unknown_across_restart (test_risk_and_execution.ExecutionTests.test_contradictory_terminal_state_latches_unknown_across_restart) ... ok
+test_cumulative_fill_cannot_regress_or_overfill (test_risk_and_execution.ExecutionTests.test_cumulative_fill_cannot_regress_or_overfill) ... ok
+test_duplicate_across_restart (test_risk_and_execution.ExecutionTests.test_duplicate_across_restart) ... ok
+test_filled_requires_entire_quantity (test_risk_and_execution.ExecutionTests.test_filled_requires_entire_quantity) ... ok
+test_identical_terminal_fill_accepts_equivalent_decimal_format (test_risk_and_execution.ExecutionTests.test_identical_terminal_fill_accepts_equivalent_decimal_format) ... ok
+test_learning_context_blocks_even_with_live_mode (test_risk_and_execution.ExecutionTests.test_learning_context_blocks_even_with_live_mode) ... ok
+test_live_mode_switch_does_not_reset_daily_order_count (test_risk_and_execution.ExecutionTests.test_live_mode_switch_does_not_reset_daily_order_count) ... ok
+test_live_requires_human_record (test_risk_and_execution.ExecutionTests.test_live_requires_human_record) ... ok
+test_new_id_cannot_replay_same_signal_after_fill (test_risk_and_execution.ExecutionTests.test_new_id_cannot_replay_same_signal_after_fill) ... ok
+test_new_order_requires_snapshot_reconciliation_after_last_fill (test_risk_and_execution.ExecutionTests.test_new_order_requires_snapshot_reconciliation_after_last_fill) ... ok
+test_paper_never_returns_live_permission (test_risk_and_execution.ExecutionTests.test_paper_never_returns_live_permission) ... ok
+test_partial_cancel_retains_fills_and_is_idempotent (test_risk_and_execution.ExecutionTests.test_partial_cancel_retains_fills_and_is_idempotent) ... ok
+test_policy_change_invalidates_mandate (test_risk_and_execution.ExecutionTests.test_policy_change_invalidates_mandate) ... ok
+test_protection_is_required (test_risk_and_execution.ExecutionTests.test_protection_is_required) ... ok
+test_revoked_authorization (test_risk_and_execution.ExecutionTests.test_revoked_authorization) ... ok
+test_timeout_blocks_other_intents (test_risk_and_execution.ExecutionTests.test_timeout_blocks_other_intents) ... ok
+test_unvalidated_strategy_blocked (test_risk_and_execution.ExecutionTests.test_unvalidated_strategy_blocked) ... ok
+test_existing_destination_is_preserved (test_risk_and_execution.InstallerTests.test_existing_destination_is_preserved) ... ok
+test_recursive_copy_is_rejected (test_risk_and_execution.InstallerTests.test_recursive_copy_is_rejected) ... ok
+test_separate_temporary_copy_excludes_runtime_state (test_risk_and_execution.InstallerTests.test_separate_temporary_copy_excludes_runtime_state) ... ok
+test_cash_first_and_drift_band (test_risk_and_execution.PortfolioTests.test_cash_first_and_drift_band) ... ok
+test_external_deposit_is_not_profit (test_risk_and_execution.PortfolioTests.test_external_deposit_is_not_profit) ... ok
+test_flow_adjusted_drawdown (test_risk_and_execution.PortfolioTests.test_flow_adjusted_drawdown) ... ok
+test_no_funding_from_unfilled_sale (test_risk_and_execution.PortfolioTests.test_no_funding_from_unfilled_sale) ... ok
+test_small_budget_does_not_force_unaffordable_stock (test_risk_and_execution.PortfolioTests.test_small_budget_does_not_force_unaffordable_stock) ... ok
+test_breached_existing_stop_blocks_more_risk (test_risk_and_execution.RiskTests.test_breached_existing_stop_blocks_more_risk) ... ok
+test_core_cannot_be_sold_by_day_sleeve (test_risk_and_execution.RiskTests.test_core_cannot_be_sold_by_day_sleeve) ... ok
+test_core_requires_target (test_risk_and_execution.RiskTests.test_core_requires_target) ... ok
+test_crossed_quote (test_risk_and_execution.RiskTests.test_crossed_quote) ... ok
+test_daily_weekly_drawdown_loss_breakers (test_risk_and_execution.RiskTests.test_daily_weekly_drawdown_loss_breakers) ... ok
+test_early_close (test_risk_and_execution.RiskTests.test_early_close) ... ok
+test_event_block_or_unknown_cannot_be_clearance (test_risk_and_execution.RiskTests.test_event_block_or_unknown_cannot_be_clearance) ... ok
+test_fractional_and_tick_rejected (test_risk_and_execution.RiskTests.test_fractional_and_tick_rejected) ... ok
+test_halt (test_risk_and_execution.RiskTests.test_halt) ... ok
+test_missing_quote (test_risk_and_execution.RiskTests.test_missing_quote) ... ok
+test_nan_inf_and_missing_fail_closed (test_risk_and_execution.RiskTests.test_nan_inf_and_missing_fail_closed) ... ok
+test_no_fake_account_alias (test_risk_and_execution.RiskTests.test_no_fake_account_alias) ... ok
+test_non_trading_day (test_risk_and_execution.RiskTests.test_non_trading_day) ... ok
+test_order_cannot_relabel_stock_as_etf_for_a_larger_cap (test_risk_and_execution.RiskTests.test_order_cannot_relabel_stock_as_etf_for_a_larger_cap) ... ok
+test_pending_buy_counts_toward_sleeve (test_risk_and_execution.RiskTests.test_pending_buy_counts_toward_sleeve) ... ok
+test_pending_exit_not_repeated (test_risk_and_execution.RiskTests.test_pending_exit_not_repeated) ... ok
+test_policy_allocations_cannot_exceed_capital (test_risk_and_execution.RiskTests.test_policy_allocations_cannot_exceed_capital) ... ok
+test_position_cash_equity_mismatch (test_risk_and_execution.RiskTests.test_position_cash_equity_mismatch) ... ok
+test_price_deviation_is_bounded (test_risk_and_execution.RiskTests.test_price_deviation_is_bounded) ... ok
+test_risk_and_reward_caps (test_risk_and_execution.RiskTests.test_risk_and_reward_caps) ... ok
+test_sell_can_reduce_during_loss_breaker_and_kill_switch (test_risk_and_execution.RiskTests.test_sell_can_reduce_during_loss_breaker_and_kill_switch) ... ok
+test_setup_cannot_jump_to_another_sleeve (test_risk_and_execution.RiskTests.test_setup_cannot_jump_to_another_sleeve) ... ok
+test_size_includes_round_trip_friction (test_risk_and_execution.RiskTests.test_size_includes_round_trip_friction) ... ok
+test_spread (test_risk_and_execution.RiskTests.test_spread) ... ok
+test_stale_account (test_risk_and_execution.RiskTests.test_stale_account) ... ok
+test_stale_and_future_quote (test_risk_and_execution.RiskTests.test_stale_and_future_quote) ... ok
+test_stop_wrong_side (test_risk_and_execution.RiskTests.test_stop_wrong_side) ... ok
+test_unknown_order_halts (test_risk_and_execution.RiskTests.test_unknown_order_halts) ... ok
+test_unsettled_cash_cannot_buy (test_risk_and_execution.RiskTests.test_unsettled_cash_cannot_buy) ... ok
+test_valid_fixture (test_risk_and_execution.RiskTests.test_valid_fixture) ... ok
+test_absent_audit_computes_but_cannot_size (test_screen_and_price_audit.PriceAuditTests.test_absent_audit_computes_but_cannot_size) ... ok
+test_adjustment_does_not_erase_genuine_crash (test_screen_and_price_audit.PriceAuditTests.test_adjustment_does_not_erase_genuine_crash) ... ok
+test_declared_adjustment_does_not_excuse_an_unexplained_jump (test_screen_and_price_audit.PriceAuditTests.test_declared_adjustment_does_not_excuse_an_unexplained_jump) ... ok
+test_duplicate_jump_reviews_rejected (test_screen_and_price_audit.PriceAuditTests.test_duplicate_jump_reviews_rejected) ... ok
+test_hash_mismatch_rejects_audit_for_different_prices (test_screen_and_price_audit.PriceAuditTests.test_hash_mismatch_rejects_audit_for_different_prices) ... ok
+test_in_sample_action_cannot_be_marked_outside_sample (test_screen_and_price_audit.PriceAuditTests.test_in_sample_action_cannot_be_marked_outside_sample) ... ok
+test_manifest_cannot_change_field_or_annualization (test_screen_and_price_audit.PriceAuditTests.test_manifest_cannot_change_field_or_annualization) ... ok
+test_market_declaration_is_explicitly_not_verified_by_helper (test_screen_and_price_audit.PriceAuditTests.test_market_declaration_is_explicitly_not_verified_by_helper) ... ok
+test_partial_window_and_future_observations_blocked (test_screen_and_price_audit.PriceAuditTests.test_partial_window_and_future_observations_blocked) ... ok
+test_split_sized_jump_even_with_generic_review_blocks_fit (test_screen_and_price_audit.PriceAuditTests.test_split_sized_jump_even_with_generic_review_blocks_fit) ... ok
+test_split_sized_jump_without_audit_blocks_fit (test_screen_and_price_audit.PriceAuditTests.test_split_sized_jump_without_audit_blocks_fit) ... ok
+test_unresolved_small_corporate_action_blocks_fit (test_screen_and_price_audit.PriceAuditTests.test_unresolved_small_corporate_action_blocks_fit) ... ok
+test_duplicate_or_foreign_security_is_not_extra_coverage (test_screen_and_price_audit.ScreeningTests.test_duplicate_or_foreign_security_is_not_extra_coverage) ... ok
+test_eligible_report_rejects_watch_speculative_reject_and_event_block (test_screen_and_price_audit.ScreeningTests.test_eligible_report_rejects_watch_speculative_reject_and_event_block) ... ok
+test_empty_or_single_eligible_report_has_no_quota_or_authority (test_screen_and_price_audit.ScreeningTests.test_empty_or_single_eligible_report_has_no_quota_or_authority) ... ok
+test_event_blocked_retains_eligible_fundamentals (test_screen_and_price_audit.ScreeningTests.test_event_blocked_retains_eligible_fundamentals) ... ok
+test_full_retrieval_with_missing_data_is_not_complete_analysis (test_screen_and_price_audit.ScreeningTests.test_full_retrieval_with_missing_data_is_not_complete_analysis) ... ok
+test_full_screen_does_not_mean_all_retained_reviewed (test_screen_and_price_audit.ScreeningTests.test_full_screen_does_not_mean_all_retained_reviewed) ... ok
+test_garch_regime_cannot_make_or_break_fundamental_eligibility (test_screen_and_price_audit.ScreeningTests.test_garch_regime_cannot_make_or_break_fundamental_eligibility) ... ok
+test_incomplete_or_invalid_method_cannot_claim_declared (test_screen_and_price_audit.ScreeningTests.test_incomplete_or_invalid_method_cannot_claim_declared) ... ok
+test_legacy_manifest_does_not_claim_recorded_methodology (test_screen_and_price_audit.ScreeningTests.test_legacy_manifest_does_not_claim_recorded_methodology) ... ok
+test_method_hash_tracks_rules_but_not_dictionary_order (test_screen_and_price_audit.ScreeningTests.test_method_hash_tracks_rules_but_not_dictionary_order) ... ok
+test_missing_event_review_is_unknown_not_clear (test_screen_and_price_audit.ScreeningTests.test_missing_event_review_is_unknown_not_clear) ... ok
+test_missing_filing_evidence_cannot_pass (test_screen_and_price_audit.ScreeningTests.test_missing_filing_evidence_cannot_pass) ... ok
+test_missing_rows_prevent_complete_screen_claim (test_screen_and_price_audit.ScreeningTests.test_missing_rows_prevent_complete_screen_claim) ... ok
+test_no_candidates_is_valid (test_screen_and_price_audit.ScreeningTests.test_no_candidates_is_valid) ... ok
+test_no_fixed_count_or_execution_permission (test_screen_and_price_audit.ScreeningTests.test_no_fixed_count_or_execution_permission) ... ok
+test_not_advanced_is_counted_without_inventing_fundamental_failure (test_screen_and_price_audit.ScreeningTests.test_not_advanced_is_counted_without_inventing_fundamental_failure) ... ok
+test_rankings_cannot_add_unreviewed_or_duplicate_names (test_screen_and_price_audit.ScreeningTests.test_rankings_cannot_add_unreviewed_or_duplicate_names) ... ok
+test_rankings_require_specific_rationale_entries (test_screen_and_price_audit.ScreeningTests.test_rankings_require_specific_rationale_entries) ... ok
+test_reject_is_not_hidden_by_event (test_screen_and_price_audit.ScreeningTests.test_reject_is_not_hidden_by_event) ... ok
+test_speculative_is_not_eligible_even_if_other_checks_pass (test_screen_and_price_audit.ScreeningTests.test_speculative_is_not_eligible_even_if_other_checks_pass) ... ok
+test_unexamined_name_cannot_be_not_advanced (test_screen_and_price_audit.ScreeningTests.test_unexamined_name_cannot_be_not_advanced) ... ok
+test_watch_hypotheses_report_retains_watch_without_authority (test_screen_and_price_audit.ScreeningTests.test_watch_hypotheses_report_retains_watch_without_authority) ... ok
+
+----------------------------------------------------------------------
+Ran 180 tests in 16.087s
+
+OK
+
+[Offline learning walkthrough] exit=0
+{
+  "valid_fictional_proposal": {
+    "allowed": true,
+    "reasons": [],
+    "metrics": {
+      "planned_loss": "42.60040",
+      "reward_risk": "2.755833278560764687655514972",
+      "available_cash": "95000.00",
+      "projected_sleeve_value": "2000.40",
+      "spread_bps": "4.0000",
+      "notional": "2000.40",
+      "existing_open_risk": "0"
+    },
+    "order_hash": "c709a84670e0aae7ec59c90600d6ac7de2d578960d7a4d97094a4525f5c774fc",
+    "policy_hash": "1b10671a90474807a272e641c8100489c10e260d2066d47cf023001398c2f755",
+    "planned_loss_is_not_guaranteed": true
+  },
+  "stale_quote_is_blocked": {
+    "allowed": false,
+    "reasons": [
+      "STALE_OR_FUTURE_QUOTE"
+    ],
+    "metrics": {
+      "planned_loss": "42.60040",
+      "reward_risk": "2.755833278560764687655514972",
+      "available_cash": "95000.00",
+      "projected_sleeve_value": "2000.40",
+      "spread_bps": "4.0000",
+      "notional": "2000.40",
+      "existing_open_risk": "0"
+    },
+    "order_hash": "c709a84670e0aae7ec59c90600d6ac7de2d578960d7a4d97094a4525f5c774fc",
+    "policy_hash": "1b10671a90474807a272e641c8100489c10e260d2066d47cf023001398c2f755",
+    "planned_loss_is_not_guaranteed": true
+  },
+  "paper_claim": {
+    "id": "demo-entry-001",
+    "state": "CLAIMED",
+    "order_hash": "c709a84670e0aae7ec59c90600d6ac7de2d578960d7a4d97094a4525f5c774fc",
+    "may_submit_once": false,
+    "mode": "paper",
+    "broker_request_hash": null
+  },
+  "partial_fill_then_cancel": {
+    "state": "CANCELLED",
+    "filled": "5",
+    "average_price": "100.01"
+  },
+  "duplicate_blocked": "DUPLICATE_ORDER_INTENT",
+  "core_rebalance_candidates": {
+    "buy_candidates": [
+      {
+        "symbol": "CORE_A",
+        "side": "buy",
+        "sleeve": "core",
+        "quantity": "50",
+        "reference_price": "100",
+        "notional_before_fees": "5000"
+      }
+    ],
+    "sell_reviews": [],
+    "unused_planning_budget": "0.00",
+    "cash_remaining_before_fees": "15000",
+    "next_step": "Add fees, current broker quotes and run each exact order through risk_engine and execution_ledger"
+  },
+  "scope": "FICTIONAL OFFLINE LEARNING ONLY; no broker access, investment recommendation or live validation"
+}
+
+[Risk CLI] exit=0
+{
+  "allowed": true,
+  "reasons": [],
+  "metrics": {
+    "planned_loss": "42.60040",
+    "reward_risk": "2.755833278560764687655514972",
+    "available_cash": "95000.00",
+    "projected_sleeve_value": "2000.40",
+    "spread_bps": "4.0000",
+    "notional": "2000.40",
+    "existing_open_risk": "0"
+  },
+  "order_hash": "c709a84670e0aae7ec59c90600d6ac7de2d578960d7a4d97094a4525f5c774fc",
+  "policy_hash": "1b10671a90474807a272e641c8100489c10e260d2066d47cf023001398c2f755",
+  "planned_loss_is_not_guaranteed": true
+}
+
+[Cash-first allocation] exit=0
+{
+  "buy_candidates": [
+    {
+      "symbol": "GROWTH_A",
+      "side": "buy",
+      "sleeve": "core",
+      "quantity": "1",
+      "reference_price": "45",
+      "notional_before_fees": "45"
+    }
+  ],
+  "sell_reviews": [],
+  "unused_planning_budget": "355.00",
+  "cash_remaining_before_fees": "455",
+  "next_step": "Add fees, current broker quotes and run each exact order through risk_engine and execution_ledger"
+}
+
+[Core rebalance] exit=0
+{
+  "buy_candidates": [
+    {
+      "symbol": "CORE_A",
+      "side": "buy",
+      "sleeve": "core",
+      "quantity": "50",
+      "reference_price": "100",
+      "notional_before_fees": "5000"
+    }
+  ],
+  "sell_reviews": [],
+  "unused_planning_budget": "0.00",
+  "cash_remaining_before_fees": "15000",
+  "next_step": "Add fees, current broker quotes and run each exact order through risk_engine and execution_ledger"
+}
+
+[Screen coverage CLI] exit=0
+{
+  "universe": {
+    "name": "Configurable fictional learning universe",
+    "source": "Locally invented example; not S&P 500 constituents",
+    "as_of": "2026-10-07T16:00:00Z",
+    "scope_and_filters": "Schema example only; no fixed output count or real selection"
+  },
+  "coverage": {
+    "expected_securities": 7,
+    "retrieved_rows": 7,
+    "screened_with_evidence": 6,
+    "retained": 4,
+    "excluded": 1,
+    "not_advanced": 1,
+    "missing_data": 1,
+    "absent_symbols": [],
+    "candidate_reviews": 4,
+    "retained_without_review": [],
+    "all_constituents_screened": false
+  },
+  "candidates": [
+    {
+      "symbol": "FICTION_VALUE",
+      "status": "Eligible",
+      "fundamental_status": "Eligible",
+      "event_status": "clear",
+      "unresolved_checks": 0,
+      "reasons": [],
+      "event_reason": "Artificial event review, no real calendar",
+      "execution_authorized": false
+    },
+    {
+      "symbol": "FICTION_EVENT",
+      "status": "Event-blocked",
+      "fundamental_status": "Eligible",
+      "event_status": "blocked",
+      "unresolved_checks": 0,
+      "reasons": [],
+      "event_reason": "Fictional event within the illustrative strategy blackout",
+      "execution_authorized": false
+    },
+    {
+      "symbol": "FICTION_TRAP",
+      "status": "Reject",
+      "fundamental_status": "Reject",
+      "event_status": "blocked",
+      "unresolved_checks": 0,
+      "reasons": [
+        {
+          "check": "balance_sheet",
+          "status": "fail",
+          "reason": "Fictional refinancing need unsupported by cash capacity"
+        }
+      ],
+      "event_reason": "Artificial event review, no real calendar",
+      "execution_authorized": false
+    },
+    {
+      "symbol": "FICTION_WATCH",
+      "status": "Watch",
+      "fundamental_status": "Watch",
+      "event_status": "clear",
+      "unresolved_checks": 1,
+      "reasons": [
+        {
+          "check": "cycle_normalization",
+          "status": "unresolved",
+          "reason": "Fictional synergy bridge not yet supported"
+        }
+      ],
+      "event_reason": "Artificial event review, no real calendar",
+      "execution_authorized": false
+    }
+  ],
+  "methodology": {
+    "status": "DECLARED",
+    "spec_sha256": "c89a4a4565462c3b35daa4401cc03e602d8993fb68e31222a1a45f90b4433163",
+    "specification": {
+      "schema_version": 1,
+      "run_id": "fictional-method-demo",
+      "methodology_version": "demo-1",
+      "defined_at": "2026-10-07T15:00:00Z",
+      "mandate": "Fictional long-term moderate-risk comparison; no account, money or real recommendation",
+      "input_snapshot": [
+        "This file contains synthetic declarations only; no external quotes or financial observations"
+      ],
+      "field_definitions": {
+        "fixture_review_status": "Artificial pass/unresolved/fail evidence checks, not market metrics"
+      },
+      "peer_policy": "No market peers or valuation metric; fixture-only classification example",
+      "discovery_policy": "Synthetic retained/excluded/not_advanced/missing rows demonstrate coverage; no real stock filter",
+      "deep_review_policy": "Review VALUE, EVENT, TRAP and WATCH; leave DEFERRED for later and MISSING unresolved; stop after the schema cases",
+      "ranking_policy": "Qualitative research priority: VALUE first for complete fixture evidence, WATCH next to resolve its missing cycle bridge; not an investment ranking",
+      "valuation_policy": "No valuation performed; do not infer any fair value from fixture statuses",
+      "changes": []
+    },
+    "limitations": "Validates declarations only; does not verify input files, sources, when rules were chosen, economic merit or reproducibility of judgments"
+  },
+  "report": {
+    "kind": "screened_hypotheses",
+    "ranked_symbols": [
+      "FICTION_VALUE",
+      "FICTION_WATCH"
+    ],
+    "selection_rationale": {
+      "FICTION_VALUE": "First: complete artificial reviews; no real investment claim",
+      "FICTION_WATCH": "Second research priority: cycle-normalization gap remains; not a buy"
+    },
+    "execution_authorized": false
+  },
+  "status_counts": {
+    "Eligible": 1,
+    "Event-blocked": 1,
+    "Reject": 1,
+    "Watch": 1
+  },
+  "execution_authorized": false,
+  "limitations": "Checks declared coverage/judgments only; does not verify universe membership, sources or current events"
+}
+
+[Intraday replay] exit=0
+{
+  "strategy": "opening_range_breakout",
+  "final_equity": 100268.14487559999,
+  "return": 0.002681448755999849,
+  "max_drawdown": 0.0001501251428531747,
+  "closed_trades": 3,
+  "win_rate": 1.0,
+  "profit_factor": null,
+  "mean_trade_pnl": 89.38162520000151,
+  "buy_hold_return": 0.03561335100000007,
+  "benchmark_caveat": "Full-capital buy-and-hold, entry friction, marked terminal value; different exposure, no dividends",
+  "open_position": null,
+  "events": [],
+  "trades": [
+    {
+      "quantity": 49,
+      "entry_price": 101.56765845,
+      "cost": 4977.060264049999,
+      "entry_time": "2026-10-05T13:50:00+00:00",
+      "entry_bar_end": "2026-10-05T13:55:00+00:00",
+      "session": "2026-10-05T13:30:00+00:00",
+      "stop": 99.8,
+      "target": 105.80915000000003,
+      "signal_time": "2026-10-05T13:50:00+00:00",
+      "exit_time": "2026-10-05T19:50:00+00:00",
+      "exit_price": 103.40177325,
+      "pnl": 89.38162520000151,
+      "reason": "scheduled_session_exit"
+    },
+    {
+      "quantity": 49,
+      "entry_price": 101.56765845,
+      "cost": 4977.060264049999,
+      "entry_time": "2026-10-06T13:50:00+00:00",
+      "entry_bar_end": "2026-10-06T13:55:00+00:00",
+      "session": "2026-10-06T13:30:00+00:00",
+      "stop": 99.8,
+      "target": 105.80915000000003,
+      "signal_time": "2026-10-06T13:50:00+00:00",
+      "exit_time": "2026-10-06T19:50:00+00:00",
+      "exit_price": 103.40177325,
+      "pnl": 89.38162520000151,
+      "reason": "scheduled_session_exit"
+    },
+    {
+      "quantity": 49,
+      "entry_price": 101.56765845,
+      "cost": 4977.060264049999,
+      "entry_time": "2026-10-07T13:50:00+00:00",
+      "entry_bar_end": "2026-10-07T13:55:00+00:00",
+      "session": "2026-10-07T13:30:00+00:00",
+      "stop": 99.8,
+      "target": 105.80915000000003,
+      "signal_time": "2026-10-07T13:50:00+00:00",
+      "exit_time": "2026-10-07T19:50:00+00:00",
+      "exit_price": 103.40177325,
+      "pnl": 89.38162520000151,
+      "reason": "scheduled_session_exit"
+    }
+  ],
+  "equity_curve": [
+    {
+      "timestamp": "2026-10-05T13:35:00+00:00",
+      "equity": 100000.0
+    },
+    {
+      "timestamp": "2026-10-05T13:40:00+00:00",
+      "equity": 100000.0
+    },
+    {
+      "timestamp": "2026-10-05T13:45:00+00:00",
+      "equity": 100000.0
+    },
+    {
+      "timestamp": "2026-10-05T13:50:00+00:00",
+      "equity": 100000.0
+    },
+    {
+      "timestamp": "2026-10-05T13:55:00+00:00",
+      "equity": 99995.91053595
+    },
+    {
+      "timestamp": "2026-10-05T14:00:00+00:00",
+      "equity": 99998.63983595
+    },
+    {
+      "timestamp": "2026-10-05T14:05:00+00:00",
+      "equity": 100006.55823595
+    },
+    {
+      "timestamp": "2026-10-05T14:10:00+00:00",
+      "equity": 100015.98093595
+    },
+    {
+      "timestamp": "2026-10-05T14:15:00+00:00",
+      "equity": 100021.85603595
+    },
+    {
+      "timestamp": "2026-10-05T14:20:00+00:00",
+      "equity": 100022.38523595
+    },
+    {
+      "timestamp": "2026-10-05T14:25:00+00:00",
+      "equity": 100020.68003595
+    },
+    {
+      "timestamp": "2026-10-05T14:30:00+00:00",
+      "equity": 100021.91973595
+    },
+    {
+      "timestamp": "2026-10-05T14:35:00+00:00",
+      "equity": 100028.56413595
+    },
+    {
+      "timestamp": "2026-10-05T14:40:00+00:00",
+      "equity": 100038.10933595
+    },
+    {
+      "timestamp": "2026-10-05T14:45:00+00:00",
+      "equity": 100045.38583595
+    },
+    {
+      "timestamp": "2026-10-05T14:50:00+00:00",
+      "equity": 100047.30173595
+    },
+    {
+      "timestamp": "2026-10-05T14:55:00+00:00",
+      "equity": 100045.70923595
+    },
+    {
+      "timestamp": "2026-10-05T15:00:00+00:00",
+      "equity": 100045.66513595
+    },
+    {
+      "timestamp": "2026-10-05T15:05:00+00:00",
+      "equity": 100050.82483595
+    },
+    {
+      "timestamp": "2026-10-05T15:10:00+00:00",
+      "equity": 100060.04173595
+    },
+    {
+      "timestamp": "2026-10-05T15:15:00+00:00",
+      "equity": 100068.45013595
+    },
+    {
+      "timestamp": "2026-10-05T15:20:00+00:00",
+      "equity": 100071.91933595
+    },
+    {
+      "timestamp": "2026-10-05T15:25:00+00:00",
+      "equity": 100070.86583595
+    },
+    {
+      "timestamp": "2026-10-05T15:30:00+00:00",
+      "equity": 100069.86623595
+    },
+    {
+      "timestamp": "2026-10-05T15:35:00+00:00",
+      "equity": 100073.43343595
+    },
+    {
+      "timestamp": "2026-10-05T15:40:00+00:00",
+      "equity": 100081.90063595
+    },
+    {
+      "timestamp": "2026-10-05T15:45:00+00:00",
+      "equity": 100091.08323595
+    },
+    {
+      "timestamp": "2026-10-05T15:50:00+00:00",
+      "equity": 100096.14493595
+    },
+    {
+      "timestamp": "2026-10-05T15:55:00+00:00",
+      "equity": 100096.03223595
+    },
+    {
+      "timestamp": "2026-10-05T16:00:00+00:00",
+      "equity": 100090.53933595
+    },
+    {
+      "timestamp": "2026-10-05T16:05:00+00:00",
+      "equity": 100088.62833595
+    },
+    {
+      "timestamp": "2026-10-05T16:10:00+00:00",
+      "equity": 100092.06323595
+    },
+    {
+      "timestamp": "2026-10-05T16:15:00+00:00",
+      "equity": 100097.68353595
+    },
+    {
+      "timestamp": "2026-10-05T16:20:00+00:00",
+      "equity": 100100.31973595
+    },
+    {
+      "timestamp": "2026-10-05T16:25:00+00:00",
+      "equity": 100097.55123595
+    },
+    {
+      "timestamp": "2026-10-05T16:30:00+00:00",
+      "equity": 100091.92113595
+    },
+    {
+      "timestamp": "2026-10-05T16:35:00+00:00",
+      "equity": 100088.60873595
+    },
+    {
+      "timestamp": "2026-10-05T16:40:00+00:00",
+      "equity": 100090.65693595
+    },
+    {
+      "timestamp": "2026-10-05T16:45:00+00:00",
+      "equity": 100096.18413595
+    },
+    {
+      "timestamp": "2026-10-05T16:50:00+00:00",
+      "equity": 100100.10903595
+    },
+    {
+      "timestamp": "2026-10-05T16:55:00+00:00",
+      "equity": 100098.82033595
+    },
+    {
+      "timestamp": "2026-10-05T17:00:00+00:00",
+      "equity": 100093.50873595
+    },
+    {
+      "timestamp": "2026-10-05T17:05:00+00:00",
+      "equity": 100089.04973595
+    },
+    {
+      "timestamp": "2026-10-05T17:10:00+00:00",
+      "equity": 100089.54953595
+    },
+    {
+      "timestamp": "2026-10-05T17:15:00+00:00",
+      "equity": 100094.54263595
+    },
+    {
+      "timestamp": "2026-10-05T17:20:00+00:00",
+      "equity": 100099.44263594999
+    },
+    {
+      "timestamp": "2026-10-05T17:25:00+00:00",
+      "equity": 100099.74153595
+    },
+    {
+      "timestamp": "2026-10-05T17:30:00+00:00",
+      "equity": 100095.16493595
+    },
+    {
+      "timestamp": "2026-10-05T17:35:00+00:00",
+      "equity": 100089.92193595
+    },
+    {
+      "timestamp": "2026-10-05T17:40:00+00:00",
+      "equity": 100088.82923595
+    },
+    {
+      "timestamp": "2026-10-05T17:45:00+00:00",
+      "equity": 100092.89623595
+    },
+    {
+      "timestamp": "2026-10-05T17:50:00+00:00",
+      "equity": 100098.37933595
+    },
+    {
+      "timestamp": "2026-10-05T17:55:00+00:00",
+      "equity": 100100.24133595
+    },
+    {
+      "timestamp": "2026-10-05T18:00:00+00:00",
+      "equity": 100096.76723595
+    },
+    {
+      "timestamp": "2026-10-05T18:05:00+00:00",
+      "equity": 100091.15183595
+    },
+    {
+      "timestamp": "2026-10-05T18:10:00+00:00",
+      "equity": 100088.55973595
+    },
+    {
+      "timestamp": "2026-10-05T18:15:00+00:00",
+      "equity": 100091.37233595
+    },
+    {
+      "timestamp": "2026-10-05T18:20:00+00:00",
+      "equity": 100097.00243595
+    },
+    {
+      "timestamp": "2026-10-05T18:25:00+00:00",
+      "equity": 100100.27563595
+    },
+    {
+      "timestamp": "2026-10-05T18:30:00+00:00",
+      "equity": 100098.18333595
+    },
+    {
+      "timestamp": "2026-10-05T18:35:00+00:00",
+      "equity": 100092.64633595
+    },
+    {
+      "timestamp": "2026-10-05T18:40:00+00:00",
+      "equity": 100088.76063595
+    },
+    {
+      "timestamp": "2026-10-05T18:45:00+00:00",
+      "equity": 100090.09343595
+    },
+    {
+      "timestamp": "2026-10-05T18:50:00+00:00",
+      "equity": 100095.42463595
+    },
+    {
+      "timestamp": "2026-10-05T18:55:00+00:00",
+      "equity": 100099.84933595
+    },
+    {
+      "timestamp": "2026-10-05T19:00:00+00:00",
+      "equity": 100099.30053595
+    },
+    {
+      "timestamp": "2026-10-05T19:05:00+00:00",
+      "equity": 100094.28293595
+    },
+    {
+      "timestamp": "2026-10-05T19:10:00+00:00",
+      "equity": 100089.40743595
+    },
+    {
+      "timestamp": "2026-10-05T19:15:00+00:00",
+      "equity": 100089.15753595
+    },
+    {
+      "timestamp": "2026-10-05T19:20:00+00:00",
+      "equity": 100093.76353595
+    },
+    {
+      "timestamp": "2026-10-05T19:25:00+00:00",
+      "equity": 100098.99183595
+    },
+    {
+      "timestamp": "2026-10-05T19:30:00+00:00",
+      "equity": 100100.03063595
+    },
+    {
+      "timestamp": "2026-10-05T19:35:00+00:00",
+      "equity": 100095.93423595
+    },
+    {
+      "timestamp": "2026-10-05T19:40:00+00:00",
+      "equity": 100090.46093595
+    },
+    {
+      "timestamp": "2026-10-05T19:45:00+00:00",
+      "equity": 100088.64793595
+    },
+    {
+      "timestamp": "2026-10-05T19:50:00+00:00",
+      "equity": 100089.3816252
+    },
+    {
+      "timestamp": "2026-10-05T19:55:00+00:00",
+      "equity": 100089.3816252
+    },
+    {
+      "timestamp": "2026-10-05T20:00:00+00:00",
+      "equity": 100089.3816252
+    },
+    {
+      "timestamp": "2026-10-06T13:35:00+00:00",
+      "equity": 100089.3816252
+    },
+    {
+      "timestamp": "2026-10-06T13:40:00+00:00",
+      "equity": 100089.3816252
+    },
+    {
+      "timestamp": "2026-10-06T13:45:00+00:00",
+      "equity": 100089.3816252
+    },
+    {
+      "timestamp": "2026-10-06T13:50:00+00:00",
+      "equity": 100089.3816252
+    },
+    {
+      "timestamp": "2026-10-06T13:55:00+00:00",
+      "equity": 100085.29216114999
+    },
+    {
+      "timestamp": "2026-10-06T14:00:00+00:00",
+      "equity": 100088.02146115
+    },
+    {
+      "timestamp": "2026-10-06T14:05:00+00:00",
+      "equity": 100095.93986115
+    },
+    {
+      "timestamp": "2026-10-06T14:10:00+00:00",
+      "equity": 100105.36256114999
+    },
+    {
+      "timestamp": "2026-10-06T14:15:00+00:00",
+      "equity": 100111.23766115
+    },
+    {
+      "timestamp": "2026-10-06T14:20:00+00:00",
+      "equity": 100111.76686115
+    },
+    {
+      "timestamp": "2026-10-06T14:25:00+00:00",
+      "equity": 100110.06166115
+    },
+    {
+      "timestamp": "2026-10-06T14:30:00+00:00",
+      "equity": 100111.30136114999
+    },
+    {
+      "timestamp": "2026-10-06T14:35:00+00:00",
+      "equity": 100117.94576115
+    },
+    {
+      "timestamp": "2026-10-06T14:40:00+00:00",
+      "equity": 100127.49096114999
+    },
+    {
+      "timestamp": "2026-10-06T14:45:00+00:00",
+      "equity": 100134.76746115
+    },
+    {
+      "timestamp": "2026-10-06T14:50:00+00:00",
+      "equity": 100136.68336114999
+    },
+    {
+      "timestamp": "2026-10-06T14:55:00+00:00",
+      "equity": 100135.09086114999
+    },
+    {
+      "timestamp": "2026-10-06T15:00:00+00:00",
+      "equity": 100135.04676114999
+    },
+    {
+      "timestamp": "2026-10-06T15:05:00+00:00",
+      "equity": 100140.20646115
+    },
+    {
+      "timestamp": "2026-10-06T15:10:00+00:00",
+      "equity": 100149.42336115
+    },
+    {
+      "timestamp": "2026-10-06T15:15:00+00:00",
+      "equity": 100157.83176115
+    },
+    {
+      "timestamp": "2026-10-06T15:20:00+00:00",
+      "equity": 100161.30096115
+    },
+    {
+      "timestamp": "2026-10-06T15:25:00+00:00",
+      "equity": 100160.24746115
+    },
+    {
+      "timestamp": "2026-10-06T15:30:00+00:00",
+      "equity": 100159.24786115
+    },
+    {
+      "timestamp": "2026-10-06T15:35:00+00:00",
+      "equity": 100162.81506115
+    },
+    {
+      "timestamp": "2026-10-06T15:40:00+00:00",
+      "equity": 100171.28226115
+    },
+    {
+      "timestamp": "2026-10-06T15:45:00+00:00",
+      "equity": 100180.46486115
+    },
+    {
+      "timestamp": "2026-10-06T15:50:00+00:00",
+      "equity": 100185.52656114999
+    },
+    {
+      "timestamp": "2026-10-06T15:55:00+00:00",
+      "equity": 100185.41386115
+    },
+    {
+      "timestamp": "2026-10-06T16:00:00+00:00",
+      "equity": 100179.92096115
+    },
+    {
+      "timestamp": "2026-10-06T16:05:00+00:00",
+      "equity": 100178.00996114999
+    },
+    {
+      "timestamp": "2026-10-06T16:10:00+00:00",
+      "equity": 100181.44486115
+    },
+    {
+      "timestamp": "2026-10-06T16:15:00+00:00",
+      "equity": 100187.06516114999
+    },
+    {
+      "timestamp": "2026-10-06T16:20:00+00:00",
+      "equity": 100189.70136115
+    },
+    {
+      "timestamp": "2026-10-06T16:25:00+00:00",
+      "equity": 100186.93286115
+    },
+    {
+      "timestamp": "2026-10-06T16:30:00+00:00",
+      "equity": 100181.30276115
+    },
+    {
+      "timestamp": "2026-10-06T16:35:00+00:00",
+      "equity": 100177.99036114999
+    },
+    {
+      "timestamp": "2026-10-06T16:40:00+00:00",
+      "equity": 100180.03856115
+    },
+    {
+      "timestamp": "2026-10-06T16:45:00+00:00",
+      "equity": 100185.56576114999
+    },
+    {
+      "timestamp": "2026-10-06T16:50:00+00:00",
+      "equity": 100189.49066114999
+    },
+    {
+      "timestamp": "2026-10-06T16:55:00+00:00",
+      "equity": 100188.20196115
+    },
+    {
+      "timestamp": "2026-10-06T17:00:00+00:00",
+      "equity": 100182.89036115
+    },
+    {
+      "timestamp": "2026-10-06T17:05:00+00:00",
+      "equity": 100178.43136115
+    },
+    {
+      "timestamp": "2026-10-06T17:10:00+00:00",
+      "equity": 100178.93116115
+    },
+    {
+      "timestamp": "2026-10-06T17:15:00+00:00",
+      "equity": 100183.92426115
+    },
+    {
+      "timestamp": "2026-10-06T17:20:00+00:00",
+      "equity": 100188.82426115
+    },
+    {
+      "timestamp": "2026-10-06T17:25:00+00:00",
+      "equity": 100189.12316115
+    },
+    {
+      "timestamp": "2026-10-06T17:30:00+00:00",
+      "equity": 100184.54656115
+    },
+    {
+      "timestamp": "2026-10-06T17:35:00+00:00",
+      "equity": 100179.30356115
+    },
+    {
+      "timestamp": "2026-10-06T17:40:00+00:00",
+      "equity": 100178.21086115
+    },
+    {
+      "timestamp": "2026-10-06T17:45:00+00:00",
+      "equity": 100182.27786115
+    },
+    {
+      "timestamp": "2026-10-06T17:50:00+00:00",
+      "equity": 100187.76096115
+    },
+    {
+      "timestamp": "2026-10-06T17:55:00+00:00",
+      "equity": 100189.62296115
+    },
+    {
+      "timestamp": "2026-10-06T18:00:00+00:00",
+      "equity": 100186.14886115
+    },
+    {
+      "timestamp": "2026-10-06T18:05:00+00:00",
+      "equity": 100180.53346115
+    },
+    {
+      "timestamp": "2026-10-06T18:10:00+00:00",
+      "equity": 100177.94136114999
+    },
+    {
+      "timestamp": "2026-10-06T18:15:00+00:00",
+      "equity": 100180.75396115
+    },
+    {
+      "timestamp": "2026-10-06T18:20:00+00:00",
+      "equity": 100186.38406114999
+    },
+    {
+      "timestamp": "2026-10-06T18:25:00+00:00",
+      "equity": 100189.65726115
+    },
+    {
+      "timestamp": "2026-10-06T18:30:00+00:00",
+      "equity": 100187.56496115
+    },
+    {
+      "timestamp": "2026-10-06T18:35:00+00:00",
+      "equity": 100182.02796115
+    },
+    {
+      "timestamp": "2026-10-06T18:40:00+00:00",
+      "equity": 100178.14226115
+    },
+    {
+      "timestamp": "2026-10-06T18:45:00+00:00",
+      "equity": 100179.47506114999
+    },
+    {
+      "timestamp": "2026-10-06T18:50:00+00:00",
+      "equity": 100184.80626114999
+    },
+    {
+      "timestamp": "2026-10-06T18:55:00+00:00",
+      "equity": 100189.23096115
+    },
+    {
+      "timestamp": "2026-10-06T19:00:00+00:00",
+      "equity": 100188.68216114999
+    },
+    {
+      "timestamp": "2026-10-06T19:05:00+00:00",
+      "equity": 100183.66456115
+    },
+    {
+      "timestamp": "2026-10-06T19:10:00+00:00",
+      "equity": 100178.78906114999
+    },
+    {
+      "timestamp": "2026-10-06T19:15:00+00:00",
+      "equity": 100178.53916115
+    },
+    {
+      "timestamp": "2026-10-06T19:20:00+00:00",
+      "equity": 100183.14516115
+    },
+    {
+      "timestamp": "2026-10-06T19:25:00+00:00",
+      "equity": 100188.37346115
+    },
+    {
+      "timestamp": "2026-10-06T19:30:00+00:00",
+      "equity": 100189.41226114999
+    },
+    {
+      "timestamp": "2026-10-06T19:35:00+00:00",
+      "equity": 100185.31586115
+    },
+    {
+      "timestamp": "2026-10-06T19:40:00+00:00",
+      "equity": 100179.84256115
+    },
+    {
+      "timestamp": "2026-10-06T19:45:00+00:00",
+      "equity": 100178.02956114999
+    },
+    {
+      "timestamp": "2026-10-06T19:50:00+00:00",
+      "equity": 100178.76325039999
+    },
+    {
+      "timestamp": "2026-10-06T19:55:00+00:00",
+      "equity": 100178.76325039999
+    },
+    {
+      "timestamp": "2026-10-06T20:00:00+00:00",
+      "equity": 100178.76325039999
+    },
+    {
+      "timestamp": "2026-10-07T13:35:00+00:00",
+      "equity": 100178.76325039999
+    },
+    {
+      "timestamp": "2026-10-07T13:40:00+00:00",
+      "equity": 100178.76325039999
+    },
+    {
+      "timestamp": "2026-10-07T13:45:00+00:00",
+      "equity": 100178.76325039999
+    },
+    {
+      "timestamp": "2026-10-07T13:50:00+00:00",
+      "equity": 100178.76325039999
+    },
+    {
+      "timestamp": "2026-10-07T13:55:00+00:00",
+      "equity": 100174.67378634999
+    },
+    {
+      "timestamp": "2026-10-07T14:00:00+00:00",
+      "equity": 100177.40308635
+    },
+    {
+      "timestamp": "2026-10-07T14:05:00+00:00",
+      "equity": 100185.32148634999
+    },
+    {
+      "timestamp": "2026-10-07T14:10:00+00:00",
+      "equity": 100194.74418635
+    },
+    {
+      "timestamp": "2026-10-07T14:15:00+00:00",
+      "equity": 100200.61928634999
+    },
+    {
+      "timestamp": "2026-10-07T14:20:00+00:00",
+      "equity": 100201.14848635
+    },
+    {
+      "timestamp": "2026-10-07T14:25:00+00:00",
+      "equity": 100199.44328635
+    },
+    {
+      "timestamp": "2026-10-07T14:30:00+00:00",
+      "equity": 100200.68298634999
+    },
+    {
+      "timestamp": "2026-10-07T14:35:00+00:00",
+      "equity": 100207.32738634999
+    },
+    {
+      "timestamp": "2026-10-07T14:40:00+00:00",
+      "equity": 100216.87258634999
+    },
+    {
+      "timestamp": "2026-10-07T14:45:00+00:00",
+      "equity": 100224.14908635
+    },
+    {
+      "timestamp": "2026-10-07T14:50:00+00:00",
+      "equity": 100226.06498634999
+    },
+    {
+      "timestamp": "2026-10-07T14:55:00+00:00",
+      "equity": 100224.47248634999
+    },
+    {
+      "timestamp": "2026-10-07T15:00:00+00:00",
+      "equity": 100224.42838634999
+    },
+    {
+      "timestamp": "2026-10-07T15:05:00+00:00",
+      "equity": 100229.58808634999
+    },
+    {
+      "timestamp": "2026-10-07T15:10:00+00:00",
+      "equity": 100238.80498634999
+    },
+    {
+      "timestamp": "2026-10-07T15:15:00+00:00",
+      "equity": 100247.21338634999
+    },
+    {
+      "timestamp": "2026-10-07T15:20:00+00:00",
+      "equity": 100250.68258635
+    },
+    {
+      "timestamp": "2026-10-07T15:25:00+00:00",
+      "equity": 100249.62908634999
+    },
+    {
+      "timestamp": "2026-10-07T15:30:00+00:00",
+      "equity": 100248.62948635
+    },
+    {
+      "timestamp": "2026-10-07T15:35:00+00:00",
+      "equity": 100252.19668635
+    },
+    {
+      "timestamp": "2026-10-07T15:40:00+00:00",
+      "equity": 100260.66388635
+    },
+    {
+      "timestamp": "2026-10-07T15:45:00+00:00",
+      "equity": 100269.84648635
+    },
+    {
+      "timestamp": "2026-10-07T15:50:00+00:00",
+      "equity": 100274.90818634999
+    },
+    {
+      "timestamp": "2026-10-07T15:55:00+00:00",
+      "equity": 100274.79548634999
+    },
+    {
+      "timestamp": "2026-10-07T16:00:00+00:00",
+      "equity": 100269.30258635
+    },
+    {
+      "timestamp": "2026-10-07T16:05:00+00:00",
+      "equity": 100267.39158634999
+    },
+    {
+      "timestamp": "2026-10-07T16:10:00+00:00",
+      "equity": 100270.82648635
+    },
+    {
+      "timestamp": "2026-10-07T16:15:00+00:00",
+      "equity": 100276.44678634999
+    },
+    {
+      "timestamp": "2026-10-07T16:20:00+00:00",
+      "equity": 100279.08298635
+    },
+    {
+      "timestamp": "2026-10-07T16:25:00+00:00",
+      "equity": 100276.31448634999
+    },
+    {
+      "timestamp": "2026-10-07T16:30:00+00:00",
+      "equity": 100270.68438635
+    },
+    {
+      "timestamp": "2026-10-07T16:35:00+00:00",
+      "equity": 100267.37198634999
+    },
+    {
+      "timestamp": "2026-10-07T16:40:00+00:00",
+      "equity": 100269.42018634999
+    },
+    {
+      "timestamp": "2026-10-07T16:45:00+00:00",
+      "equity": 100274.94738634999
+    },
+    {
+      "timestamp": "2026-10-07T16:50:00+00:00",
+      "equity": 100278.87228634999
+    },
+    {
+      "timestamp": "2026-10-07T16:55:00+00:00",
+      "equity": 100277.58358635
+    },
+    {
+      "timestamp": "2026-10-07T17:00:00+00:00",
+      "equity": 100272.27198635
+    },
+    {
+      "timestamp": "2026-10-07T17:05:00+00:00",
+      "equity": 100267.81298634999
+    },
+    {
+      "timestamp": "2026-10-07T17:10:00+00:00",
+      "equity": 100268.31278635
+    },
+    {
+      "timestamp": "2026-10-07T17:15:00+00:00",
+      "equity": 100273.30588634999
+    },
+    {
+      "timestamp": "2026-10-07T17:20:00+00:00",
+      "equity": 100278.20588634998
+    },
+    {
+      "timestamp": "2026-10-07T17:25:00+00:00",
+      "equity": 100278.50478635
+    },
+    {
+      "timestamp": "2026-10-07T17:30:00+00:00",
+      "equity": 100273.92818635
+    },
+    {
+      "timestamp": "2026-10-07T17:35:00+00:00",
+      "equity": 100268.68518634999
+    },
+    {
+      "timestamp": "2026-10-07T17:40:00+00:00",
+      "equity": 100267.59248635
+    },
+    {
+      "timestamp": "2026-10-07T17:45:00+00:00",
+      "equity": 100271.65948634999
+    },
+    {
+      "timestamp": "2026-10-07T17:50:00+00:00",
+      "equity": 100277.14258634999
+    },
+    {
+      "timestamp": "2026-10-07T17:55:00+00:00",
+      "equity": 100279.00458635
+    },
+    {
+      "timestamp": "2026-10-07T18:00:00+00:00",
+      "equity": 100275.53048634999
+    },
+    {
+      "timestamp": "2026-10-07T18:05:00+00:00",
+      "equity": 100269.91508635
+    },
+    {
+      "timestamp": "2026-10-07T18:10:00+00:00",
+      "equity": 100267.32298634999
+    },
+    {
+      "timestamp": "2026-10-07T18:15:00+00:00",
+      "equity": 100270.13558634999
+    },
+    {
+      "timestamp": "2026-10-07T18:20:00+00:00",
+      "equity": 100275.76568634999
+    },
+    {
+      "timestamp": "2026-10-07T18:25:00+00:00",
+      "equity": 100279.03888635
+    },
+    {
+      "timestamp": "2026-10-07T18:30:00+00:00",
+      "equity": 100276.94658635
+    },
+    {
+      "timestamp": "2026-10-07T18:35:00+00:00",
+      "equity": 100271.40958635
+    },
+    {
+      "timestamp": "2026-10-07T18:40:00+00:00",
+      "equity": 100267.52388635
+    },
+    {
+      "timestamp": "2026-10-07T18:45:00+00:00",
+      "equity": 100268.85668634999
+    },
+    {
+      "timestamp": "2026-10-07T18:50:00+00:00",
+      "equity": 100274.18788634999
+    },
+    {
+      "timestamp": "2026-10-07T18:55:00+00:00",
+      "equity": 100278.61258634999
+    },
+    {
+      "timestamp": "2026-10-07T19:00:00+00:00",
+      "equity": 100278.06378634999
+    },
+    {
+      "timestamp": "2026-10-07T19:05:00+00:00",
+      "equity": 100273.04618635
+    },
+    {
+      "timestamp": "2026-10-07T19:10:00+00:00",
+      "equity": 100268.17068634999
+    },
+    {
+      "timestamp": "2026-10-07T19:15:00+00:00",
+      "equity": 100267.92078634999
+    },
+    {
+      "timestamp": "2026-10-07T19:20:00+00:00",
+      "equity": 100272.52678634999
+    },
+    {
+      "timestamp": "2026-10-07T19:25:00+00:00",
+      "equity": 100277.75508635
+    },
+    {
+      "timestamp": "2026-10-07T19:30:00+00:00",
+      "equity": 100278.79388634999
+    },
+    {
+      "timestamp": "2026-10-07T19:35:00+00:00",
+      "equity": 100274.69748634999
+    },
+    {
+      "timestamp": "2026-10-07T19:40:00+00:00",
+      "equity": 100269.22418635
+    },
+    {
+      "timestamp": "2026-10-07T19:45:00+00:00",
+      "equity": 100267.41118634999
+    },
+    {
+      "timestamp": "2026-10-07T19:50:00+00:00",
+      "equity": 100268.14487559999
+    },
+    {
+      "timestamp": "2026-10-07T19:55:00+00:00",
+      "equity": 100268.14487559999
+    },
+    {
+      "timestamp": "2026-10-07T20:00:00+00:00",
+      "equity": 100268.14487559999
+    }
+  ],
+  "execution_time_resolution": "Entry at modeled bar open; exit_time labels the containing bar end, not an observed tick",
+  "assumptions": {
+    "slippage_bps": 5,
+    "fee_per_share": 0.005,
+    "capital_fraction": 0.05,
+    "risk_fraction": 0.001,
+    "intrabar_ambiguity": "stop_first",
+    "queue_or_depth_model": false
+  },
+  "validated_for_live": false
+}
+
+[Daily forward windows] exit=0
+{
+  "folds": [
+    {
+      "train_end": "2025-03-26T21:00:00+00:00",
+      "test_start": "2025-03-28T21:00:00+00:00",
+      "test_end": "2025-04-24T21:00:00+00:00",
+      "return": 0.0,
+      "max_drawdown": 0.0,
+      "closed_trades": 0,
+      "buy_hold_return": 0.0036393333600002187
+    },
+    {
+      "train_end": "2025-04-23T21:00:00+00:00",
+      "test_start": "2025-04-25T21:00:00+00:00",
+      "test_end": "2025-05-22T21:00:00+00:00",
+      "return": 0.0019970522143000213,
+      "max_drawdown": 0.00032461249535598036,
+      "closed_trades": 0,
+      "buy_hold_return": 0.06729178051300022
+    },
+    {
+      "train_end": "2025-05-21T21:00:00+00:00",
+      "test_start": "2025-05-23T21:00:00+00:00",
+      "test_end": "2025-06-19T21:00:00+00:00",
+      "return": -0.00034334214300002497,
+      "max_drawdown": 0.00039856974300001013,
+      "closed_trades": 0,
+      "buy_hold_return": 0.0016614628352000782
+    },
+    {
+      "train_end": "2025-06-18T21:00:00+00:00",
+      "test_start": "2025-06-20T21:00:00+00:00",
+      "test_end": "2025-07-17T21:00:00+00:00",
+      "return": 0.0008443376633999744,
+      "max_drawdown": 0.0005178535190113465,
+      "closed_trades": 0,
+      "buy_hold_return": 0.04851128309880015
+    },
+    {
+      "train_end": "2025-07-16T21:00:00+00:00",
+      "test_start": "2025-07-18T21:00:00+00:00",
+      "test_end": "2025-08-14T21:00:00+00:00",
+      "return": 0.0031962459248999764,
+      "max_drawdown": 0.0006812307930081918,
+      "closed_trades": 0,
+      "buy_hold_return": 0.06679990481580012
+    },
+    {
+      "train_end": "2025-08-13T21:00:00+00:00",
+      "test_start": "2025-08-15T21:00:00+00:00",
+      "test_end": "2025-09-11T21:00:00+00:00",
+      "return": 0.0,
+      "max_drawdown": 0.0,
+      "closed_trades": 0,
+      "buy_hold_return": 0.06436103347170019
+    },
+    {
+      "train_end": "2025-09-10T21:00:00+00:00",
+      "test_start": "2025-09-12T21:00:00+00:00",
+      "test_end": "2025-10-09T21:00:00+00:00",
+      "return": 0.0020646584558998704,
+      "max_drawdown": 0.0008086227838984827,
+      "closed_trades": 0,
+      "buy_hold_return": 0.05941544345275007
+    },
+    {
+      "train_end": "2025-10-08T21:00:00+00:00",
+      "test_start": "2025-10-10T21:00:00+00:00",
+      "test_end": "2025-11-06T21:00:00+00:00",
+      "return": 0.0015852050475000379,
+      "max_drawdown": 0.0012321051666687177,
+      "closed_trades": 0,
+      "buy_hold_return": 0.030026670578100267
+    },
+    {
+      "train_end": "2025-11-05T21:00:00+00:00",
+      "test_start": "2025-11-07T21:00:00+00:00",
+      "test_end": "2025-12-04T21:00:00+00:00",
+      "return": 0.00028105556489976813,
+      "max_drawdown": 0.0014587247445144724,
+      "closed_trades": 1,
+      "buy_hold_return": -0.028539984021500153
+    },
+    {
+      "train_end": "2025-12-03T21:00:00+00:00",
+      "test_start": "2025-12-05T21:00:00+00:00",
+      "test_end": "2026-01-01T21:00:00+00:00",
+      "return": 0.0030762062900000497,
+      "max_drawdown": 7.537375289434767e-05,
+      "closed_trades": 0,
+      "buy_hold_return": 0.13221462320440014
+    },
+    {
+      "train_end": "2025-12-31T21:00:00+00:00",
+      "test_start": "2026-01-02T21:00:00+00:00",
+      "test_end": "2026-01-29T21:00:00+00:00",
+      "return": 0.0,
+      "max_drawdown": 0.0,
+      "closed_trades": 0,
+      "buy_hold_return": -0.07110964233170003
+    },
+    {
+      "train_end": "2026-01-28T21:00:00+00:00",
+      "test_start": "2026-01-30T21:00:00+00:00",
+      "test_end": "2026-02-26T21:00:00+00:00",
+      "return": 0.0006288883439000692,
+      "max_drawdown": 0.00023143487109988925,
+      "closed_trades": 1,
+      "buy_hold_return": -0.01027514241149996
+    },
+    {
+      "train_end": "2026-02-25T21:00:00+00:00",
+      "test_start": "2026-02-27T21:00:00+00:00",
+      "test_end": "2026-03-26T21:00:00+00:00",
+      "return": 0.001532824570650071,
+      "max_drawdown": 0.0,
+      "closed_trades": 0,
+      "buy_hold_return": 0.040634986749000124
+    }
+  ],
+  "selection": "fixed_rules_no_parameter_optimization",
+  "fold_capital_resets": true
+}
+
+[GARCH with exact fictional audit] exit=0
+{
+  "data_quality": {
+    "action_count": 0,
+    "bar_interval": "1d",
+    "csv_sha256": "049a463d266d1ca673b95694aebeef353f7ddfbf300ec71623ecec548d19f205",
+    "eligible_for_sizing": false,
+    "jump_threshold": 0.25,
+    "large_moves": [],
+    "limitations": "Caller-supplied audit; evidence not fetched or authenticated by this helper",
+    "price_basis": "split_adjusted",
+    "provider": "Bundled synthetic learning fixture",
+    "reasons": [
+      "Fictional data cannot support investment sizing"
+    ],
+    "status": "FICTIONAL",
+    "symbol": "FICTION_DAILY"
+  },
+  "eligible_as_sizing_input": false,
+  "fit_message": "Optimization terminated successfully",
+  "fit_success": true,
+  "forecast_annualized_volatility": 0.21948843361236875,
+  "forecast_daily_volatility": 0.01382647169031995,
+  "forecast_period_volatility": 0.01382647169031995,
+  "forecast_variance_percent_squared": [
+    1.9117131940321905
+  ],
+  "innovation_distribution": "Gaussian; zero conditional mean",
+  "last_price": 150.79701,
+  "last_timestamp": "2026-04-08T21:00:00+00:00",
+  "log_likelihood": -536.3396987279095,
+  "model": "garch",
+  "observations": 329,
+  "parameters": [
+    0.0032405829534755703,
+    0.004950198197861118,
+    0.9940498018021394
+  ],
+  "periods_per_year": 252.0,
+  "recent_realized_daily_volatility": 0.013460365487858443,
+  "regime": "NORMAL",
+  "run_specification": {
+    "audit_helper_sha256": "80d1ee25367a1de16cc1ee3ad41275531758837a002d545b22afab8f30c489f4",
+    "audit_sha256": "cbece29bc7dbb13188c21830d403b49f29cccb0549942400093cfdc6accf47a4",
+    "close_column": "close",
+    "csv_sha256": "049a463d266d1ca673b95694aebeef353f7ddfbf300ec71623ecec548d19f205",
+    "first_timestamp": "2025-01-02T21:00:00+00:00",
+    "forecast_fit": "refit on all available returns after sequential prefix-only holdout",
+    "holdout_first_return_end": "2026-02-12T21:00:00+00:00",
+    "holdout_returns": 40,
+    "horizon": 1,
+    "implementation": "bundled-garch-2.2.0",
+    "last_timestamp": "2026-04-08T21:00:00+00:00",
+    "numpy": "2.4.6",
+    "optimizer": "SLSQP; maxiter=2500; ftol=1e-10; deterministic single start",
+    "periods_per_year": 252.0,
+    "price_count": 330,
+    "python": "3.11.3",
+    "realized_window_returns": 60,
+    "regime_ratio": 1.027198830729503,
+    "regime_ratio_boundaries": [
+      0.7,
+      1.3,
+      1.9
+    ],
+    "requested_model": "garch",
+    "return_count": 329,
+    "return_definition": "100 * log(P[t] / P[t-1]); zero mean; Gaussian innovations",
+    "scipy": "1.17.1",
+    "script_sha256": "6d3de424625387923df396726fbbf918c02bab0d73ac4165c4695efc9dd75a06",
+    "selected_model": "garch",
+    "timestamp_column": "timestamp",
+    "training_last_return_end": "2026-02-11T21:00:00+00:00",
+    "training_returns": 289,
+    "variance_initialization": "sample variance ddof=1 on each fit sample"
+  },
+  "selection_caveat": "Holdout used for model selection, not independent strategy performance proof",
+  "validation": {
+    "garch": {
+      "baseline_qlike": 1.2514161674233493,
+      "beats_constant_variance": true,
+      "method": "fixed_parameter_sequential_one_step",
+      "mse": 4.772939363519541,
+      "n": 40,
+      "qlike": 1.199181546200047,
+      "status": "ok"
+    }
+  }
+}
+
+[Early-close calendar] exit=0
+{
+  "is_trading_day": true,
+  "exchange": "XNYS",
+  "date": "2026-11-27",
+  "open": "2026-11-27T14:30:00+00:00",
+  "close": "2026-11-27T18:00:00+00:00"
+}
+
+[Personal initialization] exit=0
+{
+  "runtime": "C:\\Users\\ajit_\\Documents\\Codex\\2026-10-06\\files-mentioned-by-the-user-robinhood\\work\\personal-release-7fjku0tr\\runtime",
+  "mode": "paper",
+  "configuration_status": "draft",
+  "next": "Configure investor policy and personal broker capability mapping; no live authority created"
+}
+
+[Doctor fails closed on draft/paper] exit=2
+{
+  "local_checks_passed": false,
+  "failures": [
+    "PERSONAL_POLICY_REQUIRES_CONFIGURATION_AND_APPROVAL",
+    "PAPER_MODE_NO_LIVE_AUTHORITY"
+  ],
+  "checks": {
+    "numpy": "2.4.6",
+    "scipy": "1.17.1",
+    "exchange_calendars": "4.13.2",
+    "yfinance": "1.7.0",
+    "jsonschema": "4.26.0",
+    "requests": "2.34.2",
+    "policy_hash": "6a076f9b8ebc351d9bdbfc5af25217bb11af8ef68f556f7eae2a458d9ac133a0",
+    "mode": "paper",
+    "unresolved_intents": 0,
+    "unresolved_cancellations": 0
+  },
+  "live_readiness": "Requires an exact claim with fresh broker evidence, active session and human authorization"
+}
+
+[FCF CLI] exit=0
+{
+  "period": "FY2026",
+  "reported_fcf": 70.0,
+  "normalized_fcf": 70.0,
+  "sbc_adjusted_owner_earnings_sensitivity": 60.0,
+  "adjustments": [],
+  "caveat": "SBC sensitivity is not a cash outflow; separately model dilution, recurring capex and working-capital reversals"
+}
+
+[Accounting CLI] exit=0
+{
+  "calculated_cash": "100",
+  "broker_cash": "100",
+  "difference": "0",
+  "reconciled": true,
+  "unsettled_positive_trade_proceeds": "0",
+  "caveat": "Not a buying-power calculation: use broker settled cash, restrictions and existing reservations"
+}
+
+[Portfolio stress CLI] exit=0
+{
+  "scenarios": [
+    {
+      "name": "gap",
+      "pnl": -40.0,
+      "equity_fraction": -0.04,
+      "post_scenario_equity": 960.0,
+      "positions": [
+        {
+          "symbol": "DEMO",
+          "shock": -0.4,
+          "pnl": -40.0
+        }
+      ]
+    }
+  ],
+  "caveat": "User-defined shocks; no probability, guaranteed bound or stop-fill assumption"
+}
+
+[Extracted portable regression suite] exit=0
+----------------------------------------------------------------------
+Ran 180 tests in 15.929s
+
+OK
+
+[Extracted offline walkthrough] exit=0
+{
+  "valid_fictional_proposal": {
+    "allowed": true,
+    "reasons": [],
+    "metrics": {
+      "planned_loss": "42.60040",
+      "reward_risk": "2.755833278560764687655514972",
+      "available_cash": "95000.00",
+      "projected_sleeve_value": "2000.40",
+      "spread_bps": "4.0000",
+      "notional": "2000.40",
+      "existing_open_risk": "0"
+    },
+    "order_hash": "c709a84670e0aae7ec59c90600d6ac7de2d578960d7a4d97094a4525f5c774fc",
+    "policy_hash": "1b10671a90474807a272e641c8100489c10e260d2066d47cf023001398c2f755",
+    "planned_loss_is_not_guaranteed": true
+  },
+  "stale_quote_is_blocked": {
+    "allowed": false,
+    "reasons": [
+      "STALE_OR_FUTURE_QUOTE"
+    ],
+    "metrics": {
+      "planned_loss": "42.60040",
+      "reward_risk": "2.755833278560764687655514972",
+      "available_cash": "95000.00",
+      "projected_sleeve_value": "2000.40",
+      "spread_bps": "4.0000",
+      "notional": "2000.40",
+      "existing_open_risk": "0"
+    },
+    "order_hash": "c709a84670e0aae7ec59c90600d6ac7de2d578960d7a4d97094a4525f5c774fc",
+    "policy_hash": "1b10671a90474807a272e641c8100489c10e260d2066d47cf023001398c2f755",
+    "planned_loss_is_not_guaranteed": true
+  },
+  "paper_claim": {
+    "id": "demo-entry-001",
+    "state": "CLAIMED",
+    "order_hash": "c709a84670e0aae7ec59c90600d6ac7de2d578960d7a4d97094a4525f5c774fc",
+    "may_submit_once": false,
+    "mode": "paper",
+    "broker_request_hash": null
+  },
+  "partial_fill_then_cancel": {
+    "state": "CANCELLED",
+    "filled": "5",
+    "average_price": "100.01"
+  },
+  "duplicate_blocked": "DUPLICATE_ORDER_INTENT",
+  "core_rebalance_candidates": {
+    "buy_candidates": [
+      {
+        "symbol": "CORE_A",
+        "side": "buy",
+        "sleeve": "core",
+        "quantity": "50",
+        "reference_price": "100",
+        "notional_before_fees": "5000"
+      }
+    ],
+    "sell_reviews": [],
+    "unused_planning_budget": "0.00",
+    "cash_remaining_before_fees": "15000",
+    "next_step": "Add fees, current broker quotes and run each exact order through risk_engine and execution_ledger"
+  },
+  "scope": "FICTIONAL OFFLINE LEARNING ONLY; no broker access, investment recommendation or live validation"
+}
