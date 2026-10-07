@@ -11,6 +11,8 @@ Shareable source exports of reusable Agent Skills, packaged as a native Claude C
 - `linkedin-knowledge-digest`: Filter LinkedIn feed and inbox activity into concise knowledge-bearing digests with clickable source links while excluding career milestones, hiring posts, self-promotion, and low-value outreach.
 - `travel-deal-finder`: Compare current travel deals across flights, hotels, packages, and rental cars with clear ranking rules and source verification.
 
+- `robinhood-ai-trading-agent`: Research and manage a long-term portfolio core with separately budgeted supervised swing/day trading, configurable stock screening, GARCH risk analysis and broker-verified execution gates. Starts in paper mode; live execution requires the official Robinhood Trading MCP and applicable human authorization.
+
 ## Layout
 
 Each skill lives under `skills/<skill-name>` and keeps the shared Agent Skills structure understood by Codex and Claude Code:
@@ -28,7 +30,7 @@ Claude-specific packaging lives alongside the skills:
 
 ## Use With Codex
 
-Current Codex releases discover personal skills under `~/.agents/skills`. Copy one skill or all six there.
+Current Codex releases discover personal skills under `~/.agents/skills`. Copy one skill or all seven there.
 
 ```powershell
 New-Item -ItemType Directory -Force "$HOME\.agents\skills" | Out-Null
@@ -46,7 +48,7 @@ Some older Codex desktop installations discover personal skills from `$CODEX_HOM
 
 ## Use With Claude Code (Recommended)
 
-Install the repository as a native plugin. This loads all six skills and their matching agents without copying folders or depending on the current working directory.
+Install the repository as a native plugin. This loads all seven skills and their matching agents without copying folders or depending on the current working directory.
 
 In Claude Code:
 
@@ -72,6 +74,7 @@ The matching Claude plugin agents have these scoped names:
 - `ai-skills:karaoke-video-agent`
 - `ai-skills:linkedin-digest-agent`
 - `ai-skills:travel-deal-agent`
+- `ai-skills:robinhood-trading-agent`
 
 Claude can delegate automatically from each agent's description. To guarantee one runs, type `@` and choose its scoped name from the agent picker. A manual mention uses `@agent-` followed by the scoped name, for example `@agent-ai-skills:guitar-karaoke-agent`. Each agent preloads only its corresponding skill to keep context focused.
 
@@ -101,6 +104,7 @@ cp -R skills/create-karaoke-video ~/.claude/skills/
 cp -R skills/deal-watch-alerts ~/.claude/skills/
 cp -R skills/linkedin-knowledge-digest ~/.claude/skills/
 cp -R skills/travel-deal-finder ~/.claude/skills/
+cp -R skills/robinhood-ai-trading-agent ~/.claude/skills/
 ```
 
 PowerShell equivalent:
@@ -113,6 +117,7 @@ Copy-Item -Recurse skills\create-karaoke-video "$HOME\.claude\skills\"
 Copy-Item -Recurse skills\deal-watch-alerts "$HOME\.claude\skills\"
 Copy-Item -Recurse skills\linkedin-knowledge-digest "$HOME\.claude\skills\"
 Copy-Item -Recurse skills\travel-deal-finder "$HOME\.claude\skills\"
+Copy-Item -Recurse skills\robinhood-ai-trading-agent "$HOME\.claude\skills\"
 ```
 
 If the top-level skills directory did not exist when the session started, restart Claude Code once. Otherwise Claude detects skill changes live. Standalone skills can be invoked with `/skill-name` or preloaded into a custom agent:
@@ -166,6 +171,8 @@ The repository's CI runs the portability checks and focused helper tests on both
 ## Dependencies
 
 Some skill scripts call optional third-party tools such as FFmpeg, Pillow, Demucs, or audio-separator. Dependencies and model checkpoints are not vendored in this repository.
+
+The trading skill has separate Python dependencies in `skills/robinhood-ai-trading-agent/requirements-tested.txt`. Use its isolated environment and paper-runtime setup instructions. Packaging it as a Claude agent does not establish broker availability or validate live trading on that host.
 
 Agents inherit the tools and MCP servers enabled in the user's Claude Code session. Live browser, web, Slack/email, or other external operations require the corresponding configured capability and authenticated session; the agents stop clearly when a required capability is unavailable.
 
