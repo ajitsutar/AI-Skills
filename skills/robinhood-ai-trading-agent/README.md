@@ -1,6 +1,6 @@
 # Robinhood portfolio and trading agent
 
-Version **3.2.0 — October 8, 2026**. A portable skill for **personal Codex**, with
+Version **3.3.0 — October 8, 2026**. A portable skill for **personal Codex**, with
 a long-term core and separately budgeted swing/day trading in an active supervised
 session. It starts in paper mode and supports exact-order approval or a bounded
 mandate through the connected official Robinhood Trading MCP.
@@ -11,8 +11,14 @@ quantitative analysis, and execution controls. Choose and adapt the examples;
 they do not change the skill's operating policy or grant trading authorization.
 
 Provide/extract the **entire ZIP**, not only SKILL.md. Ask the personal agent to
-identify version 3.2.0 and verify its supporting files before use. GARCH is
+identify version 3.3.0 and verify its supporting files before use. GARCH is
 explicitly part of this skill and has an executable, audited helper.
+
+Version 3.3 adds holding-period planning from intraday to decades, explicit entry
+and hold-event policies, latest-financial-period checks and dated net scenario
+comparisons. It retains the separate day-trading signal and live-execution gates.
+Read [the current review](REVIEW-3.3.md) and
+[holding-period planning](references/holding-period-planning.md).
 
 Version 3.2 restores historical source credits and uses the licensed arch backend
 for volatility estimation. Read the [release review](REVIEW-3.2.md),
@@ -31,6 +37,11 @@ to a brokerage, place trades, install a skill or create a schedule.
 
 ## Research and trading routes
 
+- **Any requested hold:** exact units and entry/exit clock, same-session versus
+  overnight exposure, fixed versus rolling deadline, and provisional future
+  calendars. Supports ten years and longer without a skill-imposed maximum.
+- **Swing / dated hold:** within-window thesis, latest primary evidence, event
+  exposure, net terminal scenarios, portfolio fit and an explicit exit plan.
 - **Long term:** configurable universe → suitable sector/industry valuation →
   earnings/FCF normalization → balance-sheet/value-trap review → analysts,
   dispersion and revisions → events → GARCH risk overlay → portfolio fit.
@@ -69,6 +80,7 @@ lockfile. Use an isolated environment and rerun tests after dependency updates.
 | Skill and references | Separate portfolio, value-screening and tactical workflows; source discipline |
 | research_data / research_analytics | SEC exact-context facts; public daily history; configurable provider; peers, earnings/FCF bridges, scenarios, targets and estimate revisions |
 | screen_review / price_audit | Coverage, declared-method hashes, hypothesis/Eligible report checks, candidate classifications and corporate-action/jump/session declarations bound to exact price files |
+| horizon_review | Same-session/elapsed/calendar/session clocks through multi-decade holds, latest-period consistency, event scope, rolling reviews and same-exit net scenarios; research only |
 | garch_volatility | GARCH/GJR/one-step EGARCH; prefix-only holdout versus baseline; reproducible model outputs |
 | portfolio_manager / portfolio_analytics | Cash-first rebalance, ETF look-through, aligned covariance, stress scenarios |
 | accounting_tools | Cash reconciliation, flow-timed returns, lot-selection proposals and wash-sale review flags |
@@ -83,6 +95,7 @@ lockfile. Use an isolated environment and rerun tests after dependency updates.
 ```powershell
 .\.venv\Scripts\python.exe scripts/learning_demo.py
 .\.venv\Scripts\python.exe scripts/screen_review.py examples/fictional-screen.json
+.\.venv\Scripts\python.exe scripts/screen_review.py examples/fictional-horizon-screen.json
 .\.venv\Scripts\python.exe scripts/garch_volatility.py examples/fictional-daily.csv --data-audit examples/fictional-daily.audit.json --model garch --horizon 1
 .\.venv\Scripts\python.exe scripts/strategy_lab.py examples/fictional-intraday.csv --strategy opening_range_breakout
 ```

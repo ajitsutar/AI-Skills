@@ -55,3 +55,11 @@ separate from market-data permissions and brokerage terms.
 
 See [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) and
 [the release review](REVIEW-3.2.md).
+
+## Version 3.3 additions
+
+Holding-period planning, declaration checks and fictional regression fixtures were
+created for this repository in response to the user's workflow review. They reuse
+the existing exchange_calendars integration, add no copied external implementation
+or dependency, and preserve all 3.2 credits and notices. New fixtures contain no
+personal account data or pasted private-agent research.
