@@ -3,6 +3,7 @@
 
 from __future__ import annotations
 
+import hashlib
 import re
 import sys
 from pathlib import Path
@@ -41,6 +42,13 @@ FORBIDDEN_EXTENSIONS = {
     ".tar",
     ".gz",
 }
+
+# Only the exact reviewed upstream notice may contain these public author emails.
+# Normalize line endings through read_text so the allowance survives Git checkout.
+PUBLIC_LICENSE_EMAIL_EXCEPTIONS = {
+    "skills/robinhood-ai-trading-agent/ARCH-LICENSE.txt": "c6e622bd89db4e13315f4e91605ff96fcbb9012d78ee74e429855870b203eed6",
+}
+
 
 TEXT_PATTERNS = [
     (
@@ -100,6 +108,10 @@ def scan() -> list[str]:
 
         text = path.read_text(encoding="utf-8")
         for label, pattern in TEXT_PATTERNS:
+            if (label == "personal email"
+                    and PUBLIC_LICENSE_EMAIL_EXCEPTIONS.get(rel.as_posix())
+                    == hashlib.sha256(text.encode("utf-8")).hexdigest()):
+                continue
             for match in pattern.finditer(text):
                 line_no = text.count("\n", 0, match.start()) + 1
                 findings.append(f"{label}: {rel}:{line_no}")
