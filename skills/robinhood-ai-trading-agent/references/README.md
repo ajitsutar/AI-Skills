@@ -9,3 +9,6 @@ For ranked long-term discovery and competing screens, read research-run-methodol
 
 The influencer adaptation and REVIEW.md preserve original inspiration/social
 research provenance. They provide no authorization or verified performance evidence.
+
+Historical credits are maintained in [SOURCES.md](../SOURCES.md); source and
+license status are in [PROVENANCE.md](../PROVENANCE.md).

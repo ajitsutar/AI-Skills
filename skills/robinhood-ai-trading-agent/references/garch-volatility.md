@@ -1,6 +1,6 @@
 # Volatility helper: corrected behavior and limits
 
-This is the built-in GARCH specification for package 3.1.0. The main SKILL.md
+This is the built-in GARCH specification for package 3.2.0. The main SKILL.md
 states when to assess it and how to report computation versus a skipped overlay.
 Load this reference when a shortlist/risk-sizing workflow reaches that step.
 
@@ -10,7 +10,8 @@ GARCH is not part of the skill. Preserve a clear distinction between the bundled
 helper and any separately verified alternative implementation.
 
 GARCH forecasts conditional variance, not price direction or profitability.
-Dependencies are NumPy and SciPy. The helper assumes zero conditional mean and
+Estimation/filtering/forecasting use arch 8.0.0 with its installed numerical dependencies.
+See [dependency notices](../THIRD-PARTY-NOTICES.md). The helper assumes zero conditional mean and
 Gaussian innovations; percent log returns improve numerical scale.
 
 ## Correct recursion
@@ -109,14 +110,19 @@ all but the last 40 returns (minimum 250). The holdout predicts sequentially usi
 prefix-fitted fixed parameters. Only the final forward forecast refits on all
 returns. Never label predictions from the full-sample fit as held out.
 
-Initial variance is sample variance (ddof=1, floor 1e-8); likelihood variance has
-floor 1e-12. SLSQP uses a deterministic single start, maxiter=2500, ftol=1e-10.
-GARCH parameter order is omega/alpha/beta with alpha+beta <= 0.999. GJR adds gamma
-before beta and uses alpha+gamma/2+beta <= 0.999, gamma >= 0. The emitted
-run_specification records exact code/audit-helper/input/audit hashes, Python and
-NumPy/SciPy versions, windows/counts, model/horizon and annualization. Code hashes
-capture remaining bounds/choices. Preserve inputs plus output JSON; dependency
-or optimizer changes can still cause small numeric differences.
+The backend now uses arch's default backcasting, variance bounds and optimizer
+initialization, with rescale=False. SLSQP has maxiter=2500 and ftol=1e-10.
+Each holdout prediction calls arch's fixed-parameter API on only the observed
+prefix; neither the target nor future data enters variance initialization.
+GARCH/GJR persistence must be below one, and EGARCH beta must be below one.
+Library parameter constraints apply; unlike the former implementation, GJR gamma
+need not be nonnegative when arch's other positivity constraints are satisfied.
+The training sample-variance benchmark retains ddof=1 and a floor of 1e-8.
+
+Parameter names accompany the parameter array. The run specification identifies
+arch and the numerical dependency versions, initialization, input/code hashes,
+windows, model and units. Results can differ from v3.1: rerun and revalidate the
+research rather than treating the new adapter as the old numerical implementation.
 
 Regime ratio = next-period forecast volatility / standard deviation of the last
 60 returns (ddof=1): LOW <0.70, NORMAL >=0.70 and <1.30, ELEVATED >=1.30 and <1.90,
