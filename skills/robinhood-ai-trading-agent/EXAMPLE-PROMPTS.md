@@ -1,6 +1,6 @@
 # 50 example prompts: beginner to advanced
 
-These examples match skill version **3.1.0**. Documentation updated October 8, 2026.
+These examples match skill version **3.3.0**. Documentation updated October 8, 2026.
 
 Start any prompt with: **Use the robinhood-ai-trading-agent skill.** Replace the
 bracketed placeholders with your own inputs. The examples are requests you can
@@ -95,7 +95,7 @@ monitoring after it closes. See the [skill](SKILL.md) and
 
 ### 18. Apply consistent event checks
 
-> Review [WATCHLIST] for upcoming earnings, dividends, regulatory decisions, and other material events. Apply the same event criteria across candidates and explain how the implications differ for long-term investment and short-term entry.
+> Review [WATCHLIST] for upcoming earnings, dividends, regulatory decisions, and other material events. Distinguish entry-only blackouts from a prohibition on holding through events. Verify release versus call dates and uncertain windows. For long holds, specify near-term coverage and rolling reviews without claiming that distant events are known.
 
 ### 19. Research social and ownership signals
 
@@ -103,7 +103,7 @@ monitoring after it closes. See the [skill](SKILL.md) and
 
 ### 20. Reconcile two conflicting stock screens
 
-> Compare these two screens: [RESULT A] and [RESULT B]. Reconcile universe, timestamps, price adjustments, sector definitions, metric definitions, missing data, and ranking rules. Explain which disagreements come from data and which come from judgment.
+> Compare these two screens: [RESULT A] and [RESULT B]. Reconcile skill version, model/settings, tools/data access, prior context, universe, cutoff, holding period, price adjustments, latest primary financial periods, peer/metric definitions, coverage, event policy, and ranking rules. Separate factual errors from judgment differences; do not infer model quality from one pair of lists.
 
 ## Portfolio management
 
@@ -171,7 +171,7 @@ monitoring after it closes. See the [skill](SKILL.md) and
 
 ### 36. Research a swing-trading setup
 
-> Evaluate [SYMBOL] as a swing-trading candidate using the daily trend research baseline. Review events, entry conditions, invalidation, holding period, and portfolio fit. Explain what additional validation would be required before live use.
+> Find suitable candidates in [UNIVERSE] for a [HOLDING PERIOD] hold and exit. Support my actual interval, whether a same-session day trade, 90 calendar days, 18 months, or 10 years or longer. Resolve the entry/exit clock and route to the appropriate strategy. Review relevant fundamentals or completed-bar signals, event exposure, horizon-specific outcomes, costs, portfolio fit, and exit coverage. Return fewer candidates if the evidence is incomplete; do not place orders.
 
 ### 37. Handle a losing trading session
 

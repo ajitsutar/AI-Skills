@@ -109,3 +109,14 @@ No bundled setup is approved for live trading; a positive synthetic replay is no
 promotion evidence. The SMA example remains research-only until a matching live
 signal/exit adapter and evaluation are added. This does not restrict the separate
 long-term core portfolio workflow.
+
+## Holding-period boundary
+
+Read [holding-period-planning.md](holding-period-planning.md) when a duration is
+specified. A one-day day trade exits in its entry session; a 24-hour overnight
+position is a swing. The standalone horizon_review helper can resolve the clock
+without imposing a fundamental screen. Arbitrary longer holds route to swing or
+long-term research with their own evidence, events and review cadence. Do not
+extend an intraday exit or reuse its live adapter for a multi-session strategy.
+Event scope defaults to entry_and_hold for compatibility with approved live
+policies; entry_only is a different policy choice, not an automatic relaxation.

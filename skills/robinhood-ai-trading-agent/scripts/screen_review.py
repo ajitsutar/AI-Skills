@@ -13,6 +13,7 @@ from collections import Counter
 from pathlib import Path
 
 from price_audit import evidence, timestamp
+from horizon_review import resolve_horizon, review_horizon_candidate, review_primary
 
 
 REQUIRED_CHECKS = (
@@ -124,6 +125,16 @@ def assess_candidate(candidate):
 
 
 def review_screen(document):
+    mode = document.get("decision_mode", "legacy_unspecified")
+    if mode not in {"legacy_unspecified", "long_term", "fixed_horizon"}:
+        raise ValueError("screen_review supports long_term or fixed_horizon; intraday uses signal_review")
+    if "horizon" in document and mode != "fixed_horizon":
+        raise ValueError("A horizon contract requires decision_mode fixed_horizon")
+    horizon = resolve_horizon(document.get("horizon")) if mode == "fixed_horizon" else None
+    if horizon and horizon["strategy_route"] == "intraday":
+        raise ValueError("Use horizon_review for the intraday clock and signal_review for its setup; no fundamental screen is required")
+    research_as_of = (timestamp(horizon["as_of"]) if horizon else
+                      timestamp(document["research_as_of"]) if mode == "long_term" else None)
     universe = document["universe"]
     if (not universe.get("name") or not universe.get("source")
             or not universe.get("scope_and_filters")):
@@ -156,11 +167,34 @@ def review_screen(document):
         if symbol in reviewed or symbol not in retained:
             raise ValueError("Candidate reviews must be unique retained screening rows")
         reviewed.add(symbol)
-        candidates.append(assess_candidate(candidate))
+        result = assess_candidate(candidate)
+        if mode == "long_term":
+            gaps = review_primary(candidate.get("primary_review"), research_as_of)
+            result["primary_review_gaps"] = gaps
+            if gaps and result["status"] in {"Eligible", "Event-blocked"}:
+                result["status"] = "Watch"
+        if horizon:
+            extra = review_horizon_candidate(candidate, document["horizon"], horizon)
+            result["horizon_review"] = extra
+            # Never let a timing/event overlay hide failed fundamentals.
+            statuses = {result["fundamental_status"], extra["status"]}
+            result["status"] = ("Reject" if "Reject" in statuses else "Speculative" if "Speculative" in statuses
+                                else "Watch" if "Watch" in statuses else "Eligible")
+            event_states = {result["event_status"], extra["event_status"]}
+            result["event_status"] = ("blocked" if "blocked" in event_states else
+                                      "unknown" if "unknown" in event_states else "clear")
+            if result["status"] == "Eligible":
+                result["status"] = {"blocked": "Event-blocked", "unknown": "Watch", "clear": "Eligible"}[result["event_status"]]
+        candidates.append(result)
     absent = sorted(expected - seen)
     methodology = review_run_spec(document)
+    if mode != "legacy_unspecified" and methodology["status"] != "DECLARED":
+        raise ValueError("New decision modes require a declared run_spec")
+    if research_as_of and timestamp(universe["as_of"]) > research_as_of:
+        raise ValueError("Universe snapshot cannot postdate the research decision")
     report = review_report(document, candidates)
-    return {"universe": {key: universe[key] for key in ("name", "source", "as_of", "scope_and_filters")},
+    return {"decision_mode": mode, "research_as_of": research_as_of.isoformat() if research_as_of else None, "horizon": horizon,
+            "universe": {key: universe[key] for key in ("name", "source", "as_of", "scope_and_filters")},
             "coverage": {"expected_securities": len(expected), "retrieved_rows": len(seen),
                          "screened_with_evidence": counts["retained"] + counts["excluded"] + counts["not_advanced"],
                          "retained": counts["retained"], "excluded": counts["excluded"],

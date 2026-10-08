@@ -1,11 +1,11 @@
 ---
 name: robinhood-ai-trading-agent
-description: Review and manage a Robinhood portfolio with a long-term core, separately budgeted swing and intraday strategies, GARCH volatility analysis, deterministic risk checks, research, rebalancing, simulation, and exact-order or bounded-mandate execution through the official Robinhood Trading MCP. Use for portfolio decisions and trading-agent operation; live execution requires verified broker capabilities and applicable human authorization.
+description: Review and manage a Robinhood portfolio with a long-term core, configurable holding periods from same-session day trades through decades, separately budgeted swing and intraday strategies, GARCH volatility analysis, deterministic risk checks, research, rebalancing, simulation, and exact-order or bounded-mandate execution through the official Robinhood Trading MCP. Use for portfolio decisions and trading-agent operation; live execution requires verified broker capabilities and applicable human authorization.
 ---
 
 # Robinhood Portfolio and Trading Agent
 
-Package version: **3.2.0 — October 8, 2026**.
+Package version: **3.3.0 — October 8, 2026**.
 
 When first loading this package or diagnosing a version mismatch, identify this
 version and check that its referenced files and scripts are accessible. An uploaded
@@ -42,6 +42,7 @@ The user's preference for bounded autonomy is a design choice. Activate it after
 
 - Example requests: [50 beginner-to-advanced prompts](EXAMPLE-PROMPTS.md); read when helping a user choose a workflow or asking for example prompts.
 - Portfolio/rebalancing: [portfolio-management.md](references/portfolio-management.md), scripts/portfolio_manager.py.
+- Any specified holding period: [holding-period-planning.md](references/holding-period-planning.md), [holding-period-review.md](templates/holding-period-review.md), scripts/horizon_review.py.
 - Tactical setups: [short-term-trading.md](references/short-term-trading.md), [strategy-playbook.md](references/strategy-playbook.md), scripts/strategy_lab.py.
 - Any live action: [approval-gated-execution.md](references/approval-gated-execution.md), [broker-integration.md](references/broker-integration.md), scripts/risk_engine.py and scripts/execution_ledger.py.
 - GARCH volatility: read the explicit section below and [garch-volatility.md](references/garch-volatility.md); use scripts/garch_volatility.py.
@@ -51,8 +52,9 @@ The user's preference for bounded autonomy is a design choice. Activate it after
 - Formats/examples: [runtime-contract.md](references/runtime-contract.md), [README.md](README.md).
 - Personal setup, commands and session loop: [personal-setup.md](references/personal-setup.md).
 - Data acquisition and numeric research: [data-and-analytics.md](references/data-and-analytics.md).
-- Current backend/provenance release: [REVIEW-3.2.md](REVIEW-3.2.md).
-- Current research update: [REVIEW-3.1.md](REVIEW-3.1.md); operational review and activation prerequisites: [REVIEW-3.0.md](REVIEW-3.0.md).
+- Current holding-period and research review: [REVIEW-3.3.md](REVIEW-3.3.md).
+- Backend/provenance release: [REVIEW-3.2.md](REVIEW-3.2.md).
+- Earlier research update: [REVIEW-3.1.md](REVIEW-3.1.md); operational review and activation prerequisites: [REVIEW-3.0.md](REVIEW-3.0.md).
 - Original findings and Reddit/X research provenance: [REVIEW.md](REVIEW.md), historical context only.
 
 ## Persistent context
@@ -64,6 +66,25 @@ Use an approved descriptive alias locally. Resolve it to the eligible Agentic ac
 Policy changes invalidate the mandate hash. A prose policy not yet normalized and approved supports research, not autonomous writes. Never guess a favorable missing field.
 
 ## Choose the decision horizon
+
+**Any holding period:** support the user's actual interval, from a same-session day
+trade through arbitrary days, weeks, months, ten years or longer. Read
+[holding-period-planning.md](references/holding-period-planning.md). Resolve units,
+proposed/latest entry, fixed versus rolling deadline, early exits and cash needs
+before selection. One day for a day trade means the same exchange session, not an
+overnight 24-hour hold. Use the relevant strategy below; there is no fixed maximum
+investment horizon. Distinguish a forced exit from a thesis-review horizon. Future
+exchange dates may be provisional; use rolling event/thesis reviews for long holds
+instead of inventing a fully known future calendar.
+
+**Swing or dated fundamental hold:** configured universe → horizon-specific thesis
+and appropriate fundamental/value-trap review → latest primary financial period →
+entry versus holding-event policy → same-exit downside/base/upside scenarios net of
+costs and comparison with cash → portfolio fit, GARCH risk overlay and exit plan.
+An event after the exit or a twelve-month analyst target does not establish return
+within the requested window. Validate a structured research record with
+scripts/screen_review.py and its horizon contract. This adds research support, not
+a live swing adapter. Do not route unsupported swing orders through core/intraday.
 
 **Long-term discovery:** configured universe → suitable industry/sector-relative
 valuation → earnings/cash-flow normalization → balance-sheet and value-trap review

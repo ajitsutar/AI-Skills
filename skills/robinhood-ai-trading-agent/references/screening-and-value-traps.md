@@ -163,3 +163,14 @@ Report no qualifying choice when appropriate. Portfolio sizing,
 affordability, live quotes, risk_engine and applicable human authorization remain
 subsequent independent steps. `screen_review.py` reports historical judgments;
 never copy its status into a live `event_clear` field without a fresh event check.
+
+## Apply the actual holding mandate
+
+Use [holding-period-planning.md](holding-period-planning.md) for dated holds of any
+length. Verify the latest public financial period before approving a finalist;
+issuer releases can be newer than vendor TTM figures or the latest filing. Record
+what primary work was attempted, what it established and what remains material.
+Do not label a screen complete merely because every candidate was assigned Watch.
+For a ten-year thesis use rolling event and fundamental reviews; for a forced exit
+show the value/price mechanism and scenario outcomes within that specific window.
+No new holding-period research status authorizes or implements live swing orders.

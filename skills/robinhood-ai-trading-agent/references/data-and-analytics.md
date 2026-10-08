@@ -95,3 +95,14 @@ with the unresolved tax implications reported. See [IRS Publication 550](https:/
 
 Every evidence JSON is a declaration the host must substantiate with retained
 sources. Hashes detect changed files; they do not authenticate providers or humans.
+
+## Latest-period and horizon consistency
+
+Before finalist conclusions, check issuer IR and filings for the latest published
+period available at the run cutoff. Record the newest release separately from the
+newest filed report and reconcile non-GAAP/pro-forma/discontinued-operation bases.
+Retain the price's timestamp separately; a fresh price can accompany stale earnings.
+Company earnings-release dates and conference-call dates are distinct observations.
+Prefer current primary calendars, preserve uncertain windows, and disclose conflicts.
+For holding clocks and same-exit scenario arithmetic use horizon_review via
+screen_review; this does not download missing evidence or validate probabilities.
