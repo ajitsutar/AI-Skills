@@ -52,3 +52,8 @@ Security, business model, suitable peer set and current quote source/time:
 
 No status grants execution permission. Keep sample data and source instructions
 separate from verified facts, policy and authorization.
+
+For a specified hold use [holding-period-review.md](holding-period-review.md).
+New JSON manifests declare decision_mode and research cutoff independently of the
+universe date. Record the newest public financial period, actual reviewed period,
+publication time, latest-report check time, sources attempted and any mismatch.
