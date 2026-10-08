@@ -59,6 +59,11 @@ do not fund new orders. The SEC adopted T+1 for most broker-dealer transactions;
 actual settlement and restrictions must come from the broker, not an inferred
 calendar-day increment. See [SEC settlement rule](https://www.sec.gov/rules-regulations/2023/02/34-96930).
 
+For cash-account T+1 details, the Agentic limited-margin distinction, and
+configurable intraday reserves, read [settled-cash-planning.md](settled-cash-planning.md).
+This runtime continues to require settled funds regardless of broader broker buying
+power. Completed unsettled sales cannot satisfy the intraday liquidity reserve.
+
 As researched October 6, 2026, Robinhood states that its day-trading framework moved
 to intraday margin standards on June 4, 2026. FINRA permits firm transition through
 October 20, 2027. Do not hardcode the historical $25,000 PDT rule or assume every

@@ -85,6 +85,12 @@ risk/cash/cost limits; whole-share sizing may correctly be zero. Do not increase
 the sleeve, enable leverage or choose illiquid cheap shares to manufacture activity.
 Fractional trading needs a separately supported and validated adapter.
 
+For a configurable usable-cash reserve, read
+[settled-cash-planning.md](settled-cash-planning.md). Budget before buying so that
+exiting positions does not leave all capital waiting for settlement. Symbol
+rotation cannot create settled cash. A cash-blocked entry stays local and must be
+reassessed with a fresh signal; never park it at the broker awaiting funds.
+
 ## Costs and replay
 
 Signals use completed bars; simulated entries use the next open and must meet the
