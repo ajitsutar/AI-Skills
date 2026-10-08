@@ -1,0 +1,30 @@
+Robinhood trading skill 3.2.0 - local release verification
+Date: October 8, 2026 (America/Los_Angeles)
+Base: fe65aeba9404211651b867a2d81fe3ae29af0e71
+Claude plugin/catalog version: 1.2.0
+
+185 trading regression tests passed on Windows with Python 3.11; zero skips.
+5 exact-notice export-scanner tests passed.
+Repository safety scan and all seven skill portability checks passed.
+Skill-creator quick validation passed.
+
+CLI checks: audited fictional GARCH, unaudited GARCH, automatic model selection
+and five-step GJR all compute while keeping fictional/unaudited sizing ineligible.
+The one-step EGARCH formula is covered by a numerical backend regression test.
+Explicit EGARCH on the bundled fictional prices fails closed on an optimizer
+constraint error; auto mode proceeds only with the usable alternative models.
+No successful fit is fabricated or substituted when an explicit model fails.
+
+The inherited-source comparison found zero AST-identical Python definitions and
+zero whitespace-trimmed blocks of at least four nonblank lines and 180 characters
+against the predecessor files at the same paths. Exact-match absence is not a
+proof of original authorship. See PROVENANCE.md for historical limitations.
+
+The arch 8.0.0 license notice is retained byte-for-byte with normalized newlines.
+All 50 example prompts are retained unchanged. The package manifest binds the
+current release files. No credentials, personal runtime state or third-party
+implementation binaries are included.
+
+Linux and Claude CLI validation run through the repository's Windows/Linux CI
+on publication. This local receipt does not claim those remote checks completed.
+No brokerage connection, live trade or schedule was created for this release.

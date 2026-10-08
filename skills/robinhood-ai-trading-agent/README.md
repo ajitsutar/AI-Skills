@@ -1,6 +1,6 @@
 # Robinhood portfolio and trading agent
 
-Version **3.1.0 — October 7, 2026**. A portable skill for **personal Codex**, with
+Version **3.2.0 — October 8, 2026**. A portable skill for **personal Codex**, with
 a long-term core and separately budgeted swing/day trading in an active supervised
 session. It starts in paper mode and supports exact-order approval or a bounded
 mandate through the connected official Robinhood Trading MCP.
@@ -11,8 +11,14 @@ quantitative analysis, and execution controls. Choose and adapt the examples;
 they do not change the skill's operating policy or grant trading authorization.
 
 Provide/extract the **entire ZIP**, not only SKILL.md. Ask the personal agent to
-identify version 3.1.0 and verify its supporting files before use. GARCH is
+identify version 3.2.0 and verify its supporting files before use. GARCH is
 explicitly part of this skill and has an executable, audited helper.
+
+Version 3.2 restores historical source credits and uses the licensed arch backend
+for volatility estimation. Read the [release review](REVIEW-3.2.md),
+[provenance](PROVENANCE.md), [acknowledgments](SOURCES.md), and
+[dependency notices](THIRD-PARTY-NOTICES.md). The repository has not selected a
+license for its own material. Revalidate saved volatility results after upgrading.
 
 Version 3.1 adds a declared research method, distinct discovery dispositions and
 report checks that keep Watch names out of an Eligible comparison. See the
@@ -52,7 +58,7 @@ python -m venv .venv
 
 Doctor intentionally reports **draft/paper**, not live readiness. Configure the
 policy with the personal agent using actual account data and investor preferences.
-`requirements-tested.txt` pins the direct libraries used for this release;
+`requirements-tested.txt` pins the direct libraries and statsmodels used for this release;
 `requirements.txt` contains compatible ranges. Neither is a complete transitive
 lockfile. Use an isolated environment and rerun tests after dependency updates.
 

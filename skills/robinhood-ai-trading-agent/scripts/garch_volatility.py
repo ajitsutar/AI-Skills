@@ -1,344 +1,245 @@
 #!/usr/bin/env python3
-"""GARCH-family volatility forecasting for the Robinhood Codex trading skill.
+"""Audited-price adapter for arch. See ../PROVENANCE.md and ../THIRD-PARTY-NOTICES.md.
 
-Input: CSV with a close column (or configurable column).
-Output: JSON with fitted model, forecast variance/volatility, regime hints,
-and optional rolling holdout diagnostics.
-
-Dependencies: numpy and scipy. No broker/account information is used.
+The external library performs estimation, filtering and variance forecasts.
+This adapter controls input evidence, chronological validation and output units.
 """
 from __future__ import annotations
 
 import argparse
+import bisect
 import csv
 import hashlib
 import io
 import json
 import math
 import sys
-from dataclasses import dataclass
+from datetime import datetime
+from importlib.metadata import version
 from pathlib import Path
-from typing import Callable, Dict, Iterable, Tuple
 
 import numpy as np
-import scipy
-from scipy.optimize import minimize
+from arch import arch_model
+from arch.univariate import EGARCH
 
 from price_audit import audit_prices
 
 
-@dataclass
-class Fit:
-    model: str
-    params: np.ndarray
-    variance: np.ndarray
-    loglik: float
-    success: bool
-    message: str
+def model_specification(family, observations):
+    """Construct a zero-mean normal model with explicit input units."""
+    choices = {"garch": ("GARCH", 0), "gjr": ("GARCH", 1), "egarch": ("EGARCH", 1)}
+    if family not in choices:
+        raise ValueError(f"Unknown volatility family: {family}")
+    data = np.asarray(observations, dtype=np.float64)
+    if data.ndim != 1 or data.size < 3 or not np.isfinite(data).all():
+        raise ValueError("Provide at least three finite returns in a one-dimensional series")
+    if float(data.var()) <= 1e-12:
+        raise ValueError("Returns must have nonzero variation")
+    process, asymmetry = choices[family]
+    return arch_model(data, mean="Zero", vol=process, p=1, o=asymmetry,
+                      q=1, dist="normal", rescale=False)
 
 
-def gaussian_nll(returns: np.ndarray, var: np.ndarray) -> float:
-    v = np.maximum(var, 1e-12)
-    return float(0.5 * np.sum(np.log(2.0 * np.pi) + np.log(v) + returns**2 / v))
+def require_usable_fit(estimate):
+    if estimate.convergence_flag != 0:
+        raise ValueError(f"Volatility optimizer failed: {estimate.optimization_result.message}")
+    numbers = np.r_[estimate.params, estimate.conditional_volatility, estimate.loglikelihood]
+    if not np.isfinite(numbers).all() or np.any(estimate.conditional_volatility <= 0):
+        raise ValueError("Volatility fit contains invalid numerical values")
+    pars = estimate.params
+    persistence = float(pars["beta[1]"])
+    if not isinstance(estimate.model.volatility, EGARCH):
+        persistence += float(pars["alpha[1]"]) + .5 * float(pars.get("gamma[1]", 0))
+    if persistence >= 1.0:
+        raise ValueError("A stationary volatility fit is required for this sizing adapter")
 
 
-def stationary_var(returns: np.ndarray) -> float:
-    v = float(np.var(returns, ddof=1))
-    return max(v, 1e-8)
+def fit_model(family, observations):
+    result = model_specification(family, observations).fit(
+        disp="off", update_freq=0, show_warning=False,
+        options={"maxiter": 2500, "ftol": 1e-10})
+    require_usable_fit(result)
+    return result
 
 
-def garch_variance(params: np.ndarray, returns: np.ndarray) -> np.ndarray:
-    omega, alpha, beta = params
-    var = np.empty(len(returns), dtype=float)
-    var[0] = stationary_var(returns)
-    for t in range(1, len(returns)):
-        var[t] = omega + alpha * returns[t - 1] ** 2 + beta * var[t - 1]
-    return np.maximum(var, 1e-12)
+def analytic_variance(estimate, steps):
+    if isinstance(steps, bool) or not isinstance(steps, (int, np.integer)) or steps < 1:
+        raise ValueError("Forecast horizon must be a positive integer")
+    if isinstance(estimate.model.volatility, EGARCH) and steps != 1:
+        raise ValueError("Multi-step EGARCH needs simulation; this adapter supports one step")
+    table = estimate.forecast(horizon=int(steps), method="analytic", reindex=False)
+    prediction = table.residual_variance.iloc[-1].to_numpy(dtype=float)
+    if prediction.shape != (steps,) or not np.isfinite(prediction).all() or np.any(prediction <= 0):
+        raise ValueError("Backend returned an invalid variance forecast")
+    return prediction
 
 
-def gjr_variance(params: np.ndarray, returns: np.ndarray) -> np.ndarray:
-    omega, alpha, gamma, beta = params
-    var = np.empty(len(returns), dtype=float)
-    var[0] = stationary_var(returns)
-    for t in range(1, len(returns)):
-        neg = 1.0 if returns[t - 1] < 0 else 0.0
-        var[t] = omega + alpha * returns[t - 1] ** 2 + gamma * neg * returns[t - 1] ** 2 + beta * var[t - 1]
-    return np.maximum(var, 1e-12)
+def forecast(estimate, horizon):
+    require_usable_fit(estimate)
+    return analytic_variance(estimate, horizon)
 
 
-def egarch_variance(params: np.ndarray, returns: np.ndarray) -> np.ndarray:
-    omega, alpha, gamma, beta = params
-    log_var = np.empty(len(returns), dtype=float)
-    log_var[0] = math.log(stationary_var(returns))
-    e_abs_z = math.sqrt(2.0 / math.pi)
-    for t in range(1, len(returns)):
-        prev_var = math.exp(log_var[t - 1])
-        z = returns[t - 1] / math.sqrt(max(prev_var, 1e-12))
-        log_var[t] = (
-            omega
-            + beta * log_var[t - 1]
-            + alpha * (abs(z) - e_abs_z)
-            + gamma * z
-        )
-        log_var[t] = float(np.clip(log_var[t], -30.0, 30.0))
-    return np.maximum(np.exp(log_var), 1e-12)
+def variance_loss(squared_returns, predictions):
+    """QLIKE: x/y - log(x/y) - 1, flooring zero realized squared returns."""
+    actual, expected = np.asarray(squared_returns, dtype=float), np.asarray(predictions, dtype=float)
+    if actual.shape != expected.shape or actual.size == 0:
+        raise ValueError("Variance loss requires equally sized nonempty arrays")
+    if not np.isfinite(actual).all() or not np.isfinite(expected).all():
+        raise ValueError("Variance loss requires finite inputs")
+    if np.any(actual < 0) or np.any(expected <= 0):
+        raise ValueError("Squared returns cannot be negative and predictions must be positive")
+    scaled = np.clip(actual, 1e-12, None) / expected
+    return float(np.average(scaled - 1 - np.log(scaled)))
 
 
-def fit_model(model: str, returns: np.ndarray) -> Fit:
-    returns = np.asarray(returns, dtype=float)
-    if len(returns) < 3 or not np.all(np.isfinite(returns)) or np.var(returns) <= 1e-12:
-        raise ValueError("Need at least three finite, nonconstant returns")
-    model = model.lower()
-    v0 = stationary_var(returns)
-    if model == "garch":
-        fn = garch_variance
-        x0 = np.array([v0 * 0.05, 0.08, 0.90], dtype=float)
-        bounds = [(1e-10, max(v0 * 2, 1e-6)), (1e-8, 0.999), (1e-8, 0.999)]
-
-        def cons(x):
-            return 0.999 - x[1] - x[2]
-
-        constraints = [{"type": "ineq", "fun": cons}]
-    elif model == "gjr":
-        fn = gjr_variance
-        x0 = np.array([v0 * 0.03, 0.05, 0.05, 0.85], dtype=float)
-        bounds = [(1e-10, max(v0 * 2, 1e-6)), (1e-8, 0.999), (0.0, 0.999), (1e-8, 0.999)]
-
-        def cons(x):
-            return 0.999 - x[1] - 0.5 * x[2] - x[3]
-
-        constraints = [{"type": "ineq", "fun": cons}]
-    elif model == "egarch":
-        fn = egarch_variance
-        x0 = np.array([0.0, 0.08, -0.05, 0.95], dtype=float)
-        bounds = [(-1.0, 1.0), (-2.0, 2.0), (-2.0, 2.0), (0.0, 0.999)]
-        constraints = []
-    else:
-        raise ValueError(f"Unsupported model: {model}")
-
-    def objective(x: np.ndarray) -> float:
-        try:
-            var = fn(x, returns)
-            if not np.all(np.isfinite(var)) or np.any(var <= 0):
-                return 1e50
-            return gaussian_nll(returns, var)
-        except (OverflowError, FloatingPointError, ValueError):
-            return 1e50
-
-    result = minimize(objective, x0, method="SLSQP", bounds=bounds, constraints=constraints,
-                      options={"maxiter": 2500, "ftol": 1e-10})
-    params = result.x
-    var = fn(params, returns)
-    feasible = all(c["fun"](params) >= -1e-7 for c in constraints)
-    ok = bool(result.success) and feasible and np.all(np.isfinite(var))
-    return Fit(model, params, var, -objective(params), bool(ok), str(result.message))
-
-
-def forecast(fit: Fit, returns: np.ndarray, horizon: int) -> np.ndarray:
-    if not fit.success or horizon < 1 or int(horizon) != horizon:
-        raise ValueError("Forecast requires a converged fit and positive integer horizon")
-    if fit.model == "egarch" and horizon > 1:
-        raise ValueError("EGARCH multi-step forecasts require simulation; use horizon=1")
-    h = int(horizon)
-    last_var = float(fit.variance[-1])
-    last_r = float(returns[-1])
-    out = []
-
-    for step in range(h):
-        if fit.model == "garch":
-            omega, alpha, beta = fit.params
-            next_var = omega + alpha * last_r**2 + beta * last_var if step == 0 else omega + (alpha + beta) * last_var
-        elif fit.model == "gjr":
-            omega, alpha, gamma, beta = fit.params
-            neg = 1.0 if last_r < 0 else 0.0
-            next_var = (omega + alpha * last_r**2 + gamma * neg * last_r**2 + beta * last_var
-                        if step == 0 else omega + (alpha + 0.5 * gamma + beta) * last_var)
-        else:
-            omega, alpha, gamma, beta = fit.params
-            z = last_r / math.sqrt(max(last_var, 1e-12))
-            next_log = omega + beta * math.log(max(last_var, 1e-12)) + alpha * (abs(z) - math.sqrt(2 / math.pi)) + gamma * z
-            next_var = math.exp(float(np.clip(next_log, -30.0, 30.0)))
-        next_var = max(float(next_var), 1e-12)
-        out.append(next_var)
-        # Future shocks have zero mean but NONZERO expected squared magnitude.
-        last_var = next_var
-        last_r = 0.0
-    return np.asarray(out)
-
-
-def qlike(realized_var: np.ndarray, forecast_var: np.ndarray) -> float:
-    rv = np.maximum(np.asarray(realized_var, dtype=float), 1e-12)
-    fv = np.maximum(np.asarray(forecast_var, dtype=float), 1e-12)
-    ratio = rv / fv
-    return float(np.mean(ratio - np.log(ratio) - 1.0))
-
-
-def holdout_validation(returns: np.ndarray, model: str, train: int, test: int) -> Dict[str, float]:
-    """Fixed-parameter, sequential ONE-step holdout. Update only after observing each return."""
-    if train < 3 or test < 1 or len(returns) < train + test:
+def holdout_validation(observations, family, train, test):
+    if train < 3 or test < 1 or len(observations) < train + test:
         return {"status": "insufficient_data"}
-    train_returns = returns[:train]
-    realized = returns[train:train + test] ** 2
-    fit = fit_model(model, train_returns)
-    if not fit.success:
-        return {"status": "fit_failed", "message": fit.message}
-    predictions = []
-    state = float(fit.variance[-1])
-    last_return = float(train_returns[-1])
-    for observed in returns[train:train + test]:
-        one = Fit(model, fit.params, np.array([state]), fit.loglik, True, fit.message)
-        state = float(forecast(one, np.array([last_return]), 1)[0])
-        predictions.append(state)
-        last_return = float(observed)
-    forecast_var = np.asarray(predictions)
-    baseline = np.full(test, stationary_var(train_returns))
-    return {
-        "status": "ok",
-        "n": int(len(realized)),
-        "qlike": qlike(realized, forecast_var),
-        "mse": float(np.mean((realized - forecast_var) ** 2)),
-        "baseline_qlike": qlike(realized, baseline),
-        "beats_constant_variance": bool(qlike(realized, forecast_var) < qlike(realized, baseline)),
-        "method": "fixed_parameter_sequential_one_step",
-    }
+    data = np.asarray(observations, dtype=float)
+    try:
+        estimate = fit_model(family, data[:train])
+        predictions = []
+        for end in range(train, train + test):
+            # The target and future data never enter the backend. Parameters stay
+            # fixed; arch filters/backcasts using only this observed prefix.
+            past = model_specification(family, data[:end]).fix(estimate.params)
+            predictions.append(float(analytic_variance(past, 1)[0]))
+        expected = np.asarray(predictions)
+        actual = np.square(data[train:train + test])
+        baseline = np.repeat(max(float(data[:train].var(ddof=1)), 1e-8), test)
+        score, reference = variance_loss(actual, expected), variance_loss(actual, baseline)
+        return {"status": "ok", "n": test, "qlike": score,
+                "mse": float(np.square(actual - expected).mean()),
+                "baseline_qlike": reference, "beats_constant_variance": score < reference,
+                "predicted_variance_percent_squared": predictions,
+                "method": "fixed_parameter_sequential_one_step",
+                "filtering": "arch fixed parameters; observed prefixes only"}
+    except (ValueError, FloatingPointError, OverflowError) as error:
+        return {"status": "fit_failed", "message": str(error)}
 
 
-def regime(forecast_vol: float, realized_vol: float) -> str:
-    if realized_vol <= 0:
-        return "UNKNOWN"
-    ratio = forecast_vol / realized_vol
-    if ratio < 0.70:
-        return "LOW"
-    if ratio < 1.30:
-        return "NORMAL"
-    if ratio < 1.90:
-        return "ELEVATED"
-    return "EXTREME"
-
-
-def main() -> int:
-    ap = argparse.ArgumentParser()
-    ap.add_argument("csv", help="CSV containing close prices")
-    ap.add_argument("--close-column", default="close")
-    ap.add_argument("--model", choices=["garch", "gjr", "egarch", "auto"], default="garch")
-    ap.add_argument("--horizon", type=int, default=1)
-    ap.add_argument("--periods-per-year", type=float, default=252.0)
-    ap.add_argument("--min-observations", type=int, default=250)
-    ap.add_argument("--validation-test", type=int, default=40)
-    ap.add_argument("--timestamp-column", default="timestamp")
-    ap.add_argument("--data-audit", help="JSON audit tied to the exact CSV; absent audit is research-only")
-    args = ap.parse_args()
-
-    if args.horizon < 1 or args.min_observations < 30 or args.validation_test < 10:
-        raise ValueError("Require horizon >= 1, training >= 30 and validation >= 10")
-    if not math.isfinite(args.periods_per_year) or args.periods_per_year <= 0:
-        raise ValueError("periods-per-year must be finite and positive")
-    from datetime import datetime
-    raw_csv = Path(args.csv).read_bytes()
-    rows = list(csv.DictReader(io.StringIO(raw_csv.decode("utf-8-sig"), newline="")))
-    prices, times = [], []
-    for row in rows:
-        price = float(row[args.close_column])
-        if not math.isfinite(price) or price <= 0:
-            raise ValueError("Invalid price row; do not silently drop or join across gaps")
-        time = datetime.fromisoformat(row[args.timestamp_column].replace("Z", "+00:00"))
-        if time.tzinfo is None or (times and time <= times[-1]):
-            raise ValueError("Timestamps must include offsets and be unique and increasing")
-        if row.get("synthetic", "false").lower() not in {"false", "0", ""}:
-            raise ValueError("Synthetic bars require upstream data repair")
+def load_price_input(path, close_column, timestamp_column):
+    content = Path(path).read_bytes()
+    prices, stamps = [], []
+    for row in csv.DictReader(io.StringIO(content.decode("utf-8-sig"), newline="")):
+        price = float(row[close_column])
+        stamp = datetime.fromisoformat(row[timestamp_column].replace("Z", "+00:00"))
+        if price <= 0 or not math.isfinite(price):
+            raise ValueError("Every price must be finite and positive; repair data upstream")
+        if stamp.utcoffset() is None or (stamps and stamp <= stamps[-1]):
+            raise ValueError("Price timestamps need timezone offsets and strict chronological order")
+        if row.get("synthetic", "false").strip().lower() not in ("", "false", "0"):
+            raise ValueError("Synthetic/interpolated price rows cannot enter the risk model")
         prices.append(price)
-        times.append(time)
-    prices = np.asarray(prices)
-    needed = args.min_observations + args.validation_test + 1
-    if len(prices) < needed:
-        raise ValueError(f"Need at least {needed} timestamped prices including holdout; found {len(prices)}")
+        stamps.append(stamp)
+    return content, np.asarray(prices, dtype=float), stamps
 
-    raw_audit = Path(args.data_audit).read_bytes() if args.data_audit else None
-    metadata = json.loads(raw_audit.decode("utf-8-sig")) if raw_audit is not None else None
-    data_quality = audit_prices(raw_csv, prices, times, metadata,
-                                close_column=args.close_column, timestamp_column=args.timestamp_column,
-                                periods_per_year=args.periods_per_year)
 
-    returns = 100.0 * np.diff(np.log(prices))
-    candidates = ["garch", "gjr", "egarch"] if args.model == "auto" else [args.model]
-    if args.horizon > 1:
-        if args.model == "egarch":
-            raise ValueError("EGARCH supports horizon=1 only; simulation not implemented")
-        candidates = [m for m in candidates if m != "egarch"]
-    fits = {m: fit_model(m, returns) for m in candidates}
+def parse_options(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("csv")
+    parser.add_argument("--data-audit")
+    parser.add_argument("--model", default="garch", choices=("garch", "gjr", "egarch", "auto"))
+    parser.add_argument("--close-column", default="close")
+    parser.add_argument("--timestamp-column", default="timestamp")
+    parser.add_argument("--horizon", default=1, type=int)
+    parser.add_argument("--min-observations", default=250, type=int)
+    parser.add_argument("--validation-test", default=40, type=int)
+    parser.add_argument("--periods-per-year", default=252.0, type=float)
+    opts = parser.parse_args(argv)
+    if opts.horizon < 1 or opts.min_observations < 30 or opts.validation_test < 10:
+        raise ValueError("Minimums: horizon 1, training returns 30, holdout returns 10")
+    if not math.isfinite(opts.periods_per_year) or opts.periods_per_year <= 0:
+        raise ValueError("Annualization periods must be finite and positive")
+    if opts.model == "egarch" and opts.horizon > 1:
+        raise ValueError("Multi-step EGARCH needs simulation; request horizon=1")
+    return opts
 
-    validations = {}
-    train_len = len(returns) - args.validation_test
-    for m in candidates:
-        validations[m] = holdout_validation(returns, m, train_len, args.validation_test)
 
-    valid_models = [m for m in candidates if fits[m].success and validations[m].get("status") == "ok"]
-    if args.model == "auto" and valid_models:
-        selected = min(valid_models, key=lambda m: validations[m]["qlike"])
-    elif args.model in valid_models:
-        selected = args.model
-    else:
-        raise ValueError("No model converged with valid holdout diagnostics")
-
-    fit = fits[selected]
-    fc = forecast(fit, returns, args.horizon)
-    forecast_daily_vol = np.sqrt(fc[0]) / 100.0
-    realized_daily_vol = np.std(returns[-min(60, len(returns)):], ddof=1) / 100.0
-    annualized = forecast_daily_vol * math.sqrt(args.periods_per_year)
-
-    result = {
-        "model": selected,
-        "parameters": [float(x) for x in fit.params],
-        "observations": int(len(returns)),
-        "last_price": float(prices[-1]),
-        "forecast_variance_percent_squared": [float(x) for x in fc],
-        "forecast_daily_volatility": float(forecast_daily_vol),
-        "forecast_annualized_volatility": float(annualized),
-        "recent_realized_daily_volatility": float(realized_daily_vol),
-        "regime": regime(forecast_daily_vol, realized_daily_vol),
-        "fit_success": fit.success,
-        "fit_message": fit.message,
-        "log_likelihood": float(fit.loglik),
-        "validation": validations,
-        "forecast_period_volatility": float(forecast_daily_vol),
-        "periods_per_year": args.periods_per_year,
-        "innovation_distribution": "Gaussian; zero conditional mean",
-        "eligible_as_sizing_input": bool(validations[selected]["beats_constant_variance"]
-                                        and data_quality["eligible_for_sizing"]),
-        "data_quality": data_quality,
-        "selection_caveat": "Holdout used for model selection, not independent strategy performance proof",
-        "last_timestamp": times[-1].isoformat(),
-        "run_specification": {
-            "implementation": "bundled-garch-2.2.0",
-            "script_sha256": hashlib.sha256(Path(__file__).read_bytes()).hexdigest(),
-            "audit_helper_sha256": hashlib.sha256(Path(__file__).with_name("price_audit.py").read_bytes()).hexdigest(),
-            "csv_sha256": data_quality["csv_sha256"],
-            "audit_sha256": hashlib.sha256(raw_audit).hexdigest() if raw_audit is not None else None,
-            "python": sys.version.split()[0], "numpy": np.__version__, "scipy": scipy.__version__,
-            "close_column": args.close_column, "timestamp_column": args.timestamp_column,
-            "first_timestamp": times[0].isoformat(), "last_timestamp": times[-1].isoformat(),
-            "price_count": len(prices), "return_count": len(returns),
-            "training_returns": train_len, "holdout_returns": args.validation_test,
-            "training_last_return_end": times[train_len].isoformat(),
-            "holdout_first_return_end": times[train_len + 1].isoformat(),
-            "return_definition": "100 * log(P[t] / P[t-1]); zero mean; Gaussian innovations",
-            "requested_model": args.model, "selected_model": selected, "horizon": args.horizon,
-            "periods_per_year": args.periods_per_year,
-            "variance_initialization": "sample variance ddof=1 on each fit sample",
-            "optimizer": "SLSQP; maxiter=2500; ftol=1e-10; deterministic single start",
-            "forecast_fit": "refit on all available returns after sequential prefix-only holdout",
-            "realized_window_returns": min(60, len(returns)),
-            "regime_ratio": float(forecast_daily_vol / realized_daily_vol),
-            "regime_ratio_boundaries": [0.70, 1.30, 1.90],
-        },
+def run_analysis(opts):
+    raw, prices, times = load_price_input(opts.csv, opts.close_column, opts.timestamp_column)
+    required = opts.min_observations + opts.validation_test + 1
+    if prices.size < required:
+        raise ValueError(f"Need {required} prices including the holdout; received {prices.size}")
+    audit_bytes = Path(opts.data_audit).read_bytes() if opts.data_audit else None
+    declaration = json.loads(audit_bytes.decode("utf-8-sig")) if audit_bytes is not None else None
+    quality = audit_prices(raw, prices, times, declaration, close_column=opts.close_column,
+                           timestamp_column=opts.timestamp_column, periods_per_year=opts.periods_per_year)
+    changes = np.log(prices[1:] / prices[:-1]) * 100
+    prefix_size = int(changes.size - opts.validation_test)
+    families = [opts.model] if opts.model != "auto" else ["garch", "gjr", "egarch"]
+    families = [name for name in families if name != "egarch" or opts.horizon == 1]
+    diagnostics, estimates = {}, {}
+    for family in families:
+        diagnostics[family] = holdout_validation(changes, family, prefix_size, opts.validation_test)
+        if diagnostics[family]["status"] != "ok":
+            continue
+        try:
+            estimates[family] = fit_model(family, changes)
+        except (ValueError, FloatingPointError, OverflowError) as error:
+            diagnostics[family]["refit_error"] = str(error)
+    if not estimates:
+        raise ValueError("No usable model after chronological validation: " + json.dumps(diagnostics))
+    selected = min(estimates, key=lambda name: diagnostics[name]["qlike"])
+    fitted = estimates[selected]
+    variances = forecast(fitted, opts.horizon)
+    period_sigma = float(np.sqrt(variances[0]) * .01)
+    recent_count = min(60, int(changes.size))
+    realized_sigma = float(changes[-recent_count:].std(ddof=1) * .01)
+    ratio = period_sigma / realized_sigma if realized_sigma > 0 else None
+    labels = ("LOW", "NORMAL", "ELEVATED", "EXTREME")
+    bucket = "UNKNOWN" if ratio is None else labels[bisect.bisect_right((.7, 1.3, 1.9), ratio)]
+    digest = lambda value: hashlib.sha256(value).hexdigest()
+    script = Path(__file__)
+    spec = {
+        "implementation": "arch-adapter-3.2.0", "backend": "arch",
+        "script_sha256": digest(script.read_bytes()),
+        "audit_helper_sha256": digest(script.with_name("price_audit.py").read_bytes()),
+        "csv_sha256": quality["csv_sha256"],
+        "audit_sha256": digest(audit_bytes) if audit_bytes is not None else None,
+        "python": sys.version.split()[0],
+        **{name: version(name) for name in ("arch", "numpy", "scipy", "pandas", "statsmodels")},
+        "close_column": opts.close_column, "timestamp_column": opts.timestamp_column,
+        "first_timestamp": times[0].isoformat(), "last_timestamp": times[-1].isoformat(),
+        "price_count": int(prices.size), "return_count": int(changes.size),
+        "training_returns": prefix_size, "holdout_returns": opts.validation_test,
+        "training_last_return_end": times[prefix_size].isoformat(),
+        "holdout_first_return_end": times[prefix_size + 1].isoformat(),
+        "return_definition": "100 * log(P[t] / P[t-1]); zero mean; Gaussian innovations",
+        "requested_model": opts.model, "selected_model": selected, "horizon": opts.horizon,
+        "periods_per_year": opts.periods_per_year,
+        "variance_initialization": "arch default backcast and variance bounds on observed prefix",
+        "optimizer": "arch fit using SLSQP; maxiter=2500; ftol=1e-10; rescale=False",
+        "parameter_names": list(fitted.params.index),
+        "forecast_fit": "full-sample refit after fixed-parameter observed-prefix holdout",
+        "realized_window_returns": recent_count, "regime_ratio": ratio,
+        "regime_ratio_boundaries": [.7, 1.3, 1.9],
     }
-    print(json.dumps(result, indent=2, sort_keys=True, allow_nan=False))
+    return {
+        "model": selected, "parameters": fitted.params.tolist(), "parameter_names": list(fitted.params.index),
+        "observations": int(changes.size), "last_price": float(prices[-1]), "last_timestamp": times[-1].isoformat(),
+        "forecast_variance_percent_squared": variances.tolist(),
+        "forecast_period_volatility": period_sigma, "forecast_daily_volatility": period_sigma,
+        "forecast_annualized_volatility": period_sigma * math.sqrt(opts.periods_per_year),
+        "recent_realized_daily_volatility": realized_sigma, "regime": bucket,
+        "fit_success": True, "fit_message": str(fitted.optimization_result.message),
+        "log_likelihood": float(fitted.loglikelihood), "validation": diagnostics,
+        "periods_per_year": opts.periods_per_year, "innovation_distribution": "Gaussian; zero conditional mean",
+        "eligible_as_sizing_input": bool(quality["eligible_for_sizing"] and diagnostics[selected]["beats_constant_variance"]),
+        "data_quality": quality, "selection_caveat": "Selection holdout is not independent strategy-performance evidence",
+        "run_specification": spec,
+    }
+
+
+def main(argv=None):
+    print(json.dumps(run_analysis(parse_options(argv)), sort_keys=True, indent=2, allow_nan=False))
     return 0
 
 
 if __name__ == "__main__":
     try:
-        raise SystemExit(main())
-    except Exception as exc:
-        print(f"ERROR: {exc}", file=sys.stderr)
-        raise
+        sys.exit(main())
+    except (ValueError, KeyError, OSError) as problem:
+        print(f"ERROR: {problem}", file=sys.stderr)
+        sys.exit(1)
+
