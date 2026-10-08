@@ -5,6 +5,11 @@ a long-term core and separately budgeted swing/day trading in an active supervis
 session. It starts in paper mode and supports exact-order approval or a bounded
 mandate through the connected official Robinhood Trading MCP.
 
+Explore [50 example prompts, from beginner to advanced](EXAMPLE-PROMPTS.md) for
+getting started, stock research, portfolio management, swing/day trading,
+quantitative analysis, and execution controls. Choose and adapt the examples;
+they do not change the skill's operating policy or grant trading authorization.
+
 Provide/extract the **entire ZIP**, not only SKILL.md. Ask the personal agent to
 identify version 3.1.0 and verify its supporting files before use. GARCH is
 explicitly part of this skill and has an executable, audited helper.

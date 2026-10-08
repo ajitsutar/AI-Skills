@@ -40,6 +40,7 @@ The user's preference for bounded autonomy is a design choice. Activate it after
 
 ## Read the relevant procedures
 
+- Example requests: [50 beginner-to-advanced prompts](EXAMPLE-PROMPTS.md); read when helping a user choose a workflow or asking for example prompts.
 - Portfolio/rebalancing: [portfolio-management.md](references/portfolio-management.md), scripts/portfolio_manager.py.
 - Tactical setups: [short-term-trading.md](references/short-term-trading.md), [strategy-playbook.md](references/strategy-playbook.md), scripts/strategy_lab.py.
 - Any live action: [approval-gated-execution.md](references/approval-gated-execution.md), [broker-integration.md](references/broker-integration.md), scripts/risk_engine.py and scripts/execution_ledger.py.
