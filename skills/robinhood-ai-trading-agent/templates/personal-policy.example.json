@@ -67,7 +67,9 @@
     "fee_per_share": "0.005",
     "no_entry_minutes_before_close": 30,
     "stress_loss_fraction": "0.20",
-    "portfolio_annualized_volatility": "0.25"
+    "portfolio_annualized_volatility": "0.25",
+    "intraday_settled_cash_floor_amount": "0",
+    "intraday_settled_cash_floor_fraction": "0.05"
   },
   "configuration_status": "draft",
   "requirements": {
@@ -173,7 +175,7 @@
         "opening_bars": 3,
         "bar_minutes": 5
       },
-      "implementation_sha256": "faf4a00017853c7ab71e6ffaa7fa9d73029c7d19ce6ad7e992736c5b96574376",
+      "implementation_sha256": "40dc0266ce7a7ca7bc7fd18e6ddb6d01d8f6cb1c906e4794ec41c5f976f7d4c6",
       "max_entries_per_symbol_session": 1
     }
   }

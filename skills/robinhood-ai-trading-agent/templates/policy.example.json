@@ -5,13 +5,44 @@
   "description": "ILLUSTRATIVE limits and fictional symbols; not a funded mandate or personalized allocation",
   "allow_leverage": false,
   "allow_shorting": false,
-  "sleeves": {"core": "0.80", "swing": "0.10", "intraday": "0.05"},
-  "core_targets": {"CORE_A": "0.30", "CORE_B": "0.30", "CORE_C": "0.20"},
-  "allowed_symbols": ["DEMO", "CORE_A", "CORE_B", "CORE_C"],
-  "allowed_setups": ["core_rebalance", "sma_trend", "opening_range_breakout"],
-  "setup_sleeves": {"core_rebalance": ["core"], "sma_trend": ["swing"], "opening_range_breakout": ["intraday"]},
+  "sleeves": {
+    "core": "0.80",
+    "swing": "0.10",
+    "intraday": "0.05"
+  },
+  "core_targets": {
+    "CORE_A": "0.30",
+    "CORE_B": "0.30",
+    "CORE_C": "0.20"
+  },
+  "allowed_symbols": [
+    "DEMO",
+    "CORE_A",
+    "CORE_B",
+    "CORE_C"
+  ],
+  "allowed_setups": [
+    "core_rebalance",
+    "sma_trend",
+    "opening_range_breakout"
+  ],
+  "setup_sleeves": {
+    "core_rebalance": [
+      "core"
+    ],
+    "sma_trend": [
+      "swing"
+    ],
+    "opening_range_breakout": [
+      "intraday"
+    ]
+  },
   "live_validated_setups": [],
-  "autonomous_sleeves": ["core", "swing", "intraday"],
+  "autonomous_sleeves": [
+    "core",
+    "swing",
+    "intraday"
+  ],
   "limits": {
     "single_stock": "0.10",
     "single_etf": "0.30",
@@ -34,6 +65,8 @@
     "min_daily_dollar_volume": "20000000",
     "slippage_bps": 5,
     "fee_per_share": "0.005",
-    "no_entry_minutes_before_close": 30
+    "no_entry_minutes_before_close": 30,
+    "intraday_settled_cash_floor_amount": "0",
+    "intraday_settled_cash_floor_fraction": "0.05"
   }
 }

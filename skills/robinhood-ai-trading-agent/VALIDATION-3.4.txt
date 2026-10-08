@@ -1,0 +1,8 @@
+Version 3.4.0 validation — October 8, 2026
+Python 3.11; direct dependencies unchanged from requirements-tested.txt.
+231 trading tests PASS (13 new settled-cash cases); 5 scanner tests PASS.
+7-skill portability PASS; quick_validate PASS; both fictional screen examples PASS.
+50 numbered prompts; all skill Markdown file links resolve.
+Release packaging verifies every skill file against SHA-256 manifest; no runtime state included.
+Export safety scan PASS. GitHub cross-platform checks are verified before merge.
+Tests use fictional inputs and do not validate investment performance or live broker support.

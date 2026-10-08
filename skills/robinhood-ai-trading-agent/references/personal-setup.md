@@ -91,12 +91,19 @@ or use a unit-test grant to manufacture approval.
 
 ## 6. Active loop
 
+Before the session, configure the [intraday settled-cash reserve](settled-cash-planning.md)
+in the policy. Dollar and equity-percentage thresholds are configurable; the larger
+amount is retained. Do not enable a live setting from an illustrative example.
+
 1. Refresh positions, cash, restrictions, all orders, quotes and child protection.
    Reconcile manual activity and cumulative fills. Resolve unknown submissions first.
 2. Run actions_needed; prioritize protection gaps, overdue exits and order conflicts.
    Refresh the heartbeat only after this health observation. If data or tools fail,
    stop entries, preserve protection, and hand off; do not let an empty timer certify health.
-3. On completed bars, evaluate the registered setup. Perform event/news checks,
+3. Preserve the configured intraday reserve in unreserved settled funds. If the
+   cash budget is insufficient, keep the idea local and let its signal expire; do
+   not submit it to wait for settlement. Recheck broker balances before a fresh setup.
+   On completed bars, evaluate the registered setup. Perform event/news checks,
    current quotes, evidence and risk checks. Never use public delayed prices to submit.
 4. Preview the exact order, attach readiness_inputs and actual human authorization,
    then call ExecutionLedger.claim. It reruns deterministic personal checks within

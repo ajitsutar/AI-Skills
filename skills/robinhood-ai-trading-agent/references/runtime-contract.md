@@ -21,6 +21,13 @@ promote a strategy to live. Allowed symbols are an explicit universe, not a scan
 unverified output. setup_sleeves maps every allowed setup to permitted sleeves;
 changing a core setup's label cannot make it an intraday strategy.
 
+For intraday buys only, limits.intraday_settled_cash_floor_amount (default 0)
+and limits.intraday_settled_cash_floor_fraction (default the existing cash_floor)
+retain the larger floor in unreserved settled cash. The fraction uses total account
+equity. Both zero disables this additional floor; other gates remain. The default
+draft policies explicitly use 0 dollars and 0.05. See
+[settled-cash-planning.md](settled-cash-planning.md) for examples and result metrics.
+
 ## Snapshot
 
 [snapshot.json](../examples/snapshot.json) shows all required fields:
@@ -29,8 +36,9 @@ changing a core setup's label cannot make it an intraday strategy.
 - as_of: actual observation timestamp; timezone required. Never refresh a cached
   quote/account merely by relabeling its time.
 - equity: marked long-only account equity; cash + sum(quantity * mark) must reconcile.
-- cash: gross cash ledger balance; settled_cash: settled portion. Neither is future
-  sale proceeds. Open buy reservations are subtracted by this helper. buying_power
+- cash: gross cash ledger balance, which may include completed but unsettled
+  sale proceeds; settled_cash: the currently settled portion. Neither includes
+  hypothetical proceeds from an unfilled sale. Open buy reservations are subtracted by this helper. buying_power
   is current broker available buying power and is not treated as a leverage allowance.
   If a provider supplies net cash fields, normalize to gross or block; do not subtract
   reservations twice by accident or silently add unsettled money.

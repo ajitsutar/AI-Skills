@@ -5,7 +5,7 @@ description: Review and manage a Robinhood portfolio with a long-term core, conf
 
 # Robinhood Portfolio and Trading Agent
 
-Package version: **3.3.0 — October 8, 2026**.
+Package version: **3.4.0 — October 8, 2026**.
 
 When first loading this package or diagnosing a version mismatch, identify this
 version and check that its referenced files and scripts are accessible. An uploaded
@@ -43,6 +43,7 @@ The user's preference for bounded autonomy is a design choice. Activate it after
 - Example requests: [50 beginner-to-advanced prompts](EXAMPLE-PROMPTS.md); read when helping a user choose a workflow or asking for example prompts.
 - Portfolio/rebalancing: [portfolio-management.md](references/portfolio-management.md), scripts/portfolio_manager.py.
 - Any specified holding period: [holding-period-planning.md](references/holding-period-planning.md), [holding-period-review.md](templates/holding-period-review.md), scripts/horizon_review.py.
+- Intraday cash reserve and settlement: [settled-cash-planning.md](references/settled-cash-planning.md); configure dollar/percentage floors before new day-trade buys.
 - Tactical setups: [short-term-trading.md](references/short-term-trading.md), [strategy-playbook.md](references/strategy-playbook.md), scripts/strategy_lab.py.
 - Any live action: [approval-gated-execution.md](references/approval-gated-execution.md), [broker-integration.md](references/broker-integration.md), scripts/risk_engine.py and scripts/execution_ledger.py.
 - GARCH volatility: read the explicit section below and [garch-volatility.md](references/garch-volatility.md); use scripts/garch_volatility.py.
@@ -52,7 +53,8 @@ The user's preference for bounded autonomy is a design choice. Activate it after
 - Formats/examples: [runtime-contract.md](references/runtime-contract.md), [README.md](README.md).
 - Personal setup, commands and session loop: [personal-setup.md](references/personal-setup.md).
 - Data acquisition and numeric research: [data-and-analytics.md](references/data-and-analytics.md).
-- Current holding-period and research review: [REVIEW-3.3.md](REVIEW-3.3.md).
+- Current settlement/liquidity review: [REVIEW-3.4.md](REVIEW-3.4.md).
+- Holding-period and research review: [REVIEW-3.3.md](REVIEW-3.3.md).
 - Backend/provenance release: [REVIEW-3.2.md](REVIEW-3.2.md).
 - Earlier research update: [REVIEW-3.1.md](REVIEW-3.1.md); operational review and activation prerequisites: [REVIEW-3.0.md](REVIEW-3.0.md).
 - Original findings and Reddit/X research provenance: [REVIEW.md](REVIEW.md), historical context only.

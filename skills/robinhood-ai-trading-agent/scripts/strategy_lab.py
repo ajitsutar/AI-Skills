@@ -99,11 +99,12 @@ def signal(history, strategy, lookback=20, opening_bars=3, bar_minutes=5):
 def replay(bars, strategy, initial_cash=100000, risk_fraction=0.001,
            capital_fraction=0.05, slippage_bps=5, fee_per_share=0.005,
            lookback=20, opening_bars=3, bar_minutes=5, trade_start=0):
-    """One position, one symbol; no leverage, no reinvested unsettled intraday proceeds.
+    """One position, one symbol; no leverage, one intraday entry per session.
 
-    Intraday simulation permits one entry per session (conservative settlement and
-    churn assumption). Daily swing settlement is an approximation; production uses
-    actual broker settled funds. Open positions at end are marked, never fabricated as sold.
+    This price replay is not a cash-account settlement model. Proceeds enter ledger
+    cash on exit; overnight residuals, holidays and multi-symbol cash reuse require
+    separate settlement validation. It does not model the configurable intraday
+    settled-cash reserve. Production uses broker-confirmed settled funds. Open positions at end are marked, never fabricated as sold.
     """
     if not bars or initial_cash <= 0 or not 0 < risk_fraction <= 1 or not 0 < capital_fraction <= 1:
         raise ValueError("Invalid capital or risk configuration")
@@ -192,7 +193,9 @@ def replay(bars, strategy, initial_cash=100000, risk_fraction=0.001,
             "execution_time_resolution": "Entry at modeled bar open; exit_time labels the containing bar end, not an observed tick",
             "assumptions": {"slippage_bps": slippage_bps, "fee_per_share": fee_per_share,
                             "capital_fraction": capital_fraction, "risk_fraction": risk_fraction,
-                            "intrabar_ambiguity": "stop_first", "queue_or_depth_model": False},
+                            "intrabar_ambiguity": "stop_first", "queue_or_depth_model": False,
+                            "broker_settlement_calendar_modeled": False,
+                            "settled_cash_reserve_modeled": False},
             "validated_for_live": False}
 
 
