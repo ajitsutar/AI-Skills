@@ -1,0 +1,254 @@
+{
+  "universe": {
+    "name": "Configurable fictional learning universe",
+    "source": "Locally invented example; not S&P 500 constituents",
+    "as_of": "2026-01-15T14:00:00Z",
+    "symbols": [
+      "FICTION_VALUE"
+    ],
+    "scope_and_filters": "Schema example only; no fixed output count or real selection"
+  },
+  "screening": [
+    {
+      "symbol": "FICTION_VALUE",
+      "outcome": "retained",
+      "reason": "Artificial discovery candidate",
+      "evidence": [
+        "offline fixture only"
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "symbol": "FICTION_VALUE",
+      "checks": {
+        "earnings_quality": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "cash_support": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "balance_sheet": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "cycle_normalization": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "structural_health": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "valuation_growth": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "analyst_evidence": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        }
+      },
+      "event_review": {
+        "status": "clear",
+        "reason": "Artificial event review, no real calendar",
+        "evidence": [
+          "offline fixture only"
+        ]
+      },
+      "primary_review": {
+        "status": "reviewed",
+        "reason": "Artificial latest-period consistency example",
+        "latest_public_period_end": "2025-12-31",
+        "reviewed_period_end": "2025-12-31",
+        "latest_published_at": "2026-01-13T12:00:00Z",
+        "checked_at": "2026-01-15T13:30:00Z",
+        "evidence": [
+          "Fictional issuer release and filing; no real company"
+        ]
+      },
+      "horizon_review": {
+        "checks": {
+          "thesis_timing": {
+            "status": "pass",
+            "reason": "Fictional evidenced judgment including allowed event exposure",
+            "evidence": [
+              "offline schema fixture only"
+            ]
+          },
+          "terminal_valuation": {
+            "status": "pass",
+            "reason": "Fictional evidenced judgment including allowed event exposure",
+            "evidence": [
+              "offline schema fixture only"
+            ]
+          },
+          "downside_liquidity": {
+            "status": "pass",
+            "reason": "Fictional evidenced judgment including allowed event exposure",
+            "evidence": [
+              "offline schema fixture only"
+            ]
+          },
+          "portfolio_fit": {
+            "status": "pass",
+            "reason": "Fictional evidenced judgment including allowed event exposure",
+            "evidence": [
+              "offline schema fixture only"
+            ]
+          },
+          "exit_plan": {
+            "status": "pass",
+            "reason": "Fictional evidenced judgment including allowed event exposure",
+            "evidence": [
+              "offline schema fixture only"
+            ]
+          }
+        },
+        "event_calendar": {
+          "symbol": "FICTION_VALUE",
+          "source": "Fictional calendar",
+          "coverage_verified": true,
+          "checked_at": "2026-01-15T13:30:00Z",
+          "coverage_start": "2026-01-01T00:00:00Z",
+          "coverage_end": "2026-04-30T23:59:00Z",
+          "events": [
+            {
+              "kind": "earnings",
+              "earliest_at": "2026-02-05T21:00:00Z",
+              "latest_at": "2026-02-05T23:00:00Z",
+              "certainty": "estimated",
+              "evidence": [
+                "Fictional dated event window"
+              ]
+            }
+          ]
+        },
+        "terminal_scenarios": {
+          "exit_at": "2026-04-15T19:45:00+00:00",
+          "entry_price": 100,
+          "round_trip_cost_bps": 20,
+          "cash_benchmark_return": 0.01,
+          "cash_benchmark_evidence": [
+            "Fictional comparable 90-day cash outcome"
+          ],
+          "evidence": [
+            "Fictional normalized-earnings and multiple sensitivity"
+          ],
+          "cases": [
+            {
+              "name": "downside",
+              "terminal_price": 80,
+              "distributions_per_share": 0,
+              "assumptions": "Artificial terminal-price assumption; no probability assigned",
+              "evidence": [
+                "offline schema fixture only"
+              ]
+            },
+            {
+              "name": "base",
+              "terminal_price": 108,
+              "distributions_per_share": 0,
+              "assumptions": "Artificial terminal-price assumption; no probability assigned",
+              "evidence": [
+                "offline schema fixture only"
+              ]
+            },
+            {
+              "name": "upside",
+              "terminal_price": 120,
+              "distributions_per_share": 0,
+              "assumptions": "Artificial terminal-price assumption; no probability assigned",
+              "evidence": [
+                "offline schema fixture only"
+              ]
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "run_spec": {
+    "schema_version": 1,
+    "run_id": "fictional-holding-period-schema",
+    "methodology_version": "demo-1",
+    "defined_at": "2026-01-15T13:00:00Z",
+    "mandate": "Fictional 90-calendar-day fixed-end research, no actual security or order",
+    "input_snapshot": [
+      "This file contains synthetic declarations only; no external quotes or financial observations"
+    ],
+    "field_definitions": {
+      "fixture_review_status": "Artificial pass/unresolved/fail evidence checks, not market metrics"
+    },
+    "peer_policy": "No market peers or valuation metric; fixture-only classification example",
+    "discovery_policy": "Synthetic retained/excluded/not_advanced/missing rows demonstrate coverage; no real stock filter",
+    "deep_review_policy": "Review VALUE, EVENT, TRAP and WATCH; leave DEFERRED for later and MISSING unresolved; stop after the schema cases",
+    "ranking_policy": "Qualitative research priority: VALUE first for complete fixture evidence, WATCH next to resolve its missing cycle bridge; not an investment ranking",
+    "valuation_policy": "No valuation performed; do not infer any fair value from fixture statuses",
+    "changes": []
+  },
+  "report": {
+    "kind": "eligible_comparison",
+    "ranked_symbols": [
+      "FICTION_VALUE"
+    ],
+    "selection_rationale": {
+      "FICTION_VALUE": "Artificial complete declaration; not verified investment evidence"
+    }
+  },
+  "decision_mode": "fixed_horizon",
+  "horizon": {
+    "schema_version": 1,
+    "as_of": "2026-01-15T14:00:00Z",
+    "entry_at": "2026-01-15T15:00:00Z",
+    "latest_entry_at": "2026-01-16T15:00:00Z",
+    "anchor_date": "2026-01-15",
+    "deadline_mode": "fixed_end",
+    "strategy_route": "swing",
+    "duration": {
+      "unit": "calendar_days",
+      "value": 90
+    },
+    "early_exit_policy": "risk_exits_allowed",
+    "non_session_exit": "previous_session",
+    "exit_buffer_minutes": 15,
+    "exchange": "XNYS",
+    "calendar_confirmed_through": "2026-12-31",
+    "calendar_evidence": [
+      "Fictional calendar declaration; library dates must be checked for live use"
+    ],
+    "event_policy": {
+      "scope": "entry_only",
+      "coverage_mode": "full_hold",
+      "before_sessions": 2,
+      "after_sessions": 1,
+      "max_age_seconds": 86400,
+      "blocked_kinds": [
+        "earnings"
+      ]
+    }
+  }
+}
