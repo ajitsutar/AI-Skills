@@ -1,6 +1,6 @@
 # Robinhood portfolio and trading agent
 
-Version **3.3.0 — October 8, 2026**. A portable skill for **personal Codex**, with
+Version **3.4.0 — October 8, 2026**. A portable skill for **personal Codex**, with
 a long-term core and separately budgeted swing/day trading in an active supervised
 session. It starts in paper mode and supports exact-order approval or a bounded
 mandate through the connected official Robinhood Trading MCP.
@@ -11,8 +11,14 @@ quantitative analysis, and execution controls. Choose and adapt the examples;
 they do not change the skill's operating policy or grant trading authorization.
 
 Provide/extract the **entire ZIP**, not only SKILL.md. Ask the personal agent to
-identify version 3.3.0 and verify its supporting files before use. GARCH is
+identify version 3.4.0 and verify its supporting files before use. GARCH is
 explicitly part of this skill and has an executable, audited helper.
+
+Version 3.4 adds a configurable dollar/percentage reserve held in usable settled
+cash before new day-trade buys. It prevents unsettled sale proceeds from satisfying
+that reserve, accounts for pending buys and leaves necessary exits available.
+Read [the settlement review](REVIEW-3.4.md) and
+[configuration and waiting behavior](references/settled-cash-planning.md).
 
 Version 3.3 adds holding-period planning from intraday to decades, explicit entry
 and hold-event policies, latest-financial-period checks and dated net scenario

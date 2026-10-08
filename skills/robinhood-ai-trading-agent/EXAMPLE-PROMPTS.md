@@ -213,7 +213,7 @@ monitoring after it closes. See the [skill](SKILL.md) and
 
 ### 46. Audit live readiness
 
-> Using an already authorized broker connection, perform a read-only live-readiness assessment. Verify account eligibility, actual tool schemas, restrictions, settled cash, order support, native protection, partial-fill handling, and time-exit coverage. List concrete blockers without changing broker settings.
+> Using an already authorized broker connection, perform a read-only live-readiness assessment. Verify account eligibility, actual tool schemas, restrictions, settled cash, configurable intraday cash reserves in dollars and/or equity percentage, order support, native protection, partial-fill handling, and time-exit coverage. List concrete blockers without changing broker settings.
 
 ### 47. Prepare and execute one approved order
 
