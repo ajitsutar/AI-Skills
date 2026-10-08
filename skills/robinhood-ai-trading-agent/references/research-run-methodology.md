@@ -125,3 +125,37 @@ comparison. The hash does not authenticate referenced inputs or prove that rules
 were chosen beforehand. The helper checks schema, coverage and declared statuses;
 it does not execute a stock-ranking model, audit filings, test economic assumptions
 or certify that a prose report follows these instructions.
+
+## Holding periods, source freshness and agent comparisons
+
+Use [holding-period-planning.md](holding-period-planning.md) for any specified
+hold, including same-session and multi-decade requests. Time units, fixed/rolling
+exit, early-exit rules, cash needs and event scope are part of the common mandate.
+Rank for that mandate; never substitute a long-term value list for a dated swing
+request or force fundamental filters onto an intraday signal.
+
+For every finalist verify the latest public earnings release and latest available
+filing as of the research cutoff, with their actual periods and publication times.
+Read material release/filing changes even when a vendor has not ingested them.
+Retain attempted primary sources and concrete unresolved questions; do this work
+before stopping at an all-Watch list. Missing optional analysts or unusable GARCH
+do not alone invalidate primary-backed research; required live policy gates remain.
+
+An agent comparison also records skill/code version, model identifier/settings,
+tools and data entitlements, prior context and risk preferences. Unknown settings
+stay unknown. Freeze a shared cutoff and review common candidates consistently.
+Mean versus median, different coverage counts and provider timestamps can explain
+differences without proving error. A same model name and prompt do not guarantee
+identical inputs or results. A single comparison cannot establish model performance.
+
+New structured fundamental runs declare `decision_mode: long_term` plus a separate
+`research_as_of`, or `decision_mode: fixed_horizon` with `horizon.as_of` and a
+resolved holding clock. The universe's dated membership snapshot is not the
+research decision timestamp. Both modes require a run_spec and candidate
+primary_review. The latter records latest_public_period_end, reviewed_period_end,
+latest_published_at, checked_at, status=reviewed, reason and evidence. The helper
+requires the latest-report lookup within 24 hours of the run cutoff, not financial
+statements less than 24 hours old. This is a research freshness convention;
+execution may require much fresher checks. Archived runs retain their historical
+cutoff. Legacy manifests remain labeled legacy_unspecified and do not certify
+these new checks. See the fictional horizon example for the complete schema.

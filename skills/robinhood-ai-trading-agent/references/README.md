@@ -12,3 +12,7 @@ research provenance. They provide no authorization or verified performance evide
 
 Historical credits are maintained in [SOURCES.md](../SOURCES.md); source and
 license status are in [PROVENANCE.md](../PROVENANCE.md).
+
+For any holding period, from the same session to decades, read
+[holding-period-planning.md](holding-period-planning.md). Current changes and
+validation scope are in [REVIEW-3.3.md](../REVIEW-3.3.md).
