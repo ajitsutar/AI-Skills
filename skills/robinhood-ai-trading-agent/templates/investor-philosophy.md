@@ -1,48 +1,41 @@
-# Investor Philosophy
+# Personal investment brief
 
-## North Star
-What the portfolio is optimizing for and over what horizon.
+Complete this with the investor. Unanswered items remain unknown. This document
+informs research; live permissions belong in the separately approved runtime policy.
 
-## Core Rules
-1.
-2.
-3.
-4.
-5.
+## Desired outcome and resources
 
-## Time Horizons / Portfolio Buckets
-- Core:
-- Tactical:
-- Speculative:
+Describe the purpose of the account, the target holding period, contributions,
+planned withdrawals and money that must remain available for near-term needs.
+Record the account's currency and relevant restrictions without account numbers.
 
-## Risk Limits
-- Normal single-position target:
-- Hard single-position cap:
-- Speculative position cap:
-- Minimum cash floor:
-- Leverage / margin policy:
-- Options policy:
+## How capital will be used
 
-## Rebalancing Rules
-- Prefer new contributions for underweights when practical:
-- Rebalancing threshold:
-- Tax-aware sell rules:
+Explain the intended role and budget of long-term holdings, swing trades, intraday
+trades and cash. Identify existing exposure outside this account when it changes
+the portfolio decision. Budgets are proposals until the investor approves them.
 
-## Behavioral Pre-Commitments
-- What I will not do during sharp selloffs:
-- What I will not do after large rallies:
-- What requires a cooling-off period:
+## Acceptable losses and concentration
 
-## Anti-Portfolio
-Things I will not buy or strategies I will not use.
+Record tolerable drawdown and the action required when it is reached. Specify
+position, sector and correlated-exposure limits; day-trading loss and trade-count
+limits; and the permitted instruments, leverage and holding sessions.
 
-## Research Preferences
-Preferred evidence sources, sectors, themes, and holding periods.
+## Evidence and decision rules
 
-## Approval Policy
-Trades the agent may propose without approval:
+Describe what makes an investment thesis credible, what evidence invalidates it,
+which sources are acceptable and what uncertainty would justify waiting.
+Distinguish a valuation hypothesis from a fully researched eligible investment.
 
-Trades that always require explicit approval:
+## Trading supervision and permissions
 
-## Thesis-Invalidation Rules
-What evidence is strong enough to change a prior view?
+Choose paper, exact-order approval or a bounded mandate. Identify who supervises
+the session, how positions will be protected, when authority expires and how
+unresolved orders or positions will be handed back to the investor. This brief
+alone never authorizes a broker action.
+
+## Maintenance
+
+Set contribution and rebalance preferences, tax/turnover considerations and a
+review cadence. Record the effective date, the investor's approval and reasons for
+later amendments. Reconcile changes with runtime policy before considering orders.
