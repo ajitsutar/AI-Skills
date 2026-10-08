@@ -85,6 +85,10 @@ def validate_policy(policy):
         positive(limits[name])
     for name in ("slippage_bps", "fee_per_share", "no_entry_minutes_before_close"):
         nonnegative(limits[name])
+    reserve_fraction = dec(limits.get("intraday_settled_cash_floor_fraction", limits["cash_floor"]))
+    if not 0 <= reserve_fraction <= 1:
+        raise InvalidInput("Intraday settled cash floor fraction outside [0,1]")
+    nonnegative(limits.get("intraday_settled_cash_floor_amount", 0))
     if policy["allow_leverage"] is not False or policy["allow_shorting"] is not False:
         raise InvalidInput("This runtime supports unlevered long-only equities/ETFs")
     if not policy["allowed_symbols"] or not policy["allowed_setups"]:
@@ -286,6 +290,22 @@ def evaluate(policy, snapshot, order, now=None):
                             settled - reserved_cash, buying_power)
             if cost > available:
                 reasons.append("INSUFFICIENT_UNRESERVED_SETTLED_CASH")
+            # Gross ledger cash may include unsettled proceeds. Keep the intraday
+            # liquidity reserve in usable settled funds, after ALL buy reservations.
+            # This is an entry budget, never a restriction on reducing owned shares.
+            reserve_floor = Decimal(0)
+            if sleeve == "intraday":
+                reserve_floor = max(
+                    equity * dec(limits.get("intraday_settled_cash_floor_fraction", limits["cash_floor"])),
+                    dec(limits.get("intraday_settled_cash_floor_amount", 0)))
+                settled_budget = max(Decimal(0), settled - reserved_cash - reserve_floor)
+                available = min(available, settled_budget)
+                if cost > settled_budget:
+                    reasons.append("INTRADAY_SETTLED_CASH_RESERVE")
+            metrics.update(required_cash=str(cost), reserved_buy_cash=str(reserved_cash),
+                           unreserved_settled_cash=str(max(Decimal(0), settled - reserved_cash)),
+                           intraday_settled_cash_floor=str(reserve_floor),
+                           cash_budget_shortfall=str(max(Decimal(0), cost - available)))
             if sleeve_values[sleeve] + notional > equity * dec(policy["sleeves"][sleeve]):
                 reasons.append("SLEEVE_CAP")
             if sleeve == "core" and symbol_values.get(symbol, 0) + notional > equity * dec(policy["core_targets"].get(symbol, 0)):
@@ -322,7 +342,11 @@ def evaluate(policy, snapshot, order, now=None):
                        existing_open_risk=str(open_risk))
     except (KeyError, TypeError, ValueError, ArithmeticError) as exc:
         reasons.append("INVALID_OR_MISSING_INPUT: " + str(exc))
+    disposition = "READY_FOR_NEXT_GATE" if not reasons else "BLOCKED"
+    if reasons and set(reasons) <= {"INSUFFICIENT_UNRESERVED_SETTLED_CASH", "INTRADAY_SETTLED_CASH_RESERVE"}:
+        disposition = "WAIT_FOR_CASH_BUDGET"
     return {"allowed": not reasons, "reasons": sorted(set(reasons)), "metrics": metrics,
+            "entry_disposition": disposition if order.get("side") == "buy" else "NOT_AN_ENTRY",
             "order_hash": canonical_hash(order), "policy_hash": canonical_hash(policy),
             "planned_loss_is_not_guaranteed": True}
 
