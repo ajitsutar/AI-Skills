@@ -74,7 +74,7 @@ def audit_timestamps(observed, start_date, end_date, interval_minutes=None,
             "exchange": exchange, "calendar_source": "exchange_calendars; confirm live session with broker"}
 
 
-def event_gate(document, symbol, policy, now=None, hold_until=None):
+def event_gate(document, symbol, policy, now=None, hold_until=None, entry_at=None):
     """Assess a sourced, freshness-limited event list against session-based policy.
 
     Entries have kind, earliest_at, latest_at, evidence. Date-only events must be
@@ -82,9 +82,17 @@ def event_gate(document, symbol, policy, now=None, hold_until=None):
     """
     now = now or datetime.now(timezone.utc)
     hold_until = timestamp(hold_until) if isinstance(hold_until, str) else (hold_until or now)
-    reasons, blocked = [], []
-    if hold_until < now:
+    entry = timestamp(entry_at) if isinstance(entry_at, str) else (entry_at or now)
+    scope = policy.get("scope", "entry_and_hold")  # Preserve the strict live-policy default.
+    if scope == "holding_window":  # Existing approved personal policies use this spelling.
+        scope = "entry_and_hold"
+    if scope not in {"entry_only", "entry_and_hold"}:
+        raise ValueError("Event scope must be entry_only or entry_and_hold")
+    reasons, blocked, holding_events = [], [], []
+    if entry < now or hold_until < entry:
         raise ValueError("Holding window ends before the decision")
+    if timestamp(document["coverage_start"]) > timestamp(document["coverage_end"]):
+        raise ValueError("Event coverage interval is reversed")
     before, after = policy["before_sessions"], policy["after_sessions"]
     if any(isinstance(v, bool) or not isinstance(v, int) or not 0 <= v <= 60 for v in (before, after)):
         raise ValueError("Event window requires 0..60 whole sessions")
@@ -94,7 +102,7 @@ def event_gate(document, symbol, policy, now=None, hold_until=None):
     max_age = float(positive(policy["max_age_seconds"]))
     if max_age <= 0 or not 0 <= (now - checked).total_seconds() <= max_age:
         reasons.append("EVENT_CALENDAR_STALE_OR_FUTURE")
-    earliest = min(now, timestamp(document["coverage_start"]))
+    earliest = min(entry, timestamp(document["coverage_start"]))
     latest = max(hold_until, timestamp(document["coverage_end"]))
     schedule = sessions((earliest - timedelta(days=180)).date().isoformat(),
                         (latest + timedelta(days=180)).date().isoformat(), policy.get("exchange", "XNYS"))
@@ -112,31 +120,38 @@ def event_gate(document, symbol, policy, now=None, hold_until=None):
     # Need lookahead because an event after hold_until can begin its blackout earlier.
     lookahead = date_index(hold_until, "next") + before + 1
     needed_end = timestamp(schedule[lookahead]["close"])
-    lookback = date_index(now, "previous") - after - 1
+    lookback = date_index(entry, "previous") - after - 1
     needed_start = timestamp(schedule[lookback]["open"])
     if timestamp(document["coverage_start"]) > needed_start or timestamp(document["coverage_end"]) < needed_end:
         reasons.append("EVENT_COVERAGE_INCOMPLETE")
     if not isinstance(document["events"], list):
         raise ValueError("events must be an explicit list, even when empty")
     for event in document["events"]:
-        if event["kind"] not in policy["blocked_kinds"]:
-            continue
-        if not event.get("evidence"):
+        if not isinstance(event.get("evidence"), list) or not event["evidence"] or any(
+                not isinstance(ref, str) or not ref.strip() for ref in event["evidence"]):
             reasons.append("EVENT_WITHOUT_SOURCE_EVIDENCE")
         begin, end = timestamp(event["earliest_at"]), timestamp(event["latest_at"])
         if begin > end:
             raise ValueError("Event date interval is reversed")
+        if begin <= hold_until and end >= entry:
+            holding_events.append({"kind": event["kind"], "earliest_at": begin.isoformat(),
+                                   "latest_at": end.isoformat(), "evidence": event.get("evidence", []),
+                                   "certainty": event.get("certainty", "unknown")})
+        if event["kind"] not in policy["blocked_kinds"]:
+            continue
         start_index, end_index = date_index(begin, "previous") - before, date_index(end, "next") + after
         if start_index < 0 or end_index >= len(schedule):
             raise ValueError("Event blackout exceeds calendar coverage")
         block_start, block_end = timestamp(schedule[start_index]["open"]), timestamp(schedule[end_index]["close"])
-        if block_start <= hold_until and block_end >= now:
+        gate_end = entry if scope == "entry_only" else hold_until
+        if block_start <= gate_end and block_end >= entry:
             blocked.append({"kind": event["kind"], "start": block_start.isoformat(), "end": block_end.isoformat(),
                             "evidence": event.get("evidence", []), "certainty": event.get("certainty", "unknown")})
     if blocked:
         reasons.append("EVENT_BLACKOUT_OVERLAPS_ENTRY_OR_HOLD")
     return {"clear": not reasons, "symbol": symbol, "checked_at": now.isoformat(),
-            "hold_until": hold_until.isoformat(), "reasons": sorted(set(reasons)), "blackouts": blocked,
+            "entry_at": entry.isoformat(), "hold_until": hold_until.isoformat(), "scope": scope,
+            "reasons": sorted(set(reasons)), "blackouts": blocked, "holding_events": holding_events,
             "input_hash": canonical_hash(document), "policy_hash": canonical_hash(policy)}
 
 
