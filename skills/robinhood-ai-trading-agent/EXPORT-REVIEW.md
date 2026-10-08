@@ -1,3 +1,5 @@
+> Historical v3.1 packaging record. For the current release, see [REVIEW-3.2.md](REVIEW-3.2.md) and [VALIDATION-3.2.txt](VALIDATION-3.2.txt).
+
 # AI-Skills repository export of v3.1.0
 
 This export retains the Robinhood-specific execution workflow and skill name.

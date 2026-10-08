@@ -5,7 +5,7 @@ description: Review and manage a Robinhood portfolio with a long-term core, sepa
 
 # Robinhood Portfolio and Trading Agent
 
-Package version: **3.1.0 — October 7, 2026**.
+Package version: **3.2.0 — October 8, 2026**.
 
 When first loading this package or diagnosing a version mismatch, identify this
 version and check that its referenced files and scripts are accessible. An uploaded
@@ -51,6 +51,7 @@ The user's preference for bounded autonomy is a design choice. Activate it after
 - Formats/examples: [runtime-contract.md](references/runtime-contract.md), [README.md](README.md).
 - Personal setup, commands and session loop: [personal-setup.md](references/personal-setup.md).
 - Data acquisition and numeric research: [data-and-analytics.md](references/data-and-analytics.md).
+- Current backend/provenance release: [REVIEW-3.2.md](REVIEW-3.2.md).
 - Current research update: [REVIEW-3.1.md](REVIEW-3.1.md); operational review and activation prerequisites: [REVIEW-3.0.md](REVIEW-3.0.md).
 - Original findings and Reddit/X research provenance: [REVIEW.md](REVIEW.md), historical context only.
 
@@ -221,6 +222,9 @@ At close, reconcile all orders, identify residual intraday positions and verify 
 
 ## Provenance
 
-The supplied ZIP's investor philosophy, research comparisons and adversarial risk-review concepts are retained. Influencer attributions are historical inspiration, not verified performance evidence. Historical sources are in [REVIEW.md](REVIEW.md); current changes, tested controls
-and deployment prerequisites are in [REVIEW-3.0.md](REVIEW-3.0.md). Research reproducibility changes
-and their validation are in [REVIEW-3.1.md](REVIEW-3.1.md).
+Read [SOURCES.md](SOURCES.md) for all historical workflow credits and
+[PROVENANCE.md](PROVENANCE.md) for the source audit and replacement history.
+The volatility implementation now uses the external arch library; its full notice
+and dependency context are in [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+Numerical behavior and migration checks are in [REVIEW-3.2.md](REVIEW-3.2.md).
+Attribution does not establish performance, execution authority or reuse permission.
