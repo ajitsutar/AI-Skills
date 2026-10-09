@@ -224,7 +224,9 @@ class HorizonTests(unittest.TestCase):
                     review_schedule={'next_review_at':'2026-03-01T14:00:00Z',
                                      'cadence':'quarterly and material events','evidence':['fictional review policy']})
         spec['event_policy']['coverage_mode'] = 'rolling_review'
-        doc['candidates'][0]['horizon_review']['terminal_scenarios']['exit_at'] = resolve_horizon(spec)['exit_at']
+        terminal = doc['candidates'][0]['horizon_review']['terminal_scenarios']
+        terminal['exit_at'] = resolve_horizon(spec)['exit_at']
+        terminal['cash_benchmark'].update(exit_at=terminal['exit_at'], instrument_maturity_at=terminal['exit_at'])
         result = review_screen(doc)['candidates'][0]['horizon_review']
         self.assertEqual(result['status'], 'Eligible')
         self.assertEqual(result['events_beyond_review'], 'UNASSESSED')

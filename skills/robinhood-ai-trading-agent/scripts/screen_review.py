@@ -13,7 +13,8 @@ from collections import Counter
 from pathlib import Path
 
 from price_audit import evidence, timestamp
-from horizon_review import resolve_horizon, review_horizon_candidate, review_primary
+from horizon_review import resolve_horizon, review_horizon_candidate, review_primary, validate_event_policy
+from deterministic_rank import rank_screen
 
 
 REQUIRED_CHECKS = (
@@ -58,10 +59,13 @@ def review_report(document, candidates):
     report = document.get("report")
     if report is None:
         return {"kind": "NOT_RECORDED", "ranked_symbols": [],
-                "selection_rationale": {}, "execution_authorized": False}
+                "stage": "draft", "selection_rationale": {}, "execution_authorized": False}
     if not isinstance(report, dict) or report.get("kind") not in {
             "screened_hypotheses", "eligible_comparison"}:
         raise ValueError("report kind must be screened_hypotheses or eligible_comparison")
+    stage = report.get("stage", "draft")
+    if stage not in {"draft", "final"}:
+        raise ValueError("report.stage must be draft or final")
     symbols = report.get("ranked_symbols")
     if (not isinstance(symbols, list) or any(not isinstance(s, str) for s in symbols)
             or len(set(symbols)) != len(symbols)):
@@ -77,7 +81,7 @@ def review_report(document, candidates):
             raise ValueError("Ranked symbol needs a selection rationale: " + symbol)
         if report["kind"] == "eligible_comparison" and by_symbol[symbol]["status"] != "Eligible":
             raise ValueError("Eligible comparison cannot include " + by_symbol[symbol]["status"] + ": " + symbol)
-    return {"kind": report["kind"], "ranked_symbols": symbols,
+    return {"kind": report["kind"], "stage": stage, "ranked_symbols": symbols,
             "selection_rationale": rationale, "execution_authorized": False}
 
 
@@ -133,6 +137,8 @@ def review_screen(document):
     horizon = resolve_horizon(document.get("horizon")) if mode == "fixed_horizon" else None
     if horizon and horizon["strategy_route"] == "intraday":
         raise ValueError("Use horizon_review for the intraday clock and signal_review for its setup; no fundamental screen is required")
+    if horizon:
+        validate_event_policy(document["horizon"], horizon)
     research_as_of = (timestamp(horizon["as_of"]) if horizon else
                       timestamp(document["research_as_of"]) if mode == "long_term" else None)
     universe = document["universe"]
@@ -168,6 +174,7 @@ def review_screen(document):
             raise ValueError("Candidate reviews must be unique retained screening rows")
         reviewed.add(symbol)
         result = assess_candidate(candidate)
+        result["primary_evidence_complete"] = bool(research_as_of) and not review_primary(candidate.get("primary_review"), research_as_of)
         if mode == "long_term":
             gaps = review_primary(candidate.get("primary_review"), research_as_of)
             result["primary_review_gaps"] = gaps
@@ -193,6 +200,25 @@ def review_screen(document):
     if research_as_of and timestamp(universe["as_of"]) > research_as_of:
         raise ValueError("Universe snapshot cannot postdate the research decision")
     report = review_report(document, candidates)
+    ranking = rank_screen(document, candidates)
+    if (ranking["status"] == "COMPUTED" and report["stage"] == "final"
+            and report["ranked_symbols"] != ranking["selected_symbols"]):
+        raise ValueError("Final report.ranked_symbols must match deterministic ranking.selected_symbols in order")
+    gaps = []
+    if absent:
+        gaps.append("SCREENING_ROWS_ABSENT")
+    if counts["missing_data"]:
+        gaps.append("SCREENING_DATA_INCOMPLETE")
+    if retained - reviewed:
+        gaps.append("RETAINED_CANDIDATE_REVIEWS_MISSING")
+    if methodology["status"] != "DECLARED" or report["kind"] == "NOT_RECORDED":
+        gaps.append("METHODOLOGY_OR_REPORT_NOT_RECORDED")
+    if ranking.get("blocking_review_queue"):
+        gaps.append("HIGHER_RANKED_CONTENDERS_NEED_REVIEW")
+    completion = {"status": "INCOMPLETE" if gaps else "COMPLETE" if report["stage"] == "final" else "DRAFT",
+                  "reasons": gaps, "eligible_candidates": sum(c["status"] == "Eligible" for c in candidates),
+                  "noneligible_candidates": sum(c["status"] != "Eligible" for c in candidates),
+                  "limitations": "Record completeness for the declared universe only; not source verification, economic validity or trade authority"}
     return {"decision_mode": mode, "research_as_of": research_as_of.isoformat() if research_as_of else None, "horizon": horizon,
             "universe": {key: universe[key] for key in ("name", "source", "as_of", "scope_and_filters")},
             "coverage": {"expected_securities": len(expected), "retrieved_rows": len(seen),
@@ -204,7 +230,7 @@ def review_screen(document):
                          "retained_without_review": sorted(retained - reviewed),
                          "all_constituents_screened": not absent and counts["missing_data"] == 0},
             "candidates": candidates,
-            "methodology": methodology, "report": report,
+            "methodology": methodology, "report": report, "completion": completion, "ranking": ranking,
             "status_counts": dict(Counter(c["status"] for c in candidates)),
             "execution_authorized": False,
             "limitations": "Checks declared coverage/judgments only; does not verify universe membership, sources or current events"}
@@ -213,9 +239,12 @@ def review_screen(document):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("json", help="Offline screening manifest with evidence references")
+    parser.add_argument("--strict-final", action="store_true", help="Exit 2 unless report.stage=final and all declared coverage/reviews are present")
     args = parser.parse_args()
     result = review_screen(json.loads(Path(args.json).read_text(encoding="utf-8-sig")))
     print(json.dumps(result, indent=2, allow_nan=False))
+    if (args.strict_final or result["report"]["stage"] == "final") and result["completion"]["status"] != "COMPLETE":
+        raise SystemExit(2)
 
 
 if __name__ == "__main__":

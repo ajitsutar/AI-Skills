@@ -38,12 +38,15 @@ def initialize(directory):
 
 def doctor(directory):
     directory = Path(directory).resolve()
-    checks, failures = {}, []
-    for dependency in ("numpy", "scipy", "exchange_calendars", "yfinance", "jsonschema", "requests"):
+    checks, failures, warnings = {}, [], []
+    for dependency in ("numpy", "scipy", "exchange_calendars", "yfinance", "jsonschema", "requests", "tzdata", "arch"):
         try:
             checks[dependency] = importlib.metadata.version(dependency)
         except importlib.metadata.PackageNotFoundError:
-            failures.append("MISSING_DEPENDENCY:" + dependency)
+            checks[dependency] = "NOT_INSTALLED"
+            (warnings if dependency == "arch" else failures).append("MISSING_DEPENDENCY:" + dependency)
+    checks["garch_capability"] = "AVAILABLE" if checks.get("arch") != "NOT_INSTALLED" else "SKIPPED_MISSING_DEPENDENCIES"
+    checks["skill_version"] = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
     try:
         policy = json.loads((directory / "policy.json").read_text(encoding="utf-8-sig"))
         validate_policy(policy)
@@ -67,7 +70,7 @@ def doctor(directory):
                 failures.append("UNRESOLVED_INTENTS_REQUIRE_BROKER_RECONCILIATION")
         finally:
             ledger.close()
-    return {"local_checks_passed": not failures, "failures": failures, "checks": checks,
+    return {"local_checks_passed": not failures, "failures": failures, "warnings": warnings, "checks": checks,
             "live_readiness": "Requires an exact claim with fresh broker evidence, active session and human authorization"}
 
 

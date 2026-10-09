@@ -1,0 +1,10 @@
+Version 3.5.0 validation - October 9, 2026
+Python 3.11; dependency requirements unchanged.
+Full offline suite: 261 tests PASS; final integrity suite: 31 tests PASS,
+including the added caller-precision regression (262 tests in the final suite).
+Bundle create, strict verify and compare CLI smokes PASS.
+5 export-scanner tests PASS; 7-skill portability PASS; skill quick_validate PASS.
+50 numbered prompts retained; Markdown links checked; export safety scan PASS.
+The release ZIP is verified against PACKAGE-MANIFEST.json.
+GitHub Windows/Linux CI must pass on the uploaded PR before merge.
+Synthetic cases validate controls, not stock-selection performance or live broker support.

@@ -11,7 +11,7 @@ Shareable source exports of reusable Agent Skills, packaged as a native Claude C
 - `linkedin-knowledge-digest`: Filter LinkedIn feed and inbox activity into concise knowledge-bearing digests with clickable source links while excluding career milestones, hiring posts, self-promotion, and low-value outreach.
 - `travel-deal-finder`: Compare current travel deals across flights, hotels, packages, and rental cars with clear ranking rules and source verification.
 
-- `robinhood-ai-trading-agent`: Research and manage a long-term portfolio core with separately budgeted supervised swing/day trading, configurable holding periods from same-session trades to decades, a configurable settled-cash reserve for day trading, stock screening, GARCH risk analysis and broker-verified execution gates. Starts in paper mode; live execution requires the official Robinhood Trading MCP and applicable human authorization.
+- `robinhood-ai-trading-agent`: Research and manage a long-term portfolio core with separately budgeted supervised swing/day trading, configurable holding periods from same-session trades to decades, a configurable settled-cash reserve for day trading, deterministic stock ranking from saved profiles and snapshots, replayable research bundles, GARCH risk analysis and broker-verified execution gates. Starts in paper mode; live execution requires the official Robinhood Trading MCP and applicable human authorization.
 
 ## Layout
 

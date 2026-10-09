@@ -103,7 +103,7 @@ monitoring after it closes. See the [skill](SKILL.md) and
 
 ### 20. Reconcile two conflicting stock screens
 
-> Compare these two screens: [RESULT A] and [RESULT B]. Reconcile skill version, model/settings, tools/data access, prior context, universe, cutoff, holding period, price adjustments, latest primary financial periods, peer/metric definitions, coverage, event policy, and ranking rules. Separate factual errors from judgment differences; do not infer model quality from one pair of lists.
+> Compare these two research bundles: [RESULT A] and [RESULT B]. Verify replay and compare their saved profiles and frozen inputs. Reconcile skill version, model/settings, tools/data access, prior context, universe, cutoff, holding period, price adjustments, latest primary financial periods, peer/metric definitions, coverage, event policy, and ranking rules. Rerun deterministic ranking on the same agreed inputs to isolate model-specific judgments. Separate factual errors from judgment differences; do not infer model quality from one pair of lists.
 
 ## Portfolio management
 

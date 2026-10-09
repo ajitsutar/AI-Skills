@@ -27,7 +27,7 @@ used to run its helpers. On macOS/Linux use python3 and `.venv/bin/python`.
 
 `personal_runtime.py init <new-runtime-directory>` creates draft `policy.json`,
 `execution.db`, `supervised-session.db`, evidence/ and reports/ outside the skill.
-It creates no grant or active session. `doctor` checks local prerequisites;
+It creates no grant or active session. `doctor` reports VERSION, local prerequisites and optional GARCH capability; missing arch is a research warning, while an approved policy that requires GARCH still blocks live entry;
 exit code 2 with draft/paper findings is expected initially. Never use test/demo
 databases as personal account journals. Use one live journal per account alias
 across sessions/modes; keep paper journals separate.
@@ -162,14 +162,14 @@ for deterministic fixtures. Do not persist private routing in a CLI input file.
 
 Useful initial prompt in personal Codex:
 
-> Load the complete Robinhood agent v3.1.0. Start in paper mode. Run doctor, inspect
+> Load the complete installed Robinhood agent. Read VERSION and verify PACKAGE-MANIFEST.json. Start in paper mode. Run doctor, inspect
 > my authorized broker read capabilities, configure my investor policy and research
 > universe, and show the concrete remaining activation checks. Do not place a trade.
 
 ## Release verification
 
 The package includes PACKAGE-MANIFEST.json with SHA-256 hashes for every delivered
-file except the manifest itself. VALIDATION-3.1.txt records the current tests/smokes; VALIDATION-3.0.txt is historical.
+file except the manifest itself. Use the VALIDATION file matching VERSION for current tests; older validation files are historical.
 The outer ZIP has a separate SHA-256 file. A hash comparison detects a changed
 copy; it does not authenticate an unknown publisher. Keep the downloaded original
 and prior runtime backup when upgrading.

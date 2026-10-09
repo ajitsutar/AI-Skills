@@ -7,7 +7,7 @@
   "plugins": [
     {
       "name": "ai-skills",
-      "version": "1.4.0",
+      "version": "1.5.0",
       "source": "./",
       "description": "Reusable agents and skills for ticket checkout, karaoke and guitar-practice media, deal alerts, LinkedIn digests, travel comparison, and Robinhood portfolio research and supervised trading.",
       "repository": "https://github.com/ajitsutar/AI-Skills"
