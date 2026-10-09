@@ -5,7 +5,7 @@ description: Review and manage a Robinhood portfolio with a long-term core, conf
 
 # Robinhood Portfolio and Trading Agent
 
-Package version: **3.4.0 — October 8, 2026**.
+Package version: **3.5.0 — October 9, 2026**.
 
 When first loading this package or diagnosing a version mismatch, identify this
 version and check that its referenced files and scripts are accessible. An uploaded
@@ -53,6 +53,7 @@ The user's preference for bounded autonomy is a design choice. Activate it after
 - Formats/examples: [runtime-contract.md](references/runtime-contract.md), [README.md](README.md).
 - Personal setup, commands and session loop: [personal-setup.md](references/personal-setup.md).
 - Data acquisition and numeric research: [data-and-analytics.md](references/data-and-analytics.md).
+- Model-independent selection and report replay: [model-independent-research.md](references/model-independent-research.md), scripts/deterministic_rank.py and scripts/research_bundle.py.
 - Current settlement/liquidity review: [REVIEW-3.4.md](REVIEW-3.4.md).
 - Holding-period and research review: [REVIEW-3.3.md](REVIEW-3.3.md).
 - Backend/provenance release: [REVIEW-3.2.md](REVIEW-3.2.md).
@@ -97,6 +98,14 @@ is a configurable starting universe, not a mandatory or fixed constituent list.
 There is no top-N selection rule; include only supported candidates, possibly none.
 For broad/ranked screens, also use [research-run-methodology.md](references/research-run-methodology.md):
 record the snapshot, mandate, selection/ranking rules and judgment overrides.
+For ranked stock-pick requests, follow [model-independent-research.md](references/model-independent-research.md).
+Reuse a saved mandate/profile, source priority, cutoff and frozen universe/data;
+run deterministic_rank through screen_review rather than inventing weights or
+reordering picks in prose. Review unresolved contenders in returned score order.
+Keep model-specific research judgments explicit; never fabricate agreement.
+Export the full inputs/results with research_bundle and verify replay. Use
+--strict-final only with report.stage=final; a complete record is not an investment
+endorsement. Partial research stays explicitly incomplete and can be resumed.
 Distinguish discovery exclusions from names not advanced to deeper review.
 Label Watch lists as research priorities; an Eligible comparison is separate.
 Show actual coverage and missing data. A relative bargain is a research hypothesis
