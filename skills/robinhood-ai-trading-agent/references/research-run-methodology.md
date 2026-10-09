@@ -159,3 +159,19 @@ statements less than 24 hours old. This is a research freshness convention;
 execution may require much fresher checks. Archived runs retain their historical
 cutoff. Legacy manifests remain labeled legacy_unspecified and do not certify
 these new checks. See the fictional horizon example for the complete schema.
+
+## Reproducible reports (3.5 and later)
+
+Read [model-independent-research.md](model-independent-research.md) for deterministic
+ranking, input/result bundles, comparison and the structured cash benchmark.
+`report.stage` defaults to `draft`; `final` requests a complete record. Completion
+requires a recorded method/report, every declared-universe screening row, no
+missing-data rows and a review for every retained candidate. A final Watch-only
+record remains Watch-only: completeness is not a buy recommendation. A narrower
+declared universe is never a claim to have screened the whole index.
+
+The helper emits DRAFT, INCOMPLETE or COMPLETE. `--strict-final` exits 2 unless
+COMPLETE; a requested final report with gaps also exits 2. Invalid input exits
+nonzero. Drafts may exit 0 while listing gaps, so automation must read completion
+or use strict mode. Empty retained sets are valid; do not fill a requested quota.
+The JSON result alone is not a reproducible report: retain its input via the bundle.

@@ -208,3 +208,17 @@ multi-session protection, corporate actions, restart recovery and hard-exit/hand
 coverage through the broker and host. Until then, retain research/paper status or
 present the plan for human execution. Do not route a swing order through core or
 intraday simply to bypass unsupported mechanics.
+
+## Benchmark and scenario evidence
+
+For structured terminal scenarios use the `cash_benchmark` contract in
+[model-independent-research.md](model-independent-research.md). The helper computes
+the cash return for the exact entry/exit interval, checks its observation date,
+and requires explicit rollover/early-sale/floating-rate assumptions when maturity
+differs. A legacy bare percentage is unverified; excess-over-cash is then null and
+the horizon review cannot become Eligible. Scenario `arithmetic_valid` is separate
+from `valuation_evidence_status=DECLARED_NOT_VERIFIED`; neither authenticates a
+valuation. Preserve EPS/FCF period, GAAP/adjusted bridge, terminal multiple and
+other model inputs alongside assumptions/evidence, including downside cases.
+The shared event policy is validated even for an empty candidate list. Put cadence,
+evidence and next_review_at under `horizon.review_schedule`, not event_policy.
