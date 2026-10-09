@@ -17,3 +17,9 @@ For a specified holding period, load the skill's holding-period-planning.md.
 Support the actual horizon, from same-session trades to ten years and longer.
 Resolve the clock first, then use intraday signals, swing research or long-term
 fundamentals as appropriate. Research support does not add a live swing adapter.
+
+For ranked stock requests, load model-independent-research.md. Reuse the saved
+mandate, profile and frozen snapshot; run the deterministic ranking helper and
+retain a verified input/result bundle. Do not invent different weights, substitute
+data sources silently or reorder computed picks in prose. Keep evidence gaps and
+model-specific judgments visible; identical prompts alone do not fix the inputs.
