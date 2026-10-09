@@ -15,6 +15,7 @@ from pathlib import Path
 
 from price_audit import evidence, timestamp
 from trading_calendar import event_gate, sessions
+from cash_benchmark import review_cash_benchmark
 
 
 HORIZON_CHECKS = ("thesis_timing", "terminal_valuation", "downside_liquidity",
@@ -159,16 +160,21 @@ def review_primary(section, as_of):
 
 def review_scenarios(section, resolved):
     if not isinstance(section, dict) or not section:
-        return {"complete": False, "reasons": ["TERMINAL_SCENARIOS_MISSING"]}
-    if not evidence(section.get("evidence")) or not evidence(section.get("cash_benchmark_evidence")):
-        return {"complete": False, "reasons": ["SCENARIO_OR_CASH_BENCHMARK_EVIDENCE_MISSING"]}
+        return {"complete": False, "arithmetic_valid": False, "reasons": ["TERMINAL_SCENARIOS_MISSING"]}
+    if not evidence(section.get("evidence")):
+        return {"complete": False, "arithmetic_valid": False, "reasons": ["SCENARIO_EVIDENCE_MISSING"]}
     if timestamp(section["exit_at"]) != timestamp(resolved["exit_at"]):
-        return {"complete": False, "reasons": ["SCENARIOS_USE_DIFFERENT_EXIT"]}
+        return {"complete": False, "arithmetic_valid": False, "reasons": ["SCENARIOS_USE_DIFFERENT_EXIT"]}
     entry = finite(section["entry_price"], "entry_price")
     if entry == 0:
         raise ValueError("entry_price must be positive")
     costs = finite(section["round_trip_cost_bps"], "round_trip_cost_bps") / 10000
-    cash = finite(section["cash_benchmark_return"], "cash_benchmark_return", -1)
+    benchmark = review_cash_benchmark(section.get("cash_benchmark"), resolved)
+    cash = benchmark["holding_period_return"]
+    if cash is not None and "cash_benchmark_return" in section:
+        legacy_cash = finite(section["cash_benchmark_return"], "cash_benchmark_return", -1)
+        if not math.isclose(legacy_cash, cash, rel_tol=1e-9, abs_tol=1e-10):
+            raise ValueError("cash_benchmark_return conflicts with the structured holding-period benchmark")
     cases = section.get("cases")
     if not isinstance(cases, list) or [c.get("name") for c in cases] != ["downside", "base", "upside"]:
         raise ValueError("Provide downside, base, upside scenarios in that order")
@@ -177,19 +183,61 @@ def review_scenarios(section, resolved):
         if "probability" in case or "probabilities" in section or "expected_return" in section:
             raise ValueError("This helper does not validate probabilities or expected returns")
         if not case.get("assumptions") or not evidence(case.get("evidence")):
-            return {"complete": False, "reasons": ["SCENARIO_ASSUMPTIONS_OR_EVIDENCE_MISSING"]}
+            return {"complete": False, "arithmetic_valid": False, "reasons": ["SCENARIO_ASSUMPTIONS_OR_EVIDENCE_MISSING"]}
         terminal = finite(case["terminal_price"], "terminal_price")
         distributions = finite(case["distributions_per_share"], "distributions_per_share")
         net = (terminal + distributions) / entry - 1 - costs
-        if not math.isfinite(net) or not math.isfinite(net - cash):
+        if not math.isfinite(net) or (cash is not None and not math.isfinite(net - cash)):
             raise ValueError("Scenario return arithmetic must remain finite")
         output.append({"name": case["name"], "net_return": net,
-                       "excess_over_cash": net - cash, "assumptions": case["assumptions"]})
+                       "excess_over_cash": net - cash if cash is not None else None,
+                       "assumptions": case["assumptions"], "inputs": case})
     if [c["net_return"] for c in output] != sorted(c["net_return"] for c in output):
         raise ValueError("Scenario terminal payoffs must be ordered downside <= base <= upside")
-    return {"complete": True, "reasons": [], "cases": output,
+    return {"complete": cash is not None, "arithmetic_valid": True,
+            "valuation_evidence_status": "DECLARED_NOT_VERIFIED",
+            "reasons": benchmark["reasons"], "cases": output,
+            "cash_benchmark": benchmark,
+            "entry_price": entry, "round_trip_cost_bps": section["round_trip_cost_bps"],
             "exit_at": resolved["exit_at"], "probability_of_profit": None,
-            "limitations": "Assumption-driven terminal outcomes, not forecasts or calibrated probabilities"}
+            "limitations": "complete describes scenario arithmetic and a declared cash comparison, not economic evidence sufficiency, forecasts or calibrated probabilities"}
+
+
+def validate_event_policy(spec, resolved):
+    """Validate the shared contract even when a screen has no candidates."""
+    policy = spec.get("event_policy")
+    if not isinstance(policy, dict) or policy.get("scope") not in {"entry_only", "entry_and_hold"}:
+        raise ValueError("horizon.event_policy.scope requires entry_only or entry_and_hold")
+    if policy.get("exchange", resolved["exchange"]) != resolved["exchange"]:
+        raise ValueError("horizon.event_policy.exchange must match horizon.exchange")
+    for key in ("before_sessions", "after_sessions"):
+        value = policy.get(key)
+        if isinstance(value, bool) or not isinstance(value, int) or not 0 <= value <= 60:
+            raise ValueError("horizon.event_policy." + key + " requires 0..60 whole sessions")
+    if finite(policy.get("max_age_seconds"), "horizon.event_policy.max_age_seconds") <= 0:
+        raise ValueError("horizon.event_policy.max_age_seconds must be positive")
+    kinds = policy.get("blocked_kinds")
+    if not isinstance(kinds, list) or any(not isinstance(k, str) or not k.strip() for k in kinds):
+        raise ValueError("horizon.event_policy.blocked_kinds requires an explicit list")
+    coverage = policy.get("coverage_mode")
+    if coverage not in {"full_hold", "rolling_review"}:
+        raise ValueError("horizon.event_policy.coverage_mode requires full_hold or rolling_review")
+    if "next_review_at" in policy or "review_schedule" in policy:
+        raise ValueError("Move the review schedule to horizon.review_schedule, outside event_policy")
+    event_end = resolved["exit_at"]
+    if coverage == "rolling_review":
+        schedule = spec.get("review_schedule")
+        if policy["scope"] != "entry_only":
+            raise ValueError("Rolling review cannot certify no prohibited events over the entire hold")
+        if not isinstance(schedule, dict) or not schedule.get("cadence") or not evidence(schedule.get("evidence")):
+            raise ValueError("horizon.review_schedule requires cadence and evidence for rolling review")
+        if not schedule.get("next_review_at"):
+            raise ValueError("horizon.review_schedule.next_review_at is required")
+        next_review = timestamp(schedule["next_review_at"])
+        if not timestamp(resolved["entry_at"]) < next_review <= timestamp(resolved["exit_at"]):
+            raise ValueError("horizon.review_schedule.next_review_at must be after entry and no later than exit")
+        event_end = next_review.isoformat()
+    return event_end
 
 
 def review_horizon_candidate(candidate, spec, resolved):
@@ -209,24 +257,8 @@ def review_horizon_candidate(candidate, spec, resolved):
     scenarios = review_scenarios(review.get("terminal_scenarios"), resolved)
     reasons.extend(scenarios["reasons"])
     events, policy = review.get("event_calendar"), spec.get("event_policy")
-    if not isinstance(policy, dict) or policy.get("scope") not in {"entry_only", "entry_and_hold"}:
-        raise ValueError("Fixed-horizon event_policy requires explicit scope")
-    if policy.get("exchange", resolved["exchange"]) != resolved["exchange"]:
-        raise ValueError("Event and horizon exchange must match")
-    coverage = policy.get("coverage_mode")
-    if coverage not in {"full_hold", "rolling_review"}:
-        raise ValueError("Declare event coverage_mode full_hold or rolling_review")
-    event_end = resolved["exit_at"]
-    if coverage == "rolling_review":
-        schedule = spec.get("review_schedule", {})
-        if policy["scope"] != "entry_only":
-            raise ValueError("Rolling review cannot certify no prohibited events over the entire hold")
-        if not schedule.get("cadence") or not evidence(schedule.get("evidence")):
-            raise ValueError("Rolling event coverage needs an evidenced review_schedule")
-        next_review = timestamp(schedule["next_review_at"])
-        if not timestamp(resolved["entry_at"]) < next_review <= timestamp(resolved["exit_at"]):
-            raise ValueError("Next review must be after entry and no later than exit")
-        event_end = next_review.isoformat()
+    event_end = validate_event_policy(spec, resolved)
+    coverage = policy["coverage_mode"]
     if events is None:
         event_result = {"clear": False, "reasons": ["EVENT_CALENDAR_MISSING"], "blackouts": []}
     else:
@@ -241,6 +273,8 @@ def review_horizon_candidate(candidate, spec, resolved):
               or review_primary(candidate.get("primary_review"), timestamp(resolved["as_of"]))
               else "Eligible")
     return {"status": status, "event_status": event_status, "reasons": reasons,
+            "evidence_complete": not review_primary(candidate.get("primary_review"), timestamp(resolved["as_of"]))
+                and "unresolved" not in states and scenarios["complete"],
             "terminal_scenarios": scenarios, "events": event_result,
             "event_coverage_mode": coverage, "events_beyond_review": "UNASSESSED" if coverage == "rolling_review" else "DECLARED_COVERED",
             "execution_authorized": False}
