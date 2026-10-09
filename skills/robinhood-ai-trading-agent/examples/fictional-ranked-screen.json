@@ -232,7 +232,7 @@
     "selection_rationale": {
       "FICTION_VALUE": "Artificial complete declaration; not verified investment evidence"
     },
-    "stage": "draft"
+    "stage": "final"
   },
   "decision_mode": "fixed_horizon",
   "horizon": {
@@ -265,5 +265,78 @@
         "earnings"
       ]
     }
-  }
+  },
+  "ranking_spec": {
+    "schema_version": 1,
+    "profile_id": "fictional-value-quality",
+    "profile_version": "1",
+    "snapshot_id": "synthetic-example-1",
+    "as_of": "2026-01-15T14:00:00Z",
+    "max_age_seconds": 86400,
+    "missing_data_policy": "exclude",
+    "tie_break": "symbol_ascending",
+    "selection_count": null,
+    "max_per_group": null,
+    "allowed_statuses": [
+      "Eligible"
+    ],
+    "minimum_score": "0.5",
+    "filters": [
+      {
+        "metric": "peer_discount",
+        "operator": "ge",
+        "value": "0"
+      }
+    ],
+    "criteria": [
+      {
+        "metric": "peer_discount",
+        "direction": "higher",
+        "weight": "0.6",
+        "low": "0",
+        "high": "0.5"
+      },
+      {
+        "metric": "cash_quality",
+        "direction": "higher",
+        "weight": "0.4",
+        "low": "0",
+        "high": "1"
+      }
+    ],
+    "field_definitions": {
+      "peer_discount": {
+        "unit": "fraction",
+        "period": "fictional NTM",
+        "basis": "synthetic industry-relative multiple discount",
+        "normalization": "fixture only; actual runs need comparable business models and normalized earnings",
+        "source_priority": [
+          "invented fixture, not a market source"
+        ]
+      },
+      "cash_quality": {
+        "unit": "fraction",
+        "period": "fictional trailing year",
+        "basis": "synthetic numeric quality input",
+        "normalization": "fixture only; not an LLM-assigned score in actual research",
+        "source_priority": [
+          "invented fixture, not a market source"
+        ]
+      }
+    }
+  },
+  "ranking_inputs": [
+    {
+      "symbol": "FICTION_VALUE",
+      "observed_at": "2026-01-15T14:00:00Z",
+      "group": "FICTIONAL_INDUSTRY",
+      "metrics": {
+        "peer_discount": "0.3",
+        "cash_quality": "0.8"
+      },
+      "evidence": [
+        "offline synthetic numeric inputs only"
+      ]
+    }
+  ]
 }
