@@ -6,6 +6,7 @@ code execution, linked-file reads, broker data access or execution authority.
 from __future__ import annotations
 
 import argparse
+import copy
 import hashlib
 import importlib.metadata
 import json
@@ -32,11 +33,15 @@ def implementation():
     files = {p.relative_to(ROOT).as_posix(): hashlib.sha256(
         p.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
         for p in sorted((ROOT / "scripts").glob("*.py"))}
+    files.update({p.relative_to(ROOT).as_posix(): hashlib.sha256(
+        p.read_bytes().replace(b"\r\n", b"\n")).hexdigest()
+        for p in sorted((ROOT / "profiles").glob("*.json"))})
     return {"skill_version": (ROOT / "VERSION").read_text(encoding="utf-8").strip(),
             "source_sha256": files, "dependencies": dependencies}
 
 
 def create_bundle(document):
+    document = copy.deepcopy(document)
     result = review_screen(document)
     return {"schema_version": 1, "input_document": document,
             "input_sha256": canonical_hash(document), "result": result,
@@ -75,14 +80,29 @@ def compare_bundles(left, right):
             raise ValueError("Comparison bundle hash mismatch")
     a, b = left["input_document"], right["input_document"]
     fields = ("decision_mode", "research_as_of", "horizon", "universe", "run_spec",
-              "ranking_spec", "ranking_inputs", "screening", "candidates", "report")
+              "ranking_spec", "ranking_inputs", "shared_strategy", "vqm_snapshot",
+              "screening", "candidates", "report")
     differences = [field for field in fields if a.get(field) != b.get(field)]
     if left["implementation"] != right["implementation"]:
         differences.append("implementation")
     picks = [bundle["result"].get("ranking", {}).get("selected_symbols", []) for bundle in (left, right)]
     configured = all(bundle["result"].get("ranking", {}).get("status") == "COMPUTED" for bundle in (left, right))
+    counts = [d.get('shared_strategy', {}).get('selection_count', d.get('ranking_spec', {}).get('selection_count')) for d in (a, b)]
+    identity_maps = [{r['symbol']: r['issuer_id'] for r in d.get('vqm_snapshot', {}).get('rows', [])} for d in (a, b)]
+    issuer_basis = all(identity_maps)
+    identities = [{identity_maps[i].get(s, s) if issuer_basis else s for s in picks[i]} for i in range(2)]
+    common = sorted(identities[0] & identities[1])
+    count = counts[0] if type(counts[0]) is int and counts[0] > 0 and counts[0] == counts[1] else None
+    full = bool(configured and count and all(len(items) == count for items in identities))
+    overlap = {'requested_count': count, 'common_identifiers': common,
+               'identity_basis': 'issuer_id' if issuer_basis else 'exact_symbol',
+               'common_count': len(common), 'fraction_of_requested_count': len(common) / count if count else None,
+               'acceptance_threshold': 0.8,
+               'status': ('MEETS_OVERLAP_THRESHOLD' if len(common) * 5 >= count * 4 else 'BELOW_OVERLAP_THRESHOLD') if full else 'INSUFFICIENT_FULL_LISTS',
+               'limitations': 'Set overlap, not Jaccard, investment merit or proof of an actual independent model run. Compare input differences and verify both bundles separately.'}
     return {"differing_components": differences, "selected_symbols": picks,
             "same_picks": picks[0] == picks[1] if configured else None,
+            'overlap': overlap,
             "execution_authorized": False,
             "limitations": "Structural comparison only; run verify separately to establish replay, not investment merit"}
 

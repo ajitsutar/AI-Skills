@@ -15,6 +15,7 @@ from pathlib import Path
 from price_audit import evidence, timestamp
 from horizon_review import resolve_horizon, review_horizon_candidate, review_primary, validate_event_policy
 from deterministic_rank import rank_screen
+from vqm_research import prepare_document
 
 
 REQUIRED_CHECKS = (
@@ -64,6 +65,8 @@ def review_report(document, candidates):
             "screened_hypotheses", "eligible_comparison"}:
         raise ValueError("report kind must be screened_hypotheses or eligible_comparison")
     stage = report.get("stage", "draft")
+    if report.get('recommendation_label', 'research_comparison') != 'research_comparison':
+        raise ValueError('STRONG_BUY_UNAVAILABLE: no calibrated recommendation classifier is installed')
     if stage not in {"draft", "final"}:
         raise ValueError("report.stage must be draft or final")
     symbols = report.get("ranked_symbols")
@@ -129,6 +132,7 @@ def assess_candidate(candidate):
 
 
 def review_screen(document):
+    document, shared_strategy = prepare_document(document)
     mode = document.get("decision_mode", "legacy_unspecified")
     if mode not in {"legacy_unspecified", "long_term", "fixed_horizon"}:
         raise ValueError("screen_review supports long_term or fixed_horizon; intraday uses signal_review")
@@ -215,6 +219,8 @@ def review_screen(document):
         gaps.append("METHODOLOGY_OR_REPORT_NOT_RECORDED")
     if ranking.get("blocking_review_queue"):
         gaps.append("HIGHER_RANKED_CONTENDERS_NEED_REVIEW")
+    if shared_strategy and shared_strategy['status'] != 'COMPUTED':
+        gaps.append("SHARED_SNAPSHOT_DATA_INCOMPLETE")
     completion = {"status": "INCOMPLETE" if gaps else "COMPLETE" if report["stage"] == "final" else "DRAFT",
                   "reasons": gaps, "eligible_candidates": sum(c["status"] == "Eligible" for c in candidates),
                   "noneligible_candidates": sum(c["status"] != "Eligible" for c in candidates),
@@ -231,6 +237,7 @@ def review_screen(document):
                          "all_constituents_screened": not absent and counts["missing_data"] == 0},
             "candidates": candidates,
             "methodology": methodology, "report": report, "completion": completion, "ranking": ranking,
+            "shared_strategy": shared_strategy,
             "status_counts": dict(Counter(c["status"] for c in candidates)),
             "execution_authorized": False,
             "limitations": "Checks declared coverage/judgments only; does not verify universe membership, sources or current events"}
