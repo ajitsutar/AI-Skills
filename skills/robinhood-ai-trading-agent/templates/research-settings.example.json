@@ -17,8 +17,11 @@
     "candidate_count_rule": "evidence_and_suitability_no_fixed_count",
     "risk_profile": null,
     "run_record": "templates/screen-review.md; optional structured run_spec documented in references/research-run-methodology.md",
-    "selection_method": "Declare filters, deeper-review selection and ranking for the request; no universal score or PEG gate",
-    "report_rule": "Classify first; separate Eligible comparison, Watch research priorities and speculative ideas"
+    "selection_method": "Default vqm-fundamental 1.0.0 via shared_strategy and vqm_snapshot; explicit saved custom profiles only",
+    "report_rule": "Classify first; separate Eligible comparison, Watch research priorities and speculative ideas",
+    "profile_path": "profiles/vqm-fundamental-v1.json",
+    "research_cutoff": "last_completed_XNYS_session",
+    "strong_buy_enabled": false
   },
   "intraday": {
     "universe": {
