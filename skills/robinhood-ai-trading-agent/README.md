@@ -1,6 +1,6 @@
 # Robinhood portfolio and trading agent
 
-Version **3.5.0 — October 9, 2026**. A portable skill for **personal Codex**, with
+Version **3.7.0 — October 9, 2026**, local review candidate. A portable skill for **personal Codex**, with
 a long-term core and separately budgeted swing/day trading in an active supervised
 session. It starts in paper mode and supports exact-order approval or a bounded
 mandate through the connected official Robinhood Trading MCP.
@@ -11,8 +11,24 @@ quantitative analysis, and execution controls. Choose and adapt the examples;
 they do not change the skill's operating policy or grant trading authorization.
 
 Provide/extract the **entire ZIP**, not only SKILL.md. Ask the personal agent to
-identify version 3.5.0 and verify its supporting files before use. GARCH is
+identify version 3.7.0 and verify its supporting files before use. GARCH is
 explicitly part of this skill and has an executable, audited helper.
+
+Version 3.7 adds a shared financial normalizer with retained source contexts,
+unit/scale/sign handling, fixed accounting component definitions, TTM reconciliation,
+publication-date intervals, and source/identity diagnostics. Schema-2 research
+snapshots derive their financial fields in code and reject financial-value overrides.
+Read [the input contract](references/financial-normalization.md) and
+[local review](REVIEW-3.7.md). Source authentication and reviewed table transcription
+are still evidence work; this does not establish actual 80% stock-pick overlap.
+
+Version 3.6 adds the fixed **Value–Quality–Momentum** fundamental research
+default, accounting adapters, a point-in-time data contract, deterministic
+issuer/peer rules and benchmark-aware allocation from separately calibrated
+alpha. Read [the shared strategy](references/shared-default-strategy.md) and
+[release review](REVIEW-3.6.md). **Strong Buy remains unavailable:** no
+historical performance calibration is shipped. Identical picks require shared
+data and evidence decisions, not merely the same skill version.
 
 Version 3.5 adds reproducible research bundles, deterministic ranking from a
 saved profile and snapshot, explicit draft/incomplete/final status, unconditional

@@ -5,7 +5,7 @@ description: Review and manage a Robinhood portfolio with a long-term core, conf
 
 # Robinhood Portfolio and Trading Agent
 
-Package version: **3.5.0 — October 9, 2026**.
+Package version: **3.7.0 — October 10, 2026**.
 
 When first loading this package or diagnosing a version mismatch, identify this
 version and check that its referenced files and scripts are accessible. An uploaded
@@ -15,6 +15,9 @@ absent feature; do not claim a bundled model was executed unless its run is evid
 Resolve bundled references, templates and scripts relative to this SKILL.md. Run
 helper commands with this skill directory as the working directory and keep personal
 runtime state in a separate user-chosen directory.
+For research startup run scripts/research_preflight.py; disclose unavailable
+components before choosing a workflow. A missing calendar or data dependency
+does not authorize a model-created replacement score or a claim of executed replay.
 
 ## Scope and modes
 
@@ -53,6 +56,8 @@ The user's preference for bounded autonomy is a design choice. Activate it after
 - Formats/examples: [runtime-contract.md](references/runtime-contract.md), [README.md](README.md).
 - Personal setup, commands and session loop: [personal-setup.md](references/personal-setup.md).
 - Data acquisition and numeric research: [data-and-analytics.md](references/data-and-analytics.md).
+- Default fundamental ranking: [shared-default-strategy.md](references/shared-default-strategy.md), [validation protocol](references/shared-strategy-validation.md), scripts/vqm_research.py and scripts/benchmark_portfolio.py.
+- Shared financial inputs: [financial-normalization.md](references/financial-normalization.md), scripts/filing_extract.py and scripts/financial_normalize.py. For new real fundamental runs use schema-2 snapshots; the scorer derives financial facts from the embedded evidence. Models explain results and propose separately versioned corrections, not replacement arithmetic.
 - Model-independent selection and report replay: [model-independent-research.md](references/model-independent-research.md), scripts/deterministic_rank.py and scripts/research_bundle.py.
 - Current settlement/liquidity review: [REVIEW-3.4.md](REVIEW-3.4.md).
 - Holding-period and research review: [REVIEW-3.3.md](REVIEW-3.3.md).
@@ -99,15 +104,26 @@ There is no top-N selection rule; include only supported candidates, possibly no
 For broad/ranked screens, also use [research-run-methodology.md](references/research-run-methodology.md):
 record the snapshot, mandate, selection/ranking rules and judgment overrides.
 For ranked stock-pick requests, follow [model-independent-research.md](references/model-independent-research.md).
-Reuse a saved mandate/profile, source priority, cutoff and frozen universe/data;
-run deterministic_rank through screen_review rather than inventing weights or
-reordering picks in prose. Review unresolved contenders in returned score order.
+Use the shipped **vqm-fundamental 1.0.0** profile for a new fundamental ranking
+unless the user selects a different saved strategy. Read the shared-default
+reference and embed shared_strategy plus vqm_snapshot in screen_review inputs;
+the helper derives factors and ranking without model-selected weights. Use the
+last completed session and shared point-in-time facts, issuer mapping, peers
+and evidence decisions. Missing inputs stay missing; do not substitute another
+profile silently. Legacy/custom records remain replayable but are not the shared
+default. Export and compare the actual frozen snapshot across models.
+**Strong Buy is unavailable until a separately calibrated classifier is released.**
+This research baseline has no demonstrated alpha. Keep numerical rank,
+valuation evidence, portfolio allocation and recommendation confidence separate. Review unresolved contenders in returned score order.
 Keep model-specific research judgments explicit; never fabricate agreement.
 Export the full inputs/results with research_bundle and verify replay. Use
 --strict-final only with report.stage=final; a complete record is not an investment
 endorsement. Partial research stays explicitly incomplete and can be resumed.
 Distinguish discovery exclusions from names not advanced to deeper review.
 Label Watch lists as research priorities; an Eligible comparison is separate.
+Do not rank by the number of checks completed. Missing research is a coverage gap,
+not an inferior investment score. Report profile/version/hash, cutoff, coverage,
+classification, disabled components and bundle/replay status alongside any table.
 Show actual coverage and missing data. A relative bargain is a research hypothesis
 until its normalized earnings, business quality and downside are supported.
 
