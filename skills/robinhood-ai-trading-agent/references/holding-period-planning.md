@@ -75,9 +75,10 @@ Widen uncertainty and use sensitivity analysis instead of spurious price precisi
 ## Research for the remaining window
 
 Freeze a configurable universe and record the method using
-[research-run-methodology.md](research-run-methodology.md). Initial discovery may
-consider valuation, quality, earnings revisions, price/volume behavior or a sourced
-catalyst, as appropriate to the request. Define any technical rule before choosing
+[research-run-methodology.md](research-run-methodology.md). Fundamental rankings use [the shared VQM default](shared-default-strategy.md)
+unless the user selects another saved strategy. Swing/intraday requests retain
+their separate within-window price/catalyst or completed-bar profile. Arbitrary
+horizon support does not imply a validated alpha model for every interval. Define any technical rule before choosing
 names and retain its actual inputs; a hindsight chart narrative is not a tested
 signal. Do not reuse the daily trend baseline as a validated live strategy.
 

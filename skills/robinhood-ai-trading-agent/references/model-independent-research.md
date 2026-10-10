@@ -15,11 +15,20 @@ source priority, freshness limits and tie-break rule. Do not tune these after
 seeing names or inherit a prior chat's preferred stocks. An intentional change
 creates a new profile version and a new run, with its reason recorded.
 
-If no suitable profile exists, define one transparently from the user's mandate
-and retain it for subsequent runs. Label that initial strategy choice provisional;
-do not claim model-independent picks until the profile and common snapshot are
-fixed. The bundled numeric example is a schema demonstration, not a recommended
-or validated strategy. There is no universal top-N, score weighting or P/E filter.
+For new fundamental equity rankings, use [the shared VQM default](shared-default-strategy.md)
+unless the user has selected another saved strategy. Do not invent a provisional
+score or substitute the old illustrative numeric example. Use shared_strategy
+and vqm_snapshot; screen_review derives its numerical ranking automatically.
+New real VQM runs use schema-2 snapshots and the
+[shared financial normalization pipeline](financial-normalization.md). Freeze
+the accounting policy hash and evidence ledger with the factor profile. The
+scorer computes financial facts from that ledger; hand-entered financial overrides
+are rejected. Keep subjective eligibility decisions in the separately hashed
+decision register and label their remaining dependence on research judgment.
+Custom profiles remain supported when explicitly selected and versioned before
+retrieval. Intraday/swing routes keep separate registered strategies. An unsupported
+route/profile combination stays research-only with its validation gap disclosed.
+There is no fixed top-N quota, positive-EPS gate or default PEG/analyst-target score.
 
 Use the same dated security identifiers and constituent file, source precedence,
 field basis (e.g. NTM versus company fiscal year), corporate-action treatment and
