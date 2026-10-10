@@ -1,6 +1,6 @@
 # Robinhood portfolio and trading agent
 
-Version **3.7.0 — October 9, 2026**, local review candidate. A portable skill for **personal Codex**, with
+Version **3.7.0 — October 10, 2026**. A portable skill for **personal Codex**, with
 a long-term core and separately budgeted swing/day trading in an active supervised
 session. It starts in paper mode and supports exact-order approval or a bounded
 mandate through the connected official Robinhood Trading MCP.
@@ -19,8 +19,11 @@ unit/scale/sign handling, fixed accounting component definitions, TTM reconcilia
 publication-date intervals, and source/identity diagnostics. Schema-2 research
 snapshots derive their financial fields in code and reject financial-value overrides.
 Read [the input contract](references/financial-normalization.md) and
-[local review](REVIEW-3.7.md). Source authentication and reviewed table transcription
-are still evidence work; this does not establish actual 80% stock-pick overlap.
+[release review](REVIEW-3.7.md). Source authentication and reviewed table transcription
+are still evidence work. The [actual cross-model tests](references/cross-model-validation-2026-10-10.md)
+matched the v3.7 calculation outputs; a separately declared frozen Yahoo-data
+experiment achieved 10/10 issuer overlap and identical order. Strict full-universe
+filing eligibility and agreement from independently gathered fresh data remain unproven.
 
 Version 3.6 adds the fixed **Value–Quality–Momentum** fundamental research
 default, accounting adapters, a point-in-time data contract, deterministic
