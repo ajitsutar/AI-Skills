@@ -2,15 +2,18 @@
 
 Read for a broad long-term screen, a ranked investment shortlist, or comparison
 with another agent's results. The goal is to explain why a name was selected and
-which assumptions could change that decision. It does not require identical
-judgments from independent analysts or prescribe a universal stock-scoring formula.
+which assumptions could change that decision. New fundamental rankings use [the shared VQM default](shared-default-strategy.md)
+unless another saved strategy is explicitly selected. Frozen evidence decisions
+are part of the shared input; independent judgments are labeled differences, not
+silently treated as the same experiment.
 Intraday selection follows the registered strategy card and completed-bar signal
 workflow instead; do not apply this fundamental screen to every day-trade signal.
 
 ## Record the method before choosing the shortlist
 
-For a new run, retain the following in the run record. Choose reasonable details
-from the request and disclose assumptions; do not add a permission step for research.
+For a new run, retain the following in the run record. Resolve the mandate from
+the request and disclose assumptions; reuse the shipped profile and data contract
+rather than inventing scoring details. Routine research needs no new approval.
 If the method changes during investigation, record the change and re-evaluate all
 affected candidates. When documenting an older run, label it retrospective rather
 than inventing an earlier rule-setting timestamp.

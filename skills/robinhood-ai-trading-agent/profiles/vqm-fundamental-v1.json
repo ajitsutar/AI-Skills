@@ -1,0 +1,47 @@
+{
+  "profile_id": "vqm-fundamental",
+  "profile_version": "1.0.0",
+  "status": "RESEARCH_BASELINE_UNVALIDATED",
+  "benchmark": "S&P 500 total return for the default S&P 500 universe; otherwise declare a matching total-return benchmark",
+  "signal": "Equal arithmetic mean of Value, Quality and Momentum; equal weights within each family",
+  "normalization": "Bounded midrank: 2 * (count_below + 0.5 * count_equal) / count - 1; no additional winsorization",
+  "peer_minimum": 8,
+  "peer_fallback": ["same_adapter_and_industry", "same_adapter_and_sector", "same_adapter"],
+  "momentum": {"lookback_sessions": 252, "skip_sessions": 21, "peer_basis": "all_complete_unique_issuers"},
+  "taxonomy": "GICS codes from a single dated mapping; identifiers and mapping source retained in each snapshot",
+  "accounting": "USD, latest publicly available TTM and balance sheet as of cutoff; reported GAAP plus separately sourced Nareit FFO for equity REITs; no discretionary addbacks in the score",
+  "max_financial_period_age_days": 185,
+  "cash_benchmark_max_age_seconds": 604800,
+  "source_priority": {"financial": ["regulatory_filing", "issuer_release"], "market": ["declared_market_provider"], "identity": ["declared_universe_provider"]},
+  "families": {
+    "corporate": {
+      "value": ["ebit_ttm / enterprise_value", "(cfo_ttm - capex_ttm) / market_cap"],
+      "quality": ["net_income_ttm / average_assets", "(cfo_ttm - net_income_ttm) / average_assets", "-(debt - cash) / assets"]
+    },
+    "bank": {
+      "value": ["common_income_ttm / market_cap", "tangible_common_equity / market_cap"],
+      "quality": ["common_income_ttm / average_tangible_common_equity", "cet1 / risk_weighted_assets", "-nonperforming_loans / gross_loans"]
+    },
+    "insurer": {
+      "value": ["common_income_ttm / market_cap", "common_equity / market_cap"],
+      "quality": ["common_income_ttm / average_common_equity", "common_equity / assets", "-debt / common_equity"]
+    },
+    "other_financial": {
+      "value": ["common_income_ttm / market_cap", "common_equity / market_cap"],
+      "quality": ["common_income_ttm / average_common_equity", "common_equity / assets", "-debt / common_equity"]
+    },
+    "equity_reit": {
+      "value": ["ffo_common_ttm / market_cap", "(cfo_ttm - capex_ttm) / market_cap"],
+      "quality": ["ffo_common_ttm / average_assets", "(cfo_ttm - net_income_ttm) / average_assets", "-(debt - cash) / assets"]
+    }
+  },
+  "issuer_rule": "Highest ADV20 share class, then symbol ascending; issuer-wide market cap for all classes; incomplete class liquidity blocks issuer selection",
+  "tie_break": "symbol_ascending",
+  "missing_data": "No imputation or weight renormalization; missing issuer stays unranked and makes universe-wide comparison incomplete",
+  "analyst_targets_and_peg": "Not scored or required for discovery",
+  "earnings_revisions": "Separate future profile only with point-in-time consensus data",
+  "risk_overlay": "GARCH, GJR-GARCH and EGARCH affect risk ceilings only",
+  "calibration": null,
+  "strong_buy_enabled": false,
+  "execution_authorized": false
+}

@@ -6,6 +6,7 @@ authenticated facts. This module does not estimate return probabilities.
 from __future__ import annotations
 
 import calendar
+import copy
 import argparse
 import json
 import math
@@ -120,6 +121,8 @@ def resolve_horizon(spec):
     if entry >= exit_at or (mode == "fixed_end" and latest >= exit_at):
         raise ValueError("Entry window must precede the fixed exit deadline")
     latest_exit = exit_for(latest_day, latest)[2] if mode == "rolling_from_entry" else exit_at
+    if latest >= latest_exit:
+        raise ValueError('Latest entry must precede its buffered exit deadline')
     if route == "intraday" and (iso_date(exit_day) != entry_day
             or latest_exit.astimezone(ZONE).date() != latest_day):
         raise ValueError("Intraday positions must exit in their entry session; use swing for overnight risk")
@@ -149,11 +152,17 @@ def review_primary(section, as_of):
     published, checked = (timestamp(section[k]) for k in ("latest_published_at", "checked_at"))
     latest, reviewed = (iso_date(section[k]) for k in ("latest_public_period_end", "reviewed_period_end"))
     reasons = []
-    if not published <= checked <= as_of or latest > published.date():
+    information_at = checked
+    if section.get('information_as_of'):
+        information_at = timestamp(section['information_as_of'])
+        if (information_at != as_of or checked < information_at
+                or not evidence(section.get('point_in_time_evidence'))):
+            reasons.append('PRIMARY_POINT_IN_TIME_EVIDENCE_INVALID')
+    if not published <= information_at <= as_of or latest > published.date():
         reasons.append("PRIMARY_PUBLICATION_OR_CHECK_TIME_INVALID")
     if latest != reviewed:
         reasons.append("LATEST_FINANCIAL_PERIOD_NOT_REVIEWED")
-    if (as_of - checked).total_seconds() > 86400:
+    if (as_of - information_at).total_seconds() > 86400:
         reasons.append("PRIMARY_LATEST_REPORT_CHECK_NOT_CURRENT_FOR_RUN")
     return reasons
 
@@ -262,9 +271,24 @@ def review_horizon_candidate(candidate, spec, resolved):
     if events is None:
         event_result = {"clear": False, "reasons": ["EVENT_CALENDAR_MISSING"], "blackouts": []}
     else:
+        # Research may reconstruct an archived calendar after its information date.
+        # Keep the live event_gate's checked_at/freshness rules unchanged.
+        events = copy.deepcopy(events)
+        retrieved = events.get('checked_at')
+        if events.get('information_as_of'):
+            point = timestamp(events['information_as_of'])
+            if (point != timestamp(resolved['as_of']) or timestamp(retrieved) < point
+                    or not evidence(events.get('point_in_time_evidence'))
+                    or any(not e.get('published_at') or timestamp(e['published_at']) > point
+                           for e in events.get('events', []))):
+                raise ValueError('RESEARCH_EVENT_POINT_IN_TIME_EVIDENCE_INVALID')
+            events['checked_at'] = events['information_as_of']
         event_result = event_gate(events, candidate["symbol"], {**policy, "exchange": resolved["exchange"]},
                                   now=timestamp(resolved["as_of"]), hold_until=event_end,
                                   entry_at=resolved["entry_at"])
+        if events.get('information_as_of'):
+            event_result.update(source_retrieved_at=retrieved, information_as_of=events['information_as_of'],
+                                source_evidence_status='DECLARED_POINT_IN_TIME_RECONSTRUCTION')
     event_status = "clear" if event_result["clear"] else (
         "blocked" if event_result["blackouts"] else "unknown")
     reasons.extend(event_result["reasons"])

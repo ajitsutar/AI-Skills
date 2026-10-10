@@ -1,0 +1,73 @@
+{
+  "profile_sha256": "fictional-profile",
+  "horizon_id": "1y-fixed",
+  "benchmark_id": "fictional-benchmark",
+  "management_mode": "fixed_hold",
+  "as_of": "2026-10-09T20:00:00Z",
+  "calibration": {
+    "profile_sha256": "fictional-profile",
+    "horizon_id": "1y-fixed",
+    "benchmark_id": "fictional-benchmark",
+    "management_mode": "fixed_hold",
+    "units": "holding_period_excess_total_return_decimal",
+    "frozen_at": "2020-01-01T00:00:00Z",
+    "test_start": "2021-01-01T00:00:00Z",
+    "test_end": "2025-01-01T00:00:00Z",
+    "evidence": [
+      "FICTIONAL calibration: schema example only, never live evidence"
+    ]
+  },
+  "assets": [
+    {
+      "symbol": "A",
+      "issuer": "A",
+      "sector": "S",
+      "themes": [
+        "T"
+      ],
+      "eligible": true,
+      "alpha": 0.04,
+      "benchmark_weight": 0.5,
+      "previous_weight": 0.5,
+      "one_way_cost": 0.001,
+      "max_weight": 0.7
+    },
+    {
+      "symbol": "B",
+      "issuer": "B",
+      "sector": "S",
+      "themes": [
+        "T"
+      ],
+      "eligible": true,
+      "alpha": 0,
+      "benchmark_weight": 0.5,
+      "previous_weight": 0.5,
+      "one_way_cost": 0.001,
+      "max_weight": 0.7
+    }
+  ],
+  "covariance_symbols": [
+    "A",
+    "B"
+  ],
+  "covariance_horizon_id": "1y-fixed",
+  "covariance": [
+    [
+      0.04,
+      0
+    ],
+    [
+      0,
+      0.04
+    ]
+  ],
+  "constraints": {
+    "risk_aversion": 2,
+    "issuer_cap": 0.7,
+    "sector_active_cap": 0.1,
+    "theme_cap": 1,
+    "turnover_cap": 0.2
+  },
+  "fictional": true
+}

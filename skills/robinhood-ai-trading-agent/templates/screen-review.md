@@ -1,6 +1,8 @@
 # Research run record
 
 - Run/version, as-of time, research horizon and purpose:
+- Shared profile/version/hash (default VQM), frozen snapshot and evidence-decision hashes:
+- Capability preflight, unavailable components, bundle path and actual replay result:
 - Mandate/risk preference; method defined_at (label retrospective if applicable):
 - Configured universe, source/effective date and frozen security-list path/hash:
 - Universe size, filtered names/reasons, share-class mapping, missing/absent rows:
@@ -9,7 +11,7 @@
 - Peer methodology, sample counts, exclusions, missing/nonmeaningful ratios:
 - Discovery rules, threshold/field definitions (including PEG if used):
 - Deeper-review selection order, stopping reason and not_advanced versus exclusions:
-- Ranking method: qualitative / quantitative / hybrid; criteria, ties, sensitivity:
+- Computed ranking and ordered review queue; separately identify any explicitly chosen custom strategy:
 - Judgment overrides or method changes and re-evaluation of affected candidates:
 - Assumptions added for this request (distinguish from skill requirements):
 
@@ -46,6 +48,7 @@ Security, business model, suitable peer set and current quote source/time:
 - Report type: screened hypotheses / eligible comparison; qualifying count:
 - Eligible comparison (if any), decisive ranking rationale and ties:
 - Watch research priorities, speculative ideas and rejected theses separately:
+- Recommendation confidence: uncalibrated research only; no Strong Buy classifier installed:
 - Actual universe coverage versus depth of research; unresolved work/next checks:
 - If comparing another screen: snapshot, definitions, peers, selection, mandate and
   normalization differences; apply one declared review to any combined candidate set:

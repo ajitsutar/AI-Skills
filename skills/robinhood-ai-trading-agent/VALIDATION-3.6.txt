@@ -1,0 +1,13 @@
+Version 3.6.0 review candidate, validated 2026-10-09.
+Trading regression suite: 302 tests PASS (87.078 seconds).
+Export safety scanner: PASS; scanner regression suite: 5 tests PASS.
+Skill metadata validation: PASS.
+Repository portability validation: PASS, 7 skills.
+CLI smoke checks: capability preflight PASS; fictional one-year strict-final
+screen PASS; fictional benchmark-aware allocation PASS.
+Controlled fictional ten-name bundle: local create and replay PASS.
+
+These are software and synthetic-data checks, not historical performance evidence.
+Actual Claude comparison was pending when this review ZIP was built. Its results
+are kept separately from the package under test. No real S&P 500 overlap claim,
+calibrated expected return, Strong Buy classifier or trade authorization is implied.

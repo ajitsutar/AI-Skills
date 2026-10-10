@@ -63,3 +63,11 @@ created for this repository in response to the user's workflow review. They reus
 the existing exchange_calendars integration, add no copied external implementation
 or dependency, and preserve all 3.2 credits and notices. New fixtures contain no
 personal account data or pasted private-agent research.
+
+## Version 3.6 additions
+
+The VQM contracts, accounting adapters, benchmark allocator and tests were newly
+written for this repository. Research papers are credited in the shared-default
+reference as conceptual influences; no paper code or datasets were copied.
+The allocator imports the existing SciPy dependency. This is not a published
+strategy replication or a claim of validated investment performance.
