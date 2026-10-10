@@ -23,3 +23,8 @@ mandate, profile and frozen snapshot; run the deterministic ranking helper and
 retain a verified input/result bundle. Do not invent different weights, substitute
 data sources silently or reorder computed picks in prose. Keep evidence gaps and
 model-specific judgments visible; identical prompts alone do not fix the inputs.
+
+For new fundamental rankings, use the bundled vqm-fundamental profile and its
+shared snapshot contract. Do not invent a scoring profile or label an
+uncalibrated ranking Strong Buy. Intraday and swing keep their own strategy
+routes; arbitrary horizon parsing does not establish strategy performance.
