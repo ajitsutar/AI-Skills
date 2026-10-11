@@ -5,7 +5,7 @@ description: Quant research and portfolio management across investment horizons,
 
 # Robinhood Quant Portfolio and Trading Agent
 
-Package version: **4.0.0 — October 11, 2026**.
+Package version: **4.0.1 — October 11, 2026**.
 
 When first loading this package or diagnosing a version mismatch, identify this
 version and check that its referenced files and scripts are accessible. An uploaded

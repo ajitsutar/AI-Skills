@@ -1,6 +1,6 @@
 {
   "package": "robinhood-ai-trading-agent",
-  "version": "4.0.0",
+  "version": "4.0.1",
   "distribution": "AI-Skills repository release",
   "hash_algorithm": "SHA-256",
   "files": {
@@ -34,7 +34,7 @@
     "profiles/public-vqm-discovery-v1.json": "54d374b307f16c9fe2da4f726288060f5f2a20e63e47e9a08549efbe2c067b8d",
     "profiles/vqm-fundamental-v1.json": "9078c2bebfb43ab4b84c6e9c70c22753571afc06d08554b8c1d09fcf80c2c295",
     "PROVENANCE.md": "7d033d88413460661260b2b09ccc8bdeb60b8a288947d985b3fe7241ff53a5a9",
-    "README.md": "217151287ac9d5354d381c5c8321e45ee938432ceb2197a38ddb812b09b9308c",
+    "README.md": "ed1abb0246c39a84e7335db2756d15ef4912a7c612b76c548d9865f18cb23652",
     "references/approval-gated-execution.md": "2ca95d6b0d8ca2e1bc13bab8bf5a2df509071830fe23aff789939008e99eb579",
     "references/broker-integration.md": "95ee4c40c3461a881a1fbb5ab88a27b133edd2cd7d21130e4f709920f14ac42c",
     "references/cross-model-validation-2026-10-10.md": "e07b831860cdbbe6c4430b7a6007ecac87b79fd5ef90c087f9dd92d2c3a4116a",
@@ -123,7 +123,7 @@
     "scripts/supervised_session.py": "a1e59bc5bd92db869f5e06775665ab5738c6bbf73cba466821c5cbd466387cc9",
     "scripts/trading_calendar.py": "40143b4c40140bd4bdaa2f8e402983d07d7091526e17919fdba92f48fff467b1",
     "scripts/vqm_research.py": "8f61ac4244eb9e6ad2d48aa0ccd402ef2352d45e5fd068eafd8b596506eaef45",
-    "SKILL.md": "23e0329308b811fd620f1edb7b669ff21fe4a38e9e0fe3a82ce05cf813f60764",
+    "SKILL.md": "e43e1665f4d88888b5697680ea021817f7076101934027ddb61adf85f8e02f2c",
     "SOURCES.md": "5adb1d8ef8a67171b460ee9609c28410d92779ab11a034c8ce098147456ec0eb",
     "templates/autonomous-mandate.md": "77c61cb72423217b38ac3af4b4d72258439a2af7832a0bce0386b9ab562aaede",
     "templates/broker-capabilities.template.json": "9b1fe44c5c6b4e8b367784ea8362e044538824d4af8b2118b1d9f812426a4a5f",
@@ -163,6 +163,9 @@
     "VALIDATION-3.7.txt": "eebe1a30c61e168d121f419d9dbb883e89dc2296468ef6e2bfbada365ca2348e",
     "VALIDATION-3.8.txt": "9751a506193ae6b0aaf6d80011d2b85fbe04af6bd265ea38fcf345900d8d0ce0",
     "VALIDATION.txt": "71ab01f6d81b76fd72247a318dec5c85ff4b8d5402dc1ea012fa1078de2288bf",
-    "VERSION": "fd74ec08ccc3f3a67b174c72d055c4ca09326d3d63156c7c36cc7a6309868774"
+    "VERSION": "cd6321af37482f49efc326524a9fcd7fc86902a48da8d4bbd3dc718d290c3fea",
+    "INSTALL.md": "013b907fe376537dd58fad9b512bc77ba64b184d46c9abdac161c8311127ea42",
+    "agents/plugin/robinhood-trading-agent.md": "90d4c01d5e7301368e1e0e5882c882a8694008632666365f31c7b1c4b9795656",
+    "agents/robinhood-trading-agent.md": "62796a5ebcf844033a6c7bd9addd6525f090f3e068d785bdfe94b6031e717f9b"
   }
 }
