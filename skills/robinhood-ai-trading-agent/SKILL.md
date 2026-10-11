@@ -5,7 +5,7 @@ description: Review and manage a Robinhood portfolio with a long-term core, conf
 
 # Robinhood Portfolio and Trading Agent
 
-Package version: **3.7.0 — October 10, 2026**.
+Package version: **3.8.0 — October 10, 2026**.
 
 When first loading this package or diagnosing a version mismatch, identify this
 version and check that its referenced files and scripts are accessible. An uploaded
@@ -18,6 +18,14 @@ runtime state in a separate user-chosen directory.
 For research startup run scripts/research_preflight.py; disclose unavailable
 components before choosing a workflow. A missing calendar or data dependency
 does not authorize a model-created replacement score or a claim of executed replay.
+
+For ranked fundamental stock requests, first read
+[research-campaign.md](references/research-campaign.md). Run the shipped
+`public-vqm-discovery` acquisition/scorer for the official research candidate queue,
+then apply primary-evidence investment review in that order. Preserve the computed
+candidate list; model-selected research subsets are not the default. Report
+candidate overlap separately from buy-eligibility agreement. The strict filing-based
+VQM route and execution gates remain separate.
 
 ## Scope and modes
 
@@ -56,6 +64,7 @@ The user's preference for bounded autonomy is a design choice. Activate it after
 - Formats/examples: [runtime-contract.md](references/runtime-contract.md), [README.md](README.md).
 - Personal setup, commands and session loop: [personal-setup.md](references/personal-setup.md).
 - Data acquisition and numeric research: [data-and-analytics.md](references/data-and-analytics.md).
+- Ranked research startup and comparison: [research-campaign.md](references/research-campaign.md), scripts/public_research_fetch.py, scripts/public_research.py and scripts/research_report_checks.py.
 - Default fundamental ranking: [shared-default-strategy.md](references/shared-default-strategy.md), [validation protocol](references/shared-strategy-validation.md), scripts/vqm_research.py and scripts/benchmark_portfolio.py.
 - Shared financial inputs: [financial-normalization.md](references/financial-normalization.md), scripts/filing_extract.py and scripts/financial_normalize.py. For new real fundamental runs use schema-2 snapshots; the scorer derives financial facts from the embedded evidence. Models explain results and propose separately versioned corrections, not replacement arithmetic.
 - Model-independent selection and report replay: [model-independent-research.md](references/model-independent-research.md), scripts/deterministic_rank.py and scripts/research_bundle.py.
@@ -104,8 +113,9 @@ There is no top-N selection rule; include only supported candidates, possibly no
 For broad/ranked screens, also use [research-run-methodology.md](references/research-run-methodology.md):
 record the snapshot, mandate, selection/ranking rules and judgment overrides.
 For ranked stock-pick requests, follow [model-independent-research.md](references/model-independent-research.md).
-Use the shipped **vqm-fundamental 1.0.0** profile for a new fundamental ranking
-unless the user selects a different saved strategy. Read the shared-default
+Begin ranked fundamental requests with the named public research queue described
+above. For a strict filing-based ranking, use **vqm-fundamental 1.0.0** unless the
+user selects another saved strategy. Read the shared-default
 reference and embed shared_strategy plus vqm_snapshot in screen_review inputs;
 the helper derives factors and ranking without model-selected weights. Use the
 last completed session and shared point-in-time facts, issuer mapping, peers

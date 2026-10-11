@@ -28,6 +28,7 @@ components may carry additional notices.
 | yfinance | Apache-2.0 |
 | jsonschema | MIT |
 | requests | Apache-2.0; upstream LICENSE and NOTICE |
+| lxml | BSD-3-Clause project license; linked libxml2/libxslt have their own notices |
 | tzdata | Apache-2.0 wrapper plus timezone-data terms |
 
 Read the exact installed distribution's license and notice files for its version.

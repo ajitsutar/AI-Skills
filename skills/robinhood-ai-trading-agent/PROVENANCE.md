@@ -71,3 +71,12 @@ written for this repository. Research papers are credited in the shared-default
 reference as conceptual influences; no paper code or datasets were copied.
 The allocator imports the existing SciPy dependency. This is not a published
 strategy replication or a claim of validated investment performance.
+
+## Version 3.8 additions
+
+The public research acquisition adapter, replayable queue, report checks and
+fictional regression tests were written for this repository. They adapt this
+workspace's repository-authored vendor experiment without embedding its data or
+selected stocks. No external strategy implementation was copied. The adapter
+imports installed yfinance, requests, pandas and lxml libraries; their code and
+retrieved market datasets are not redistributed in the skill package.

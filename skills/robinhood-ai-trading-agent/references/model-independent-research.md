@@ -1,5 +1,10 @@
 # Model-independent research and reproducible selection
 
+For v3.8 broad fundamental startup, first follow
+[research-campaign.md](research-campaign.md). Its public VQM queue fixes acquisition,
+arithmetic and research coverage before the strict evidence review described here.
+Public candidates and Eligible selections are distinct outputs.
+
 The same prompt alone does not fix data access, cutoff, sector membership,
 normalization judgments or strategy preferences. Aim for the same picks by sharing
 those inputs and using deterministic selection. Do not force models to agree by
@@ -15,7 +20,7 @@ source priority, freshness limits and tie-break rule. Do not tune these after
 seeing names or inherit a prior chat's preferred stocks. An intentional change
 creates a new profile version and a new run, with its reason recorded.
 
-For new fundamental equity rankings, use [the shared VQM default](shared-default-strategy.md)
+For strict filing-based rankings, use [the shared VQM default](shared-default-strategy.md)
 unless the user has selected another saved strategy. Do not invent a provisional
 score or substitute the old illustrative numeric example. Use shared_strategy
 and vqm_snapshot; screen_review derives its numerical ranking automatically.

@@ -8,3 +8,4 @@ pandas==3.0.6
 tzdata==2026.5
 arch==8.0.0
 statsmodels==0.15.0
+lxml==6.1.3
