@@ -1,6 +1,10 @@
 # Robinhood portfolio and trading agent
 
-Version **4.0.0 — October 11, 2026**. A portable skill for **personal Codex**, with
+Packaging release **4.0.1** keeps the v4.0 calculations unchanged and includes
+standalone installation instructions and both Claude agent variants inside this
+folder. See [INSTALL.md](INSTALL.md).
+
+Version **4.0.1 — October 11, 2026**. A portable skill for **personal Codex**, with
 a long-term core and separately budgeted swing/day trading in an active supervised
 session. It starts in paper mode and supports exact-order approval or a bounded
 mandate through the connected official Robinhood Trading MCP.
@@ -11,7 +15,7 @@ quantitative analysis, and execution controls. Choose and adapt the examples;
 they do not change the skill's operating policy or grant trading authorization.
 
 Provide/extract the **entire ZIP**, not only SKILL.md. Ask the personal agent to
-identify version 4.0.0 and verify its supporting files before use. GARCH is
+identify version 4.0.1 and verify its supporting files before use. GARCH is
 explicitly part of this skill and has an executable, audited helper.
 
 Version 4.0 adds a [quant portfolio-manager workflow](references/institutional-manager.md)

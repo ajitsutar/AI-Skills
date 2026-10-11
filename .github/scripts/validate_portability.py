@@ -3,15 +3,18 @@
 
 from __future__ import annotations
 
+import argparse
+import hashlib
 import json
 import re
 import shutil
 import subprocess
 import sys
 from pathlib import Path
+from urllib.parse import unquote as url_unquote, urlsplit
 
 
-ROOT = Path(__file__).resolve().parents[1]
+ROOT = Path(__file__).resolve().parents[2]
 SKILLS_DIR = ROOT / "skills"
 NAME_RE = re.compile(r"^[a-z0-9]+(?:-[a-z0-9]+)*$")
 PATH_REF_RE = re.compile(r"(?<![A-Za-z0-9_.-])((?:assets|references|scripts)/[A-Za-z0-9_.\-/]+)")
@@ -123,7 +126,7 @@ def parse_openai_yaml(path: Path) -> dict[str, str]:
     return values
 
 
-def validate_skill(skill_dir: Path, agent_skills: dict[str, list[Path]]) -> None:
+def validate_skill(skill_dir: Path) -> None:
     skill_path = skill_dir / "SKILL.md"
     if not skill_path.is_file():
         fail(f"{skill_dir}: missing uppercase SKILL.md")
@@ -172,9 +175,65 @@ def validate_skill(skill_dir: Path, agent_skills: dict[str, list[Path]]) -> None
     if f"${name}" not in interface["default_prompt"]:
         fail(f"{openai_path}: default_prompt must mention ${name}")
 
-    matches = agent_skills.get(f"ai-skills:{name}", [])
-    if len(matches) != 1:
-        fail(f"{skill_dir}: expected one Claude plugin agent preloading ai-skills:{name}, found {len(matches)}")
+    standalone = list((skill_dir / "agents").glob("*.md"))
+    plugin_agents = list((skill_dir / "agents" / "plugin").glob("*.md"))
+    if len(standalone) != 1 or len(plugin_agents) != 1:
+        fail(f"{skill_dir}: expected one local standalone agent and one plugin variant")
+    for agent_path, expected in ((standalone[0], name), (plugin_agents[0], f"ai-skills:{name}")):
+        fields, skills = parse_agent(agent_path)
+        if set(fields) != {"name", "description", "skills"}:
+            fail(f"{agent_path}: agent must contain exactly name, description and skills")
+        if not NAME_RE.fullmatch(fields["name"]) or not fields["description"]:
+            fail(f"{agent_path}: invalid agent name or description")
+        if skills != [expected]:
+            fail(f"{agent_path}: expected preload {expected!r}, found {skills!r}")
+    if standalone[0].name != plugin_agents[0].name:
+        fail(f"{skill_dir}: standalone and plugin agent filenames must match")
+    local_text = standalone[0].read_text(encoding="utf-8")
+    plugin_text = plugin_agents[0].read_text(encoding="utf-8")
+    if local_text != plugin_text.replace(f"ai-skills:{name}", name):
+        fail(f"{skill_dir}: standalone and plugin agent content has drifted")
+    if not (skill_dir / "INSTALL.md").is_file():
+        fail(f"{skill_dir}: missing standalone INSTALL.md")
+    validate_containment(skill_dir)
+
+
+def validate_containment(skill_dir: Path) -> None:
+    """Check local Markdown links and package integrity without a checkout."""
+    skill_root = skill_dir.resolve()
+    files = []
+    for path in skill_dir.rglob("*"):
+        if path.is_symlink():
+            fail(f"{path}: standalone packages cannot depend on symlinks")
+        if not path.is_file() or "__pycache__" in path.parts:
+            continue
+        files.append(path)
+        if path.suffix != ".md":
+            continue
+        for match in re.finditer(r"\[[^\]\n]*\]\(([^)\n]+)\)", path.read_text(encoding="utf-8")):
+            target = match.group(1).strip()
+            if target.startswith("<") and target.endswith(">"):
+                target = target[1:-1]
+            parsed = urlsplit(target)
+            if parsed.scheme or parsed.netloc or not parsed.path:
+                continue
+            resource = (path.parent / url_unquote(parsed.path)).resolve()
+            if not resource.is_relative_to(skill_root):
+                fail(f"{path}: local link escapes the standalone skill: {target}")
+            if not resource.exists():
+                fail(f"{path}: broken local link: {target}")
+    manifest_path = skill_dir / "PACKAGE-MANIFEST.json"
+    if manifest_path.is_file():
+        manifest = json.loads(manifest_path.read_text(encoding="utf-8"))
+        inventory = {p.relative_to(skill_dir).as_posix(): p for p in files if p != manifest_path}
+        hashes = manifest.get("files")
+        if not isinstance(hashes, dict) or set(inventory) != set(hashes):
+            fail(f"{manifest_path}: file inventory differs from standalone package")
+        for name, path in inventory.items():
+            if hashlib.sha256(path.read_bytes()).hexdigest() != hashes[name]:
+                fail(f"{manifest_path}: hash mismatch for {name}")
+        if manifest.get("version") != (skill_dir / "VERSION").read_text(encoding="utf-8").strip():
+            fail(f"{manifest_path}: package version mismatch")
 
 
 def validate_package(skill_names: set[str]) -> None:
@@ -201,22 +260,12 @@ def validate_package(skill_names: set[str]) -> None:
     if entry.get("version") != version:
         fail(f"{marketplace_path}: marketplace and plugin versions must match")
 
-    agent_files = sorted((ROOT / "agents").glob("*.md"))
-    if len(agent_files) != len(skill_names):
-        fail("agents/: expected exactly one root Claude agent for every skill")
-    for path in agent_files:
-        fields, skills = parse_agent(path)
-        if set(fields) != {"name", "description", "skills"}:
-            fail(
-                f"{path}: repository policy keeps plugin agents portable and must contain "
-                "exactly name, description, and skills"
-            )
-        if not fields.get("name") or not fields.get("description"):
-            fail(f"{path}: agent requires name and description")
-        if not NAME_RE.fullmatch(fields["name"]):
-            fail(f"{path}: invalid Claude agent name {fields['name']!r}")
-        if len(skills) != 1 or skills[0].removeprefix("ai-skills:") not in skill_names:
-            fail(f"{path}: agent must preload exactly one repository skill")
+    if (ROOT / "agents").exists() or (ROOT / "scripts").exists():
+        fail("Root agents/ and scripts/ must not contain skill dependencies; use skill folders or .github/scripts/")
+    agent_files = sorted(SKILLS_DIR.glob("*/agents/plugin/*.md"))
+    expected_paths = sorted("./" + path.relative_to(ROOT).as_posix() for path in agent_files)
+    if len(agent_files) != len(skill_names) or plugin.get("agents") != expected_paths:
+        fail(f"{plugin_path}: agents must explicitly map every skill-local plugin agent once")
 
 
 def validate_text_hygiene() -> None:
@@ -235,7 +284,7 @@ def validate_text_hygiene() -> None:
     personal_path = re.compile(
         rf"(?:[A-Za-z]:\\{user_directory}\\|/{user_directory}/)[^\s`\"']+"
     )
-    scanners = {Path(__file__).resolve(), (ROOT / "scripts" / "safety_scan.py").resolve()}
+    scanners = {Path(__file__).resolve(), (ROOT / ".github" / "scripts" / "safety_scan.py").resolve()}
     for path in ROOT.rglob("*"):
         if not path.is_file() or ".git" in path.parts or path.suffix.lower() not in TEXT_SUFFIXES:
             continue
@@ -265,19 +314,20 @@ def validate_javascript() -> None:
 
 
 def main() -> int:
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--skill", type=Path, help="Validate one copied skill without repository/plugin dependencies")
+    args = parser.parse_args()
     try:
+        if args.skill is not None:
+            validate_skill(args.skill.resolve())
+            print(f"STANDALONE VALIDATION PASSED: {args.skill.name}")
+            return 0
         skill_dirs = sorted(path for path in SKILLS_DIR.iterdir() if path.is_dir())
         if not skill_dirs:
             fail("skills/: no skills found")
 
-        agent_skills: dict[str, list[Path]] = {}
-        for agent_path in sorted((ROOT / "agents").glob("*.md")):
-            _, skills = parse_agent(agent_path)
-            for skill in skills:
-                agent_skills.setdefault(skill, []).append(agent_path)
-
         for skill_dir in skill_dirs:
-            validate_skill(skill_dir, agent_skills)
+            validate_skill(skill_dir)
         validate_package({path.name for path in skill_dirs})
         validate_text_hygiene()
         validate_javascript()

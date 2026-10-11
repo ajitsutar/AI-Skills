@@ -1,9 +1,18 @@
 {
   "name": "ai-skills",
-  "version": "2.0.0",
+  "version": "2.0.1",
   "description": "Reusable agents and skills for ticket checkout, karaoke and guitar-practice media, deal alerts, LinkedIn digests, travel comparison, and Robinhood portfolio research and supervised trading.",
   "author": {
     "name": "Ajit Sutar"
   },
-  "repository": "https://github.com/ajitsutar/AI-Skills"
+  "repository": "https://github.com/ajitsutar/AI-Skills",
+  "agents": [
+    "./skills/concert-ticket-checkout/agents/plugin/concert-ticket-agent.md",
+    "./skills/create-guitar-karaoke/agents/plugin/guitar-karaoke-agent.md",
+    "./skills/create-karaoke-video/agents/plugin/karaoke-video-agent.md",
+    "./skills/deal-watch-alerts/agents/plugin/deal-watch-agent.md",
+    "./skills/linkedin-knowledge-digest/agents/plugin/linkedin-digest-agent.md",
+    "./skills/robinhood-ai-trading-agent/agents/plugin/robinhood-trading-agent.md",
+    "./skills/travel-deal-finder/agents/plugin/travel-deal-agent.md"
+  ]
 }
