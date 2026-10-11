@@ -1,6 +1,10 @@
 # Shared default: Value, Quality and Momentum
 
-Use **vqm-fundamental 1.0.0** for a new fundamental equity ranking when the user has
+Version 3.8 begins broad ranked requests with the separate
+[public research campaign](research-campaign.md) and its fixed review queue.
+This reference governs the strict filing-based ranking, not that vendor stage.
+
+Use **vqm-fundamental 1.0.0** for a strict fundamental equity ranking when the user has
 not selected a different saved strategy. This is the shared default for a one-year
 S&P 500 request. It is a **research baseline without measured alpha or calibrated
 recommendation confidence**. Equal family weights are a low-complexity convention,

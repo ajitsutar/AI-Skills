@@ -6,3 +6,4 @@ jsonschema>=4.26,<5
 requests>=2.32,<3
 tzdata>=2025.1
 arch>=8.0,<9
+lxml>=5,<7

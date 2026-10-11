@@ -1,6 +1,6 @@
 # Robinhood portfolio and trading agent
 
-Version **3.7.0 — October 10, 2026**. A portable skill for **personal Codex**, with
+Version **3.8.0 — October 10, 2026**. A portable skill for **personal Codex**, with
 a long-term core and separately budgeted swing/day trading in an active supervised
 session. It starts in paper mode and supports exact-order approval or a bounded
 mandate through the connected official Robinhood Trading MCP.
@@ -11,8 +11,18 @@ quantitative analysis, and execution controls. Choose and adapt the examples;
 they do not change the skill's operating policy or grant trading authorization.
 
 Provide/extract the **entire ZIP**, not only SKILL.md. Ask the personal agent to
-identify version 3.7.0 and verify its supporting files before use. GARCH is
+identify version 3.8.0 and verify its supporting files before use. GARCH is
 explicitly part of this skill and has an executable, audited helper.
+
+Version 3.8 adds a [reproducible public research campaign](references/research-campaign.md):
+fresh whole-universe acquisition, a named VQM vendor profile, deterministic review
+order, replayable bundles, and separate candidate/eligibility comparison. Arithmetic
+checks cover mixed P/E fields, fiscal-period revisions and absent downside stresses.
+The queue cannot grant Eligible or Strong Buy status. The [independent Muse/Codex
+test](references/muse-codex-validation-2026-10-11.md) achieved 10/10 candidate overlap,
+with eight matching rank positions, from separately acquired public inputs.
+Coverage and scores differed (401 versus 414 scorable issuers); both bundles
+replayed. This one result does not guarantee future agreement or validate buys.
 
 Version 3.7 adds a shared financial normalizer with retained source contexts,
 unit/scale/sign handling, fixed accounting component definitions, TTM reconciliation,
@@ -22,8 +32,9 @@ Read [the input contract](references/financial-normalization.md) and
 [release review](REVIEW-3.7.md). Source authentication and reviewed table transcription
 are still evidence work. The [actual cross-model tests](references/cross-model-validation-2026-10-10.md)
 matched the v3.7 calculation outputs; a separately declared frozen Yahoo-data
-experiment achieved 10/10 issuer overlap and identical order. Strict full-universe
-filing eligibility and agreement from independently gathered fresh data remain unproven.
+experiment achieved 10/10 issuer overlap and identical order. That frozen-data experiment did not test independent acquisition. Strict
+full-universe filing eligibility remains incomplete; the v3.8 independent test
+above has its own measured scope and limitations.
 
 Version 3.6 adds the fixed **Value–Quality–Momentum** fundamental research
 default, accounting adapters, a point-in-time data contract, deterministic

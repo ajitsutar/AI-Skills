@@ -18,13 +18,15 @@ Support the actual horizon, from same-session trades to ten years and longer.
 Resolve the clock first, then use intraday signals, swing research or long-term
 fundamentals as appropriate. Research support does not add a live swing adapter.
 
-For ranked stock requests, load model-independent-research.md. Reuse the saved
-mandate, profile and frozen snapshot; run the deterministic ranking helper and
-retain a verified input/result bundle. Do not invent different weights, substitute
-data sources silently or reorder computed picks in prose. Keep evidence gaps and
-model-specific judgments visible; identical prompts alone do not fix the inputs.
+For ranked fundamental stock requests, begin with research-campaign.md. Execute
+the bundled public acquisition and VQM discovery helpers, retain the complete
+universe attempt and verified input/result bundle, and publish the computed
+research queue without substitutions. Independently acquire fresh data when
+requested; shared-snapshot replay is a different test. Review primary evidence
+in queue order and disclose excluded or unreviewed issuers.
 
-For new fundamental rankings, use the bundled vqm-fundamental profile and its
-shared snapshot contract. Do not invent a scoring profile or label an
-uncalibrated ranking Strong Buy. Intraday and swing keep their own strategy
-routes; arbitrary horizon parsing does not establish strategy performance.
+The public queue uses vendor approximations and does not establish buy eligibility.
+The strict filing-based vqm-fundamental route remains separate. Do not label an
+uncalibrated ranking Strong Buy. Candidate overlap is not investment-performance
+validation. Intraday and swing keep their own strategy routes; arbitrary horizon
+parsing does not establish strategy performance.
