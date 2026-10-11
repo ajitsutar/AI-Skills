@@ -21,8 +21,8 @@ from test_personal_components import capability_fixture
 
 
 def strategy_fixture():
-    return dict(setup='opening_range_breakout', version='unvalidated-baseline-1', data_kind='market',
-        input_hashes={'fixture': 'not-real-market-data'}, data_audit_passed=True,
+    report = dict(setup='opening_range_breakout', version='unvalidated-baseline-1', data_kind='market',
+        input_hashes={'fictional_market_data': 'a'*64}, data_audit_passed=True,
         windows={name:dict(start=f'2025-0{i+1}-01T00:00:00Z', end=f'2025-0{i+1}-28T00:00:00Z')
                  for i,name in enumerate(['development','validation','test','forward_paper'])},
         test_was_used_for_selection=False, variants_tried=['fixture only'], costs_included=True,
@@ -31,6 +31,19 @@ def strategy_fixture():
         test_metrics=dict(trades=120,max_drawdown=.02,net_expectancy_per_trade=.1,net_excess_return_vs_matched_benchmark=.01),
         forward_paper_metrics=dict(trades=60,max_drawdown=.02,net_expectancy_per_trade=.1,net_excess_return_vs_matched_benchmark=.01),
         stress_cost_multiplier=2, cost_stress_survived=True)
+    # Fictional statistical evidence exercises the gate, never strategy promotion.
+    start = timestamp(report['windows']['test']['start'])
+    report['quant_evidence'] = dict(units='net_excess_return_decimal',
+        strategy_setup=report['setup'], strategy_version=report['version'],
+        all_variants_disclosed=True, trial_registry_sha256='f'*64, input_data_hashes=['a'*64],
+        parameters_frozen_at='2025-02-28T00:00:00Z',
+        test_start=report['windows']['test']['start'], test_end=report['windows']['test']['end'],
+        selected_trial='fixture only', trials=[dict(id='fixture only', observations=[
+            dict(timestamp=(start+timedelta(hours=i)).isoformat(), return_value=.01 if i%2 else .02)
+            for i in range(252)])])
+    for row in report['quant_evidence']['trials'][0]['observations']:
+        row['return'] = row.pop('return_value')
+    return report
 
 
 class PersonalIntegrationTests(unittest.TestCase):
@@ -252,6 +265,40 @@ class PersonalIntegrationTests(unittest.TestCase):
         criteria['test_min_trades']=-1
         with self.assertRaisesRegex(ValueError,'Positive integer'):
             evaluate_evidence(strategy_fixture(),criteria,'opening_range_breakout','unvalidated-baseline-1',self.now)
+
+    def test_promotion_requires_raw_quantitative_evidence(self):
+        report = strategy_fixture()
+        report.pop('quant_evidence')
+        criteria = self.policy['strategy_registry']['opening_range_breakout']['criteria']
+        out = evaluate_evidence(report, criteria, report['setup'], report['version'], self.now)
+        self.assertFalse(out['eligible_for_promotion_review'])
+        self.assertTrue(any('QUANT' in reason for reason in out['reasons']))
+
+    def test_malformed_promotion_report_is_a_structured_rejection(self):
+        criteria = self.policy['strategy_registry']['opening_range_breakout']['criteria']
+        for field in ('windows', 'test_metrics'):
+            report = strategy_fixture()
+            report.pop(field)
+            out = evaluate_evidence(report, criteria, 'opening_range_breakout', 'unvalidated-baseline-1', self.now)
+            self.assertFalse(out['eligible_for_promotion_review'])
+            self.assertTrue(any(r.startswith('MALFORMED_') for r in out['reasons']))
+        out = evaluate_evidence([], criteria, 'opening_range_breakout', 'unvalidated-baseline-1', self.now)
+        self.assertFalse(out['eligible_for_promotion_review'])
+
+    def test_quant_evidence_binds_strategy_data_and_trial_registry(self):
+        for key, bad_value, reason in [
+            ('strategy_version', 'another-version', 'QUANT_STRATEGY_IDENTITY_MISMATCH'),
+            ('input_data_hashes', ['b'*64], 'QUANT_MARKET_DATA_BINDING_MISMATCH')]:
+            report = strategy_fixture()
+            report['quant_evidence'][key] = bad_value
+            criteria = self.policy['strategy_registry']['opening_range_breakout']['criteria']
+            out = evaluate_evidence(report, criteria, report['setup'], report['version'], self.now)
+            self.assertFalse(out['eligible_for_promotion_review'])
+            self.assertIn(reason, out['reasons'])
+        report = strategy_fixture()
+        report['variants_tried'].append('unreported failed variant')
+        out = evaluate_evidence(report, criteria, report['setup'], report['version'], self.now)
+        self.assertIn('QUANT_VARIANT_REGISTRY_MISMATCH', out['reasons'])
 
     def test_external_manual_activity_consumes_daily_budget(self):
         self.snapshot['external_session_order_count']=self.policy['limits']['max_orders_per_day']

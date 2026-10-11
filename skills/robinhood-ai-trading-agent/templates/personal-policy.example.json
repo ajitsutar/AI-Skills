@@ -156,7 +156,15 @@
         "max_drawdown": 0.05,
         "min_net_expectancy_per_trade": 0,
         "min_excess_return": 0,
-        "minimum_stress_cost_multiplier": 2
+        "minimum_stress_cost_multiplier": 2,
+        "quant_controls": {
+          "minimum_observations": 252,
+          "hac_lags": 5,
+          "max_holm_p": 0.05,
+          "bootstrap_block_length": 10,
+          "bootstrap_replications": 1000,
+          "bootstrap_seed": 1729
+        }
       },
       "live_adapter_status": "research_only_no_live_adapter"
     },
@@ -169,7 +177,15 @@
         "max_drawdown": 0.05,
         "min_net_expectancy_per_trade": 0,
         "min_excess_return": 0,
-        "minimum_stress_cost_multiplier": 2
+        "minimum_stress_cost_multiplier": 2,
+        "quant_controls": {
+          "minimum_observations": 252,
+          "hac_lags": 5,
+          "max_holm_p": 0.05,
+          "bootstrap_block_length": 10,
+          "bootstrap_replications": 1000,
+          "bootstrap_seed": 1729
+        }
       },
       "signal_parameters": {
         "opening_bars": 3,

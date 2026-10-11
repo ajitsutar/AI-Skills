@@ -209,6 +209,7 @@ class SharedStrategyTests(unittest.TestCase):
         with patch.object(Path, 'is_file', missing_rank):
             r = preflight()
             self.assertEqual(r['shared_default'], 'UNAVAILABLE')
+            self.assertEqual(r['quant_workbench'], 'UNAVAILABLE')
             self.assertIn('scripts/deterministic_rank.py', r['missing_files'])
         def missing_garch(path):
             return False if path.name == 'garch_volatility.py' else original(path)

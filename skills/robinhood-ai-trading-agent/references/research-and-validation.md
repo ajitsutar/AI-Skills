@@ -84,3 +84,13 @@ signal timestamp, actual stop/target/limit and the per-symbol session entry cap.
 The bundled live signal adapter is opening_range_breakout only; it remains
 unpromoted until real validation succeeds. Daily SMA remains a research baseline.
 Long-term core execution follows the distinct portfolio/fundamental route.
+
+Version 4 draft criteria add `quant_controls`. Once explicitly approved, the
+promotion gate recomputes HAC, Holm and block-bootstrap checks from retained
+aligned net-excess returns for the complete trial family. Quantitative evidence
+must match the strategy setup/version, market-data hashes, trial registry and
+test window. Read [quant-workbench.md](quant-workbench.md) for the evidence
+contract and [quant-research.md](quant-research.md) for assumptions. Missing raw
+evidence fails this gate; statistical acceptance does not waive forward-paper,
+source authenticity, operational or broker checks. Existing approved policies
+require explicit review before adding these criteria.

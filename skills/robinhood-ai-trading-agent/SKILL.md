@@ -1,11 +1,11 @@
 ---
 name: robinhood-ai-trading-agent
-description: Review and manage a Robinhood portfolio with a long-term core, configurable holding periods from same-session day trades through decades, separately budgeted swing and intraday strategies, GARCH volatility analysis, deterministic risk checks, research, rebalancing, simulation, and exact-order or bounded-mandate execution through the official Robinhood Trading MCP. Use for portfolio decisions and trading-agent operation; live execution requires verified broker capabilities and applicable human authorization.
+description: Quant research and portfolio management across investment horizons, with reproducible stock discovery, primary financial evidence, constrained allocation, strategy validation, multi-asset risk, performance accounting, and supervised Robinhood equity trading. Use for investment research, portfolio decisions and trading-agent operation; instrument research support is broader than the validated live execution scope.
 ---
 
-# Robinhood Portfolio and Trading Agent
+# Robinhood Quant Portfolio and Trading Agent
 
-Package version: **3.8.0 — October 10, 2026**.
+Package version: **4.0.0 — October 11, 2026**.
 
 When first loading this package or diagnosing a version mismatch, identify this
 version and check that its referenced files and scripts are accessible. An uploaded
@@ -26,6 +26,37 @@ then apply primary-evidence investment review in that order. Preserve the comput
 candidate list; model-selected research subsets are not the default. Report
 candidate overlap separately from buy-eligibility agreement. The strict filing-based
 VQM route and execution gates remain separate.
+
+## Quant and investment-manager workflows
+
+For multi-asset portfolios, quantitative strategy development, hedging or investment
+manager requests, read [institutional-manager.md](references/institutional-manager.md).
+It routes the mandate, data recovery, research, construction, validation, execution,
+accounting and incident lifecycle. Read [quant-research.md](references/quant-research.md)
+for method assumptions and primary research, [quant-workbench.md](references/quant-workbench.md)
+for executable contracts, and [multi-asset-playbook.md](references/multi-asset-playbook.md)
+for relevant instruments. Load only the modules needed for the request.
+
+Run numerical jobs with scripts/quant_workbench.py and retain inputs/results for
+replay. Available operations include constrained risk/return allocation, causal
+validation splits, HAC/bootstrapped inference, multiple-testing controls, empirical
+tail loss, factor attribution, option/bond/futures/FX scenarios, cash ladders,
+execution shortfall, XIRR, Brinson attribution, period portfolio simulation and
+model monitoring. Primary SEC extraction and strict-normalization recovery tasks
+support missing financial fields, including the existing bank/REIT adapters.
+
+These additions do not change the public VQM profile, make scores into returns,
+authorize derivatives/shorting, or establish a profitable strategy. Treat all
+instruments through their actual pricing, risk, liquidity and broker capabilities.
+Preserve explicit unsupported statuses; never mislabel an instrument to pass a gate.
+The package supports an investment manager's analytical work; custody, audited
+fund operations, legal responsibility and resilient always-on infrastructure remain
+external. Do not claim universal investment coverage or hedge-fund replacement.
+
+For model compatibility, compare frozen code/data/contracts and independently
+replayed outputs before claiming agreement. New independently acquired data require
+a separate comparison. Investment performance depends on data, validated strategy,
+costs and operations; model agreement alone is not investment validation.
 
 ## Scope and modes
 
