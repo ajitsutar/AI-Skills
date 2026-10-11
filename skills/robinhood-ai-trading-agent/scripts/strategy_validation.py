@@ -15,6 +15,19 @@ from risk_engine import canonical_hash, timestamp
 
 
 def evaluate_evidence(report, criteria, setup, version, now=None):
+    try:
+        if not isinstance(report, dict) or not isinstance(criteria, dict):
+            raise TypeError('Evidence and criteria must be objects')
+        return _evaluate_evidence(report, criteria, setup, version, now)
+    except (KeyError, TypeError, IndexError) as exc:
+        return {'eligible_for_promotion_review': False,
+                'reasons': ['MALFORMED_STRATEGY_EVIDENCE_OR_CRITERIA:'+type(exc).__name__],
+                'quantitative_review': None, 'report_hash': canonical_hash(report),
+                'criteria_hash': canonical_hash(criteria), 'setup': setup, 'version': version,
+                'caveat': 'Malformed retained evidence cannot establish eligibility; repair the report before review'}
+
+
+def _evaluate_evidence(report, criteria, setup, version, now=None):
     now = now or datetime.now(timezone.utc)
     for key in ("test_min_trades", "forward_paper_min_trades"):
         value = number(criteria[key])
@@ -67,7 +80,28 @@ def evaluate_evidence(report, criteria, setup, version, now=None):
         reasons.append("INSUFFICIENT_COST_STRESS")
     if report.get("cost_stress_survived") is not True:
         reasons.append("COST_STRESS_FAILED")
+    quantitative = None
+    if criteria.get('quant_controls') is not None:
+        from quant_validation import promotion_evidence
+        try:
+            raw = report['quant_evidence']
+            if raw.get('strategy_setup') != setup or raw.get('strategy_version') != version:
+                reasons.append('QUANT_STRATEGY_IDENTITY_MISMATCH')
+            if sorted(t['id'] for t in raw['trials']) != sorted(report['variants_tried']):
+                reasons.append('QUANT_VARIANT_REGISTRY_MISMATCH')
+            retained_hashes = report['input_hashes']
+            if (not isinstance(retained_hashes, dict) or not raw.get('input_data_hashes')
+                    or not set(raw['input_data_hashes']).issubset(set(retained_hashes.values()))):
+                reasons.append('QUANT_MARKET_DATA_BINDING_MISMATCH')
+            if (timestamp(raw['test_start']) != timestamp(windows['test']['start'])
+                    or timestamp(raw['test_end']) != timestamp(windows['test']['end'])):
+                reasons.append('QUANT_AND_STRATEGY_WINDOWS_MISMATCH')
+            quantitative = promotion_evidence(raw, criteria['quant_controls'])
+            reasons.extend(quantitative['reasons'])
+        except (ValueError, KeyError, TypeError) as exc:
+            reasons.append('QUANT_EVIDENCE_INCOMPLETE:' + str(exc))
     return {"eligible_for_promotion_review": not reasons, "reasons": sorted(set(reasons)),
+            "quantitative_review": quantitative,
             "report_hash": canonical_hash(report), "criteria_hash": canonical_hash(criteria),
             "setup": setup, "version": version,
             "caveat": "Host must verify retained evidence; thresholds and passing results do not prove an investment edge"}

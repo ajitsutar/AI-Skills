@@ -42,3 +42,11 @@ market data. Obtain data through authorized sources under their applicable terms
 
 These notices do not license the repository's own code. Workflow influences are
 acknowledged separately in [SOURCES.md](SOURCES.md).
+
+## Version 4.0 research methods
+
+New modules use existing external NumPy/SciPy/Requests dependencies. Their
+implementations are original to this package; research references are attributed
+in references/quant-research.md. Cvxportfolio/Ledoit-Wolf implementations are not
+bundled or imported. Referencing a method does not imply source-code reuse, an
+endorsement or a license grant over the publications.

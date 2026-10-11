@@ -80,3 +80,12 @@ workspace's repository-authored vendor experiment without embedding its data or
 selected stocks. No external strategy implementation was copied. The adapter
 imports installed yfinance, requests, pandas and lxml libraries; their code and
 retrieved market datasets are not redistributed in the skill package.
+
+## Version 4.0 quantitative additions
+
+The new quant workbench, validation, allocation, scenario, operational, primary-data,
+monitoring and portfolio-simulation modules were written for this package. No code
+was copied from AQR, Cvxportfolio, quant blogs or another repository. Published
+method attributions and adoption limits are in references/quant-research.md. NumPy,
+SciPy and Requests remain external dependencies under their existing licenses;
+no publication text, vendor datasets or external implementation is redistributed.

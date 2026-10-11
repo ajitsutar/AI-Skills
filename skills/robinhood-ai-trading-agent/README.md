@@ -1,6 +1,6 @@
 # Robinhood portfolio and trading agent
 
-Version **3.8.0 — October 10, 2026**. A portable skill for **personal Codex**, with
+Version **4.0.0 — October 11, 2026**. A portable skill for **personal Codex**, with
 a long-term core and separately budgeted swing/day trading in an active supervised
 session. It starts in paper mode and supports exact-order approval or a bounded
 mandate through the connected official Robinhood Trading MCP.
@@ -11,8 +11,21 @@ quantitative analysis, and execution controls. Choose and adapt the examples;
 they do not change the skill's operating policy or grant trading authorization.
 
 Provide/extract the **entire ZIP**, not only SKILL.md. Ask the personal agent to
-identify version 3.8.0 and verify its supporting files before use. GARCH is
+identify version 4.0.0 and verify its supporting files before use. GARCH is
 explicitly part of this skill and has an executable, audited helper.
+
+Version 4.0 adds a [quant portfolio-manager workflow](references/institutional-manager.md)
+with source-backed methods, constrained allocation, causal statistical validation,
+multiple-testing controls, multi-asset scenarios, cash/execution accounting,
+portfolio simulations and replayable calculation bundles. Start with the
+[workbench contract](references/quant-workbench.md). New draft policy examples
+require recomputed quantitative promotion evidence. Existing policies are never
+silently changed. These tools do not establish alpha, universal instrument coverage,
+or a hedge-fund replacement. See [the capability review](REVIEW-4.0.md).
+The [actual Muse/Codex quant test](references/muse-codex-quant-validation-2026-10-11.md)
+matched all 27 shared-input jobs, including guards. Its routing review found and
+resolved an American-option ambiguity; calculation agreement is not a performance
+guarantee or a claim of universally identical model judgments.
 
 Version 3.8 adds a [reproducible public research campaign](references/research-campaign.md):
 fresh whole-universe acquisition, a named VQM vendor profile, deterministic review
@@ -130,6 +143,13 @@ lockfile. Use an isolated environment and rerun tests after dependency updates.
 | execution_ledger | Durable authorization, deduplication, cumulative fills, cancellation reservations and conflict recovery |
 | supervised_session / personal_runtime | Owner lease, heartbeat, protection/time-exit action planning, init/doctor and local command interface |
 | strategy_lab | Causal example OHLC replays and chronological forward windows; research baselines remain unvalidated |
+| quant_workbench / quant_common | Allowlisted numerical contracts, source/input hashes, original bundles and cross-model replay |
+| quant_validation / strategy_validation | Purged walk-forward folds, HAC, Holm, block bootstrap, PSR/DSR diagnostics and raw-evidence promotion checks |
+| quant_portfolio | Constrained cash/cost/risk allocation with hard issuer, group, capacity and stress limits; research proposals |
+| multi_asset_risk | Spot/FX, linear futures, European options and fixed noncallable bond scenarios; unsupported models rejected |
+| investment_ops | Per-currency cash/hold ladder, execution shortfall, conventional XIRR and one-period Brinson attribution |
+| primary_financial_data | Dated SEC extraction candidates and bank/REIT-aware primary normalization recovery tasks |
+| portfolio_backtest / manager_monitor | Causal period portfolio accounting and fixed-threshold operational/model monitoring |
 
 ## Try the offline examples
 

@@ -6,6 +6,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITY_FILES = {
+    'quant_workbench': ['scripts/' + name + '.py' for name in
+        ('quant_workbench', 'quant_common', 'quant_validation', 'quant_portfolio',
+         'multi_asset_risk', 'investment_ops', 'primary_financial_data',
+         'portfolio_backtest', 'manager_monitor', 'price_audit', 'deterministic_rank',
+         'financial_normalize', 'filing_extract')] + ['profiles/financial-normalization-v1.json'],
     'public_research': ['profiles/public-vqm-discovery-v1.json', 'scripts/public_research.py',
                         'scripts/public_research_fetch.py', 'scripts/research_report_checks.py'],
     'shared_default': ['profiles/vqm-fundamental-v1.json', 'profiles/financial-normalization-v1.json'] + ['scripts/' + name + '.py' for name in
@@ -35,6 +40,7 @@ def check():
             'volatility': 'AVAILABLE' if not missing_by_capability['volatility'] and available(['arch', 'numpy', 'pandas', 'scipy']) else 'SKIPPED_MISSING_COMPONENTS',
             'allocation': 'AVAILABLE_REQUIRES_CALIBRATION' if not missing_by_capability['allocation'] and available(['numpy', 'scipy']) else 'UNAVAILABLE',
             'execution_authorized': False,
+            'quant_workbench': 'AVAILABLE_RESEARCH_ONLY' if not missing_by_capability['quant_workbench'] and available(['numpy', 'scipy', 'lxml', 'tzdata']) else 'UNAVAILABLE',
             'limitations': 'Import checks are not execution evidence, market-data entitlement, performance validation or broker readiness'}
 
 
