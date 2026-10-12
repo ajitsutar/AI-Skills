@@ -1,13 +1,13 @@
 ---
 name: linkedin-knowledge-digest
-description: Create concise, high-signal LinkedIn digests from an authenticated browser session or pasted LinkedIn content. Use when the user wants to automate LinkedIn feed, article, post, or inbox triage; summarize knowledge-bearing posts; filter out career milestones, self-promotion, sales spam, and low-value social updates; produce a Slack/email/Markdown-ready digest with clickable links; or create a reusable LinkedIn monitoring workflow for local agents.
+description: Find high-quality AI articles, research, and analysis from LinkedIn or supplied content and produce a concise daily reading digest with direct source links. Use for LinkedIn knowledge monitoring, feed/article triage, or configurable delivery through available authorized Slack, WhatsApp, SMS/iMessage, email, or local tools. Broader topics and local-only inbox triage are optional.
 ---
 
 # LinkedIn Knowledge Digest
 
 ## Overview
 
-Build a LinkedIn digest that helps the user learn what matters without drowning in feed noise. Prioritize posts, articles, reports, and inbox messages that contain transferable knowledge, credible analysis, or timely market/technical signal.
+Build a reading list, not a recap of social activity. Default to high-quality AI articles, research papers, engineering reports, and thoughtful analysis with direct links to the actual sources. Favor evidence, useful technical detail, and clear implications over popularity. Preserve a user's explicitly chosen broader topic scope.
 
 Resolve bundled resources relative to the directory containing this `SKILL.md`, never relative to the current working directory.
 
@@ -21,7 +21,8 @@ Do not expose private ranking criteria unless the user asks. Use the user's prio
 Collect or infer these inputs:
 
 - Access method: authenticated browser session, exported/pasted content, screenshots, or connector output.
-- Delivery target: Slack DM, email draft, Markdown, document, or terminal summary.
+- Content focus: AI by default, specific AI topics, or a broader knowledge digest; desired item count and source-age window.
+- Delivery configuration: channel, draft/send mode, exact recipient or destination, available authorized sender, and length limits. Slack is one option, not a dependency or implicit default.
 - Priority signals: people, companies, schools, communities, industries, technical topics, roles, or keywords.
 - Exclusion rules: categories the user does not want to see.
 - Link requirement: whether every referenced person, post, article, company, or message needs a clickable link.
@@ -32,6 +33,8 @@ Collect or infer these inputs:
 - Delivery privacy policy: which private inbox fields, if any, may cross into the selected delivery service.
 
 If authenticated access is unavailable, do not guess. Ask the user to restore access or provide pasted/exported LinkedIn content.
+
+Read [article-quality.md](references/article-quality.md) for AI source selection and verification. Read [delivery-configuration.md](references/delivery-configuration.md) when setting up, changing, or using a delivery channel. Keep user preferences and recipient identifiers outside the public skill. A skill update alone does not authorize changing a live schedule, recipient, channel, or sending a test message.
 
 ## Access Strategy
 
@@ -48,10 +51,11 @@ Do not recommend headless Chrome as a way to conceal or bypass website automatio
 ## Workflow
 
 1. Confirm access and scope.
+   - Resolve the user's content and delivery preferences. For send mode, preflight the configured sender and destination before scanning; do not collect a digest for an unavailable channel or silently choose another one.
    - Use the authenticated browser/session when available.
    - If browser automation is used, scroll enough to sample multiple feed bands.
    - Check inbox/messages only if the user requested inbox triage.
-   - For recurring automations, read the canonical state before scanning. Treat a non-null `pending_digest` as a possibly delivered unresolved transaction: stop before scanning or sending, and report the blocker without advancing state.
+   - For recurring automations, read the canonical state before scanning. Treat a non-null `pending_digest` as possibly delivered: stop new scans/sends. When receipt reconciliation is authorized, follow [delivery-recovery.md](references/delivery-recovery.md); otherwise report the blocker without advancing state. Never clear pending merely because it is old or has zero URLs.
    - If the run cannot read or later update required state, stop before producing a content digest that could duplicate old items.
 
 2. Build a background priority map.
@@ -60,33 +64,37 @@ Do not recommend headless Chrome as a way to conceal or bypass website automatio
    - Boost posts from trusted people only when the post itself contains useful knowledge.
 
 3. Filter aggressively.
+   - In AI mode, select AI research, model evaluations, engineering/architecture, data, safety/governance, and consequential product or market analysis. A generic AI keyword is not enough; the linked source must carry the substance.
    - Include articles, reports, research, product or market shifts, technical perspectives, architecture notes, governance/compliance commentary, thoughtful analysis, and substantive discussions.
    - Ignore career milestones, job changes, work anniversaries, promotions, graduation/congratulation posts, hiring posts, generic motivational posts, personal updates, low-value product ads, sales pitches, real estate pitches, finance-service pitches, generic recruiting, and pure self-promotion.
    - Make an exception only when the item links to or summarizes a substantive article, report, research finding, or transferable insight.
 
 4. Capture links.
-   - Prefer the exact LinkedIn post URL for feed items.
-   - Include LinkedIn profile links for people and company links for organizations.
-   - Include external article/report links when visible.
-   - If the user requires hard links, every digest bullet must include an exact content or action URL: post, article, report, news story, event, message thread, or source URL. A profile-only link is not sufficient.
+   - Prefer the direct article, paper, report, or technical source URL over the LinkedIn share. Keep the share as optional attribution, not the main reading link.
+   - Open candidate source links through an approved read path and assess the source itself. Record its title, publisher/author, date, and what was actually accessible; never imply an unread article was reviewed.
+   - Every recommendation must include an exact public content URL. A substantive LinkedIn article or essay can qualify when it contains the insight itself; profiles, company homepages, and private message threads cannot substitute for a reading link.
+   - Deduplicate multiple shares of the same source and multiple articles repeating the same announcement. Verify redirects/canonical links before using them; do not invent or shorten URLs.
    - If no content/action link is visible or recoverable, exclude the item entirely and do not mention it by name.
 
 5. Rank by value.
-   - Favor items with strong engagement, credible sources, high-quality comments, novelty, relevance to the user's priority signals, and practical implications.
+   - Rank by AI/topic relevance, strength of evidence, source credibility, novelty, and practical implications, in that order. Engagement and priority-network membership are secondary tie-breakers, never proof of quality.
+   - The scan runner accepts `contentFocus: "ai"` (default) or `"general"`. Its keyword/evidence hints are only a shortlist, not source verification; apply the article-quality reference before selecting final items.
    - Do not rank a post highly just because it is from a priority person.
 
 6. Produce a concise digest.
-   - Keep the output scannable.
-   - Lead with the most valuable knowledge items.
-   - Explain why each item is worth reading in one sentence.
+   - Default to at most five reads, fewer when quality or channel length demands it. Do not fill a quota with weak links.
+   - Lead each item with its linked article title and source. Add the main finding and why it is worth reading, with an important caveat when needed.
+   - Render for the configured channel and `delivery.link_format`. For copy-safe `plain_url` output, put each complete URL on its own line after the article title or takeaway, including on Slack. For SMS, prefer one or two complete linked items over truncating URLs or sending extra messages without authorization.
    - Separate inbox triage from feed/article recommendations.
 
 7. Update state after delivery.
+   - Draft mode never calls a sender or advances delivery/seen state. Send mode uses the configured channel's sender, not a hard-coded Slack tool. Record acceptance accurately; provider acceptance is not proof of recipient delivery or reading.
    - For recurring runs, treat the run as successful only after extraction, delivery, and state update all succeed.
-   - Immediately before delivery, write a `pending_digest` record containing a run identifier, preparation time, and every outgoing content/action URL. Re-read it and verify it exactly matches the outgoing digest.
+   - Immediately before delivery, write a `pending_digest` record containing a run identifier, preparation time, channel, exact destination, sender identifier, and every outgoing URL (including any optional attribution links). Re-read it and verify it exactly matches the final channel-rendered message.
    - Send exactly once. After the delivery tool returns success, move the pending URLs into `seen`, record the delivery timestamp and link/id, advance `last_successful_run_at`, prune old state, and clear `pending_digest`.
    - If delivery fails, do not retry through an alternate delivery path and do not advance successful-run state. Clear `pending_digest` only when the delivery tool proves that no message was accepted; retain it when the outcome is ambiguous.
    - If finalization fails after delivery succeeds, leave `pending_digest` intact. The next run must stop rather than risk sending the same digest twice.
+   - For tool-based delivery, use `scripts/linkedin_digest_delivery.js` to prepare, verify, send once, and finalize within one orchestration call. It stores the exact outgoing message and a unique run marker for evidence-based reconciliation. Read [delivery-recovery.md](references/delivery-recovery.md) for the call contract and recovery checks.
 
 ## Production Automation Guardrails
 
@@ -96,7 +104,7 @@ Use these stricter rules when building or running an unattended LinkedIn digest 
 - Require single-flight execution. Configure the scheduler to allow at most one active run for each canonical state file and to skip, rather than overlap, a new trigger while that run is active. If the scheduler cannot guarantee non-overlap, do not enable unattended delivery; limit the workflow to a user-supervised one-shot run.
 - Keep a zero-surprise approval boundary. Use only the access, browser, delivery, and workspace operations the user approved. If a required operation is unavailable, stop gracefully and leave successful-run state unchanged.
 - Preflight canonical state. Keep it inside the configured writable workspace and use normal non-escalated file tools. Do not infer failure from stale permission metadata; use the prepared `pending_digest` edit as the authoritative writeability test immediately before delivery.
-- Preserve duplicate prevention. Maintain `last_successful_run_at`, `last_digest_sent_at`, a delivery link/id, optional `pending_digest`, and a bounded `seen` list of recently reported content/action URLs with titles, sources, and timestamps. Keep roughly the latest 200 URLs or 60 days, whichever is smaller.
+- Preserve duplicate prevention. Maintain `last_successful_run_at`, `last_digest_sent_at`, channel-neutral `last_delivery` metadata (channel, destination, message id or permalink, acceptance time), optional `pending_digest`, and a bounded `seen` list of recently reported URLs with titles, sources, and timestamps. Keep roughly the latest 200 URLs or 60 days, whichever is smaller. Preserve legacy state fields when updating existing deployments; do not require a Slack permalink for other channels.
 - Use a single authenticated browser path. When the user specifies Chrome and local AppleScript, use only that approved path. Do not fall back to other browsers, Computer Use, screenshots, GUI clicking, extension repair, profile inspection, or browser-profile workarounds.
 - Isolate the browser session. Launch one new automation-owned window at the start of each run and keep one LinkedIn tab in that window. Do not navigate, select, close, scroll, or execute JavaScript in the user's pre-existing browser windows or tabs. Close only the owned window.
 - Respect service and access boundaries. Do not bypass CAPTCHA, rate limits, authentication checkpoints, bot detection, account restrictions, or LinkedIn access controls. Stop and hand control back to the user when a checkpoint requires their action.
@@ -115,37 +123,35 @@ Use these stricter rules when building or running an unattended LinkedIn digest 
 
 ## Digest Format
 
-Use this shape unless the user requests another format:
+Use this channel-neutral draft shape unless the user requests another format. Example placeholders below are not source evidence or outgoing links:
 
 ```markdown
-*LinkedIn Knowledge Digest*
-_Source: LinkedIn feed/inbox scan. Filtered for knowledge-bearing items only._
+**Daily AI Reads - [date]**
 
-*1) Highest-value reads*
-- [Author or source](https://www.linkedin.com/...) - Topic and one-sentence summary. Why it matters: ...
+**Worth reading**
+- [Actual article title](https://example.org/replace-with-verified-source) - Publisher/author, publication date. Main finding and why it matters. Caveat or abstract-only label when applicable.
 
-*2) Priority-network signal*
-- [Person](https://www.linkedin.com/in/...) - Useful insight from this person's post or comment. Link: [post](https://www.linkedin.com/feed/update/...)
+**Additional perspective** (optional; no duplicate reads)
+- [Substantive essay title](https://example.org/replace-with-verified-essay) - Source and a useful contrasting perspective.
 
-*3) Inbox triage (include only when the delivery privacy policy permits it)*
-- Review: [Sender](https://www.linkedin.com/in/...) - Why this may need attention and suggested action.
-- Ignore: spam/low-value categories, summarized without over-detailing.
-
-*Reusable perspective*
-One concise synthesis the user could use in their own post or thinking.
+**Inbox** (only when requested)
+No qualifying public linked item.
 ```
 
-For Slack, use Slack-compatible Markdown links such as `<https://example.com|label>` when the Slack tool expects mrkdwn.
+Use Markdown links for local/email drafts, Slack mrkdwn when required, and full plain URLs for WhatsApp and SMS/iMessage. The configured `delivery.link_format` takes precedence; see the delivery reference for preserving literal URLs when a Slack connector shortens link labels. Never send the template placeholders. Omit empty optional sections; if nothing meets the quality bar, say so briefly without padding the digest. An existing user-specified section layout takes precedence.
 
 ## Quality Bar
 
 Before finalizing, check:
 
 - Every included item teaches something, points to a useful article/report, or has a clear action.
+- AI is the default focus, and direct source links are visible in every reading recommendation.
+- Source claims were checked against accessible content; preprints, vendor claims, and abstract-only access are labeled when material. Engagement did not substitute for evidence.
 - No visible career milestone, job-anniversary, new-job, generic congratulations, hiring-only, or self-promotion item slipped in.
-- Each included bullet has a clickable content/action link when hard-link mode is active.
+- Each included bullet has a complete exact public content link after channel rendering, and duplicate stories are collapsed.
 - The digest is short enough to read quickly.
 - Ranking reflects the user's interests without revealing private heuristics unnecessarily.
+- The selected destination and sender are configured, available, and authorized; no credentials, private inbox details, or unapproved fallback channels are used.
 
 ## Automation Prompt Template
 
@@ -160,3 +166,4 @@ Read `references/automation-prompt-template.md` when creating a reusable schedul
 - `scripts/materialize_linkedin_scan_transport.js` copies the helpers into the automation workspace and creates the static AppleScript manifest used by recurring runs.
 - `scripts/validate_linkedin_scan_transport.js` verifies window isolation, cleanup paths, helper availability, and the no-inline-JavaScript invariant.
 - `scripts/linkedin_scan_orchestrator.js` performs state preflight, manifest execution, complete chunk collection, transport validation, public-candidate compaction, and privacy-safe optional-source degradation in one orchestration call.
+- `scripts/linkedin_digest_delivery.js` performs verified prepared-state edits, single-attempt delivery, receipt validation, finalization, and receipt-only recovery without a resend.
