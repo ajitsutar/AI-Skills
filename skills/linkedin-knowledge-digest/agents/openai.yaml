@@ -1,4 +1,4 @@
 interface:
   display_name: "LinkedIn Knowledge Digest"
-  short_description: "Filter LinkedIn into useful knowledge reads"
-  default_prompt: "Use $linkedin-knowledge-digest to create a concise, link-backed digest from my authenticated LinkedIn session or supplied content."
+  short_description: "Find quality AI reads for your chosen delivery channel"
+  default_prompt: "Use $linkedin-knowledge-digest to find high-quality AI articles with direct source links and prepare a concise daily digest for my configured delivery channel."
