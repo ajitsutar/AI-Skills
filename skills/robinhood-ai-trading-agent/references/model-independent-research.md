@@ -1,6 +1,9 @@
 # Model-independent research and reproducible selection
 
-For v3.8 broad fundamental startup, first follow
+For current ranked research, first follow [research-handoff.md](research-handoff.md).
+Its executable contract binds actual user preferences, earnings policy, source
+freshness and final order. Do not equate a deterministic public queue with a
+discretionary final recommendation. For broad fundamental acquisition, follow
 [research-campaign.md](research-campaign.md). Its public VQM queue fixes acquisition,
 arithmetic and research coverage before the strict evidence review described here.
 Public candidates and Eligible selections are distinct outputs.

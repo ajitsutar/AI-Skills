@@ -1,0 +1,30 @@
+{
+  "profile": "public-news-source-catalog",
+  "version": "1.0.0",
+  "review_date": "2026-10-12",
+  "scope": "Discovery starting points, not exhaustive coverage, subscriptions or trading signals",
+  "dynamic_discovery_required": true,
+  "sources": [
+    {"id": "issuer_ir", "category": "primary", "route": "Discover official issuer IR releases, feed, presentations and events", "adapter": "rss_or_manual", "access": "PER_ISSUER_VERIFY", "reference": "https://ir.altoingredients.com/news-events/press-releases"},
+    {"id": "sec", "category": "primary", "route": "Submissions, filings and exhibits", "adapter": "sec_submissions", "access": "FREE_REAL_CONTACT_USER_AGENT_REQUIRED", "reference": "https://www.sec.gov/search-filings/edgar-application-programming-interfaces"},
+    {"id": "nasdaq_halts", "category": "exchange", "adapter": "rss", "access": "FREE_RSS_VERIFY_EACH_RUN", "minimum_poll_seconds": 60, "reference": "https://www.nasdaqtrader.com/Trader.aspx?id=TradeHaltRSS"},
+    {"id": "fed", "category": "macro", "adapter": "rss", "access": "FREE_RSS_VERIFY_EACH_RUN", "reference": "https://www.federalreserve.gov/feeds/feeds.htm"},
+    {"id": "pr_newswire", "category": "wire", "adapter": "rss", "access": "FREE_RSS_VERIFY_EACH_RUN", "reference": "https://www.prnewswire.com/rss/"},
+    {"id": "globenewswire", "category": "wire", "adapter": "rss_after_verified_discovery", "access": "DIRECT_CLIENT_DENIED_AT_REVIEW", "reference": "https://www.globenewswire.com/Rss/List"},
+    {"id": "business_wire", "category": "wire", "adapter": "manual_or_verified_feed", "access": "UNVERIFIED", "reference": "https://www.businesswire.com/help-center"},
+    {"id": "cnbc", "category": "publisher", "adapter": "rss", "access": "FREE_RSS_VERIFY_EACH_RUN", "reference": "https://www.cnbc.com/id/100003114/device/rss/rss.html"},
+    {"id": "gdelt", "category": "aggregator", "adapter": "gdelt", "access": "MALFORMED_RESPONSE_AT_REVIEW_OPTIONAL", "reference": "https://blog.gdeltproject.org/gdelt-doc-2-0-api-debuts/"},
+    {"id": "alpha_vantage_news", "category": "vendor", "adapter": "NOT_BUNDLED", "access": "PREMIUM_ENDPOINT_ENTITLEMENT_REQUIRED", "reference": "https://www.alphavantage.co/documentation/#news-sentiment"},
+    {"id": "finnhub", "category": "vendor", "adapter": "NOT_BUNDLED", "access": "API_KEY_AND_ENDPOINT_ENTITLEMENT_UNVERIFIED", "reference": "https://finnhub.io/pricing"},
+    {"id": "stockanalysis", "category": "analyst_targets", "adapter": "manual", "access": "PUBLIC_PAGE_SAMPLE_READABLE_NOT_BULK_API", "reference": "https://stockanalysis.com/analysts/"},
+    {"id": "tipranks", "category": "analyst_track_record", "adapter": "manual", "access": "PARTIAL_PUBLIC_PLUS_PAID_FEATURES", "reference": "https://www.tipranks.com/experts/how-experts-ranked"},
+    {"id": "yahoo", "category": "financial_research", "adapter": "manual_or_existing_public_research_adapter", "access": "ANALYSIS_PAGE_RATE_LIMITED_AT_REVIEW", "reference": "https://finance.yahoo.com/"},
+    {"id": "morningstar", "category": "valuation_research", "adapter": "manual", "access": "PAGE_DENIED_AT_REVIEW_FULL_REPORTS_SUBSCRIPTION", "reference": "https://www.morningstar.com/help-center/reports"},
+    {"id": "motley_fool", "category": "editorial_research", "adapter": "manual", "access": "FREE_EDITORIAL_PREMIUM_OFFICIAL_SERVICE_RECOMMENDATIONS", "reference": "https://www.fool.com/"},
+    {"id": "msn", "category": "syndicated_research", "adapter": "manual", "access": "TOOL_DENIED_AT_REVIEW", "reference": "https://www.msn.com/en-us/money"},
+    {"id": "wsj", "category": "financial_research", "adapter": "manual", "access": "RATINGS_PAGE_SAMPLE_READABLE_ARTICLES_MAY_REQUIRE_SUBSCRIPTION", "reference": "https://www.wsj.com/market-data"},
+    {"id": "bloomberg", "category": "financial_research", "adapter": "manual_or_licensed", "access": "CURRENT_FULL_REPORT_ACCESS_UNVERIFIED", "reference": "https://www.bloomberg.com/markets"},
+    {"id": "zacks", "category": "analyst_research", "adapter": "manual", "access": "PUBLIC_SUMMARIES_FULL_REPORT_OR_REGISTRATION_CHECK_REQUIRED", "reference": "https://www.zacks.com/research/equity-research.php"},
+    {"id": "social_and_other_publishers", "category": "discovery", "adapter": "manual_or_authorized_api", "access": "PER_SOURCE_VERIFY_NO_FREE_FIREHOSE_ASSUMPTION", "route": "Discover Reuters, MarketWatch, Nasdaq research, industry and local sources, X and Reddit where relevant"}
+  ]
+}

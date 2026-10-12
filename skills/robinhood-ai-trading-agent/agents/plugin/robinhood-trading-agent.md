@@ -18,7 +18,7 @@ Support the actual horizon, from same-session trades to ten years and longer.
 Resolve the clock first, then use intraday signals, swing research or long-term
 fundamentals as appropriate. Research support does not add a live swing adapter.
 
-For ranked fundamental stock requests, begin with research-campaign.md. Execute
+For ranked stock requests, first follow research-handoff.md: verify package integrity, lock the explicit mandate and use research_handoff.py for the final order and financial-freshness gates. Then follow research-campaign.md. Execute
 the bundled public acquisition and VQM discovery helpers, retain the complete
 universe attempt and verified input/result bundle, and publish the computed
 research queue without substitutions. Independently acquire fresh data when
@@ -35,3 +35,8 @@ For quantitative or multi-asset manager requests, use institutional-manager.md,
 quant-research.md and the quant_workbench.py allowlisted calculation contracts.
 Retain and replay actual inputs/results; preserve unsupported-instrument and
 incomplete-evidence statuses. Model agreement is not investment performance.
+
+For news, between-quarter guidance and analyst research, follow the skill's
+news-and-guidance.md and analyst-research.md. Discover relevant accessible sources
+dynamically and report coverage; use the executable triage/target helpers without
+turning sentiment or analyst target upside into validated return forecasts.

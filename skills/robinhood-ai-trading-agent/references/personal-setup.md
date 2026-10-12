@@ -6,7 +6,8 @@ data configuration. It is not an unattended trading service.
 
 ## 1. Load and verify the complete skill
 
-Extract the ZIP. Confirm VERSION and SKILL.md both say 3.1.0; run the tests using
+Extract the ZIP. Confirm VERSION, SKILL.md and the package manifest agree; use
+scripts/research_preflight.py to verify the complete package. Run the tests using
 the README environment commands. Open the entire folder in personal Codex or
 explicitly ask that agent to install it. Current Codex documentation describes
 user skills under `$HOME/.agents/skills`; choose an explicit destination and avoid

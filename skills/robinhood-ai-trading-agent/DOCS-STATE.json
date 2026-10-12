@@ -1,0 +1,12 @@
+{
+  "schema_version": 1,
+  "skill_version": "4.2.1",
+  "input_fingerprint_sha256": "5a1975ffe51614253b22e5642c9ffaf8b5f4a599055fc6bb09713ab122e4e1e0",
+  "input_file_count": 131,
+  "catalog_sha256": "d18aaf516cf969180400d9e75dfcaefc7c6ea55a0dd739ad8d98c15c3a40e835",
+  "readme_sha256": "fa17ce315b2b1349f727ce45bcb4bd3e22cf26ff4d963b6512017144771547da",
+  "examples_sha256": "fbdd452171e26294aa961d431f97bfe4788e1e4111f8b4fb59603115c9799ace",
+  "section_count": 22,
+  "example_count": 157,
+  "hash_basis": "UTF-8 files with LF/CRLF normalized; excludes generated state and package manifest"
+}

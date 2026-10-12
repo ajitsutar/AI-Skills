@@ -1,11 +1,15 @@
 """Report installed research capabilities without requiring a broker account."""
 import importlib
 import importlib.metadata
+import hashlib
 import json
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITY_FILES = {
+    'news_and_analyst_research': ['scripts/news_sources.py', 'scripts/news_analysis.py', 'scripts/analyst_evidence.py',
+                                'profiles/news-sources-v1.json', 'references/news-and-guidance.md', 'references/analyst-research.md'],
+    'research_handoff': ['scripts/research_handoff.py', 'scripts/research_source_overlay.py', 'references/research-handoff.md', 'PACKAGE-MANIFEST.json'],
     'quant_workbench': ['scripts/' + name + '.py' for name in
         ('quant_workbench', 'quant_common', 'quant_validation', 'quant_portfolio',
          'multi_asset_risk', 'investment_ops', 'primary_financial_data',
@@ -21,6 +25,24 @@ CAPABILITY_FILES = {
 }
 
 
+def package_integrity():
+    try:
+        manifest = json.loads((ROOT / 'PACKAGE-MANIFEST.json').read_text(encoding='utf-8'))
+        errors = []
+        if manifest['version'] != (ROOT / 'VERSION').read_text(encoding='utf-8').strip():
+            errors.append('VERSION_MISMATCH')
+        for name, expected in manifest['files'].items():
+            path = (ROOT / name).resolve()
+            if ROOT.resolve() not in path.parents or not path.is_file():
+                errors.append('MISSING_OR_UNSAFE:' + name)
+            elif hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                errors.append('HASH_MISMATCH:' + name)
+        return {'status': 'VERIFIED' if not errors else 'INVALID', 'errors': errors,
+                'manifest_sha256': hashlib.sha256((ROOT / 'PACKAGE-MANIFEST.json').read_bytes()).hexdigest()}
+    except (OSError, ValueError, KeyError, TypeError):
+        return {'status': 'INVALID', 'errors': ['PACKAGE_MANIFEST_UNAVAILABLE_OR_INVALID']}
+
+
 def check():
     dependencies = {}
     for name in ('exchange_calendars', 'numpy', 'pandas', 'tzdata', 'scipy', 'arch', 'yfinance', 'requests', 'lxml'):
@@ -33,13 +55,17 @@ def check():
                              for key, paths in CAPABILITY_FILES.items()}
     missing = sorted({p for paths in missing_by_capability.values() for p in paths})
     available = lambda names: all(dependencies[n]['status'] == 'IMPORTABLE' for n in names)
+    integrity = package_integrity()
     return {'skill_version': (ROOT / 'VERSION').read_text(encoding='utf-8').strip(),
+            'package_integrity': integrity,
+            'research_handoff': 'AVAILABLE' if integrity['status'] == 'VERIFIED' and not missing_by_capability['research_handoff'] else 'UNAVAILABLE',
             'missing_files': missing, 'missing_by_capability': missing_by_capability, 'dependencies': dependencies,
             'public_research': 'AVAILABLE' if not missing_by_capability['public_research'] and available(['yfinance', 'requests', 'lxml', 'pandas', 'exchange_calendars']) else 'UNAVAILABLE',
             'shared_default': 'AVAILABLE' if not missing_by_capability['shared_default'] and available(['exchange_calendars', 'numpy', 'pandas', 'tzdata']) else 'UNAVAILABLE',
             'volatility': 'AVAILABLE' if not missing_by_capability['volatility'] and available(['arch', 'numpy', 'pandas', 'scipy']) else 'SKIPPED_MISSING_COMPONENTS',
             'allocation': 'AVAILABLE_REQUIRES_CALIBRATION' if not missing_by_capability['allocation'] and available(['numpy', 'scipy']) else 'UNAVAILABLE',
             'execution_authorized': False,
+            'news_and_analyst_research': 'AVAILABLE_RESEARCH_ONLY_ACCESS_NOT_VERIFIED' if integrity['status'] == 'VERIFIED' and not missing_by_capability['news_and_analyst_research'] and available(['requests', 'tzdata']) else 'UNAVAILABLE',
             'quant_workbench': 'AVAILABLE_RESEARCH_ONLY' if not missing_by_capability['quant_workbench'] and available(['numpy', 'scipy', 'lxml', 'tzdata']) else 'UNAVAILABLE',
             'limitations': 'Import checks are not execution evidence, market-data entitlement, performance validation or broker readiness'}
 

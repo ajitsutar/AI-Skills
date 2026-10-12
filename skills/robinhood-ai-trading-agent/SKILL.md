@@ -5,7 +5,7 @@ description: Quant research and portfolio management across investment horizons,
 
 # Robinhood Quant Portfolio and Trading Agent
 
-Package version: **4.1.0 — October 11, 2026**.
+Package version: **4.2.1 — October 11, 2026**.
 
 When first loading this package or diagnosing a version mismatch, identify this
 version and check that its referenced files and scripts are accessible. An uploaded
@@ -19,7 +19,30 @@ For research startup run scripts/research_preflight.py; disclose unavailable
 components before choosing a workflow. A missing calendar or data dependency
 does not authorize a model-created replacement score or a claim of executed replay.
 
-For ranked fundamental stock requests, first read
+For every new ranked fundamental or dated stock-pick request, first follow
+[research-handoff.md](references/research-handoff.md): verify the package manifest,
+lock the actual mandate with scripts/research_handoff.py, and compute the final
+order through that helper after primary and horizon review. User-requested clean
+slates ignore prior preferences; they do not cancel broker orders or erase platform
+memory. Never replace the shared profile with model-chosen beta, recent-momentum,
+analyst-count or earnings-blackout rules. Report research priorities separately
+from computed reviewed selections; neither establishes a validated return model.
+Data sources are open: use SEC, issuer releases, accessible Morningstar or other
+appropriate providers. Yahoo is one bundled acquisition adapter, not a restriction.
+Use the handoff's audited source-overlay workflow for stale financial corrections;
+preserve periods, units, accounting definitions and all unresolved coverage gaps.
+
+For substantive stock review and tactical news checks, read
+[news-and-guidance.md](references/news-and-guidance.md) and
+[analyst-research.md](references/analyst-research.md). Dynamically discover relevant
+issuer, news and finance sources; disclose actual access and coverage. Check
+between-quarter projections, guidance and preannouncements, then analyst targets,
+revisions, opposing theses and sourced analyst track records. Forward 52-week/12-month
+targets are distinct from historical 52-week ranges and intrinsic fair value.
+Run the bundled news/analyst helpers for reproducible triage and arithmetic; these
+are research inputs, not validated alpha, all-source access or a new live strategy.
+
+For ranked fundamental stock requests, then read
 [research-campaign.md](references/research-campaign.md). Run the shipped
 `public-vqm-discovery` acquisition/scorer for the official research candidate queue,
 then apply primary-evidence investment review in that order. Preserve the computed
@@ -82,7 +105,8 @@ The user's preference for bounded autonomy is a design choice. Activate it after
 
 ## Read the relevant procedures
 
-- Example requests: [50 beginner-to-advanced prompts](EXAMPLE-PROMPTS.md); read when helping a user choose a workflow or asking for example prompts.
+- Example requests: [beginner-to-quant prompt catalog](EXAMPLE-PROMPTS.md); read when helping a user choose a workflow or asking for example prompts.
+- When modifying or releasing this skill: [documentation maintenance](references/maintaining-the-skill.md); review current capabilities and regenerate the prompt catalog on every package update.
 - Portfolio/rebalancing: [portfolio-management.md](references/portfolio-management.md), scripts/portfolio_manager.py.
 - Any specified holding period: [holding-period-planning.md](references/holding-period-planning.md), [holding-period-review.md](templates/holding-period-review.md), scripts/horizon_review.py.
 - Intraday cash reserve and settlement: [settled-cash-planning.md](references/settled-cash-planning.md); configure dollar/percentage floors before new day-trade buys.
@@ -90,6 +114,9 @@ The user's preference for bounded autonomy is a design choice. Activate it after
 - Any live action: [approval-gated-execution.md](references/approval-gated-execution.md), [broker-integration.md](references/broker-integration.md), scripts/risk_engine.py and scripts/execution_ledger.py.
 - GARCH volatility: read the explicit section below and [garch-volatility.md](references/garch-volatility.md); use scripts/garch_volatility.py.
 - Research and promotion: [research-and-validation.md](references/research-and-validation.md).
+- News/sentiment and guidance: [news-and-guidance.md](references/news-and-guidance.md), scripts/news_sources.py and scripts/news_analysis.py.
+- Analyst reports/targets and success records: [analyst-research.md](references/analyst-research.md), scripts/analyst_evidence.py.
+- Institutional capability and remaining gaps: [institutional-gap-review-4.2.md](references/institutional-gap-review-4.2.md).
 - Stock discovery/value-trap review: [screening-and-value-traps.md](references/screening-and-value-traps.md), [screen-review.md](templates/screen-review.md), scripts/screen_review.py.
 - Small-budget stock discovery, including a $500 example: [small-account-research.md](references/small-account-research.md).
 - Formats/examples: [runtime-contract.md](references/runtime-contract.md), [README.md](README.md).

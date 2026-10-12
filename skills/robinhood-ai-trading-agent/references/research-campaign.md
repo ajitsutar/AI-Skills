@@ -1,4 +1,8 @@
-# Reproducible research campaign (v4.1)
+# Reproducible research campaign (v4.1.1)
+
+New runs first lock the explicit mandate through [research-handoff.md](research-handoff.md).
+That helper also enforces current primary-release evidence and final order. Do not
+publish a discretionary replacement list as the skill's computed selection.
 
 Read this first for ranked fundamental stock requests, including “top N buys.”
 Intraday retains its registered signal/bar workflow: a daily fundamental queue is
