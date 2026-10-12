@@ -7,6 +7,8 @@ const LinkedInScanOrchestrator = (() => {
   const TRACKING_PARAMS = /^(?:utm_.+|trk|trackingId|lipi|midToken|midSig|ref|source)$/i;
   const KNOWLEDGE_SIGNAL = /\b(?:ai|artificial intelligence|agentic|agents?|llm|mcp|rag|model|research|report|study|benchmark|governance|compliance|regulation|privacy|security|architecture|infrastructure|cloud|database|data platform|developer|open source|enterprise|semiconductor|chip|market|product strategy|technical|technology|software|cyber|quantum|robotics)\b/i;
   const LOW_VALUE_SIGNAL = /\b(?:congratulations|congrats|anniversary|new role|new job|joined|promotion|promoted|graduation|graduated|hiring|we(?:'| a)re hiring|i am thrilled|i'm thrilled|excited to announce|real estate|mortgage|financial advisor|lead generation|book a demo|apply now)\b/i;
+  const AI_SIGNAL = /\b(?:ai|artificial intelligence|genai|generative ai|machine learning|deep learning|neural networks?|large language models?|llms?|agentic|rag|retrieval[- ]augmented|model evaluations?|model training|inference|fine[- ]tuning|transformers?|embeddings?|diffusion models?|reinforcement learning|computer vision|natural language processing)\b/i;
+  const EVIDENCE_HINT = /\b(?:paper|research|report|study|benchmark|evaluation|experiment|ablation|methodology|dataset|reproducib\w*|source code|case study|limitations|trade[- ]offs?|failure modes?)\b/i;
 
   function compactWhitespace(value) {
     return String(value || "").replace(/\s+/g, " ").trim();
@@ -168,16 +170,18 @@ const LinkedInScanOrchestrator = (() => {
   }
 
   function candidateScore(item) {
-    let score = item.priorityNetwork ? 8 : 0;
-    if (item.kind === "news") score += 2;
-    if (item.contentUrls.some((url) => urlHost(url) !== "linkedin.com")) score += 3;
+    // Shortlist hints only: the digest author must still read and assess the source.
+    let score = item.evidenceHint ? 12 : 0;
+    if (item.contentUrls.some((url) => urlHost(url) !== "linkedin.com")) score += 4;
+    if (item.priorityNetwork) score += 1;
     const engagement = Number((item.engagement.match(/[\d,]+/) || ["0"])[0].replace(/,/g, ""));
-    score += Math.min(5, Math.floor(Math.log10(engagement + 1)));
-    if (item.relativeAgeHours !== null) score += Math.max(0, 4 - Math.floor(item.relativeAgeHours / 48));
+    score += Math.min(1, Math.log10(engagement + 1) / 5);
+    if (item.relativeAgeHours !== null) score += Math.max(0, 2 - Math.floor(item.relativeAgeHours / 48));
     return score;
   }
 
-  function buildCompactSummary({ transport, state, currentTimeIso, overlapHours = 4, priorityOrganizations = [] }) {
+  function buildCompactSummary({ transport, state, currentTimeIso, overlapHours = 4, priorityOrganizations = [], contentFocus = "ai" }) {
+    if (!["ai", "general"].includes(contentFocus)) throw new Error("invalid_content_focus");
     const nowMs = Date.parse(currentTimeIso);
     const lastSuccessMs = Date.parse(state.last_successful_run_at || "");
     if (!Number.isFinite(nowMs)) throw new Error("invalid_current_time");
@@ -202,12 +206,15 @@ const LinkedInScanOrchestrator = (() => {
     const emitted = new Set();
 
     const addCandidate = (candidate) => {
+      const aiRelevant = AI_SIGNAL.test(candidate.excerpt);
+      if (contentFocus === "ai" && !aiRelevant) return;
       const urls = [...new Set((candidate.contentUrls || []).map(normalizeContentUrl).filter(Boolean))]
-        .filter((url) => !seen.has(url) && !emitted.has(url));
+        .filter((url) => !seen.has(url) && !emitted.has(url))
+        .sort((left, right) => Number(urlHost(left) === "linkedin.com") - Number(urlHost(right) === "linkedin.com"));
       if (!urls.length) return;
-      for (const url of urls) emitted.add(url);
       const relativeAgeMs = parseRelativeAgeMs(candidate.excerpt);
       if (relativeAgeMs !== null && relativeAgeMs > allowedAgeMs + 60 * 60 * 1000) return;
+      for (const url of urls) emitted.add(url);
       const source = compactWhitespace(candidate.source) || "LinkedIn";
       const excerpt = compactWhitespace(candidate.excerpt).slice(0, MAX_EXCERPT);
       const priorityNetwork = Boolean(
@@ -221,6 +228,8 @@ const LinkedInScanOrchestrator = (() => {
         engagement: compactWhitespace(candidate.engagement).slice(0, 120),
         contentUrls: urls,
         priorityNetwork,
+        aiRelevant,
+        evidenceHint: EVIDENCE_HINT.test(candidate.excerpt),
         relativeAgeHours: relativeAgeMs === null ? null : Math.round(relativeAgeMs / 3600000)
       };
       item.score = candidateScore(item);
@@ -230,7 +239,7 @@ const LinkedInScanOrchestrator = (() => {
     for (const band of transport.bands) {
       for (const post of band.posts || []) {
         const excerpt = compactWhitespace(post.text);
-        if (!KNOWLEDGE_SIGNAL.test(excerpt) || LOW_VALUE_SIGNAL.test(excerpt)) continue;
+        if ((!KNOWLEDGE_SIGNAL.test(excerpt) && !AI_SIGNAL.test(excerpt)) || LOW_VALUE_SIGNAL.test(excerpt)) continue;
         addCandidate({
           kind: "post",
           source: post.author,
@@ -241,7 +250,7 @@ const LinkedInScanOrchestrator = (() => {
       }
       for (const news of band.news || []) {
         const excerpt = compactWhitespace(news.text);
-        if (!KNOWLEDGE_SIGNAL.test(excerpt) || LOW_VALUE_SIGNAL.test(excerpt)) continue;
+        if ((!KNOWLEDGE_SIGNAL.test(excerpt) && !AI_SIGNAL.test(excerpt)) || LOW_VALUE_SIGNAL.test(excerpt)) continue;
         addCandidate({
           kind: "news",
           source: "LinkedIn News",
@@ -257,6 +266,7 @@ const LinkedInScanOrchestrator = (() => {
       schemaVersion: 1,
       payloadType: PAYLOAD_TYPE,
       ok: true,
+      contentFocus,
       state: {
         lastSuccessfulRunAt: state.last_successful_run_at || null,
         cutoffAt: new Date(cutoffMs).toISOString(),
@@ -350,9 +360,11 @@ const LinkedInScanOrchestrator = (() => {
     currentTimeIso,
     overlapHours = 4,
     maxTransportBytes = 60000,
-    priorityOrganizations = []
+    priorityOrganizations = [],
+    contentFocus = "ai"
   }) {
     try {
+      if (!["ai", "general"].includes(contentFocus)) throw new Error("invalid_content_focus");
       const stateRead = await readJsonFile(tools, statePath, workdir, "state_read_failed");
       if (!stateRead.ok) return { schemaVersion: 1, payloadType: PAYLOAD_TYPE, ...stateRead };
       const state = stateRead.value;
@@ -408,7 +420,8 @@ const LinkedInScanOrchestrator = (() => {
         state,
         currentTimeIso,
         overlapHours,
-        priorityOrganizations
+        priorityOrganizations,
+        contentFocus
       });
       summary.transport = { exitCode: browser.exitCode, byteCount: browser.byteCount };
       return summary;

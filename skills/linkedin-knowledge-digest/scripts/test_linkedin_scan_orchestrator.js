@@ -9,6 +9,7 @@ const vm = require("node:vm");
 const orchestrator = require("./linkedin_scan_orchestrator");
 const {
   ORCHESTRATOR_NAME,
+  DELIVERY_NAME,
   materialize
 } = require("./materialize_linkedin_scan_transport");
 
@@ -61,6 +62,7 @@ function testMaterializationIncludesOrchestrator() {
     const result = materialize(destination);
     assert.equal(fs.existsSync(result.manifestPath), true);
     assert.equal(fs.existsSync(path.join(destination, ORCHESTRATOR_NAME)), true);
+    assert.equal(fs.existsSync(path.join(destination, DELIVERY_NAME)), true);
   } finally {
     fs.rmSync(destination, { recursive: true, force: true });
   }
@@ -130,6 +132,59 @@ function testRunsWithoutBrowserUrlGlobal() {
   );
 }
 
+function testAiFocusAndEvidenceRanking() {
+  const parsed = orchestrator.parseMarkedTransport(rawTransport([
+    band(1, { posts: [
+      { author: "Familiar Oracle Author", text: "1h AI is changing everything about enterprise software!", engagement: "900,000 reactions", contentUrls: ["https://www.linkedin.com/posts/viral-ai"] },
+      { author: "Research Lab", text: "2h Machine learning evaluation with reproducible baselines and limitations.", engagement: "3 reactions", contentUrls: ["https://www.linkedin.com/posts/paper-share", "https://example.com/paper"] },
+      { author: "Cloud Team", text: "1h Database architecture report with detailed benchmarks.", contentUrls: ["https://example.com/database"] },
+      { author: "Recruiter", text: "1h Hiring AI research engineers. Apply now!", contentUrls: ["https://example.com/jobs"] }
+    ] }),
+    band(2), band(3)
+  ]));
+  const input = { transport: parsed, state: { seen: [] }, currentTimeIso: "2026-10-12T13:00:00Z", priorityOrganizations: ["Oracle"] };
+  const ai = orchestrator.buildCompactSummary(input);
+  assert.equal(ai.contentFocus, "ai");
+  assert.equal(ai.candidates.length, 2);
+  assert.equal(ai.candidates[0].source, "Research Lab");
+  assert.equal(ai.candidates[0].aiRelevant, true);
+  assert.equal(ai.candidates[0].evidenceHint, true);
+  assert.deepEqual(ai.candidates[0].contentUrls, ["https://example.com/paper", "https://www.linkedin.com/posts/paper-share"]);
+  const general = orchestrator.buildCompactSummary({ ...input, contentFocus: "general" });
+  assert.equal(general.candidates.length, 3);
+  assert.ok(general.candidates.some((item) => item.source === "Cloud Team" && !item.aiRelevant));
+  assert.throws(() => orchestrator.buildCompactSummary({ ...input, contentFocus: "typo" }), /invalid_content_focus/);
+}
+
+function testFreshShareSurvivesStaleDuplicateAndSeenSources() {
+  const article = "https://example.com/ai-paper";
+  const seen = "https://example.com/prior-report";
+  const parsed = orchestrator.parseMarkedTransport(rawTransport([
+    band(1, { posts: [{ author: "Old Share", text: "4w AI research paper evaluation.", contentUrls: [article] }] }),
+    band(2, { posts: [{ author: "New Share", text: "1h AI research paper evaluation.", contentUrls: [article, seen, "https://www.linkedin.com/in/author"] }] }),
+    band(3, { posts: [{ author: "Duplicate", text: "2h AI research paper evaluation.", contentUrls: [article] }] })
+  ]));
+  const result = orchestrator.buildCompactSummary({
+    transport: parsed,
+    state: { last_successful_run_at: "2026-10-11T13:00:00Z", seen: [{ url: seen }] },
+    currentTimeIso: "2026-10-12T13:00:00Z"
+  });
+  assert.equal(result.candidates.length, 1);
+  assert.equal(result.candidates[0].source, "New Share");
+  assert.deepEqual(result.candidates[0].contentUrls, [article]);
+}
+
+async function testInvalidFocusStopsBeforeBrowser() {
+  let calls = 0;
+  const result = await orchestrator.run({
+    tools: { exec_command: async () => { calls += 1; } },
+    contentFocus: "invalid"
+  });
+  assert.equal(result.ok, false);
+  assert.equal(result.code, "invalid_content_focus");
+  assert.equal(calls, 0);
+}
+
 async function testRunCollectsAllChunksWithoutStore() {
   const manifest = ['tell application "Google Chrome"', "end tell"];
   const raw = rawTransport([band(1), band(2), band(3)], JSON.stringify({ ok: true, items: [] }), JSON.stringify({ ok: true, threads: [] }));
@@ -189,6 +244,9 @@ async function main() {
   testMaterializationIncludesOrchestrator();
   testCompactSummaryIsPublicAndStateAware();
   testRunsWithoutBrowserUrlGlobal();
+  testAiFocusAndEvidenceRanking();
+  testFreshShareSurvivesStaleDuplicateAndSeenSources();
+  await testInvalidFocusStopsBeforeBrowser();
   await testRunCollectsAllChunksWithoutStore();
   await testPendingStopsBeforeBrowser();
   console.log("LinkedIn scan orchestrator tests passed.");
