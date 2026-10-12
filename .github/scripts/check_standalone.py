@@ -25,6 +25,7 @@ PYTHON_TESTS = {
 JS_TESTS = {
     "linkedin-knowledge-digest": [
         "scripts/test_linkedin_candidates.js", "scripts/test_linkedin_scan_orchestrator.js",
+        "scripts/test_linkedin_digest_delivery.js",
     ],
 }
 
