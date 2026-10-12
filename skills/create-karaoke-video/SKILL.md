@@ -5,6 +5,9 @@ description: Create YouTube-ready karaoke or synchronized lyric videos from audi
 
 # Create Karaoke Video
 
+For packaging or attribution questions, see [PROVENANCE.md](PROVENANCE.md) and
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md), including external model/font terms.
+
 ## New Session Use
 
 This skill is designed for reuse from any new agent session. If the user explicitly invokes it, follow this workflow without requiring them to repeat setup instructions.
@@ -37,7 +40,7 @@ Use this skill to create a finished karaoke video from an audio file and lyrics.
 
 1. Resolve inputs: audio path, lyrics text/file, desired output name, video style, and vocal-removal preference.
 2. Decide audio mode:
-   - If the user explicitly asks to remove vocals, run vocal separation and use the instrumental/no-vocals stem.
+   - If the user explicitly asks to remove vocals, use a model permitted for the intended use or obtain a licensed instrumental/no-vocals stem. Apply the model-use check below before separation.
    - If the user explicitly asks to keep the original audio, render with the original audio.
    - If ambiguous, ask one concise question: "Should I remove vocals, keep the original audio, or make both versions?"
 3. Create or obtain timing:
@@ -51,15 +54,28 @@ Use this skill to create a finished karaoke video from an audio file and lyrics.
 
 ## Vocal Removal
 
-Use `scripts/separate_vocals.py` as a wrapper around Demucs when vocal removal is requested.
+Use `scripts/separate_vocals.py` as a wrapper around Demucs only after documenting
+permission for the exact selected model and intended use. Demucs's MIT software
+license does not grant general-use rights to its pretrained weights; the
+maintainer describes those weights as scientific-purpose only. See
+[model terms and the rights-record format](THIRD-PARTY-NOTICES.md#model-weights).
+For ordinary karaoke or YouTube publication, use separately permitted weights or
+a licensed instrumental supplied by the user. Do not label that activity as
+scientific research to pass the check.
 
-Typical command:
+Command after verifying a model-use record (a publication record requires
+separate permission covering that use):
 
 ```powershell
-python "<skill-dir>/scripts/separate_vocals.py" "song.mp3" --outdir "work/separated"
+python "<skill-dir>/scripts/separate_vocals.py" "song.mp3" --outdir "work/separated" --model "htdemucs" --rights-record "work/model-rights.json" --use-category "publication"
 ```
 
-The separator publishes the complete track directory under a cross-process lock and refuses an existing track by default. For an intentional rerun, add `--overwrite`; never delete or replace the source audio.
+The wrapper validates the record before checking or executing Demucs, which may
+download weights. This validates an operator's record, not the legal truth of its
+claims; do not manufacture a permission record. The separator publishes the
+complete track directory under a cross-process lock and refuses an existing track
+by default. For an intentional rerun, add `--overwrite`; never delete or replace
+the source audio.
 
 Current Demucs releases require Python 3.10 or newer. If Demucs is unavailable, create or use an isolated environment and install it only with the user's approval when the task requires vocal removal:
 

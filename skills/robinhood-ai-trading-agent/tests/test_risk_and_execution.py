@@ -115,7 +115,7 @@ class RiskTests(Fixture):
     def test_fractional_and_tick_rejected(self):
         self.order["quantity"] = "1.5"
         self.order["limit_price"] = "100.021"
-        self.blocked("WHOLE_SHARES_REQUIRED")
+        self.blocked("FRACTIONAL_SHARES_NOT_ENABLED")
         self.blocked("INVALID_PRICE_INCREMENT")
 
     def test_stop_wrong_side(self):
@@ -428,14 +428,14 @@ class InstallerTests(unittest.TestCase):
 class PortfolioTests(unittest.TestCase):
     def test_small_budget_does_not_force_unaffordable_stock(self):
         fixture = json.loads((ROOT / "examples/small-account.json").read_text())
-        result = rebalance(**fixture)
+        result = rebalance(**fixture, allow_fractional=False)
         self.assertEqual([(p["symbol"], p["quantity"]) for p in result["buy_candidates"]], [("GROWTH_A", "1")])
         self.assertEqual(result["cash_remaining_before_fees"], "455")
 
     def test_cash_first_and_drift_band(self):
         result = rebalance(10000, 5000, {"A": 40}, {"A": ".50"}, {"A": 100},
                            cash_floor=".10", band=".02", max_turnover=".05")
-        self.assertEqual(result["buy_candidates"][0]["quantity"], "5")
+        self.assertEqual(float(result["buy_candidates"][0]["quantity"]), 5)
 
     def test_no_funding_from_unfilled_sale(self):
         result = rebalance(10000, 1000, {"A": 80}, {"A": ".30", "B": ".50"},

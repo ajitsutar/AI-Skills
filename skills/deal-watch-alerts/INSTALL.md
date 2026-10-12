@@ -5,6 +5,20 @@ subfolders together. No files from another skill or the repository root are
 required to use it. Runtime tools, Python/Node packages, model downloads and
 authenticated services are separate prerequisites described in [SKILL.md](SKILL.md).
 
+## Runtime and licensing
+
+The memory helper requires Python. JSON configuration uses only its standard
+library. For YAML configuration, install the optional PyYAML package in the Python
+environment used to run the helper:
+
+```sh
+python -m pip install PyYAML
+```
+
+The skill includes its [MIT license](LICENSE), [provenance record](PROVENANCE.md)
+and [third-party notices](THIRD-PARTY-NOTICES.md). Keep these files with standalone
+copies. Browser and notification tools must be supplied by the host.
+
 ## Codex or another Agent Skills host
 
 Copy this entire `deal-watch-alerts` folder into the skills directory used by your host.

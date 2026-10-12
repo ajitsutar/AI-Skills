@@ -22,6 +22,7 @@ Start with [example prompts, from first-time investors through quants](EXAMPLE-P
 | Follow news and guidance | Discover relevant issuer, SEC, exchange, macro and financial-publisher sources; poll configured public feeds; triage language and compare reviewed guidance ranges | [News and guidance](references/news-and-guidance.md) |
 | Review analyst evidence | Discover accessible reports and attributed excerpts; compare forward targets, dispersion and revisions; retain provider-reported analyst performance with its methodology | [Analyst research](references/analyst-research.md) |
 | Manage a portfolio | Review contributions, concentration, ETF look-through, rebalance proposals, covariance, stress exposure, tax lots and potential wash-sale interactions | [Portfolio management](references/portfolio-management.md) |
+| Invest small dollar amounts | Size fractional stock/ETF quantities, preserve cash and fee reserves, and prepare each recurring contribution with durable occurrence keys | [Fractional shares](references/fractional-shares.md) |
 | Research swing/day trading | Build a liquid watchlist, review catalysts, evaluate supported completed-bar setups and model entries, stops, targets, costs and time exits | [Short-term trading](references/short-term-trading.md) |
 | Estimate volatility | Run GARCH, GJR-GARCH and supported EGARCH forecasts with chronological baseline comparisons and retained model outputs | [Volatility models](references/garch-volatility.md) |
 | Construct and stress allocations | Calculate cash/cost/risk-constrained weights and selected equity, FX, futures, European-option and fixed-bond scenarios | [Quant workbench](references/quant-workbench.md), [multi-asset scope](references/multi-asset-playbook.md) |
@@ -141,11 +142,14 @@ credential client or network order path. The host invokes actual authenticated
 broker tools only after the applicable request and authorization checks. Unknown
 submission outcomes require reconciliation before any retry.
 
-The execution adapter is limited to whole-share, unlevered, long-only U.S. stocks
-and nonleveraged ETFs, with supported regular-session DAY limit parent/reduction
-orders. Fractional orders, options, short selling and extended-hours execution
-require additional adapters. A small budget can therefore produce no executable
-whole-share order even when the security is useful for research.
+The execution adapter supports unlevered, long-only U.S. stocks and nonleveraged
+ETFs through regular-session quantity-based DAY limit orders. Fractional quantities
+are supported when the policy, fresh per-symbol rules and observed broker schemas
+permit them. Dollar budgets and recurring contributions can produce fractional
+proposals; whole-share sizing remains configurable. Native dollar-market orders,
+broker recurring-schedule management, options, short selling and extended-hours
+execution require additional adapters. An unsupported broker route stays in
+proposal mode. See [fractional sizing](references/fractional-shares.md).
 
 Live tactical entries require verified native atomic protection, partial-fill
 coverage, exclusive exits and a tested time-exit/handoff procedure. The registered
@@ -185,7 +189,10 @@ professional performance and replacement of a hedge-fund manager are unestablish
 
 Read [PROVENANCE.md](PROVENANCE.md), [SOURCES.md](SOURCES.md) and
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for origin, influences and dependency
-notices. The repository has not selected a license for its own material. The
-upstream [arch notice](ARCH-LICENSE.txt) applies to that dependency, not to the
-entire skill. Public availability of code or research does not itself grant
-redistribution rights over publisher reports or retrieved market data.
+notices. The repository-authored code and documentation are available under the
+[MIT License](LICENSE). Keep that license and the notices with standalone copies.
+External dependencies retain their own terms, including the upstream
+[arch notice](ARCH-LICENSE.txt). The MIT grant does not relicense third-party
+material. The predecessor's user-confirmed personal-Codex origin and source audit
+are recorded in PROVENANCE.md. Publisher reports and retrieved market data remain
+subject to their own permissions.

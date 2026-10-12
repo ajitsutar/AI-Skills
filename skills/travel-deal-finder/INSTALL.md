@@ -28,3 +28,9 @@ For a host that accepts skill ZIPs, zip this entire folder so the archive contai
 `travel-deal-finder/SKILL.md` and its sibling resources. Do not zip only `SKILL.md`.
 Keep generated outputs, environments and account configuration outside the package.
 Uploading the package does not configure external tools or grant transaction authority.
+
+## License and provenance
+
+Keep the bundled [MIT license](LICENSE), [provenance record](PROVENANCE.md) and
+[third-party notices](THIRD-PARTY-NOTICES.md) with standalone copies. Python and
+external travel services retain their own terms.

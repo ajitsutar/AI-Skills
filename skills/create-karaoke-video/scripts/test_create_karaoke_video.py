@@ -219,6 +219,66 @@ class KaraokeRendererTests(unittest.TestCase):
 
 
 class VocalSeparationTests(unittest.TestCase):
+    def test_separation_without_rights_record_never_checks_or_runs_demucs(self):
+        with mock.patch.object(sys, "argv", ["separate_vocals.py", "song.wav"]):
+            with mock.patch.object(separate, "ensure_demucs_available") as dependency:
+                with mock.patch.object(separate.subprocess, "run") as run:
+                    with self.assertRaises(SystemExit):
+                        separate.main()
+        dependency.assert_not_called()
+        run.assert_not_called()
+
+    def test_invalid_rights_records_fail_before_demucs_and_output_creation(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            audio = root / "song.wav"
+            audio.write_bytes(b"audio")
+            rights = root / "rights.json"
+            output = root / "separated"
+            base = {
+                "model": "htdemucs", "use_category": "scientific_research",
+                "intended_use": "Evaluate source separation quality for an academic experiment",
+                "rights_basis": "scientific_purposes",
+                "evidence": "https://github.com/facebookresearch/demucs/issues/327",
+                "confirmed_by_operator": True,
+            }
+            cases = [
+                ({**base, "model": "another_model"}, "scientific_research"),
+                (base, "publication"),
+                ({**base, "use_category": "publication"}, "publication"),
+                ({**base, "evidence": ""}, "scientific_research"),
+                ({**base, "confirmed_by_operator": False}, "scientific_research"),
+                ({**base, "rights_basis": "MIT code"}, "scientific_research"),
+                ([], "scientific_research"),
+            ]
+            for record, category in cases:
+                with self.subTest(record=record, category=category):
+                    rights.write_text(json.dumps(record), encoding="utf-8")
+                    argv = ["separate_vocals.py", str(audio), "--rights-record", str(rights),
+                            "--use-category", category, "--outdir", str(output)]
+                    with mock.patch.object(sys, "argv", argv):
+                        with mock.patch.object(separate, "ensure_demucs_available") as dependency:
+                            with mock.patch.object(separate.subprocess, "run") as run:
+                                with self.assertRaises(SystemExit):
+                                    separate.main()
+                    dependency.assert_not_called()
+                    run.assert_not_called()
+                    self.assertFalse(output.exists())
+
+    def test_matching_rights_record_allows_scientific_or_separately_permitted_use(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            record_path = Path(temporary) / "rights.json"
+            for category, basis in (("scientific_research", "scientific_purposes"),
+                                    ("publication", "separate_permission")):
+                record = {
+                    "model": "htdemucs", "use_category": category,
+                    "intended_use": "The specific intended activity",
+                    "rights_basis": basis, "evidence": "Operator-reviewed permission reference",
+                    "confirmed_by_operator": True,
+                }
+                record_path.write_text(json.dumps(record), encoding="utf-8")
+                self.assertEqual(separate.validate_model_rights(record_path, "htdemucs", category), record)
+
     def test_find_stem_is_scoped_to_isolated_job(self):
         with tempfile.TemporaryDirectory() as temporary:
             root = Path(temporary)

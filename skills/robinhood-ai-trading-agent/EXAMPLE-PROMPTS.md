@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-157 examples across 22 workflows, from first-time investing to quantitative research.
+163 examples across 23 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the robinhood-ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -28,6 +28,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Analyst reports, consensus and financial information](#analyst-reports-consensus-and-financial-information) | Intermediate to expert | 8 |
 | [Social hypotheses, ownership and disclosure context](#social-hypotheses-ownership-and-disclosure-context) | Intermediate | 5 |
 | [Portfolio planning and investor decisions](#portfolio-planning-and-investor-decisions) | Beginner to expert | 8 |
+| [Fractional shares and recurring contributions](#fractional-shares-and-recurring-contributions) | Beginner to quant; execution depends on verified broker support | 6 |
 | [Quantitative portfolio construction](#quantitative-portfolio-construction) | Quant | 8 |
 | [Volatility forecasting and portfolio risk](#volatility-forecasting-and-portfolio-risk) | Advanced to quant | 7 |
 | [Market-data quality and financial normalization](#market-data-quality-and-financial-normalization) | Advanced to quant | 8 |
@@ -339,39 +340,68 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 > Using [LOT RECORDS], compare lot-selection proposals for selling [POSITION]. Estimate gains/losses and flag possible wash-sale issues, including uncertainty from other accounts and future purchases.
 
 
+## Fractional shares and recurring contributions
+
+**Audience:** Beginner to quant; execution depends on verified broker support. Guides: [fractional shares](references/fractional-shares.md), [portfolio management](references/portfolio-management.md), [approval gated execution](references/approval-gated-execution.md).
+
+### 64. Invest a small dollar budget
+
+> Prepare fractional quantity-limit proposals for [SECURITIES] within a total [DOLLAR BUDGET]. Apply current prices, eligible share increments, minimums, fee reserves and settled-cash constraints. Show maximum debit and unspent cash; do not exclude a suitable security simply because one whole share costs more than my budget.
+
+### 65. Plan one recurring contribution
+
+> For the next occurrence of [CONTRIBUTION PLAN], prepare [DOLLAR AMOUNTS PER SECURITY] using fractional shares. Preserve my cash reserve, check funding and current targets, and give the occurrence a durable identity so a retry cannot invest twice. Produce proposals without creating a recurring schedule.
+
+### 66. Compare fractional and whole-share implementation
+
+> Apply [TARGET WEIGHTS] to [HOLDINGS AND NEW CASH] in fractional and whole-share planning modes. Compare allocation drift, fees, feasible trades and leftover cash. Clearly label any offline increment assumptions and identify the broker evidence still needed for execution.
+
+### 67. Validate fractional execution capabilities
+
+> Using an already authorized connection, inspect the actual broker schemas and symbol tradability for [FRACTIONAL PROPOSALS]. Verify precision, minimums, supported order combinations and fractional fill reporting. Keep native dollar-market orders distinct from this skill's bounded quantity-limit adapter.
+
+### 68. Reconcile a fractional partial fill
+
+> Reconcile [FRACTIONAL ORDER AND CUMULATIVE FILLS] with confirmed broker state. Preserve exact filled and remaining quantities, cash reservations and sleeve ownership. Report any residual cash or unsupported small residual sale without rounding up, duplicating fills or automatically topping up the occurrence.
+
+### 69. Size a small tactical position
+
+> Calculate a fractional tactical position for [ENTRY, STOP, TARGET, CASH AND RISK BUDGET] using explicit quantity increments, minimums and costs. Check actual fractional protective-order and partial-fill support before treating the result as executable; retain paper mode when those capabilities are absent.
+
+
 ## Quantitative portfolio construction
 
 **Audience:** Quant. Guides: [quant workbench](references/quant-workbench.md), [institutional manager](references/institutional-manager.md).
 
-### 64. Construct a constrained allocation
+### 70. Construct a constrained allocation
 
 > Run the allocation helper on [ASSETS, COVARIANCE AND MANDATE]. Enforce issuer/group, gross/net, cash, turnover, liquidity, volatility and scenario limits; show binding constraints and compare with a simple baseline.
 
-### 65. Investigate infeasibility
+### 71. Investigate infeasibility
 
 > Diagnose why [ALLOCATION INPUT] is infeasible. Identify conflicting constraints and show possible policy changes for review without silently relaxing limits or reporting an invalid allocation.
 
-### 66. Validate a return calibration
+### 72. Validate a return calibration
 
 > Audit [EXPECTED-RETURN CALIBRATION] before using it in portfolio construction. Check matching horizon and return units, training/test chronology, retained evidence and all variants; reject factor scores or analyst upside substituted for expected returns.
 
-### 67. Stress covariance assumptions
+### 73. Stress covariance assumptions
 
 > Recompute [PORTFOLIO PROPOSAL] under declared alternative covariance and scenario inputs. Compare weight stability, concentration and risk sensitivity; distinguish supplied assumptions from estimated or validated parameters.
 
-### 68. Evaluate costs and capacity
+### 74. Evaluate costs and capacity
 
 > Construct or compare allocations using [TURNOVER COSTS, IMPACT ASSUMPTIONS AND CAPACITY LIMITS]. Show how proposed weights change and where the portfolio exceeds plausible tradable size.
 
-### 69. Translate weights into feasible proposals
+### 75. Translate weights into feasible proposals
 
 > Review [CONTINUOUS TARGET WEIGHTS] against capital, share sizes, current holdings, unsettled cash, tax lots and broker capabilities. Identify rounding and implementation gaps rather than treating solver weights as executable orders.
 
-### 70. Constrain benchmark tracking risk
+### 76. Constrain benchmark tracking risk
 
 > Construct [PORTFOLIO] with the declared benchmark weights and tracking-volatility constraint. Compare it with the minimum-risk proposal and identify which active exposures consume the risk budget.
 
-### 71. Evaluate signed research weights
+### 77. Evaluate signed research weights
 
 > Evaluate [RESEARCH ALLOCATION] with explicit signed bounds, gross/net limits and supplied borrow availability and costs. Flag missing evidence and keep the result separate from unsupported live short-selling execution.
 
@@ -380,31 +410,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Advanced to quant. Guides: [garch volatility](references/garch-volatility.md), [quant workbench](references/quant-workbench.md), [portfolio management](references/portfolio-management.md).
 
-### 72. Run evidenced GARCH
+### 78. Run evidenced GARCH
 
 > Run the bundled GARCH(1,1) workflow on audited prices for [SYMBOL]. Report data counts, convergence, training/holdout separation, QLIKE against the baseline, forecast horizon and actual sizing eligibility.
 
-### 73. Compare asymmetric volatility models
+### 79. Compare asymmetric volatility models
 
 > Compare GARCH, GJR-GARCH and supported EGARCH forecasts on the same audited data and holdout. Record all variants, respect forecast-horizon limitations and separate volatility forecasts from direction.
 
-### 74. Review volatility-dependent sizing
+### 80. Review volatility-dependent sizing
 
 > Evaluate whether [VOLATILITY RESULT] may adjust the size of [PROPOSED TRADE]. Apply the configured quality and policy gates, pending exposure and stop-risk limits; show when the adjustment must be skipped.
 
-### 75. Estimate historical tail losses
+### 81. Estimate historical tail losses
 
 > Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. State frequency, sample size, missing data and why historical tail estimates may miss future gaps.
 
-### 76. Run portfolio stress scenarios
+### 82. Run portfolio stress scenarios
 
 > Stress [PORTFOLIO] under market, sector, issuer, rate, volatility and currency shocks appropriate to its instruments. Include every position and report loss concentrations, assumptions and unsupported pricing cases.
 
-### 77. Assess a risk-model breach
+### 83. Assess a risk-model breach
 
 > Apply the monitoring helper to [OBSERVATIONS] with limits fixed before the result. Review stale data, coverage, realized versus forecast risk, costs and reconciliation errors without automatically retuning models or raising limits.
 
-### 78. Estimate covariance and component risk
+### 84. Estimate covariance and component risk
 
 > Estimate aligned-return covariance and component risk for [PORTFOLIO]. Review sample coverage, asset ordering and documented shrinkage settings, then show sensitivity without claiming an unimplemented estimator was run.
 
@@ -413,35 +443,35 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Advanced to quant. Guides: [data and analytics](references/data-and-analytics.md), [financial normalization](references/financial-normalization.md), [quant workbench](references/quant-workbench.md).
 
-### 79. Audit prices before modeling
+### 85. Audit prices before modeling
 
 > Audit [PRICE FILE] for timestamp order, duplicates, missing sessions, timezones, price basis and large jumps. Investigate splits, dividends and real event moves instead of deleting inconvenient returns.
 
-### 80. Check action and share-basis consistency
+### 86. Check action and share-basis consistency
 
 > Reconcile [PRICE AND CORPORATE-ACTION FILES] with share counts and financial per-share metrics. Identify adjusted versus execution prices, ADR ratios and action dates that could distort ranking or backtests.
 
-### 81. Extract cutoff-admissible SEC facts
+### 87. Extract cutoff-admissible SEC facts
 
 > Use verified CIKs and my configured SEC contact identity to obtain primary financial data for [COMPANIES]. Preserve source bytes and extract only facts admissible at [CUTOFF], retaining amendments and accounting context.
 
-### 82. Resolve normalization failures
+### 88. Resolve normalization failures
 
 > Run strict normalization on [EVIDENCE RECORDS]. Explain missing concepts, periods, units, entity scope or source acceptance, and prepare a precise recovery backlog instead of imputing favorable values.
 
-### 83. Compare alternative data providers
+### 89. Compare alternative data providers
 
 > Compare [PROVIDER SNAPSHOTS] for the same securities and cutoff. Reconcile field definitions, fiscal periods, timestamps, price adjustments and missingness, then document which differences could change the result.
 
-### 84. Design a historical-vintage audit
+### 90. Design a historical-vintage audit
 
 > Audit [HISTORICAL DATASET] for membership changes, delistings, restatements, estimate revisions and publication availability. Identify which dates can support point-in-time research and which remain exploratory.
 
-### 85. Reconstruct trailing financial flows
+### 91. Reconstruct trailing financial flows
 
 > Reconstruct [TTM METRICS] from dated annual and interim filings. Avoid double-counting YTD periods, check fiscal calendars and amendments, and retain the source and calculation for each normalized value.
 
-### 86. Audit earnings-yield arithmetic
+### 92. Audit earnings-yield arithmetic
 
 > Audit [VALUATION SNAPSHOT] for mismatched price/EPS dates, trailing versus forward definitions, negative earnings and inconsistent share counts. Show which comparisons remain valid and which require correction.
 
@@ -450,35 +480,35 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Quant. Guides: [quant research](references/quant-research.md), [quant workbench](references/quant-workbench.md), [research and validation](references/research-and-validation.md).
 
-### 87. Create causal validation folds
+### 93. Create causal validation folds
 
 > Build purged expanding-window folds from [SAMPLES WITH FEATURE-AVAILABILITY AND LABEL-END TIMES]. Specify training size, test size and embargo; verify that overlapping outcomes and future features do not leak across splits.
 
-### 88. Measure uncertainty with serial dependence
+### 94. Measure uncertainty with serial dependence
 
 > Run HAC inference and a seeded block bootstrap on [ALIGNED NET-EXCESS RETURNS]. Declare lag and block choices before evaluating results, and compare uncertainty with a naive independent-observation assumption.
 
-### 89. Control multiple testing
+### 95. Control multiple testing
 
 > Use the full trial registry [REGISTRY] to apply the supported multiple-testing and qualified Sharpe diagnostics. Report all attempted variants, their dependence assumptions and anything that prevents a valid adjusted claim.
 
-### 90. Attribute returns to factors
+### 96. Attribute returns to factors
 
 > Regress [EXCESS RETURNS] on [ALIGNED FACTORS] using the supported factor/HAC workflow. Show exposure, residual performance and uncertainty without interpreting correlation as a causal edge.
 
-### 91. Preregister a strategy experiment
+### 97. Preregister a strategy experiment
 
 > Write a research contract for [STRATEGY]: universe, horizon, signal, costs, benchmark, variants, untouched evaluation window and acceptance criteria. Identify data and statistical-design gaps before running it.
 
-### 92. Assess promotion evidence
+### 98. Assess promotion evidence
 
 > Evaluate [STRATEGY VERSION] using retained development, validation, untouched-test and forward-paper evidence. Recompute the configured quantitative criteria, check profile/data hashes and all variants, and explain the pass or failure without promoting it automatically.
 
-### 93. Test sensitivity without hindsight
+### 99. Test sensitivity without hindsight
 
 > Evaluate [FROZEN STRATEGY] against prespecified neighboring parameters, delayed fills, missed trades and worse costs. Keep all outcomes and distinguish robustness analysis from selecting a new winner on the test set.
 
-### 94. Evaluate a challenger model
+### 100. Evaluate a challenger model
 
 > Compare [CHAMPION] and [CHALLENGER] on the same frozen contract and genuinely new paper observations. Separate implementation agreement, forecast calibration, net performance and operational changes before recommending replacement.
 
@@ -487,31 +517,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Advanced to quant. Guides: [quant workbench](references/quant-workbench.md), [research and validation](references/research-and-validation.md), [strategy playbook](references/strategy-playbook.md).
 
-### 95. Replay a period portfolio
+### 101. Replay a period portfolio
 
 > Run the portfolio simulator on [CAUSAL DECISIONS AND TOTAL RETURNS], including cash, benchmark, tradability, costs, impact and trade-value capacity. Verify that decisions precede returns and explain simulator limitations.
 
-### 96. Backtest the intraday baseline
+### 102. Backtest the intraday baseline
 
 > Replay the supported opening-range-breakout setup on [INTRADAY DATA]. Use completed-bar decisions, costs and conservative fills; disclose stop/target ordering ambiguity and facts the bars cannot establish.
 
-### 97. Compare daily and intraday engines
+### 103. Compare daily and intraday engines
 
 > Choose the appropriate bundled simulator for [STRATEGY AND DATA]. Explain which settlement, fill, latency and portfolio behaviors it models and which require separate paper observations.
 
-### 98. Compare after-cost benchmarks
+### 104. Compare after-cost benchmarks
 
 > Compare [BACKTEST] with cash and suitable passive benchmarks at comparable exposure. Report net returns, drawdowns, turnover and cost stress rather than choosing a winner solely by gross return or Sharpe.
 
-### 99. Design a forward-paper study
+### 105. Design a forward-paper study
 
 > Create a forward-paper protocol for [FROZEN STRATEGY]. Specify decision/quote/fill observations, performance and operational criteria, and the independent evidence needed before considering live use.
 
-### 100. Audit an impressive backtest
+### 106. Audit an impressive backtest
 
 > Review [BACKTEST BUNDLE] for survivor bias, revised data, look-ahead, trial selection, unrealistic fills, omitted costs and overlapping labels. Identify what can be reproduced and what cannot support the performance claim.
 
-### 101. Replay the daily trend example
+### 107. Replay the daily trend example
 
 > Run the bundled daily SMA trend research baseline on [AUDITED DAILY DATA]. Use its actual rules, chronological evaluation and costs, compare with a passive baseline and explain why the example is not a promoted live strategy.
 
@@ -520,39 +550,39 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Advanced to quant; research scope. Guides: [multi asset playbook](references/multi-asset-playbook.md), [quant workbench](references/quant-workbench.md).
 
-### 102. Choose the supported instrument route
+### 108. Choose the supported instrument route
 
 > Review [INSTRUMENT LIST] and map each position to the skill's supported research, pricing and risk functions. Identify required data and unsupported live execution rather than representing derivatives as shares.
 
-### 103. Price a European option scenario
+### 109. Price a European option scenario
 
 > Use the supported European option model with [SPOT, STRIKE, MATURITY, VOLATILITY, RATE AND DIVIDEND ASSUMPTIONS]. Calculate price and sensitivities, check parity where applicable and disclose model limitations.
 
-### 104. Identify unsupported option assumptions
+### 110. Identify unsupported option assumptions
 
 > Assess [OPTION OR HEDGE] for exercise style, payoff, settlement and volatility assumptions. Explain whether the bundled European model applies and what is missing for American or exotic structures.
 
-### 105. Analyze a fixed bond
+### 111. Analyze a fixed bond
 
 > Price [NONCALLABLE FIXED CASH FLOWS] using the supplied zero curve and spread. Evaluate rate/spread scenarios and explain why callable, prepayable or credit-default features need additional models.
 
-### 106. Stress futures exposure
+### 112. Stress futures exposure
 
 > Evaluate [FUTURES POSITIONS] with explicit contract multipliers, currencies and price shocks, including negative-price cases when relevant. Separate scenario P&L from actual margin and settlement requirements.
 
-### 107. Stress foreign-currency exposure
+### 113. Stress foreign-currency exposure
 
 > Evaluate [POSITIONS AND FX SHOCKS] in [BASE CURRENCY]. Reconcile currency conversion, contract units and collateral assumptions, and identify missing exposures.
 
-### 108. Compare hedge scenarios
+### 114. Compare hedge scenarios
 
 > Compare [HEDGE CANDIDATES] under common portfolio shocks and stated costs. Show basis risk, scenario protection, residual exposure and pricing or execution capabilities that remain unavailable.
 
-### 109. Build a multi-asset mandate
+### 115. Build a multi-asset mandate
 
 > Draft a mandate for [ASSETS AND OBJECTIVES] with explicit permitted instruments, leverage, liquidity, collateral, risk budgets and benchmarks. Keep research capabilities separate from verified broker execution support.
 
-### 110. Stress illiquid commitments
+### 116. Stress illiquid commitments
 
 > Stress [PRIVATE-ASSET COMMITMENTS AND DISTRIBUTION ASSUMPTIONS] through the cash-ladder and cash-flow tools. Evaluate funding gaps and XIRR sensitivity while distinguishing assumed cash flows from an independently valued private asset.
 
@@ -561,27 +591,27 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate to quant. Guides: [settled cash planning](references/settled-cash-planning.md), [quant workbench](references/quant-workbench.md).
 
-### 111. Preserve an intraday cash reserve
+### 117. Preserve an intraday cash reserve
 
 > Evaluate [DAY-TRADING PLAN] with a configurable reserve of [DOLLARS OR PERCENT OF EQUITY]. Account for settled cash and pending reservations so proposed entries do not consume the required buffer.
 
-### 112. Plan staggered cash usage
+### 118. Plan staggered cash usage
 
 > Given [POSITIONS, EXPECTED TRADES AND CASH], compare settlement-aware trading schedules. Use current broker availability and calendars rather than assuming alternating groups of stocks automatically avoid funding gaps.
 
-### 113. Build a currency cash ladder
+### 119. Build a currency cash ladder
 
 > Run the cash-ladder helper on [SETTLED BALANCES, RESERVATIONS AND CONFIRMED EVENTS]. Enforce currency-specific floors and identify when liabilities exceed available funds.
 
-### 114. Audit reservation releases
+### 120. Audit reservation releases
 
 > Reconcile [ORDER RESERVATIONS AND DEBITS]. Release a hold only against its matching confirmed event, avoid double charging or double spending and retain evidence linking each reservation to its order.
 
-### 115. Review a funding shortfall
+### 121. Review a funding shortfall
 
 > Review [CASH-LADDER RESULT] for a settlement or collateral shortfall. Distinguish confirmed credits from expected sales and propose feasible timing or size changes without assuming unavailable cash can be spent.
 
-### 116. Check a withdrawal against trading
+### 122. Check a withdrawal against trading
 
 > Combine [WITHDRAWAL PLAN] and [TRADING PLAN] to assess settled-cash availability, reserved amounts and liquidity floors through [DATE]. Show conflicts before any order or withdrawal proposal.
 
@@ -590,35 +620,35 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate to quant. Guides: [portfolio management](references/portfolio-management.md), [quant workbench](references/quant-workbench.md).
 
-### 117. Measure investment performance
+### 123. Measure investment performance
 
 > Calculate time-weighted performance from [VALUATIONS AND EXTERNAL FLOWS]. Separate deposits and withdrawals from investment P&L and disclose missing valuations or timing ambiguity.
 
-### 118. Calculate my money-weighted return
+### 124. Calculate my money-weighted return
 
 > Compute XIRR from [DATED CONTRIBUTIONS, DISTRIBUTIONS AND TERMINAL VALUE]. Check signs and whether the cash-flow pattern supports the conventional calculation; compare it with time-weighted return.
 
-### 119. Explain active return
+### 125. Explain active return
 
 > Run the supported Brinson attribution using [BEGINNING PORTFOLIO/BENCHMARK GROUP WEIGHTS AND RETURNS]. Include cash and reconcile allocation, selection and interaction effects to the active result.
 
-### 120. Measure execution shortfall
+### 126. Measure execution shortfall
 
 > Decompose [ORDER AND FILL RECORDS] using decision, arrival and terminal prices. Include fees, partial fills and unfilled opportunity cost, and compare buys and sells with the correct signs.
 
-### 121. Review results by sleeve
+### 127. Review results by sleeve
 
 > Compare core, swing and intraday performance from [JOURNAL]. Use appropriate benchmarks, flow treatment and net costs, and distinguish investment effects from execution problems or policy deviations.
 
-### 122. Challenge a win-rate claim
+### 128. Challenge a win-rate claim
 
 > Review [TRADE HISTORY] using average win/loss, expectancy, drawdown, costs, exposure and uncertainty. Explain why win rate alone does not establish a profitable or scalable strategy.
 
-### 123. Reconcile the cash ledger
+### 129. Reconcile the cash ledger
 
 > Reconcile [OPENING CASH, TRADES, DIVIDENDS, FEES AND EXTERNAL FLOWS] with [BROKER CASH]. Identify discrepancies and unconfirmed events before calculating spendable cash or investment performance.
 
-### 124. Compare tax-lot proposals
+### 130. Compare tax-lot proposals
 
 > Compare the supported FIFO, HIFO and specific-lot proposals for [SALE AND COST-BASIS RECORDS]. Show gain/loss differences and potential wash-sale flags, with unresolved outside-account information retained.
 
@@ -627,31 +657,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate to expert. Guides: [short term trading](references/short-term-trading.md), [strategy playbook](references/strategy-playbook.md).
 
-### 125. Prepare a session brief
+### 131. Prepare a session brief
 
 > Prepare an intraday brief for [WATCHLIST]. Verify session times, current catalysts, earnings, halts, liquidity, spreads and data freshness; disclose missing inputs before identifying setups.
 
-### 126. Build an intraday watchlist
+### 132. Build an intraday watchlist
 
 > Start from the configured stock universe and apply [PRICE, LIQUIDITY AND SPREAD FILTERS] to build a tactical watchlist. Separate membership, tradability and entry-signal qualification.
 
-### 127. Evaluate an opening-range breakout
+### 133. Evaluate an opening-range breakout
 
 > Evaluate the registered opening-range-breakout setup for [SYMBOL] using completed bars. Report the actual opening range, trigger, invalidation, stop, target, time exit and strategy-promotion status.
 
-### 128. Reject premature confirmation
+### 134. Reject premature confirmation
 
 > Review [CHART OR BAR DATA] for a possible breakout. Identify conditions that depend on an unfinished candle, stale quote or missing event check, and explain when the correct action is to wait.
 
-### 129. Size a paper trade after costs
+### 135. Size a paper trade after costs
 
 > For [ENTRY, STOP, TARGET AND CAPITAL], calculate affordable whole-share size, planned loss and net reward/risk. Include pending exposure, spread/slippage assumptions and the possibility that valid size is zero.
 
-### 130. Run a supervised paper session
+### 136. Run a supervised paper session
 
 > Run a paper session for [WATCHLIST] while this chat stays active. Use supported setups, completed-bar decisions, conservative fills, a journal and session-health checks; stop new entries if required supervision or data fails.
 
-### 131. Handle losses and closing risk
+### 137. Handle losses and closing risk
 
 > Review today's marked positions, trades and pending orders against approved loss and exposure limits. Determine whether new entries must stop, preserve protective coverage and prepare the end-of-session handoff.
 
@@ -660,31 +690,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Expert; broker and authorization dependent. Guides: [approval gated execution](references/approval-gated-execution.md), [broker integration](references/broker-integration.md), [personal setup](references/personal-setup.md).
 
-### 132. Inspect live readiness
+### 138. Inspect live readiness
 
 > Using an already authorized broker connection, run a read-only readiness assessment. Verify account eligibility, actual schemas, restrictions, settled cash, order support, protection and time-exit coverage, then list concrete blockers.
 
-### 133. Prepare an exact-order proposal
+### 139. Prepare an exact-order proposal
 
 > Prepare [SYMBOL, SIDE, QUANTITY, LIMIT AND SLEEVE] in approval mode. Present the exact order and applicable checks; obtain explicit approval before submission, refresh time-sensitive inputs and reconcile any uncertain outcome.
 
-### 134. Use an existing bounded mandate
+### 140. Use an existing bounded mandate
 
 > During this supervised session, operate only within [EXISTING APPROVED MANDATE]. Verify expiry, instruments, strategies, capital limits and broker capabilities; return exceptions for review and stop new entries when controls fail.
 
-### 135. Protect sleeve ownership
+### 141. Protect sleeve ownership
 
 > Audit [CORE, SWING AND INTRADAY HOLDINGS] with open orders and reserved quantities. Resolve ambiguous ownership so a tactical exit cannot sell the long-term sleeve's shares.
 
-### 136. Recover an unknown submission
+### 142. Recover an unknown submission
 
 > The previous session stopped after an uncertain order submission. Reconcile the durable ledger with broker orders, fills, positions and protection before further action, and prevent duplicate submission.
 
-### 137. Handle a partial fill
+### 143. Handle a partial fill
 
 > Review [PARTIALLY FILLED ORDER] against confirmed broker state and supported protection. Reconcile filled and remaining quantities, reserved cash, cancel/replace uncertainty and residual risk.
 
-### 138. Stop new exposure and hand off
+### 144. Stop new exposure and hand off
 
 > Activate the local kill switch for new automated exposure, reconcile outstanding orders and positions and prepare a human handoff. Distinguish local authorization changes from confirmed broker actions.
 
@@ -693,56 +723,56 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** All levels. Guides: [research memory](references/research-memory.md), [research handoff](references/research-handoff.md).
 
-### 139. Save a reusable research campaign
+### 145. Save a reusable research campaign
 
 > Save [COMPLETED RESEARCH] in a local immutable library with source evidence, mandate, full-universe coverage, inputs, decisions and replay results. Keep private records outside the distributable skill.
 
-### 140. Refresh without repeating everything
+### 146. Refresh without repeating everything
 
 > Refresh [SAVED CAMPAIGN] for [NEW CUTOFF]. Verify its manifest, reuse unchanged primary evidence after revalidation, refresh changing prices/news/events and rerank the full eligible universe.
 
-### 141. Resume an incomplete full-market scan
+### 147. Resume an incomplete full-market scan
 
 > Resume [RESEARCH ARCHIVE] from its actual outstanding acquisition and evidence backlog. Preserve successful work, retry appropriately and report whether remaining gaps can change the research or final-selection result.
 
-### 142. Detect changed assumptions
+### 148. Detect changed assumptions
 
 > Compare the prior and current research inputs for [COMPANIES]. Identify changed facts, guidance, events, normalization assumptions and mandate settings, and explain which conclusions must be reconsidered.
 
-### 143. Preserve correction provenance
+### 149. Preserve correction provenance
 
 > Correct [KNOWN RESEARCH ERROR] with supporting source bytes and an explicit audit trail. Preserve the original snapshot and show the effect of rerunning the same calculation and decision contract.
 
-### 144. Create a clean research handoff
+### 150. Create a clean research handoff
 
 > Prepare a portable handoff for [CAMPAIGN] with the actual prompt, contract, data, evidence decisions, coverage and hashes. Keep broker credentials, account identifiers and copyrighted full reports out of the shared package.
 
 
 ## Cross-model reproducibility and audits
 
-**Audience:** Advanced to quant. Guides: [model independent research](references/model-independent-research.md), [quant workbench](references/quant-workbench.md), [research handoff](references/research-handoff.md).
+**Audience:** Advanced to quant. Guides: [model independent research](references/model-independent-research.md), [quant workbench](references/quant-workbench.md), [research handoff](references/research-handoff.md), [PROVENANCE](PROVENANCE.md), [SOURCES](SOURCES.md), [THIRD PARTY NOTICES](THIRD-PARTY-NOTICES.md).
 
-### 145. Replay a numerical research bundle
+### 151. Replay a numerical research bundle
 
 > Verify [BUNDLE] and rerun its computations from frozen code, profile, data and parameters. Compare actual outputs using the documented numeric tolerance and exact decision/status checks.
 
-### 146. Compare models on identical inputs
+### 152. Compare models on identical inputs
 
 > Prepare a blinded comparison of [MODEL A] and [MODEL B] using the same complete skill, contract and frozen data. Compare numerical results, exclusions and decisions separately from explanation quality.
 
-### 147. Explain different stock lists
+### 153. Explain different stock lists
 
 > Reconcile [RESULT A] and [RESULT B] across universe, cutoff, horizon, profile, data freshness, coverage, prior preferences and review decisions. Distinguish candidate overlap from buy-eligibility agreement.
 
-### 148. Compare independent data acquisition
+### 154. Compare independent data acquisition
 
 > Have each authorized research environment acquire fresh evidence for [SAME MANDATE]. Compare data lineage and coverage before comparing picks; do not label this the same experiment as frozen-input replay.
 
-### 149. Audit a final-selection claim
+### 155. Audit a final-selection claim
 
 > Run the handoff and report checks on [RESEARCH RESULT]. Verify saved release/index evidence, ranking-relevant acquisition failures, review order and unresolved primary or horizon requirements.
 
-### 150. Review method provenance
+### 156. Review method provenance
 
 > Review [METHOD OR SCRIPT] for its actual mathematical assumptions, implementation provenance, dependencies and attributed sources. Distinguish original integration code from imported libraries and data-use rights.
 
@@ -751,31 +781,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Expert to quant. Guides: [institutional manager](references/institutional-manager.md), [institutional gap review 4.2](references/institutional-gap-review-4.2.md).
 
-### 151. Run a manager-style review
+### 157. Run a manager-style review
 
 > Review [PORTFOLIO AND MANDATE] across data quality, theses, construction, risk, costs, accounting and operations. Prioritize unresolved decisions and distinguish analysis support from custody or audited fund administration.
 
-### 152. Audit institutional readiness
+### 158. Audit institutional readiness
 
 > Assess this deployment against the skill's current capability inventory. Separate implemented/tested software, empirically validated investment effectiveness and available data or operational dependencies.
 
-### 153. Plan a point-in-time research database
+### 159. Plan a point-in-time research database
 
 > Design a coverage-first historical-data plan for [STRATEGY AND HORIZON]. Identify which public records can be reconstructed, which observations must be archived prospectively and which gaps may require licensed data.
 
-### 154. Design a sentiment validation study
+### 160. Design a sentiment validation study
 
 > Plan an adjudicated test of issuer matching, timestamp handling, negation and material-event classification for [NEWS DATA]. Separate extraction accuracy from a later causal, after-cost return study.
 
-### 155. Design an analyst-skill study
+### 161. Design an analyst-skill study
 
 > Specify the recommendation ledger, price history, entry/exit rules, benchmark and bias controls needed to measure analyst performance independently. Audit available data before trusting provider rankings or constructing weights.
 
-### 156. Drill operational failures
+### 162. Drill operational failures
 
 > Design and run supported paper/offline recovery drills for disconnects, stale feeds, duplicate intents, partial fills and restarts. Retain reconciliation evidence and identify production behaviors that the local helpers cannot validate.
 
-### 157. Maintain the documentation
+### 163. Maintain the documentation
 
 > Review the latest implemented capabilities, update the README as a current usage guide and refresh the example-prompt catalog without a fixed count. Regenerate the examples and run the documentation release check before packaging.
 

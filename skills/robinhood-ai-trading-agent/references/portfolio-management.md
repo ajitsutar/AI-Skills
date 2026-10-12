@@ -22,9 +22,12 @@ separately; unfilled sales are never spendable funding for a new buy.
 
 `portfolio_manager.rebalance` returns cash-funded buy candidates and separate trim
 reviews, prioritizing largest dollar underweights with deterministic tie-breaking.
-It rounds down to whole shares, preserves the cash floor and caps turnover. Its
-prices are planning inputs, not live executable quotes. Add fees, fetch fresh broker
-state, and run each final order through the execution gate. The executable core gate
+It rounds down to fractional quantities by default, with configurable whole-share
+mode, preserves the cash floor and caps turnover including fee reserves. Its
+prices are planning inputs, not live executable quotes. Supply current fees,
+fetch fresh broker state, and run each final order through the execution gate. Read
+[fractional-shares.md](fractional-shares.md) for observed precision/eligibility and
+per-occurrence recurring contribution proposals. The executable core gate
 also enforces approved per-symbol targets and the core sleeve cap.
 
 Core holding decisions use thesis durability, valuation ranges, cash generation,

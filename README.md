@@ -4,8 +4,8 @@ Reusable Agent Skills in self-contained folders. Download any one folder under `
 
 ## Included Skills
 
-- `create-karaoke-video`: Create YouTube-ready karaoke videos from audio and user-provided lyrics, with optional vocal removal, timing, ASS subtitles, and MP4 rendering.
-- `create-guitar-karaoke`: Create guitar-muted practice mixes and still-image videos with whole-song and selected-window aggregate-guitar modes, plus exact lead, rhythm, or custom removal when a verified semantic stem is supplied.
+- `create-karaoke-video`: Create karaoke videos from supplied audio and lyrics, with timing, ASS subtitles and MP4 rendering. Optional vocal separation requires a model-specific rights record for the actual intended use.
+- `create-guitar-karaoke`: Create guitar-muted practice mixes and still-image videos from verified supplied stems, with whole-song and selected-window modes. Optional model separation uses local assets with recorded weight permissions; model downloads are not automatic.
 - `concert-ticket-checkout`: Assist with browser-based concert ticket searches, seat comparison, cart setup, checkout review, and user-supervised purchasing boundaries.
 - `deal-watch-alerts`: Build configurable deal-watch automations that verify selected variants, condition rules, thresholds, duplicate memory, and optional chat/email/SMS alerts.
 - `linkedin-knowledge-digest`: Filter LinkedIn feed and inbox activity into concise knowledge-bearing digests with clickable source links while excluding career milestones, hiring posts, self-promotion, and low-value outreach.
@@ -15,7 +15,10 @@ Reusable Agent Skills in self-contained folders. Download any one folder under `
 
 The trading skill supports current stock research, portfolio management, news and
 guidance review, analyst evidence, statistical strategy validation, multi-asset
-risk, cash/performance accounting and supervised execution workflows. Stock
+risk, cash/performance accounting, fractional-share sizing and supervised execution
+workflows. Small-dollar and recurring-contribution proposals preserve budget ceilings,
+fees and settled-cash reserves; live fractional orders require observed broker support.
+Stock
 discovery defaults to all U.S. exchange-listed stocks and listed ADRs; S&P 500 is
 an explicit preset. Its saved contracts and numerical helpers support reproducible
 calculations while retaining source quality, coverage and unvalidated-performance
@@ -244,10 +247,26 @@ The repository's CI runs the portability checks and focused helper tests on both
 
 Some skill scripts call optional third-party tools such as FFmpeg, Pillow, Demucs, or audio-separator. Dependencies and model checkpoints are not vendored in this repository.
 
+The guitar helper uses external FFmpeg/ffprobe for metadata and media inspection;
+it no longer directly depends on Mutagen. Optional separator environments still
+have their own transitive dependency terms. The default guitar checkpoint's
+license has not been established, and Demucs's software license does not establish
+permission for its pretrained weights. Use verified supplied stems/instrumentals,
+or follow the affected skill's model-specific permission workflow.
+
 The trading skill has separate Python dependencies in `skills/robinhood-ai-trading-agent/requirements-tested.txt`. Use its isolated environment and paper-runtime setup instructions. Packaging it as a Claude agent does not establish broker availability or validate live trading on that host.
 
 Agents inherit the tools and MCP servers enabled in the user's Claude Code session. Live browser, web, Slack/email, or other external operations require the corresponding configured capability and authenticated session; the agents stop clearly when a required capability is unavailable.
 
 ## License
 
-No license has been selected yet. Public visibility does not grant permission to reuse or redistribute the repository. Choose a license before inviting reuse or contributions. Separately downloaded model checkpoints are not covered by this repository and may have different or undocumented terms.
+Repository-authored code and documentation are available under the [MIT license](LICENSE).
+Each skill includes its own LICENSE, PROVENANCE.md and THIRD-PARTY-NOTICES.md, so a
+standalone download preserves its license and source records. Keep those files
+with copies or distributions.
+
+External libraries, model weights, fonts, media and data retain their own terms;
+MIT does not relicense them. Read the [notice index](THIRD-PARTY-NOTICES.md) and
+[provenance record](PROVENANCE.md) for credited sources and unresolved historical
+origins. Model-weight permissions must be established independently of the
+inference software's license.

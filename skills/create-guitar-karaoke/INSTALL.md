@@ -5,6 +5,15 @@ subfolders together. No files from another skill or the repository root are
 required to use it. Runtime tools, Python/Node packages, model downloads and
 authenticated services are separate prerequisites described in [SKILL.md](SKILL.md).
 
+The default mixer uses authorized supplied stems and does not download models.
+Install `scripts/requirements.txt` and external FFmpeg/ffprobe. The optional local
+separator needs `scripts/requirements-separator.txt`, local model/config files and
+reviewed rights evidence; see [backend requirements](references/modes-and-backends.md).
+The [MIT license](LICENSE) covers the repository owner's licensable contributions;
+[third-party notices](THIRD-PARTY-NOTICES.md) and [provenance](PROVENANCE.md) describe
+dependencies and rights limits. No model, music, image, font, or external binary is
+licensed or bundled by this source package.
+
 ## Codex or another Agent Skills host
 
 Copy this entire `create-guitar-karaoke` folder into the skills directory used by your host.

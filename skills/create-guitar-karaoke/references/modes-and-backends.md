@@ -1,15 +1,39 @@
 # Modes and Separation Backends
 
-## Default Open-Source Backend
+## Default: Authorized Supplied Stems
 
-Use `BS-Roformer-SW.ckpt` through the open-source `audio-separator` 0.44.5 code for the default aggregate-guitar workflow. The checkpoint exposes six labels: bass, drums, other, vocals, guitar, and piano. Its single `guitar` label does not distinguish lead, rhythm, acoustic, or other guitar roles, and its coverage varies by mix.
+Use a full-length, aligned stem from the user or an independently authorized separator. Pass `--stem-file` and `--stem-kind aggregate-guitar|lead-guitar|rhythm-guitar|custom`. The helper's supplied-stem path does not need `audio-separator`, a model cache, or model downloads. Confirm the stem's actual content, its permission for the intended use, and alignment to the exact audio master.
+
+## Optional Local Model Adapter
+
+The helper retains an adapter for `BS-Roformer-SW.ckpt` through `audio-separator` 0.44.5. It is **not an automatically downloaded default**. The public checkpoint's trainer and weight license could not be established; neither this skill's MIT license nor the separator's software MIT license grants rights to that checkpoint. The adapter requires already obtained local checkpoint/config files plus a reviewed rights record. A record documents the operator's review; the script cannot authenticate a legal grant.
+
+The model exposes six labels: bass, drums, other, vocals, guitar, and piano. Its single `guitar` label does not distinguish guitar roles, and coverage varies by mix.
 
 Official project and model registry:
 
 - <https://github.com/nomadkaraoke/python-audio-separator>
 - <https://raw.githubusercontent.com/nomadkaraoke/python-audio-separator/v0.44.5/audio_separator/models.json>
 
-Do not vendor the roughly 699 MB checkpoint. Let the tool download it into the task's model cache after the user approves network use. The helper verifies SHA-256 `24e7d35ee9c64415673d3fd33e06a67cac2c103c5df6267ba1576459c775916e` before inference. The wrapper's software license does not by itself establish a license for separately hosted model weights; confirm weight terms before redistribution.
+Do not vendor the roughly 699 MB checkpoint. The helper never requests a missing checkpoint/config download: it stops before invoking the backend when either is missing or its hash differs. The externally installed separator may access its own registry metadata; keep its dependencies and cache outside the skill.
+
+Before enabling this path, establish permission for the exact weights, configuration, and intended use from an authorized rights holder. Do not substitute a mirror's label, architecture license, or acknowledgement of risk. If terms remain unknown, use the supplied-stem path. Record the actual evidence in a task-local JSON file with:
+
+- `schema_version`: `1`
+- `checkpoint_sha256`: `24e7d35ee9c64415673d3fd33e06a67cac2c103c5df6267ba1576459c775916e`
+- `config_sha256`: `b558996f1e25eb48798bd6502505a5de94c4f966d6edfb1a0420f06cc40b501a`
+- Nonempty `rights_holder`, `license_name`, `terms_source` (official URL or local grant reference), `permitted_use` (specific to this task), and `reviewed_by`.
+- `covers_model_weights`, `covers_config`, and `intended_use_permitted`: true only after reviewing the grant.
+
+Keep permission documents private and outside the repository. The manifest records the rights file and its SHA-256; resume/mix reject changed or missing evidence. The report contains the evidence hash, not the private grant text. Old model manifests without this record must be prepared again. The record is not permission in itself.
+
+After rights are established, install `scripts/requirements-separator.txt`, place `BS-Roformer-SW.ckpt` and `BS-Roformer-SW.yaml` in a local model directory, and run:
+
+```text
+<python> "<skill-dir>/scripts/build_guitar_karaoke.py" "song.wav" --scope whole --model-dir "authorized-models" --model-license-evidence "model-rights.json" --work-dir "work/song" --output "outputs/guitar-muted.wav"
+```
+
+We did not silently replace this checkpoint with Demucs `htdemucs_6s`: the Demucs maintainer [distinguished model-weight terms from the software MIT license](https://github.com/facebookresearch/demucs/issues/327). That statement predates some newer models; it is not a verified commercial grant for the six-stem weights. A clearly licensed replacement can be added after its specific terms and output behavior are validated.
 
 Recommended settings for version 0.44.5:
 

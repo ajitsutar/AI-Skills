@@ -217,7 +217,7 @@ no allocation; never silently loosen caps. A top-ten list is not a promise that
 those ten alone can meet benchmark-relative constraints.
 
 The optimizer validates supplied declarations and numerical feasibility, not
-calibration truth or optimal future performance. Apply lot/whole-share rounding,
+calibration truth or optimal future performance. Apply observed lot/fractional increments,
 settled-cash floors, taxes, account restrictions, fresh prices and risk checks
 afterwards; rerun feasibility on the rounded proposal. It creates no orders.
 GARCH/GJR/EGARCH remain validated risk ceilings only; their volatility cannot add

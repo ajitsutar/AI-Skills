@@ -106,6 +106,10 @@ def build_request(capabilities, operation, inputs, now, expected_alias, max_age_
         raise ValueError("Broker schema changed; rediscover and revalidate mapping")
     arguments = {name:resolve_binding(binding,inputs) for name,binding in tool['bindings'].items()}
     if operation in {"submit", "advanced_submit", "review", "advanced_review"}:
+        from fractional_shares import validate_broker_fractional_semantics
+        if inputs["order"].get("order_basis", "quantity") != "quantity" or "notional" in inputs["order"]:
+            raise ValueError("Native dollar orders require a separate observed and validated adapter")
+        validate_broker_fractional_semantics(tool, inputs["order"])
         mapped = set().union(*(binding_sources(binding) for binding in tool['bindings'].values()))
         required = {"/order/symbol", "/order/side", "/order/quantity", "/order/limit_price",
                     "/order/order_type", "/order/time_in_force", "/order/extended_hours"}

@@ -23,7 +23,7 @@ jobs:
         with:
           node-version: "22"
       - name: Install lightweight test dependencies
-        run: python -m pip install "numpy==2.4.6" "soundfile==0.14.0" "Pillow==12.3.0" "mutagen==1.48.1"
+        run: python -m pip install "numpy==2.4.6" "soundfile==0.14.0" "Pillow==12.3.0"
       - name: Validate Codex and Claude portability
         run: python .github/scripts/validate_portability.py
       - name: Check trading README and prompt-catalog freshness

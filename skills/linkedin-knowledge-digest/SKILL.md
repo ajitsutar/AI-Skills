@@ -11,6 +11,9 @@ Build a LinkedIn digest that helps the user learn what matters without drowning 
 
 Resolve bundled resources relative to the directory containing this `SKILL.md`, never relative to the current working directory.
 
+For redistribution or an origin review, see [LICENSE](LICENSE),
+[provenance](PROVENANCE.md) and [third-party notices](THIRD-PARTY-NOTICES.md).
+
 Do not expose private ranking criteria unless the user asks. Use the user's priority people, organizations, roles, topics, and recency preferences as background scoring signals.
 
 ## Inputs

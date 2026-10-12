@@ -6,6 +6,12 @@ or a claim of parity with Goldman Sachs. The useful target is rigorous,
 reproducible research and controlled implementation within the available data and
 broker scope. Adding methods cannot establish investment skill by itself.
 
+Scope update, October 12, 2026: fractional quantity-limit planning and execution
+gates now cover small-dollar budgets and per-occurrence recurring proposals. See
+the [fractional-share contract](fractional-shares.md). This extends implementation
+granularity; it does not add a live broker certification, native dollar-order
+adapter or recurring scheduler.
+
 ## What is already implemented
 
 | Area | Existing capability | What remains distinct |
@@ -16,6 +22,7 @@ broker scope. Adding methods cannot establish investment skill by itself.
 | Statistical validation | Purged expanding folds, HAC, block bootstrap, Holm adjustment, PSR/DSR diagnostics, factor attribution and promotion evidence checks | A complete trial registry, untouched real outcomes and sufficient forward evidence |
 | Simulation and costs | Period portfolio simulator, supported completed-bar strategy simulator, capacity constraints and implementation-shortfall decomposition | Tick/order-book replay, queue priority, empirical impact/borrow calibration and venue-quality measurement |
 | Operations | Settled-cash planning, cash ladders, idempotent intent ledger, reconciliation, session/kill controls and monitoring | Resilient always-on services, licensed feeds, tested recovery infrastructure and production broker support |
+| Fractional implementation | Decimal quantity-grid sizing, conservative fee/cash reserves, recurring occurrence identities and observed symbol/tool capability gates | Native dollar-market orders, broker recurring schedules, sub-dollar Sell All exceptions and fractional historical fill-model validation |
 | Accounting | Flow-timed TWR, XIRR, Brinson attribution, tax-lot suggestions and potential wash-sale flags | Audited NAV, comprehensive tax treatment, multi-account completeness and fund administration |
 | News and analyst evidence added in 4.2 | Configured news acquisition, deterministic language triage, reviewed guidance comparisons and observed-cohort analyst arithmetic | Exhaustive report access, trained/calibrated sentiment alpha and independently measured analyst skill |
 

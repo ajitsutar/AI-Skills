@@ -92,3 +92,5 @@ If a plausible legacy alert cannot be canonicalized under the current key policy
 ## Portable Use
 
 Install this folder in the host's supported skills directory or load it through the repository's plugin package. Keep host-specific metadata outside `SKILL.md`; the shared workflow must remain usable in both Codex and Claude Code.
+
+For setup, read [INSTALL.md](INSTALL.md): the Python helper uses the standard library for JSON configuration and optional PyYAML for YAML. For redistribution or provenance review, read the bundled [LICENSE](LICENSE), [PROVENANCE.md](PROVENANCE.md) and [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).

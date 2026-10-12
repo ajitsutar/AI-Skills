@@ -28,3 +28,6 @@ For a host that accepts skill ZIPs, zip this entire folder so the archive contai
 `concert-ticket-checkout/SKILL.md` and its sibling resources. Do not zip only `SKILL.md`.
 Keep generated outputs, environments and account configuration outside the package.
 Uploading the package does not configure external tools or grant transaction authority.
+
+Keep the [MIT license](LICENSE), [provenance](PROVENANCE.md) and
+[third-party notices](THIRD-PARTY-NOTICES.md) with the standalone package.

@@ -28,3 +28,10 @@ For a host that accepts skill ZIPs, zip this entire folder so the archive contai
 `linkedin-knowledge-digest/SKILL.md` and its sibling resources. Do not zip only `SKILL.md`.
 Keep generated outputs, environments and account configuration outside the package.
 Uploading the package does not configure external tools or grant transaction authority.
+
+## License and provenance
+
+Keep [LICENSE](LICENSE), [PROVENANCE.md](PROVENANCE.md) and
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) with the folder when copying or
+redistributing it. External runtimes, services and retrieved content retain their
+own terms.

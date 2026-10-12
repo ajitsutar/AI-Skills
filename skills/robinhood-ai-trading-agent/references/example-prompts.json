@@ -354,6 +354,42 @@
       ]
     },
     {
+      "id": "fractional-investing",
+      "title": "Fractional shares and recurring contributions",
+      "audience": "Beginner to quant; execution depends on verified broker support",
+      "guides": [
+        "references/fractional-shares.md",
+        "references/portfolio-management.md",
+        "references/approval-gated-execution.md"
+      ],
+      "prompts": [
+        {
+          "title": "Invest a small dollar budget",
+          "prompt": "Prepare fractional quantity-limit proposals for [SECURITIES] within a total [DOLLAR BUDGET]. Apply current prices, eligible share increments, minimums, fee reserves and settled-cash constraints. Show maximum debit and unspent cash; do not exclude a suitable security simply because one whole share costs more than my budget."
+        },
+        {
+          "title": "Plan one recurring contribution",
+          "prompt": "For the next occurrence of [CONTRIBUTION PLAN], prepare [DOLLAR AMOUNTS PER SECURITY] using fractional shares. Preserve my cash reserve, check funding and current targets, and give the occurrence a durable identity so a retry cannot invest twice. Produce proposals without creating a recurring schedule."
+        },
+        {
+          "title": "Compare fractional and whole-share implementation",
+          "prompt": "Apply [TARGET WEIGHTS] to [HOLDINGS AND NEW CASH] in fractional and whole-share planning modes. Compare allocation drift, fees, feasible trades and leftover cash. Clearly label any offline increment assumptions and identify the broker evidence still needed for execution."
+        },
+        {
+          "title": "Validate fractional execution capabilities",
+          "prompt": "Using an already authorized connection, inspect the actual broker schemas and symbol tradability for [FRACTIONAL PROPOSALS]. Verify precision, minimums, supported order combinations and fractional fill reporting. Keep native dollar-market orders distinct from this skill's bounded quantity-limit adapter."
+        },
+        {
+          "title": "Reconcile a fractional partial fill",
+          "prompt": "Reconcile [FRACTIONAL ORDER AND CUMULATIVE FILLS] with confirmed broker state. Preserve exact filled and remaining quantities, cash reservations and sleeve ownership. Report any residual cash or unsupported small residual sale without rounding up, duplicating fills or automatically topping up the occurrence."
+        },
+        {
+          "title": "Size a small tactical position",
+          "prompt": "Calculate a fractional tactical position for [ENTRY, STOP, TARGET, CASH AND RISK BUDGET] using explicit quantity increments, minimums and costs. Check actual fractional protective-order and partial-fill support before treating the result as executable; retain paper mode when those capabilities are absent."
+        }
+      ]
+    },
+    {
       "id": "quant-construction",
       "title": "Quantitative portfolio construction",
       "audience": "Quant",
@@ -810,7 +846,10 @@
       "guides": [
         "references/model-independent-research.md",
         "references/quant-workbench.md",
-        "references/research-handoff.md"
+        "references/research-handoff.md",
+        "PROVENANCE.md",
+        "SOURCES.md",
+        "THIRD-PARTY-NOTICES.md"
       ],
       "prompts": [
         {

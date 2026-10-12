@@ -1,5 +1,11 @@
 # Third-party dependencies and notices
 
+The repository-authored skill code and documentation use the [MIT License](LICENSE).
+The license does not replace the independent terms below or grant rights to
+publisher reports, market data or material of unknown origin. Keep this file and
+the included notices in standalone distributions; see [PROVENANCE.md](PROVENANCE.md)
+for the historical predecessor and the latest bounded attribution audit.
+
 ## Numerical backend
 
 The volatility adapter imports [arch 8.0.0](https://pypi.org/project/arch/8.0.0/)
@@ -40,14 +46,17 @@ distribution and preserve all applicable notices, including transitive component
 An open-source client library does not grant permission to redistribute retrieved
 market data. Obtain data through authorized sources under their applicable terms.
 
-These notices do not license the repository's own code. Workflow influences are
-acknowledged separately in [SOURCES.md](SOURCES.md).
+The repository's MIT license covers its own code; these notices describe external
+components and retain their terms. Workflow influences are acknowledged separately
+in [SOURCES.md](SOURCES.md).
 
 ## Version 4.0 research methods
 
 New modules use existing external NumPy/SciPy/Requests dependencies. Their
-implementations are original to this package; research references are attributed
-in references/quant-research.md. Cvxportfolio/Ledoit-Wolf implementations are not
+implementation is recorded in the repository's development history; research
+references are attributed in [quant methods](references/quant-research.md), including
+Black-Scholes-Merton pricing, Holm correction and circular block resampling.
+Cvxportfolio/Ledoit-Wolf implementations are not
 bundled or imported. Referencing a method does not imply source-code reuse, an
 endorsement or a license grant over the publications.
 

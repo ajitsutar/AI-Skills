@@ -1,0 +1,4 @@
+# Optional local-model adapter only; first verify rights to the weights/config.
+# The supplied-stem workflow needs only requirements.txt.
+-r requirements.txt
+audio-separator[cpu]==0.44.5

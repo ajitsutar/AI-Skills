@@ -1,8 +1,8 @@
 #!/usr/bin/env python3
 """Build guitar-muted practice audio and an optional still-image video.
 
-The default path separates an aggregate guitar stem with BS-Roformer-SW.
-An aligned external lead, rhythm, or custom stem can be supplied instead.
+The default path uses an aligned, authorized external guitar stem.
+The optional local BS-Roformer-SW adapter requires documented model rights.
 """
 
 from __future__ import annotations
@@ -29,8 +29,8 @@ EXPECTED_CONFIG_SHA256 = "b558996f1e25eb48798bd6502505a5de94c4f966d6edfb1a0420f0
 SEPARATOR_VERSION = "0.44.5"
 TARGET_SAMPLE_RATE = 44_100
 MIN_MODEL_CLIP_SECONDS = 11.0
-TOOL_VERSION = "1.0.1"
-MANIFEST_SCHEMA_VERSION = 2
+TOOL_VERSION = "1.1.0"
+MANIFEST_SCHEMA_VERSION = 3
 REPORT_SCHEMA_VERSION = 1
 ATTESTATION_SCHEMA_VERSION = 1
 SEPARATOR_SETTINGS = {
@@ -92,6 +92,62 @@ def require_sha256(value: Any, label: str) -> str:
     ):
         raise SystemExit(f"{label} must be a complete SHA-256 digest. Rerun --stage prepare.")
     return value.lower()
+
+
+def read_model_license_evidence(path: Path) -> dict[str, Any]:
+    """Check an operator-reviewed record; this cannot authenticate a legal grant."""
+    try:
+        evidence = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, UnicodeError, json.JSONDecodeError) as exc:
+        raise SystemExit(f"Model license evidence is unreadable: {path}") from exc
+    if not isinstance(evidence, dict) or evidence.get("schema_version") != 1:
+        raise SystemExit("Model license evidence must be a schema_version 1 JSON object.")
+    for key in ("rights_holder", "license_name", "terms_source", "permitted_use", "reviewed_by"):
+        value = evidence.get(key)
+        if not isinstance(value, str) or not value.strip() or value.strip().lower() in {
+            "unknown", "unverified", "none", "n/a", "todo", "accepted risk",
+        }:
+            raise SystemExit(f"Model license evidence requires a verified {key}.")
+    for key, expected in (
+        ("checkpoint_sha256", EXPECTED_MODEL_SHA256),
+        ("config_sha256", EXPECTED_CONFIG_SHA256),
+    ):
+        if require_sha256(evidence.get(key), key) != expected:
+            raise SystemExit(f"Model license evidence {key} does not match this adapter.")
+    if evidence.get("covers_model_weights") is not True or evidence.get("covers_config") is not True:
+        raise SystemExit("Model rights evidence must cover the weights and config, not just software.")
+    if evidence.get("intended_use_permitted") is not True:
+        raise SystemExit("Model rights evidence must establish permission for the intended use.")
+    return evidence
+
+
+def validate_local_model(models_dir: Path, evidence_path: Path) -> dict[str, Any]:
+    evidence = read_model_license_evidence(evidence_path)
+    for name, expected in (
+        (MODEL_FILENAME, EXPECTED_MODEL_SHA256),
+        (MODEL_CONFIG_FILENAME, EXPECTED_CONFIG_SHA256),
+    ):
+        path = models_dir / name
+        if not path.is_file():
+            raise SystemExit(
+                f"Local model asset is missing: {path}. Automatic model downloads are disabled. "
+                "Supply authorized assets or use --stem-file."
+            )
+        if hash_file(path) != expected:
+            raise SystemExit(f"Unexpected {name} SHA-256; refusing the local model.")
+    return evidence
+
+
+def verify_model_rights_record(manifest: dict[str, Any]) -> None:
+    raw_path = manifest.get("model_license_evidence_path")
+    if not isinstance(raw_path, str) or not raw_path:
+        raise SystemExit("No model license evidence in manifest. Rerun prepare with authorized assets.")
+    path = Path(raw_path)
+    evidence = read_model_license_evidence(path)
+    if hash_file(path) != manifest.get("model_license_evidence_sha256") or evidence != manifest.get(
+        "model_license_evidence"
+    ):
+        raise SystemExit("Model license evidence changed after preparation. Rerun prepare.")
 
 
 def program_version(command: list[str]) -> str:
@@ -160,6 +216,8 @@ def validate_paths(args: argparse.Namespace, *, will_mix: bool) -> None:
         protected.add(args.stem_file.expanduser().resolve())
     if args.image:
         protected.add(args.image.expanduser().resolve())
+    if getattr(args, "model_license_evidence", None):
+        protected.add(args.model_license_evidence.expanduser().resolve())
 
     for path in protected:
         if path in internal_files or any(is_within(path, directory) for directory in generated_dirs):
@@ -229,8 +287,17 @@ def resolve_separator(explicit: str | None) -> str:
         return str(adjacent)
     raise SystemExit(
         "Could not find audio-separator in the active environment. Install the skill's "
-        "pinned scripts/requirements.txt first."
+        "optional scripts/requirements-separator.txt after verifying model rights."
     )
+
+
+def resolve_probe(explicit: str | None, ffmpeg: str) -> str:
+    if explicit:
+        return resolve_program(explicit, "ffprobe")
+    sibling = Path(ffmpeg).with_name("ffprobe.exe" if os.name == "nt" else "ffprobe")
+    if sibling.is_file():
+        return str(sibling)
+    return resolve_program(None, "ffprobe", "FFPROBE_BINARY")
 
 
 def parse_timestamp(value: str, *, allow_end: bool = False) -> float | None:
@@ -364,6 +431,12 @@ def write_manifest(path: Path, manifest: dict[str, Any]) -> None:
 
 
 def prepare(args: argparse.Namespace, ffmpeg: str) -> dict[str, Any]:
+    evidence_path = getattr(args, "model_license_evidence", None)
+    if not args.stem_file:
+        if evidence_path is None or args.model_dir is None:
+            raise SystemExit("Use --stem-file, or supply --model-dir and --model-license-evidence.")
+        evidence_path = evidence_path.expanduser().resolve()
+        model_evidence = validate_local_model(args.model_dir.expanduser().resolve(), evidence_path)
     np, sf = audio_modules()
     source = args.input.expanduser().resolve()
     if not source.is_file():
@@ -439,6 +512,9 @@ def prepare(args: argparse.Namespace, ffmpeg: str) -> dict[str, Any]:
         manifest["external_stem_offset_seconds"] = args.stem_offset
         manifest["external_stem_gain"] = args.stem_gain
     else:
+        manifest["model_license_evidence_path"] = str(evidence_path)
+        manifest["model_license_evidence_sha256"] = hash_file(evidence_path)
+        manifest["model_license_evidence"] = model_evidence
         context_frames = round(args.context * sample_rate)
         chunk_frames = max(1, round(args.chunk_seconds * sample_rate))
         minimum_frames = math.ceil(MIN_MODEL_CLIP_SECONDS * sample_rate)
@@ -594,6 +670,7 @@ def load_manifest(work_dir: Path) -> dict[str, Any]:
         if tiles:
             raise SystemExit("An external-stem manifest must not contain model tiles. Rerun prepare.")
     elif manifest["stem_source"] == MODEL_LABEL:
+        verify_model_rights_record(manifest)
         if not tiles:
             raise SystemExit("Model manifest contains no prepared tiles. Rerun prepare.")
         clips_dir = resolved_work_dir / "clips"
@@ -705,6 +782,7 @@ def cache_is_valid(
 
 
 def verify_manifest_model_assets(manifest: dict[str, Any]) -> tuple[str, str, str]:
+    verify_model_rights_record(manifest)
     models_dir = Path(manifest["models_dir"])
     checkpoint = models_dir / MODEL_FILENAME
     config = models_dir / MODEL_CONFIG_FILENAME
@@ -772,6 +850,9 @@ def separate(args: argparse.Namespace, manifest: dict[str, Any], ffmpeg: str) ->
     if manifest["stem_source"] == "external":
         print("External stem supplied; model separation is not needed.")
         return
+    verify_model_rights_record(manifest)
+    models_dir = Path(manifest["models_dir"])
+    validate_local_model(models_dir, Path(manifest["model_license_evidence_path"]))
     separator = resolve_separator(args.audio_separator)
     version = separator_version(separator)
     print(f"Verified audio-separator {version}.")
@@ -782,24 +863,6 @@ def separate(args: argparse.Namespace, manifest: dict[str, Any], ffmpeg: str) ->
     environment = os.environ.copy()
     ffmpeg_dir = str(Path(ffmpeg).resolve().parent)
     environment["PATH"] = ffmpeg_dir + os.pathsep + environment.get("PATH", "")
-    if not checkpoint.is_file() or not config.is_file():
-        estimated_model_bytes = 705_000_000
-        free_bytes = shutil.disk_usage(models_dir).free
-        if free_bytes < math.ceil(estimated_model_bytes * 1.15):
-            raise SystemExit("Insufficient free disk space for the model checkpoint.")
-        run(
-            [
-                separator,
-                "--model_filename",
-                MODEL_FILENAME,
-                "--model_file_dir",
-                str(models_dir),
-                "--download_model_only",
-            ],
-            env=environment,
-        )
-    if not checkpoint.is_file() or not config.is_file():
-        raise SystemExit("Separator did not create the expected checkpoint and config files.")
     checkpoint_hash = hash_file(checkpoint)
     config_hash = hash_file(config)
     if checkpoint_hash.lower() != EXPECTED_MODEL_SHA256:
@@ -1098,68 +1161,68 @@ def encode_mp3(
         temporary.unlink(missing_ok=True)
 
 
-def copy_safe_metadata(source: Path, destination: Path, title: str | None) -> dict[str, Any]:
-    try:
-        from mutagen import File as MutagenFile
-    except ImportError:
-        return {"copied": False, "reason": "mutagen unavailable"}
-
-    source_audio = MutagenFile(source, easy=True)
-    destination_audio = MutagenFile(destination, easy=True)
-    if source_audio is None or destination_audio is None:
-        return {"copied": False, "reason": "unsupported source or destination tags"}
-    if destination_audio.tags is None:
-        destination_audio.add_tags()
-    safe_keys = (
-        "album",
-        "albumartist",
-        "artist",
-        "composer",
-        "copyright",
-        "date",
-        "discnumber",
-        "genre",
-        "title",
-        "tracknumber",
+def media_info(path: Path, ffprobe: str) -> dict[str, Any]:
+    completed = subprocess.run(
+        [ffprobe, "-v", "error", "-select_streams", "a:0", "-show_entries",
+         "format=duration,bit_rate:format_tags:stream=duration,bit_rate,sample_rate:stream_tags",
+         "-of", "json", str(path)],
+        check=True, capture_output=True, text=True, encoding="utf-8",
     )
-    copied: list[str] = []
-    for key in safe_keys:
-        values = source_audio.get(key)
-        if values:
-            destination_audio[key] = list(values)
-            copied.append(key)
-    if title:
-        destination_audio["title"] = [title]
-        if "title" not in copied:
-            copied.append("title")
-    destination_audio.save()
-    return {"copied": True, "fields": sorted(copied)}
-
-
-def media_info(path: Path) -> dict[str, Any]:
     try:
-        from mutagen import File as MutagenFile
-    except ImportError:
-        return {}
-    audio = MutagenFile(path, easy=True)
-    if audio is None or not getattr(audio, "info", None):
-        return {}
-    result: dict[str, Any] = {
-        "duration_seconds": float(getattr(audio.info, "length", 0.0)),
+        document = json.loads(completed.stdout)
+        container = document.get("format", {})
+        streams = document.get("streams", [])
+        if not isinstance(streams, list) or not streams:
+            raise ValueError("no audio stream")
+        stream = streams[0] if streams else {}
+        result: dict[str, Any] = {}
+        def stream_or_container(key: str):
+            value = stream.get(key)
+            return container.get(key) if value in (None, "N/A") else value
+        for destination, value, converter in (
+            ("duration_seconds", stream_or_container("duration"), float),
+            ("bitrate", stream_or_container("bit_rate"), int),
+            ("sample_rate", stream.get("sample_rate"), int),
+        ):
+            if value is not None and value != "N/A":
+                number = converter(value)
+                if not math.isfinite(number) or number < 0:
+                    raise ValueError(f"invalid {destination}")
+                result[destination] = number
+        tags = {**container.get("tags", {}), **stream.get("tags", {})}
+        result["tags"] = {str(key).lower(): [str(value)] for key, value in tags.items()}
+        if "duration_seconds" not in result:
+            raise ValueError("audio duration missing")
+        return result
+    except (ValueError, AttributeError, TypeError, IndexError) as exc:
+        raise SystemExit(f"Invalid ffprobe metadata for {path}") from exc
+
+
+def copy_safe_metadata(
+    source: Path, destination: Path, title: str | None, ffmpeg: str, ffprobe: str
+) -> dict[str, Any]:
+    tags = media_info(source, ffprobe).get("tags", {})
+    aliases = {"albumartist": "album_artist", "discnumber": "disc", "tracknumber": "track"}
+    safe = {"album", "album_artist", "artist", "composer", "copyright", "date", "disc",
+            "genre", "title", "track"}
+    selected = {
+        aliases.get(key, key): "; ".join(values)
+        for key, values in tags.items() if aliases.get(key, key) in safe and values
     }
-    bitrate = getattr(audio.info, "bitrate", None)
-    if bitrate is not None:
-        result["bitrate"] = int(bitrate)
-    sample_rate = getattr(audio.info, "sample_rate", None)
-    if sample_rate is not None:
-        result["sample_rate"] = int(sample_rate)
-    if audio.tags:
-        tags: dict[str, list[str]] = {}
-        for key, values in audio.tags.items():
-            sequence = [values] if isinstance(values, (str, bytes)) else values
-            tags[str(key)] = [str(value) for value in sequence]
-        result["tags"] = tags
-    return result
+    if title is not None:
+        selected["title"] = title
+    temporary = temporary_sibling(destination)
+    command = [ffmpeg, "-nostdin", "-y", "-v", "error", "-i", str(destination),
+               "-map", "0:a:0", "-c:a", "copy", "-map_metadata", "-1", "-id3v2_version", "3"]
+    for key, value in sorted(selected.items()):
+        command.extend(["-metadata", f"{key}={value}"])
+    command.append(str(temporary))
+    try:
+        run(command)
+        os.replace(temporary, destination)
+    finally:
+        temporary.unlink(missing_ok=True)
+    return {"copied": True, "fields": sorted(selected), "method": "ffmpeg_stream_copy"}
 
 
 def render_video(
@@ -1251,6 +1314,7 @@ def cleanup_unused_stems(manifest: dict[str, Any]) -> int:
 
 
 def mix(args: argparse.Namespace, manifest: dict[str, Any], ffmpeg: str) -> dict[str, Any]:
+    ffprobe = resolve_probe(getattr(args, "ffprobe", None), ffmpeg)
     np, sf = audio_modules()
     frames = int(manifest["frames"])
     estimated_memory = frames * 36
@@ -1314,12 +1378,12 @@ def mix(args: argparse.Namespace, manifest: dict[str, Any], ffmpeg: str) -> dict
     elif output.suffix.lower() == ".mp3":
         encode_mp3(ffmpeg, mix_wav, output, args.bitrate, delivery_gain)
         metadata_result = copy_safe_metadata(
-            Path(manifest["source"]), output, args.title
+            Path(manifest["source"]), output, args.title, ffmpeg, ffprobe
         )
     else:
         raise SystemExit("--output must end in .mp3 or .wav")
     decode_test(ffmpeg, output)
-    output_info = media_info(output)
+    output_info = media_info(output, ffprobe)
     output_duration = output_info.get("duration_seconds")
     if output_duration is not None and abs(output_duration - frames / sample_rate) > 0.25:
         raise SystemExit(
@@ -1341,7 +1405,7 @@ def mix(args: argparse.Namespace, manifest: dict[str, Any], ffmpeg: str) -> dict
             delivery_gain,
         )
         decode_test(ffmpeg, video)
-        video_media_info = media_info(video)
+        video_media_info = media_info(video, ffprobe)
         video_duration = video_media_info.get("duration_seconds")
         if video_duration is not None and abs(video_duration - frames / sample_rate) > 0.30:
             raise SystemExit(
@@ -1364,6 +1428,7 @@ def mix(args: argparse.Namespace, manifest: dict[str, Any], ffmpeg: str) -> dict
         "model_checkpoint_sha256": manifest.get("model_checkpoint_sha256"),
         "model_config_sha256": manifest.get("model_config_sha256"),
         "audio_separator_version": manifest.get("audio_separator_version"),
+        "model_license_evidence_sha256": manifest.get("model_license_evidence_sha256"),
         "python_version": manifest.get("python_version"),
         "ffmpeg_version": manifest.get("ffmpeg_version"),
         "stem_kind": manifest["stem_kind"],
@@ -1471,6 +1536,10 @@ def validate_resume_arguments(args: argparse.Namespace, manifest: dict[str, Any]
         manifest["models_dir"]
     ).resolve():
         raise SystemExit("Resume --model-dir does not match the preparation manifest.")
+    if args.model_license_evidence is not None and str(args.model_license_evidence.expanduser().resolve()) != manifest.get(
+        "model_license_evidence_path"
+    ):
+        raise SystemExit("Resume --model-license-evidence does not match the preparation manifest.")
     args.scope = manifest["scope"]
 
 
@@ -1537,8 +1606,11 @@ def build_parser() -> argparse.ArgumentParser:
         help="Maximum model core tile duration, default: 90 seconds",
     )
     parser.add_argument("--model-dir", type=Path)
+    parser.add_argument("--model-license-evidence", type=Path,
+                        help="Reviewed rights JSON for locally supplied optional model weights/config")
     parser.add_argument("--audio-separator", help="Path to audio-separator executable")
     parser.add_argument("--ffmpeg", help="Path to FFmpeg executable")
+    parser.add_argument("--ffprobe", help="Path to ffprobe executable; defaults to FFmpeg sibling or PATH")
     parser.add_argument("--force-separate", action="store_true")
     parser.add_argument("--overwrite", action="store_true", help="Replace existing deliverables")
     parser.add_argument("--allow-high-memory", action="store_true")
@@ -1582,11 +1654,19 @@ def main() -> int:
                 parser.error("--stem-file requires an explicit --stem-kind")
             args.stem_offset = 0.0 if args.stem_offset is None else args.stem_offset
             args.stem_gain = 1.0 if args.stem_gain is None else args.stem_gain
+            if args.model_license_evidence is not None:
+                parser.error("--model-license-evidence applies only to local model separation")
         else:
             if args.stem_kind not in (None, "aggregate-guitar"):
                 parser.error(
                     "lead-guitar, rhythm-guitar, and custom labels require --stem-file. "
-                    "The default BS-RoFormer backend produces only aggregate-guitar."
+                    "The optional local BS-RoFormer backend produces only aggregate-guitar."
+                )
+            if args.model_dir is None or args.model_license_evidence is None:
+                parser.error(
+                    "Supply --stem-file and --stem-kind for the default workflow. "
+                    "Optional model inference requires --model-dir and --model-license-evidence; "
+                    "automatic model downloads are disabled."
                 )
             if args.stem_offset is not None or args.stem_gain is not None:
                 parser.error("--stem-offset and --stem-gain require --stem-file")

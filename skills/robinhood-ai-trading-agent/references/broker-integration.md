@@ -17,6 +17,14 @@ cancellation semantics, tax-lot reads and protection/exit capabilities. Capture
 capability evidence and its check time. Do not claim native OCO/brackets merely
 because independent stop orders are available.
 
+For fractional quantities and dollar budgets, follow
+[fractional-shares.md](fractional-shares.md). Robinhood documents fractional
+tradability discovery and dollar-market orders; this package implements bounded
+quantity-limit orders only. Inspect actual per-symbol increments/minimums and the
+review/submit/fill semantics. Retail product availability is not an observed MCP
+schema. Native dollar-market orders and broker recurring schedules remain separate
+unsupported execution routes; local per-occurrence proposals are available.
+
 Map the user's account alias to exactly one broker-designated eligible Agentic
 account. Never silently pick another account after reconnect. Account numbers and
 auth material stay inside the trusted broker tool/runtime. Only a sanitized alias

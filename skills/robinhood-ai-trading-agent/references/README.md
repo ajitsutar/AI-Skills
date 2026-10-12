@@ -25,4 +25,5 @@ request. Browse [example prompts](../EXAMPLE-PROMPTS.md) to choose a workflow.
 
 Method origins and dependency notices are maintained in
 [SOURCES.md](../SOURCES.md), [PROVENANCE.md](../PROVENANCE.md) and
-[THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md).
+[THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md). The repository-authored material
+uses the included [MIT License](../LICENSE); external components retain their terms.

@@ -5,6 +5,10 @@
   "description": "Illustrative personal starting policy. DEMO symbols and thresholds require user configuration and approval; no live grant.",
   "allow_leverage": false,
   "allow_shorting": false,
+  "fractional_shares": {
+    "enabled": true,
+    "max_rules_age_seconds": 60
+  },
   "sleeves": {
     "core": "0.80",
     "swing": "0.10",
