@@ -1,0 +1,14 @@
+{
+  "schema": 1,
+  "user_agent": "AI-Skills/4.2 public research; replace with your real contact before SEC access",
+  "issuer_aliases": {"ALTO": ["Alto Ingredients"]},
+  "sources": [
+    {"id": "issuer_alto_example", "adapter": "rss", "source_kind": "issuer", "scope_issuers": ["ALTO"], "url": "https://ir.altoingredients.com/news-events/press-releases/rss", "poll_seconds": 300},
+    {"id": "nasdaq_halts", "adapter": "rss", "source_kind": "exchange", "url": "https://www.nasdaqtrader.com/rss.aspx?feed=tradehalts", "poll_seconds": 60},
+    {"id": "fed_press", "adapter": "rss", "source_kind": "macro", "url": "https://www.federalreserve.gov/feeds/press_all.xml", "poll_seconds": 300},
+    {"id": "pr_newswire", "adapter": "rss", "source_kind": "wire", "url": "https://www.prnewswire.com/rss/news-releases-list.rss", "poll_seconds": 300},
+    {"id": "cnbc_business", "adapter": "rss", "source_kind": "publisher", "url": "https://www.cnbc.com/id/100003114/device/rss/rss.html", "poll_seconds": 300},
+    {"id": "sec_example_disabled", "enabled": false, "adapter": "sec_submissions", "source_kind": "sec", "scope_issuers": ["AAPL"], "cik": 320193, "url": "https://data.sec.gov/submissions/CIK0000320193.json", "poll_seconds": 60},
+    {"id": "gdelt_example_disabled", "enabled": false, "adapter": "gdelt", "source_kind": "aggregator", "url": "https://api.gdeltproject.org/api/v2/doc/doc?query=%22Alto%20Ingredients%22&mode=artlist&format=json&maxrecords=25&timespan=24h", "poll_seconds": 900}
+  ]
+}

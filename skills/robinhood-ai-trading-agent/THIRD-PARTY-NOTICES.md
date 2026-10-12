@@ -50,3 +50,14 @@ implementations are original to this package; research references are attributed
 in references/quant-research.md. Cvxportfolio/Ledoit-Wolf implementations are not
 bundled or imported. Referencing a method does not imply source-code reuse, an
 endorsement or a license grant over the publications.
+
+## Version 4.2 news and analyst research
+
+The feed parsers, compact language rule set, guidance comparison and analyst
+arithmetic are original package code using Python's standard library and the
+existing Requests dependency. No external sentiment lexicon, FinBERT weights,
+publisher implementation or paid news/research dataset is copied into the package.
+Official API and methodology references are linked from references/news-and-guidance.md
+and references/analyst-research.md. Public availability is not permission to
+redistribute full news articles, reports or provider data; retain only permitted
+local evidence and exclude personal source archives from releases.

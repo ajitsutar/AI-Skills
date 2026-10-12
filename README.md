@@ -13,9 +13,19 @@ Reusable Agent Skills in self-contained folders. Download any one folder under `
 
 - `robinhood-ai-trading-agent`: Research and manage a long-term portfolio core with separately budgeted supervised swing/day trading, arbitrary holding periods, a configurable settled-cash reserve for day trading, a shared Value–Quality–Momentum fundamental ranking with sector accounting adapters, evidence-backed financial normalization and frozen inputs, replayable research bundles, GARCH/GJR/EGARCH risk analysis and broker-verified execution gates. The shared ranking is an uncalibrated research baseline, not a Strong Buy classifier. Starts in paper mode; live execution requires the official Robinhood Trading MCP and applicable human authorization.
 
-The trading skill is version **4.1.0** (all U.S. exchange-listed stocks and listed ADRs by default; explicit S&P 500 preset; VQM factor formulas unchanged). Its [release review](skills/robinhood-ai-trading-agent/REVIEW-4.0.md) covers constrained allocation, statistical strategy validation, multi-asset scenarios, cash/execution accounting, portfolio simulations and monitoring. The [quant workbench](skills/robinhood-ai-trading-agent/references/quant-workbench.md) freezes and replays calculations across models. Its broader research scope does not expand broker authority or establish investment performance.
+The trading skill supports current stock research, portfolio management, news and
+guidance review, analyst evidence, statistical strategy validation, multi-asset
+risk, cash/performance accounting and supervised execution workflows. Stock
+discovery defaults to all U.S. exchange-listed stocks and listed ADRs; S&P 500 is
+an explicit preset. Its saved contracts and numerical helpers support reproducible
+calculations while retaining source quality, coverage and unvalidated-performance
+limits.
 
-Ranked fundamental requests retain the [reproducible research campaign](skills/robinhood-ai-trading-agent/references/research-campaign.md): fresh public-data acquisition and a deterministic research queue, followed by primary-evidence review in that order. Candidate agreement and buy eligibility are reported separately. Strict filing-verified full-universe eligibility remains incomplete; identical prompts alone do not fix data or guarantee future overlap. The [independent Muse/Codex comparison](skills/robinhood-ai-trading-agent/references/muse-codex-validation-2026-10-11.md) achieved 10/10 candidate overlap, with 401 versus 414 scorable issuers and different scores; both original bundles replayed. This is candidate reproducibility, not buy eligibility. The earlier [frozen-data comparison](skills/robinhood-ai-trading-agent/references/cross-model-validation-2026-10-10.md) remains a separate historical test.
+Read its [current capabilities and setup](skills/robinhood-ai-trading-agent/README.md)
+or explore the [prompt catalog for investors, traders and quants](skills/robinhood-ai-trading-agent/EXAMPLE-PROMPTS.md).
+Examples cover supported workflows and useful gap assessments without a fixed count.
+For implementation boundaries and remaining research needs, see the
+[capability review](skills/robinhood-ai-trading-agent/references/institutional-gap-review-4.2.md).
 
 ## Download one skill
 
@@ -134,7 +144,7 @@ In PowerShell, the same command is:
 claude --plugin-dir .
 ```
 
-Then use `/reload-plugins` after edits. The plugin uses semantic versions; bump the version in both `.claude-plugin/plugin.json` and `.claude-plugin/marketplace.json` when publishing a new release so Claude Code can detect updates consistently.
+Then use `/reload-plugins` after edits. Keep the plugin metadata consistent when publishing updates.
 
 ## Standalone Claude Skills
 
@@ -190,7 +200,7 @@ Before publishing or updating this repository:
 1. Export only skill source files and supporting references.
 2. Do not include local task folders, browser/session data, generated outputs, audio/video files, lyrics supplied by users, credentials, keys, tokens, cookies, or personal paths.
 3. Replace copyrighted or user-specific examples with generic placeholders.
-4. Validate the shared skill contract, resource links, Codex metadata, Claude plugin mappings, script syntax, and text hygiene:
+4. For trading-skill changes, follow its [documentation maintenance procedure](skills/robinhood-ai-trading-agent/references/maintaining-the-skill.md): review the current README and capabilities, refresh the prompt catalog and regenerate it before packaging. Validate the shared skill contract, resource links, Codex metadata, Claude plugin mappings, script syntax, and text hygiene:
 
 ```powershell
 python .github/scripts/validate_portability.py

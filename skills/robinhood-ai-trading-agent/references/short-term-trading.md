@@ -44,6 +44,10 @@ model. LOW/NORMAL must not loosen capital limits or determine a directional entr
 
 Define event blackouts in the strategy card with sourced dates/timezones, start
 and release conditions. Recheck the calendar, material news and halts before entry.
+Use [news-and-guidance.md](news-and-guidance.md) for source discovery, free-feed
+access/freshness receipts and between-report updates. Its language triage is not a
+registered entry signal. Feed failure or missing critical news coverage cannot be
+reported as a passed news check; verify the current exchange/broker halt state.
 Unknown event coverage is not clear. A future catalyst-reaction strategy needs its
 own validated post-event rules; it cannot waive the breakout setup's event block.
 

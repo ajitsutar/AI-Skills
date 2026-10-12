@@ -1,18 +1,28 @@
-# References
+# Workflow references
 
-Start with SKILL.md and load the procedures relevant to the task. personal-setup.md
-describes installation, broker discovery and the active session loop;
-data-and-analytics.md covers data and calculations. runtime-contract.md records
-required fields. Portfolio, tactical, screening, volatility and permission guides
-remain separate. REVIEW-3.0.md contains the operational review; REVIEW-3.1.md records the research update.
-For ranked long-term discovery and competing screens, read research-run-methodology.md.
+Start with [SKILL.md](../SKILL.md), then load only the procedures relevant to the
+request. Browse [example prompts](../EXAMPLE-PROMPTS.md) to choose a workflow.
 
-The influencer adaptation and REVIEW.md preserve original inspiration/social
-research provenance. They provide no authorization or verified performance evidence.
+| Task | Start here |
+|---|---|
+| Install and configure personal operation | [Personal setup](personal-setup.md), [runtime contract](runtime-contract.md) |
+| Define and run a stock-research campaign | [Research handoff](research-handoff.md), [research campaign](research-campaign.md) |
+| Review fundamentals and accounting | [Screening and value traps](screening-and-value-traps.md), [normalization](financial-normalization.md) |
+| Resolve a holding period and events | [Holding-period planning](holding-period-planning.md) |
+| Follow news, sentiment and guidance | [News and guidance](news-and-guidance.md) |
+| Discover reports, targets and analyst evidence | [Analyst research](analyst-research.md) |
+| Review and rebalance a portfolio | [Portfolio management](portfolio-management.md) |
+| Plan swing or intraday research | [Short-term trading](short-term-trading.md), [strategy playbook](strategy-playbook.md) |
+| Model volatility | [GARCH family](garch-volatility.md) |
+| Run quantitative construction, risk and validation | [Quant workbench](quant-workbench.md), [quant methods](quant-research.md) |
+| Review different instruments | [Multi-asset playbook](multi-asset-playbook.md) |
+| Plan cash and settlement | [Settled-cash planning](settled-cash-planning.md) |
+| Assess evidence before strategy promotion | [Research and validation](research-and-validation.md), [shared strategy validation](shared-strategy-validation.md) |
+| Prepare or reconcile an authorized broker action | [Execution procedure](approval-gated-execution.md), [broker integration](broker-integration.md) |
+| Save, refresh or compare research | [Research memory](research-memory.md), [model-independent research](model-independent-research.md) |
+| Review institutional capability and remaining work | [Manager workflow](institutional-manager.md), [capability review](institutional-gap-review-4.2.md) |
+| Maintain the README and generated prompt catalog | [Documentation maintenance](maintaining-the-skill.md) |
 
-Historical credits are maintained in [SOURCES.md](../SOURCES.md); source and
-license status are in [PROVENANCE.md](../PROVENANCE.md).
-
-For any holding period, from the same session to decades, read
-[holding-period-planning.md](holding-period-planning.md). Current changes and
-validation scope are in [REVIEW-3.3.md](../REVIEW-3.3.md).
+Method origins and dependency notices are maintained in
+[SOURCES.md](../SOURCES.md), [PROVENANCE.md](../PROVENANCE.md) and
+[THIRD-PARTY-NOTICES.md](../THIRD-PARTY-NOTICES.md).

@@ -116,6 +116,10 @@ not verified normalization. Normalization must not routinely erase recurring cos
 
 ## Analyst, commodity, insider and beta context
 
+Follow [analyst-research.md](analyst-research.md) for dynamic source discovery,
+report-access and track-record evidence, and executable target arithmetic. Check
+[between-quarter news and guidance](news-and-guidance.md) after the latest results.
+
 Use latest available same-horizon targets per analyst/firm, with dates, currency,
 sample size, low/median/high and quartiles/IQR when individual observations exist.
 Normalize dispersion (for example IQR/median) and explain the metric; do not call
