@@ -12,7 +12,7 @@ CAPABILITY_FILES = {
          'portfolio_backtest', 'manager_monitor', 'price_audit', 'deterministic_rank',
          'financial_normalize', 'filing_extract')] + ['profiles/financial-normalization-v1.json'],
     'public_research': ['profiles/public-vqm-discovery-v1.json', 'scripts/public_research.py',
-                        'scripts/public_research_fetch.py', 'scripts/research_report_checks.py'],
+                        'scripts/public_research_fetch.py', 'scripts/listed_universe.py', 'scripts/research_report_checks.py'],
     'shared_default': ['profiles/vqm-fundamental-v1.json', 'profiles/financial-normalization-v1.json'] + ['scripts/' + name + '.py' for name in
         ('vqm_research', 'screen_review', 'research_bundle', 'horizon_review', 'trading_calendar',
          'deterministic_rank', 'price_audit', 'cash_benchmark', 'risk_engine', 'financial_normalize', 'filing_extract')],

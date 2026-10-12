@@ -33,6 +33,19 @@ def fixture():
 
 
 class PublicResearchTests(unittest.TestCase):
+    def test_directory_stocks_need_provider_type_confirmation(self):
+        data = fixture(); row = data['rows'][9]
+        row.update(directory_source='fictional-directory', security_type='listed_adr')
+        row['info']['quoteType'] = 'EQUITY'
+        self.assertEqual(calculate(data, 3)['research_candidates'][0]['symbol'], 'DEMO9')
+        for security_type, quote_type in [('listed_adr', 'ETF'),
+                                          ('unresolved_security_type', 'EQUITY'),
+                                          ('common_equity', None)]:
+            row['security_type'], row['info']['quoteType'] = security_type, quote_type
+            result = calculate(data, 3)
+            self.assertNotIn('DEMO9', [r['symbol'] for r in result['review_queue']])
+            self.assertTrue(any(r['symbol'] == 'DEMO9' for r in result['exclusions']))
+
     def test_replay_and_order_independence(self):
         data = fixture(); expected = calculate(data, 3)
         data['rows'].reverse(); data['universe_symbols'].reverse()

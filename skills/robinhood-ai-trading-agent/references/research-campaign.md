@@ -1,4 +1,4 @@
-# Reproducible research campaign (v3.8)
+# Reproducible research campaign (v4.1)
 
 Read this first for ranked fundamental stock requests, including “top N buys.”
 Intraday retains its registered signal/bar workflow: a daily fundamental queue is
@@ -43,18 +43,47 @@ python scripts/public_research.py verify /outside-skill/run-A/result.bundle.json
 
 `P1Y` is an example, not a fixed default or a maximum. Resolve the actual holding
 clock through `horizon_review.py`; the public helper only records the descriptor.
-No output count is hard-coded. Other universes can use `--universe` with a dated
+No output count is hard-coded. New runs default to `--universe-preset us-listed`:
+all U.S. exchange-listed stocks including listed ADRs. For an explicitly requested
+S&P 500 screen add `--universe-preset sp500`. These presets are mutually exclusive
+with `--universe`. Other universes can use `--universe` with a dated
 JSON object containing `universe_id`, `source`, and `rows` of `symbol`, `issuer_id`,
 `name`. Read `profiles/public-vqm-discovery-v1.json` before using its results.
 
-The adapter gets fresh constituents, an official SPY fund-proxy check, and each
-member's Yahoo quarterly statements, quotes and history. Obtain estimates and
+The default adapter joins Nasdaq Trader's Nasdaq-listed and other-exchange-listed
+directories, validates their schema and creation date against the last completed
+session, and preserves raw records and exclusion reasons. It includes every listing
+exchange code without a fixed whitelist, flags ambiguous instruments and requires
+provider EQUITY confirmation before scoring. Current directory coverage is not
+certified historical membership. Issuer names are provisional identities; reconcile
+share classes and ADR ratios during primary review. Fund, test, preferred, warrant,
+right, bundled-unit and debt records stay in the inventory, outside the stock queue.
+Use `--universe-only` to inspect membership without requesting financial data; this
+does **not** constitute a completed stock screen. `--resume` retains the frozen
+universe and completed per-security checkpoints, including after an interrupted
+collection. An explicit changed universe on resume is rejected; start a new run.
+
+The S&P preset retains fresh constituents and its official SPY fund-proxy check.
+For every stock in the chosen universe the adapter obtains Yahoo quarterly
+statements, quotes and history. Obtain estimates and
 numeric EPS trends during the ordered candidate review; neither enters this score.
 Review membership differences, fund residuals, provider errors and actions.
 Raw Close is used for price/ADV, Adj Close for 252/21 momentum, with auto_adjust
 and repair both false. Market cap/EV are explicitly vendor proxies. Publication
 timing and restatements are not certified: this is not a historical backtest.
 Use current internet acquisition, not an old Claude test or cached ranking.
+For user-requested research retention, follow [research-memory.md](research-memory.md):
+preserve old evidence and reuse verified unchanged primary facts while refreshing
+time-sensitive inputs and recomputing the full ranking under a new contract.
+Report directory inventory, included stocks, unresolved classifications, acquired,
+ranked and reviewed counts separately. Do not describe a partial public-VQM ranking
+as the best of all listed stocks: non-USD financials, missing history and specialized
+accounting remain explicit gaps. A large universe can require a lengthy acquisition;
+preserve provider rate limits and resume rather than substituting an index.
+
+Version 4.1 changes membership acquisition and adds security-type gates; factor
+weights/formulas are unchanged. Old bundles keep their original code/hash contract:
+replay them with their saved scorer version, never rewrite hashes to make them pass.
 
 If dependencies/provider access fail, retain the incomplete run and exact error.
 Do not fabricate data, infer missing zeros or invent a replacement score. A source

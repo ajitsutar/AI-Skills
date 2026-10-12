@@ -17,8 +17,9 @@ mark it as an assumption and keep the result as a research plan.
    if known and authorized, affect overlap and concentration. Do not require account
    authentication just to research public stocks.
 2. Follow [screening-and-value-traps.md](screening-and-value-traps.md). Use the
-   configured universe; S&P 500 is a replaceable starting point for broad U.S.
-   discovery. Freeze a dated constituent list and report actual screening coverage,
+   configured universe; default to all U.S. exchange-listed stocks, including listed
+   ADRs, when unspecified. A small budget does not imply S&P-only or low share prices.
+   Freeze a dated membership list and report actual screening coverage,
    exclusions and missing data. Low share price alone is not undervaluation.
 3. Gather latest filings and company results: revenue growth, gross/operating
    margins, cash generation, cash/debt, share-count change, stock compensation,

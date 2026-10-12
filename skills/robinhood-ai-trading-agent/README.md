@@ -1,10 +1,19 @@
 # Robinhood portfolio and trading agent
 
-Packaging release **4.0.1** keeps the v4.0 calculations unchanged and includes
-standalone installation instructions and both Claude agent variants inside this
-folder. See [INSTALL.md](INSTALL.md).
+Version **4.1.0** defaults stock discovery to all U.S. exchange-listed stocks,
+including listed ADRs. S&P 500 remains an explicit preset. Directory classifications,
+provider equity confirmation and coverage are retained; VQM factor formulas are
+unchanged. Standalone installation and both Claude agent variants remain inside
+this folder. See [INSTALL.md](INSTALL.md).
 
-Version **4.0.1 — October 11, 2026**. A portable skill for **personal Codex**, with
+Save substantial research in a local library and use the
+[incremental research workflow](references/research-memory.md) on follow-up
+requests. The offline memory helper verifies archived files and plans refreshes;
+unchanged primary-source work can be reused after revalidation. New market inputs,
+full-universe rankings and horizon decisions still need refreshing. Personal
+research archives do not belong in the public skill package.
+
+Version **4.1.0 — October 11, 2026**. A portable skill for **personal Codex**, with
 a long-term core and separately budgeted swing/day trading in an active supervised
 session. It starts in paper mode and supports exact-order approval or a bounded
 mandate through the connected official Robinhood Trading MCP.
@@ -15,7 +24,7 @@ quantitative analysis, and execution controls. Choose and adapt the examples;
 they do not change the skill's operating policy or grant trading authorization.
 
 Provide/extract the **entire ZIP**, not only SKILL.md. Ask the personal agent to
-identify version 4.0.1 and verify its supporting files before use. GARCH is
+identify version 4.1.0 and verify its supporting files before use. GARCH is
 explicitly part of this skill and has an executable, audited helper.
 
 Version 4.0 adds a [quant portfolio-manager workflow](references/institutional-manager.md)
@@ -107,7 +116,8 @@ to a brokerage, place trades, install a skill or create a schedule.
   → validated completed-bar setup → entry/stop/target/time exit → costs and sizing
   → live readiness → authorization → orders, partial fills and exit reconciliation.
 
-S&P 500 is an editable starting universe. There is **no fixed number of picks**.
+The default universe is all U.S. exchange-listed stocks, including listed ADRs;
+use S&P 500 only when requested or explicitly configured. There is **no fixed number of picks**.
 The answer may be no suitable trade. See [screening](references/screening-and-value-traps.md),
 [day trading](references/short-term-trading.md) and
 [the $500 research example](references/small-account-research.md).

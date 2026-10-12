@@ -37,7 +37,7 @@ core targets, tax constraints, sources, hours, event rules and loss/exposure lim
 The example allocations and thresholds are editable illustrations, not suitable
 for every investor. Save the concrete policy before asking for activation.
 
-S&P 500 research membership and the trading allowlist are distinct. A scan cannot
+Exchange-wide research membership and the trading allowlist are distinct. A scan cannot
 silently broaden the approved trade universe. Change policy and reauthorize when
 needed. `live_validated_setups=[]` intentionally prevents unreviewed live entries.
 

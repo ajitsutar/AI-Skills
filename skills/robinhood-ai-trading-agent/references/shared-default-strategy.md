@@ -27,9 +27,11 @@ verified run. Missing optional volatility changes its status, not the factor sco
 ## 1. Mandate and shared information set
 
 Resolve the requested universe, exact horizon, benchmark, fixed-hold versus review
-or rebalance mandate, and requested count. S&P 500 is the configurable starting
-universe, not a mandatory universe; its default benchmark is the **S&P 500 total
-return index**, not its price index. Retain source and dividend/tax convention.
+or rebalance mandate, and requested count. If unspecified, use **all U.S.
+exchange-listed stocks, including listed ADRs**. Explicit S&P 500 requests retain
+that index universe and its **S&P 500 total return index** benchmark. For the broader
+default, declare a U.S. total-market total-return benchmark with its source and
+dividend/tax convention; ADR inclusion can differ from a domestic benchmark.
 An investable ETF is a distinct comparator with fees and tracking differences.
 Do not inherit an earlier chat's risk preferences when the prompt says otherwise.
 

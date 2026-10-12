@@ -3,6 +3,7 @@
 Every run gets a new output directory. Provider data are research proxies, not
 point-in-time audited financials. Never reuse another model's data for a test of
 independent acquisition. A supplied universe JSON supports other equity universes.
+Unspecified universes cover U.S. exchange-listed stocks, including listed ADRs.
 """
 from __future__ import annotations
 
@@ -19,8 +20,10 @@ import threading
 import time
 import xml.etree.ElementTree as ET
 from zipfile import ZipFile
+from zoneinfo import ZoneInfo
 
 from public_research import digest, profile, incomplete_components
+from listed_universe import DIRECTORIES, build_universe
 from trading_calendar import sessions
 
 _request_lock = threading.Lock()
@@ -97,16 +100,38 @@ def xlsx_rows(raw):
         return rows
 
 
-def acquire_universe(folder, supplied=None):
+def universe_spec(preset=None, supplied=None):
+    if preset and supplied:
+        raise ValueError('CHOOSE_PRESET_OR_CUSTOM_UNIVERSE')
+    if supplied:
+        data = json.loads(supplied.read_text(encoding='utf-8-sig'))
+        return {'kind': 'custom', 'input_sha256': digest(data)}
+    return {'kind': 'preset', 'name': preset or 'us-listed'}
+
+
+def acquire_universe(folder, supplied=None, preset=None, price_date=None):
     import pandas as pd
     import requests
+    spec = universe_spec(preset, supplied)
     if supplied:
         data = json.loads(supplied.read_text(encoding='utf-8-sig'))
         # Explicit input format: {universe_id, source, rows:[{symbol,issuer_id,name}]}.
         rows = data['rows']
         evidence = {'source': data['source'], 'input_sha256': digest(data), 'retrieved_at': now(),
                     'universe_id': data['universe_id'], 'source_type': 'user_supplied_dated_universe'}
-    else:
+    elif spec['name'] == 'us-listed':
+        if not price_date:
+            raise ValueError('PRICE_DATE_REQUIRED_FOR_DIRECTORY_FRESHNESS')
+        documents = {}
+        for kind, url in DIRECTORIES.items():
+            response = requests.get(url, timeout=40); response.raise_for_status()
+            documents[kind] = response.content
+            (folder / (kind + '.txt')).write_bytes(response.content)
+        listing = build_universe(documents, price_date,
+            datetime.now(ZoneInfo('America/New_York')).date().isoformat())
+        rows, evidence = listing['rows'], listing['evidence']
+        evidence['retrieved_at'] = now()
+    elif spec['name'] == 'sp500':
         url = 'https://stockanalysis.com/list/sp-500-stocks/'
         response = requests.get(url, timeout=40); response.raise_for_status()
         (folder / 'constituents.html').write_bytes(response.content)
@@ -142,6 +167,8 @@ def acquire_universe(folder, supplied=None):
                 'note': 'SPY is a fund proxy. Residuals, cash and effective membership changes need explicit review; differences never silently change the universe.'}
         except Exception as exc:
             evidence['fund_proxy_check'] = {'source': spy_url, 'status': 'UNAVAILABLE', 'error': str(exc)}
+    else:
+        raise ValueError('UNKNOWN_UNIVERSE_PRESET:' + str(spec))
     symbols = [r['symbol'] for r in rows]
     if len(set(symbols)) != len(symbols) or not rows or any(not r.get('issuer_id') for r in rows):
         raise ValueError('Unique securities and nonempty issuer IDs required')
@@ -153,7 +180,11 @@ def acquire_universe(folder, supplied=None):
 def fetch_row(identity, grid, folder, prior=None):
     import yfinance as yf
     symbol = identity['symbol']
-    provider_symbol = symbol.replace('.', '-')
+    provider_symbol = identity.get('provider_symbol', symbol.replace('.', '-'))
+    # Safe filenames even for a listed issuer named CON, AUX or another Windows device.
+    import re
+    if not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9.\-]{0,39}', provider_symbol):
+        raise ValueError('PROVIDER_SYMBOL_MAPPING_UNRESOLVED:' + symbol)
     result = copy.deepcopy(prior) if prior else {**identity, 'provider_symbol': provider_symbol, 'retrieved_at': now(),
         'source': 'https://finance.yahoo.com/quote/' + provider_symbol + '/', 'errors': []}
     needed = incomplete_components(result) if prior else None
@@ -177,29 +208,61 @@ def fetch_row(identity, grid, folder, prior=None):
                 raise ValueError('EMPTY_PROVIDER_RESPONSE:' + key)
             if key == 'info':
                 allowed = ('currency', 'financialCurrency', 'marketCap', 'enterpriseValue',
-                    'regularMarketPrice', 'regularMarketTime', 'sector', 'industry', 'forwardPE')
+                    'regularMarketPrice', 'regularMarketTime', 'sector', 'industry', 'forwardPE', 'quoteType')
                 value = {k: value.get(k) for k in allowed}
                 result.update(sector=value.get('sector'), industry=value.get('industry'))
+                if (result.get('security_type') == 'unresolved_security_type'
+                        and result.get('provider_equity_resolution_allowed') is True
+                        and value.get('quoteType') == 'EQUITY'):
+                    result['directory_security_type'] = result['security_type']
+                    result['security_type'] = 'provider_confirmed_equity'
+                    result['security_type_basis'] = 'Yahoo EQUITY confirmation; common/ADR subtype and issuer identity still need primary review'
             result[key] = value
             result.setdefault('component_retrieved_at', {})[key] = now()
         except Exception as exc:
             result['errors'].append({'component': key, 'error': type(exc).__name__ + ':' + str(exc)})
             result[key] = {} if key == 'info' else {'index': [], 'columns': [], 'data': []}
     result['completed_at'] = now()
-    save(folder / 'raw' / (provider_symbol + '.json'), result)
+    save(folder / 'raw' / ('security-' + provider_symbol + '.json'), result)
     return result
 
 
-def main():
+def recover_checkpoints(folder, universe):
+    prior, corrupt = {}, []
+    for raw_folder in [folder / 'raw'] + sorted(folder.glob('retry-*/raw')):
+        for path in sorted(raw_folder.glob('*.json')):
+            try:
+                row = json.loads(path.read_text(encoding='utf-8'))
+            except (json.JSONDecodeError, UnicodeDecodeError):
+                # An interrupted write is retained as evidence and fetched anew.
+                corrupt.append({'path': str(path.relative_to(folder)),
+                    'sha256': hashlib.sha256(path.read_bytes()).hexdigest()})
+                continue
+            prior[row['symbol']] = row
+    identities = {r['symbol']: r for r in universe['rows']}
+    if any(s not in identities or r.get('issuer_id') != identities[s]['issuer_id'] for s, r in prior.items()):
+        raise ValueError('RESUME_CHECKPOINT_UNIVERSE_MISMATCH')
+    return prior, corrupt
+
+
+def argument_parser():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--output', type=Path, required=True)
     parser.add_argument('--decision-at', required=True, help='Timezone-bearing research decision timestamp')
     parser.add_argument('--hold', required=True, help='Explicit holding-period descriptor, e.g. P1Y; no fixed maximum')
     parser.add_argument('--prompt-file', type=Path, required=True)
-    parser.add_argument('--universe', type=Path)
+    universe_args = parser.add_mutually_exclusive_group()
+    universe_args.add_argument('--universe', type=Path, help='Explicit dated custom universe JSON')
+    universe_args.add_argument('--universe-preset', choices=('us-listed', 'sp500'),
+        help='Default for a new run: us-listed. An omitted selection on resume retains the frozen universe.')
+    parser.add_argument('--universe-only', action='store_true', help='Freeze and audit membership; do not fetch prices/financials or claim a completed stock screen')
     parser.add_argument('--resume', action='store_true', help='Retry failed components of this run, preserving old snapshots')
     parser.add_argument('--workers', type=int, default=4, choices=range(1, 5))
-    args = parser.parse_args()
+    return parser
+
+
+def main():
+    args = argument_parser().parse_args()
     decision = datetime.fromisoformat(args.decision_at.replace('Z', '+00:00'))
     if decision.tzinfo is None:
         raise ValueError('decision-at needs timezone')
@@ -215,31 +278,43 @@ def main():
         raise ValueError('Need 253 completed XNYS sessions')
     prompt = args.prompt_file.read_text(encoding='utf-8-sig').strip()
     contract = {'profile': profile(), 'profile_sha256': digest(profile()), 'defined_at': now(),
+        'acquisition_code_sha256': {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
+            for name in ('public_research_fetch.py', 'listed_universe.py')},
         'decision_at': args.decision_at, 'price_date': grid[-1]['date'], 'prompt': prompt,
         'prompt_sha256': digest(prompt), 'hold': args.hold, 'acquisition': 'independent_fresh_network_pull',
+        'universe_selection': universe_spec(args.universe_preset, args.universe),
         'historical_information_certified': False,
         'timing_note': 'Prices are frozen to the last completed session. Financial/provider facts are obtained now; historical publication and restatement timing are not certified. This is not a point-in-time backtest.'}
     prior = {}
     output_folder = folder
     if args.resume:
         old_contract = json.loads((folder / 'contract-before-fetch.json').read_text(encoding='utf-8'))
+        if ('acquisition_code_sha256' in old_contract
+                and old_contract['acquisition_code_sha256'] != contract['acquisition_code_sha256']):
+            raise ValueError('RESUME_ACQUISITION_CODE_MISMATCH: use saved collector or start a new run')
         for key in ('profile_sha256', 'price_date', 'prompt_sha256', 'hold'):
             if old_contract[key] != contract[key]:
                 raise ValueError('RESUME_CONTRACT_MISMATCH:' + key)
+        if args.universe is not None or args.universe_preset is not None:
+            if old_contract.get('universe_selection') != contract['universe_selection']:
+                raise ValueError('RESUME_CONTRACT_MISMATCH:universe_selection')
         contract = old_contract
-        snapshots = [folder / 'snapshot.json'] + sorted(folder.glob('retry-*/snapshot.json'))
-        previous = json.loads(snapshots[-1].read_text(encoding='utf-8'))
-        prior = {r['symbol']: r for r in previous['rows']}
         universe = json.loads((folder / 'universe.json').read_text(encoding='utf-8'))
+        # Recover finished per-security checkpoints even if a long collection was interrupted.
+        prior, corrupt = recover_checkpoints(folder, universe)
         attempt = len(list(folder.glob('retry-*'))) + 1
         output_folder = folder / ('retry-%03d' % attempt)
         output_folder.mkdir(exist_ok=False); (output_folder / 'raw').mkdir()
-        save(output_folder / 'resume-receipt.json', {'started_at': now(), 'previous_snapshot_sha256': digest(previous),
+        save(output_folder / 'resume-receipt.json', {'started_at': now(), 'prior_checkpoints_sha256': digest(prior),
+            'corrupt_checkpoints_retained': corrupt,
             'contract_sha256': digest(contract), 'scope': 'Only failed acquisition components; no ranking-based retries'})
     else:
         save(folder / 'contract-before-fetch.json', contract)
-        universe = acquire_universe(folder, args.universe)
+        universe = acquire_universe(folder, args.universe, args.universe_preset, grid[-1]['date'])
     print('Universe', len(universe['rows']), 'securities; close', grid[-1]['date'], flush=True)
+    if args.universe_only:
+        print('MEMBERSHIP_ONLY: no financial/price screen performed', flush=True)
+        return
     rows = []
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         futures = []
