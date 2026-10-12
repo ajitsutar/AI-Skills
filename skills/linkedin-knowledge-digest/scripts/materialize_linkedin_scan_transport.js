@@ -9,6 +9,7 @@ const HELPER_NAMES = [
   "linkedin_messages_candidates.js"
 ];
 const ORCHESTRATOR_NAME = "linkedin_scan_orchestrator.js";
+const DELIVERY_NAME = "linkedin_digest_delivery.js";
 
 function appleScriptString(value) {
   return `"${value.replace(/\\/g, "\\\\").replace(/"/g, '\\"')}"`;
@@ -78,6 +79,11 @@ function materialize(destinationDir) {
   if (path.resolve(orchestratorSource) !== path.resolve(orchestratorDestination)) {
     fs.copyFileSync(orchestratorSource, orchestratorDestination);
   }
+  const deliverySource = path.join(__dirname, DELIVERY_NAME);
+  const deliveryDestination = path.join(destinationDir, DELIVERY_NAME);
+  if (path.resolve(deliverySource) !== path.resolve(deliveryDestination)) {
+    fs.copyFileSync(deliverySource, deliveryDestination);
+  }
 
   const manifestPath = path.join(destinationDir, "linkedin_scan_applescript_lines.json");
   const lines = buildManifest(path.resolve(destinationDir));
@@ -101,4 +107,4 @@ if (require.main === module) {
   }));
 }
 
-module.exports = { HELPER_NAMES, ORCHESTRATOR_NAME, buildManifest, materialize };
+module.exports = { HELPER_NAMES, ORCHESTRATOR_NAME, DELIVERY_NAME, buildManifest, materialize };

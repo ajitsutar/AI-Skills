@@ -83,6 +83,22 @@ function testFeedRejectsLookalikeAndAuthenticationPages() {
   assert.equal(login.url, "https://www.linkedin.com/login");
 }
 
+function testMachineLearningVocabularyWithoutAiAcronym() {
+  const url = "https://example.com/embedding-evaluation";
+  const text = "Feed post Ada Lovelace \u2022 1h Embedding evaluation with reproducible baselines and measured failure modes. Detailed methodology and limitations are included for practitioners.";
+  const result = runHelper("linkedin_digest_candidates.js", {
+    selectors: {
+      '[data-testid="mainFeed"] [role="listitem"], article, .feed-shared-update-v2': [{
+        innerText: text,
+        getBoundingClientRect: () => ({ top: 10, height: 300 }),
+        querySelectorAll: () => [anchor(url, "Read evaluation")]
+      }]
+    }
+  });
+  assert.equal(result.posts.length, 1);
+  assert.deepEqual(result.posts[0].contentUrls, [url]);
+}
+
 function testMessageExtractionSkipsMalformedAndOffsiteLinks() {
   const selector = 'a[href*="/messaging/thread/"]';
   const result = runHelper("linkedin_messages_candidates.js", {
@@ -106,5 +122,6 @@ function testMessageExtractionSkipsMalformedAndOffsiteLinks() {
 
 testFeedExtractionAndAuthorEncoding();
 testFeedRejectsLookalikeAndAuthenticationPages();
+testMachineLearningVocabularyWithoutAiAcronym();
 testMessageExtractionSkipsMalformedAndOffsiteLinks();
 console.log("LinkedIn extraction helper tests passed.");

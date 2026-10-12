@@ -131,7 +131,11 @@
     return [
       "agent", "agents", "ai ", "genai", "llm", "mcp", "rag", "governance",
       "security", "platform", "architecture", "cloud", "data", "research",
-      "report", "whitepaper", "quantum", "chip", "market", "enterprise"
+      "report", "whitepaper", "quantum", "chip", "market", "enterprise",
+      "artificial intelligence", "machine learning", "deep learning", "neural network",
+      "language model", "inference", "fine-tuning", "fine tuning", "transformer",
+      "embedding", "diffusion model", "reinforcement learning", "computer vision",
+      "natural language processing"
     ].some((term) => lower.includes(term));
   };
   const visiblePosts = Array.from(document.querySelectorAll('[data-testid="mainFeed"] [role="listitem"], article, .feed-shared-update-v2'));
