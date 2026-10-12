@@ -3,9 +3,14 @@
   "description": "Editable research preferences, read by the skill; not execution policy or an automatic data scanner",
   "long_term": {
     "universe": {
-      "kind": "index",
-      "name": "S&P 500",
-      "constituents_source": null,
+      "kind": "exchange_listed_equity",
+      "name": "All U.S. exchange-listed stocks, including listed ADRs",
+      "collector_preset": "us-listed",
+      "include_listed_adrs": true,
+      "include_small_and_mid_caps": true,
+      "include_otc": false,
+      "include_foreign_only_listings": false,
+      "constituents_source": "Nasdaq Trader nasdaqlisted.txt plus otherlisted.txt",
       "constituents_as_of": null,
       "frozen_security_list_path": null
     },
@@ -25,11 +30,17 @@
   },
   "intraday": {
     "universe": {
-      "kind": "explicit_watchlist",
-      "name": "Editable intraday watchlist (fictional example)",
-      "symbols": [
-        "DEMO"
-      ]
+      "kind": "exchange_listed_equity",
+      "name": "All U.S. exchange-listed stocks, including listed ADRs",
+      "collector_preset": "us-listed",
+      "include_listed_adrs": true,
+      "include_small_and_mid_caps": true,
+      "include_otc": false,
+      "include_foreign_only_listings": false,
+      "constituents_source": "Nasdaq Trader nasdaqlisted.txt plus otherlisted.txt",
+      "constituents_as_of": null,
+      "frozen_security_list_path": null,
+      "filter_rule": "Apply declared intraday liquidity, spread, price and tradability constraints before selecting the watchlist; no S&P membership requirement"
     },
     "registered_setup": "opening_range_breakout",
     "bar_interval_minutes": 5,

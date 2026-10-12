@@ -11,8 +11,10 @@ watchlist -> session/catalyst/event checks -> registered completed-bar setup ->
 entry/stop/target/time exit and net costs -> sizing/risk gates -> authorized paper
 or authorized personal live execution -> fills/protection/exit reconciliation. Undervaluation,
 analyst upside and an Eligible research label are neither prerequisites nor
-substitutes for an intraday setup. S&P 500 may seed discovery; the intraday universe
-can be configured independently. There is no candidate-count quota.
+substitutes for an intraday setup. Default membership is all U.S. exchange-listed
+stocks, including listed ADRs; derive the liquid intraday watchlist from declared
+filters. S&P 500 or a narrower watchlist requires an explicit universe setting.
+There is no candidate-count quota.
 
 Prepare the watchlist before the session where possible. Use dollar volume,
 current spread/liquidity, reliable quotes/bars, relevant catalysts, session-relative

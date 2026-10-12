@@ -10,16 +10,33 @@ rules before choosing the shortlist. Log later changes and judgment overrides.
 
 ## Configurable universe and honest coverage
 
-Use the user's research universe. If none is supplied for broad U.S. discovery,
-state S&P 500 as a provisional starting universe. It can be replaced with another
-index, market, sector, watchlist or explicit security list. A request about existing
-holdings need not trigger an index-wide scan. Research membership never changes
-the trading policy's allowed_symbols.
+Use the user's requested universe or an explicitly saved universe setting. If
+neither is supplied, use all U.S. exchange-listed common equity, including listed
+ADRs, REIT/BDC equity and small/mid caps. This is a listing-location default, not
+a U.S.-domicile requirement. S&P 500, other indices, sectors and watchlists are
+explicit overrides. A request about existing holdings need not trigger discovery.
+Research membership never changes the trading policy's allowed_symbols.
+
+Use the fresh Nasdaq Trader Nasdaq-listed and other-exchange-listed directories
+together; keep every exchange code, raw record, dated source and classification.
+Do not hard-code today's exchange names as a whitelist. The collector retains a
+security inventory and ambiguous classifications; unknown types are not silently
+treated as common stock. Exclude test symbols and route funds, preferreds,
+warrants, rights, bundled units and debt to their own workflows. OTC and listings
+only on non-U.S. exchanges are outside this default, but remain configurable.
+
+All qualifying stocks enter screening, not necessarily the numerical ranking.
+Publish the chosen liquidity/tradability filters before seeing winners. Public
+VQM currently cannot rank non-USD financial statements, short price histories,
+banks or equity REITs lacking its specialized inputs. Retain these coverage gaps;
+do not remove ADRs from membership because their statements need currency work.
+Provider equity-type confirmation, provisional issuer grouping, ADR ratios,
+listing deficiencies and exchange-specific halts need review before a buy proposal.
 
 Freeze the actual constituent security list, source, effective date, retrieval
 time and ticker/share-class mappings. Do not hard-code 500 or 503 securities. The
 [index provider describes 500 leading companies](https://www.spglobal.com/spdji/en/indices/equity/sp-500/);
-use the dated constituent list for the actual security count. Historical testing
+use the dated constituent list for an explicitly requested S&P screen. Historical testing
 requires membership as known then, including removals, rather than today's survivors.
 
 Record each security as screened/retained, screened/excluded (failed discovery

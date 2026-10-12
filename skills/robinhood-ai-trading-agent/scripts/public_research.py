@@ -107,6 +107,9 @@ def serialize(value):
 
 def raw_metrics(row, prices, grid, cutoff):
     p = profile()
+    if 'directory_source' in row:
+        require(row.get('security_type') in {'common_equity', 'listed_adr', 'provider_confirmed_equity'}, 'SECURITY_TYPE_UNRESOLVED')
+        require(row.get('info', {}).get('quoteType') == 'EQUITY', 'PROVIDER_EQUITY_TYPE_NOT_CONFIRMED')
     kind = adapter(row)
     require(kind not in {'bank', 'equity_reit'}, 'SPECIALIZED_COMPONENTS_UNAVAILABLE:' + kind)
     info = row['info']
@@ -272,6 +275,9 @@ def _calculate(snapshot, count):
         'snapshot_sha256': digest(snapshot), 'price_date': str(cutoff), 'mandate': snapshot['mandate'],
         'status': 'RESEARCH_QUEUE_ONLY', 'input_assurance': p['assurance'],
         'universe_securities': len(rows), 'unique_issuers': len(groups), 'scored_issuers': len(scored),
+        'universe_membership_summary': {k: snapshot.get('universe_evidence', {}).get(k) for k in (
+            'universe_id', 'directory_record_count', 'screening_record_count',
+            'listing_exchange_counts', 'security_type_counts', 'classification_unresolved_count')},
         'provider_limited_issuers': transport_errors,
         'acquisition_failure_securities': acquisition_errors,
         'ranking_relevant_acquisition_failures': blocking_errors,

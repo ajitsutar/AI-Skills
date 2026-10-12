@@ -5,7 +5,7 @@ description: Quant research and portfolio management across investment horizons,
 
 # Robinhood Quant Portfolio and Trading Agent
 
-Package version: **4.0.1 — October 11, 2026**.
+Package version: **4.1.0 — October 11, 2026**.
 
 When first loading this package or diagnosing a version mismatch, identify this
 version and check that its referenced files and scripts are accessible. An uploaded
@@ -107,6 +107,11 @@ The user's preference for bounded autonomy is a design choice. Activate it after
 
 ## Persistent context
 
+For saved research or a follow-up refresh, read
+[research-memory.md](references/research-memory.md). Preserve an immutable local
+research library and verify its manifest before reuse. Recheck current disclosures
+and refresh volatile data; rerank the full eligible universe, not just old picks.
+
 Keep runtime files outside the installed skill: investor policy, policy.json, sleeve ownership, targets, thesis/watchlist records, evidence register and execution database. Use one durable execution database per account alias. A new database loses duplicate suppression, daily counters and unresolved intents.
 
 Use an approved descriptive alias locally. Resolve it to the eligible Agentic account through broker metadata before execution. Account numbers and credentials do not belong in reports, files, logs or other agents' prompts. Broker order identifiers needed for recovery belong only in the host's restricted broker mapping, never shared artifacts. Do not export authentication data.
@@ -138,8 +143,15 @@ a live swing adapter. Do not route unsupported swing orders through core/intrada
 valuation → earnings/cash-flow normalization → balance-sheet and value-trap review
 → analyst consensus, dispersion and revisions → event review → GARCH risk overlay
 → candidate classification and ranking → portfolio sizing and an applicable paper or authorized execution proposal.
-Use [screening-and-value-traps.md](references/screening-and-value-traps.md). S&P 500
-is a configurable starting universe, not a mandatory or fixed constituent list.
+Use [screening-and-value-traps.md](references/screening-and-value-traps.md). If no
+universe is specified, start with **all U.S. exchange-listed stocks, including
+listed ADRs and small/mid caps**. Apply this membership default to stock discovery
+at every horizon, including swing and intraday; their subsequent filters differ.
+S&P 500 requires an explicit request or saved universe setting. Do not replace a
+whole-market screen with an index, familiar names or a broker's popular-stock list.
+Membership is not investment eligibility: retain liquidity, security-type, currency,
+listing-status and missing-data exclusions. ETFs, preferreds, rights, warrants and
+debt use their instrument workflows; OTC and foreign-only listings are opt-in.
 There is no top-N selection rule; include only supported candidates, possibly none.
 For broad/ranked screens, also use [research-run-methodology.md](references/research-run-methodology.md):
 record the snapshot, mandate, selection/ranking rules and judgment overrides.
@@ -168,7 +180,8 @@ classification, disabled components and bundle/replay status alongside any table
 Show actual coverage and missing data. A relative bargain is a research hypothesis
 until its normalized earnings, business quality and downside are supported.
 
-**Day trading:** configured liquid intraday universe → session/catalyst/event and
+**Day trading:** configured universe (all U.S. listed stocks if unspecified) →
+declared intraday liquidity/spread/price and tradability filters → session/catalyst/event and
 data checks → completed-bar signal from a registered setup → stop, target, time exit
 and net costs → optional horizon-appropriate volatility adjustment → fresh quotes,
 portfolio/risk checks and applicable authorization → execution-state reconciliation
