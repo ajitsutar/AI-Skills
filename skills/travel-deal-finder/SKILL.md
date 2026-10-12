@@ -5,6 +5,9 @@ description: Find, compare, and summarize current travel deals across flights, h
 
 # Travel Deal Finder
 
+Package terms: [MIT license](LICENSE), [provenance](PROVENANCE.md) and
+[third-party notices](THIRD-PARTY-NOTICES.md).
+
 ## Core Workflow
 
 Resolve bundled resources relative to the directory containing this `SKILL.md`, never relative to the current working directory.

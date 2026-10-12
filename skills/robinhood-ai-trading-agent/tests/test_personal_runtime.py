@@ -175,6 +175,36 @@ class PersonalIntegrationTests(unittest.TestCase):
         self.ledger.reconcile(self.order['id'],'FILLED',self.order['quantity'],100,self.now)
         self.assertFalse(self.ledger.unresolved())
 
+    def test_fractional_claim_requires_observed_exact_broker_and_protection_contract(self):
+        self.order.update(quantity='0.123456', dollar_budget='13')
+        self.snapshot['quotes']['DEMO']['fractional_rules'] = dict(
+            eligible=True, quantity_increment='0.000001', min_quantity='0.000001', min_notional='1',
+            order_types=['limit'], time_in_force=['day'], sides=['buy','sell'], sessions=['regular'],
+            checked_at=self.now.isoformat(), source='official_broker', evidence=['fictional test observation'])
+        tool = self.context['capabilities']['operations']['advanced_submit']
+        tool['bindings']['quantity']['type'] = 'string'
+        tool['input_schema']['properties']['quantity'] = {'type':'string'}
+        tool['schema_hash'] = canonical_hash(tool['input_schema'])
+        tool['fractional_share_semantics'] = dict(quantity_based=True, cumulative_fractional_fills=True,
+            order_types=['limit'], time_in_force=['day'], sides=['buy','sell'], sessions=['regular'], evidence=['fictional test schema'])
+        self.context['broker_inputs']['order'] = copy.deepcopy(self.order)
+        for field, data in [('order_hash',self.order),('snapshot_hash',self.snapshot)]:
+            self.review[field] = self.context[field] = canonical_hash(data)
+        self.context['reviewed_request_hash'] = build_request(self.context['capabilities'],'advanced_submit',
+            self.context['broker_inputs'],self.now,self.order['account_alias'])['request_hash']
+        self.authorize()
+        # Removing the observed capability blocks the real readiness path.
+        semantics = tool.pop('fractional_share_semantics')
+        with self.assertRaisesRegex(GateClosed,'Observed fractional'):
+            self.ledger.claim(self.policy,self.snapshot,self.order,self.review,'test-grant',self.now)
+        self.assertFalse(self.ledger.unresolved())
+        tool['fractional_share_semantics'] = semantics
+        result = self.ledger.claim(self.policy,self.snapshot,self.order,self.review,'test-grant',self.now)
+        self.assertTrue(result['may_submit_once'])
+        self.ledger.reconcile(self.order['id'],'PARTIALLY_FILLED','0.023456','100',self.now)
+        self.ledger.reconcile(self.order['id'],'FILLED','0.123456','100',self.now)
+        self.assertFalse(self.ledger.unresolved())
+
     def test_missing_readiness_never_claims(self):
         self.authorize()
         del self.review['readiness_inputs']

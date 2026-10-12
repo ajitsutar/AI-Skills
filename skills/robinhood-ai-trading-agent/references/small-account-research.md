@@ -48,20 +48,24 @@ mark it as an assumption and keep the result as a research plan.
 ## Turning a shortlist into an allocation
 
 Rank research quality separately from portfolio sizing. Apply the current policy,
-cash floor and symbol caps before rounding. Keep unused cash when an affordable
-whole-share allocation does not fit. Do not buy a worse business just because its
+cash floor and symbol caps before rounding. Use fractional sizing when available;
+keep unused cash when the observed minimums or other constraints do not fit. Do
+not buy a worse business just because its
 nominal share price is lower, or relax diversification limits to spend all $500.
 
-Fractional availability must be discovered from the broker. The present executable
-gate supports whole shares only; it cannot submit a fractional order by changing a
-quantity field. A fractional adapter would require separate validation. Fees/spreads
-can be material for a small budget.
+Fractional availability and quantity increments must be discovered from the broker.
+The executable gate supports exact fractional quantity-based DAY limit orders when
+the policy and observed broker rules permit them. See
+[fractional-shares.md](fractional-shares.md) for small dollar sizing, fee reserves,
+per-occurrence recurring proposals and native-dollar execution boundaries. Fees and
+spreads can be material for a small budget. A proposal is not live permission.
 
 For a long-term stock purchase, use a thesis/downside review and target allocation;
 do not impose an arbitrary intraday stop. Research Eligible does not mean authorized:
 it can support a paper proposal, never imply an executed investment. A verified
 no-trade conclusion is valid. Day trading uses the separate tactical workflow and
-its sleeve cap; a $500 account may produce zero whole-share entries after sizing.
+its sleeve cap; a $500 account may still produce zero entries after fractional
+minimums, risk, cash and protection checks.
 
 ## Runnable fictional example
 
@@ -70,9 +74,12 @@ python scripts/portfolio_manager.py examples/small-account.json
 ```
 
 The fictional $500 account has a 10% target cap for each of two candidates, priced
-at $45 and $70. It can propose one $45 share under these example caps; the $70 share
-does not fit a $50 target. The remaining $455 is cash before fees. This teaches
-affordability and policy constraints, not stock selection or a recommendation.
+at $45 and $70. Fractional planning proposes 1.111111 and 0.714285 shares under the
+$50-per-symbol targets and reserves $100, leaving $400 after conservative cash
+rounding with the example's zero fees. Precision and eligibility remain explicitly
+unverified planning assumptions. With `allow_fractional=false`, only one $45 share
+fits and $455 remains. This teaches affordability and policy constraints, not stock
+selection or a recommendation.
 
 ## More explicit prompt for a future research session
 

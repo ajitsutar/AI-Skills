@@ -39,5 +39,7 @@ scanner permits those email matches only for the exact reviewed license path and
 normalized content hash. All other detections remain active. Focused scanner tests
 check that modified notices and unexpected secrets are still rejected.
 
-No broker connection, live order or schedule is part of this release. No blanket
-repository license is selected, and historical copies are not rewritten.
+No broker connection, live order or schedule was part of this historical release.
+At that release, no blanket repository license had been selected. The current
+repository-authored package now uses [MIT](LICENSE); this later grant does not
+rewrite the reviewed historical files or establish rights to the predecessor.

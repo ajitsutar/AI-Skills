@@ -34,8 +34,9 @@ Retain machine-readable versions in VERSION, package metadata and integrity reco
    packaged copy. Keep personal data, source archives and runtime state out of it.
 
 The check fails on a changed VERSION, README, catalog, helper, profile, template,
-example, agent or workflow reference, and on manual edits to the generated prompt
-document. Adding/removing an input file also invalidates the receipt. It normalizes
+example, agent, workflow reference, license, provenance or dependency/source notice,
+and on manual edits to the generated prompt document. Adding/removing an input file
+also invalidates the receipt. It normalizes
 LF/CRLF for documentation freshness across operating systems; the package manifest
 retains its separate byte-integrity contract. Repository CI runs the same check.
 

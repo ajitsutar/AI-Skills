@@ -85,6 +85,9 @@ def validate_policy(policy):
         positive(limits[name])
     for name in ("slippage_bps", "fee_per_share", "no_entry_minutes_before_close"):
         nonnegative(limits[name])
+    nonnegative(limits.get("fee_per_order", 0))
+    from fractional_shares import validate_fractional_policy
+    validate_fractional_policy(policy)
     reserve_fraction = dec(limits.get("intraday_settled_cash_floor_fraction", limits["cash_floor"]))
     if not 0 <= reserve_fraction <= 1:
         raise InvalidInput("Intraday settled cash floor fraction outside [0,1]")
@@ -107,7 +110,8 @@ def validate_policy(policy):
 
 
 def size_tactical(equity, entry, stop, risk_fraction, notional_cap,
-                  slippage_bps=5, fee_per_share=0):
+                  slippage_bps=5, fee_per_share=0, quantity_increment="1",
+                  min_notional="0", fee_per_order="0"):
     """Sizing suggestion only; approval must bind the final rounded quantity."""
     equity, entry, stop = map(positive, (equity, entry, stop))
     risk_fraction = positive(risk_fraction)
@@ -115,10 +119,27 @@ def size_tactical(equity, entry, stop, risk_fraction, notional_cap,
         raise InvalidInput("Long stop must be below entry; risk fraction <= 1")
     friction = 2 * entry * nonnegative(slippage_bps) / 10000 + 2 * nonnegative(fee_per_share)
     unit_risk = entry - stop + friction
-    risk_qty = equity * risk_fraction / unit_risk
-    cash_qty = nonnegative(notional_cap) / (entry + nonnegative(fee_per_share))
-    qty = min(risk_qty, cash_qty).to_integral_value(rounding=ROUND_FLOOR)
-    return {"quantity": str(qty), "planned_loss": str(qty * unit_risk),
+    from fractional_shares import quantity_step, round_quantity_down, round_trip_friction, size_dollar_buy
+    fixed_cost = 2 * nonnegative(fee_per_order)
+    risk_qty = max(Decimal(0), equity * risk_fraction - fixed_cost) / unit_risk
+    cash_size = size_dollar_buy(notional_cap, entry, quantity_increment, min_notional,
+                               fee_per_share=fee_per_share, fee_per_order=fee_per_order)
+    qty = round_quantity_down(min(risk_qty, dec(cash_size["quantity"])), quantity_increment)
+    step = quantity_step(quantity_increment)
+    def planned_loss(quantity):
+        return quantity * (entry - stop) + round_trip_friction(quantity, entry, slippage_bps, fee_per_share, fee_per_order)
+    # The linear upper bound can understate rounded fees for tiny positions.
+    low, high = 0, int(qty / step)
+    while low < high:
+        middle = (low + high + 1) // 2
+        if planned_loss(step * middle) <= equity * risk_fraction:
+            low = middle
+        else:
+            high = middle - 1
+    qty = step * low
+    if qty * entry < nonnegative(min_notional):
+        qty = Decimal(0)
+    return {"quantity": str(qty), "planned_loss": str(planned_loss(qty)),
             "per_share_risk": str(unit_risk), "gap_loss_is_uncapped": True}
 
 
@@ -154,10 +175,12 @@ def evaluate(policy, snapshot, order, now=None):
             reasons.append("ONLY_DAY_LIMIT_ORDERS_SUPPORTED")
         if order.get("extended_hours") is not False:
             reasons.append("EXTENDED_HOURS_DISABLED")
+        if order.get("order_basis", "quantity") != "quantity" or "notional" in order:
+            reasons.append("NATIVE_DOLLAR_ORDER_ADAPTER_UNAVAILABLE")
         qty, price = positive(order["quantity"]), positive(order["limit_price"])
-        if qty != qty.to_integral_value():
-            reasons.append("WHOLE_SHARES_REQUIRED")
         quote = snapshot["quotes"][symbol]
+        from fractional_shares import fractional_order_reasons, cash_requirement, round_trip_friction
+        reasons.extend(fractional_order_reasons(policy, quote, order, now))
         if quote["asset_type"] != order["asset_type"]:
             reasons.append("INSTRUMENT_TYPE_MISMATCH")
         bid, ask = positive(quote["bid"]), positive(quote["ask"])
@@ -216,9 +239,8 @@ def evaluate(policy, snapshot, order, now=None):
                 stop = positive(p["stop_price"])
                 if side == "buy" and mark <= stop:
                     reasons.append("EXISTING_TACTICAL_STOP_BREACHED")
-                open_risk += pqty * (max(mark - stop, Decimal(0)) +
-                                     2 * mark * dec(limits["slippage_bps"]) / 10000 +
-                                     2 * dec(limits["fee_per_share"]))
+                open_risk += pqty * max(mark - stop, Decimal(0)) + round_trip_friction(
+                    pqty, mark, limits["slippage_bps"], limits["fee_per_share"], limits.get("fee_per_order", 0))
         if abs(total_value + cash - equity) > max(Decimal("1"), equity * Decimal("0.0001")):
             reasons.append("EQUITY_POSITION_CASH_MISMATCH")
         seen_pending = set()
@@ -236,7 +258,8 @@ def evaluate(policy, snapshot, order, now=None):
             if p["side"] == "buy":
                 reserve_price = positive(p["reservation_price"])
                 reserve = remaining * reserve_price
-                reserved_cash += reserve + remaining * dec(limits["fee_per_share"])
+                reserved_cash += cash_requirement(remaining, reserve_price, limits["fee_per_share"],
+                                                   limits.get("fee_per_order", 0))
                 sleeve_values[p["sleeve"]] += reserve
                 symbol_values[p["symbol"]] = symbol_values.get(p["symbol"], Decimal(0)) + reserve
                 if p.get('asset_type') != 'etf':
@@ -245,9 +268,8 @@ def evaluate(policy, snapshot, order, now=None):
                     stop = positive(p["stop_price"])
                     if stop >= reserve_price:
                         raise InvalidInput("Invalid pending stop")
-                    open_risk += remaining * (reserve_price - stop +
-                        2 * reserve_price * dec(limits["slippage_bps"]) / 10000 +
-                        2 * dec(limits["fee_per_share"]))
+                    open_risk += remaining * (reserve_price - stop) + round_trip_friction(
+                        remaining, reserve_price, limits["slippage_bps"], limits["fee_per_share"], limits.get("fee_per_order", 0))
             elif p["symbol"] == symbol and p["sleeve"] == sleeve:
                 reserved_sell += remaining
 
@@ -285,7 +307,9 @@ def evaluate(policy, snapshot, order, now=None):
             if (closing - now).total_seconds() <= float(dec(limits["no_entry_minutes_before_close"]) * 60):
                 reasons.append("TOO_LATE_FOR_NEW_ENTRY")
             notional = qty * max(price, ask)
-            cost = qty * price + qty * dec(limits["fee_per_share"])
+            cost = cash_requirement(qty, price, limits["fee_per_share"], limits.get("fee_per_order", 0))
+            if "dollar_budget" in order and cost > nonnegative(order["dollar_budget"]):
+                reasons.append("ORDER_EXCEEDS_DOLLAR_BUDGET_INCLUDING_FEES")
             available = min(cash - reserved_cash - equity * dec(limits["cash_floor"]),
                             settled - reserved_cash, buying_power)
             if cost > available:
@@ -323,14 +347,13 @@ def evaluate(policy, snapshot, order, now=None):
                 stop, target = positive(order["stop_price"]), positive(order["target_price"])
                 if not stop < price < target:
                     raise InvalidInput("Expected stop < long entry < target")
-                friction = 2 * price * dec(limits["slippage_bps"]) / 10000 + 2 * dec(limits["fee_per_share"])
-                unit_risk = price - stop + friction
-                risk = qty * unit_risk
+                friction = round_trip_friction(qty, price, limits["slippage_bps"], limits["fee_per_share"], limits.get("fee_per_order", 0))
+                risk = qty * (price - stop) + friction
                 if risk > equity * dec(limits["risk_per_trade"]):
                     reasons.append("PER_TRADE_RISK_CAP")
                 if open_risk + risk > equity * dec(limits["open_risk"]):
                     reasons.append("OPEN_RISK_CAP")
-                reward_risk = (target - price - friction) / unit_risk
+                reward_risk = (qty * (target - price) - friction) / risk
                 if reward_risk < dec(limits["min_reward_risk"]):
                     reasons.append("REWARD_RISK_AFTER_COSTS")
                 exit_by = timestamp(order["exit_by"])

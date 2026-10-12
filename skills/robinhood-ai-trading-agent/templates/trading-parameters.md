@@ -38,7 +38,9 @@ This is an unapproved worksheet. personal-policy.example.json initializes person
 - Mandate start/expiry, revocation and human authorization reference:
 
 Normalize approved values into policy.json before any personal live execution.
-The supplied risk engine supports unlevered long-only whole-share equities/ETFs.
+The supplied risk engine supports unlevered long-only whole or fractional equity/ETF
+quantity-limit orders. Fractionals require explicit policy enablement and observed
+broker eligibility, precision and order/fill semantics; see references/fractional-shares.md.
 Do not enable unsupported instruments by changing prose or a Boolean.
 
 See autonomous-mandate.md for the concrete approval worksheet. Follow references/personal-setup.md for personal connection, capability discovery and activation. Installation alone creates no authority.

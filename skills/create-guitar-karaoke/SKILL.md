@@ -22,8 +22,8 @@ Translate natural-language requests with this table:
 
 | User intent | Stem | Scope | Default result |
 | --- | --- | --- | --- |
-| Remove all guitars for the whole song | Aggregate guitar | Whole | Default guitar-labelled estimate across the song; coverage and bleed vary |
-| Remove all guitars in these sections | Aggregate guitar | Windows | Default guitar-labelled estimate only in the selected sections |
+| Remove all guitars for the whole song | Authorized aggregate guitar | Whole | Supplied guitar-labelled estimate across the song; coverage and bleed vary |
+| Remove all guitars in these sections | Authorized aggregate guitar | Windows | Supplied guitar-labelled estimate only in the selected sections |
 | Remove just the lead solos | Lead stem if available; otherwise aggregate guitar | Solo windows | Role-specific with a verified lead stem; fallback also removes rhythm guitar inside the windows |
 | Remove just rhythm guitar | Rhythm stem | Whole or windows | Role-specific only with a compatible rhythm stem |
 | Keep solos but remove backing guitars | Aggregate guitar | Outside solo windows | Approximation: all guitars remain during the solo windows |
@@ -43,15 +43,16 @@ Read [references/modes-and-backends.md](references/modes-and-backends.md) when c
    - Use waveform, spectrogram, lyric gaps, and listening checks. Treat web timestamps as hints until aligned to the local file.
    - Include solo sections that overlap vocals; vocals are retained because the guitar stem is subtracted from the original mix.
 4. Choose the stem source:
-   - For aggregate guitar, use the open-source `audio-separator` workflow and verified BS-RoFormer-SW checkpoint in `scripts/build_guitar_karaoke.py`.
-   - For exact lead-only or rhythm-only work, use a verified compatible separator or a user-supplied full-length stem, then pass it with `--stem-file` and the matching `--stem-kind`.
-5. Before a full-song CPU run, process a representative 20-25-second smoke-test window and audition the target, retained vocals, and leakage.
+   - Prefer an authorized full-length stem with `--stem-file` and its matching `--stem-kind`. This path needs no model download. An independently licensed separator can generate the stem before this workflow.
+   - For exact lead-only or rhythm-only work, verify that the supplied stem contains that role. The optional aggregate model cannot identify guitar roles.
+   - Optional BS-Roformer-SW inference requires local checkpoint/config files and an operator-reviewed rights record; public weight rights are unresolved. Follow [model rights and local inference](references/modes-and-backends.md). Do not infer weight permission from a software MIT license or accept a risk acknowledgement as permission.
+5. Before a full-song model run, process a representative 20-25-second smoke-test window and audition the target, retained vocals, and leakage.
 6. Keep processing in 32-bit float WAV, encode MP3 once, and render video from the uncompressed edited master.
 7. Verify representative points inside and outside every edit window. Let the user audition a short failure point before uploading when separation quality is uncertain.
 
 ## Commands
 
-Install prerequisites in an isolated environment after obtaining approval for downloads:
+Install prerequisites in an isolated environment within the user's authorized task:
 
 Windows PowerShell:
 
@@ -69,20 +70,20 @@ python3 -m venv .venv
 ./.venv/bin/python -m pip install -r '<skill-dir>/scripts/requirements.txt'
 ```
 
-FFmpeg must also be installed and available on `PATH`, or supplied with `--ffmpeg`.
+FFmpeg and ffprobe must also be installed and available on `PATH`, or supplied with `--ffmpeg` and `--ffprobe`. ffprobe is also discovered beside FFmpeg. The base requirements exclude the optional separator. [Third-party notices](THIRD-PARTY-NOTICES.md) distinguish this skill's MIT license from dependencies, models, music and images.
 
 In the commands below, replace `<skill-dir>` with the directory containing this `SKILL.md`. Replace `<python>` with the isolated interpreter: `& ".\.venv\Scripts\python.exe"` in PowerShell, or `./.venv/bin/python` on macOS, Linux, or WSL.
 
 Remove aggregate guitar from the entire song:
 
 ```text
-<python> "<skill-dir>/scripts/build_guitar_karaoke.py" "song.mp3" --scope whole --work-dir "work/song" --output "outputs/song - All Guitars Removed.mp3"
+<python> "<skill-dir>/scripts/build_guitar_karaoke.py" "song.mp3" --stem-file "stems/guitar.wav" --stem-kind aggregate-guitar --scope whole --work-dir "work/song" --output "outputs/song - All Guitars Removed.mp3"
 ```
 
 Remove aggregate guitar only during lead-solo windows while retaining vocals:
 
 ```text
-<python> "<skill-dir>/scripts/build_guitar_karaoke.py" "song.mp3" --scope windows --window "01:20.00-01:45.50" --window "02:50.25-03:10.00" --window "04:05.00-end" --work-dir "work/song" --output "outputs/song - Solo Sections Guitar Muted.mp3"
+<python> "<skill-dir>/scripts/build_guitar_karaoke.py" "song.mp3" --stem-file "stems/guitar.wav" --stem-kind aggregate-guitar --scope windows --window "01:20.00-01:45.50" --window "02:50.25-03:10.00" --window "04:05.00-end" --work-dir "work/song" --output "outputs/song - Solo Sections Guitar Muted.mp3"
 ```
 
 Remove an exact full-length rhythm stem supplied by another separator:
@@ -94,10 +95,10 @@ Remove an exact full-length rhythm stem supplied by another separator:
 Approximate a rhythm-muted practice mix by removing aggregate guitar everywhere except the known lead windows:
 
 ```text
-<python> "<skill-dir>/scripts/build_guitar_karaoke.py" "song.mp3" --scope outside-windows --window "01:20.00-01:45.50" --window "02:50.25-03:10.00" --window "04:05.00-end" --work-dir "work/song-rhythm-approx" --output "outputs/song - Backing Guitars Reduced.mp3"
+<python> "<skill-dir>/scripts/build_guitar_karaoke.py" "song.mp3" --stem-file "stems/guitar.wav" --stem-kind aggregate-guitar --scope outside-windows --window "01:20.00-01:45.50" --window "02:50.25-03:10.00" --window "04:05.00-end" --work-dir "work/song-rhythm-approx" --output "outputs/song - Backing Guitars Reduced.mp3"
 ```
 
-The script splits long material into context-padded tiles, verifies the model checkpoint before inference, crossfades the estimates, subtracts the selected stem from the original master, copies only descriptive metadata, and writes a JSON report. Use `--stage prepare`, `--stage separate`, or `--stage mix` to resume a long CPU workflow; immutable resume arguments are checked against the manifest. Use a fresh work directory per source. Add `--overwrite` only for an intentional deliverable redo and `--cleanup-unused-stems` only after verification.
+The script subtracts the selected stem from the original master, copies descriptive tags through FFmpeg without re-encoding the MP3 again, and writes a JSON report. The optional local model path tiles long material, verifies asset hashes and the rights record before inference, and crossfades its estimates. Use `--stage prepare`, `--stage separate`, or `--stage mix` to resume; immutable arguments and evidence are checked. Use a fresh work directory per source. Add `--overwrite` only for an intentional deliverable redo and `--cleanup-unused-stems` only after verification.
 
 ## Still Image and Video
 
@@ -113,10 +114,10 @@ Read [references/quality-video-and-upload.md](references/quality-video-and-uploa
 
 ## Quality Rules
 
-- The helper intentionally converts working audio to 44.1 kHz stereo for the pinned model. Report this conversion when the source format differs.
+- The helper intentionally converts working audio to 44.1 kHz stereo. Report this conversion when the source format differs.
 - Use 10 seconds of model context and 0.35-second raised-cosine edit fades unless listening tests justify different values.
 - Split long spans into bounded model tiles. The mixer still holds several full-length arrays, so honor its RAM preflight for unusually long material.
-- Expect six generated model stems and substantial temporary disk use. Check free space and optionally clean unused stems only after successful verification.
+- For optional model inference, expect six generated stems and substantial temporary disk use. Check free space and optionally clean unused stems only after successful verification.
 - Keep the decoded 32-bit float mix unchanged outside the selected subtraction envelope. MP3 and video outputs are fully re-encoded and may receive one global headroom gain.
 - Do not claim that vocals are perfectly unchanged: model leakage can remove a small amount of other content with the guitar estimate.
 - Do not silently substitute a center-cancel, EQ filter, or aggregate guitar stem for exact lead/rhythm separation.

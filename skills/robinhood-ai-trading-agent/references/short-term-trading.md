@@ -87,9 +87,12 @@ Small-account sizing uses actual settled cash and broker-specific restrictions.
 Do not assume intraday sale proceeds are reusable immediately or hard-code an
 obsolete universal account rule. Keep core shares/cash reserved. At $500 equity,
 the illustrative 5% intraday sleeve permits at most $25 notional before stricter
-risk/cash/cost limits; whole-share sizing may correctly be zero. Do not increase
+risk/cash/cost limits. Use observed fractional increments where supported; a valid
+size may still be zero. Do not increase
 the sleeve, enable leverage or choose illiquid cheap shares to manufacture activity.
-Fractional trading needs a separately supported and validated adapter.
+Fractional trading follows [fractional-shares.md](fractional-shares.md), including
+verified fractional protection and cumulative fill semantics. Use
+`size_tactical(..., quantity_increment=observed_increment, min_notional=observed_minimum)`.
 
 For a configurable usable-cash reserve, read
 [settled-cash-planning.md](settled-cash-planning.md). Budget before buying so that

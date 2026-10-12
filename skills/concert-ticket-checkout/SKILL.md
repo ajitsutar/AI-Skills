@@ -116,3 +116,8 @@ Next action: <what the user should do or approve>
 ```
 
 If no suitable tickets are available, say so clearly and include the checked sources.
+
+## License and provenance
+
+For reuse or redistribution, see the [MIT license](LICENSE),
+[provenance](PROVENANCE.md) and [third-party notices](THIRD-PARTY-NOTICES.md).

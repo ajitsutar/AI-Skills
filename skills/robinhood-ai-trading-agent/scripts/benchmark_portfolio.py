@@ -107,7 +107,7 @@ def construct(document):
             'input_sha256': digest(document), 'max_constraint_violation': max(violations),
             'calibration_evidence_status': 'DECLARED_NOT_VERIFIED',
             'strong_buy_available': False, 'execution_authorized': False,
-            'limitations': 'No shares, orders, tax-lot optimization or live authority. Review liquidity/whole-share feasibility and broker risk gates separately. Solver weights can differ at floating-point tolerance across platforms.'}
+            'limitations': 'No shares, orders, tax-lot optimization or live authority. Review liquidity, observed whole/fractional quantity increments and broker risk gates separately. Solver weights can differ at floating-point tolerance across platforms.'}
 
 
 def main():

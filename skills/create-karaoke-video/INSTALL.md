@@ -5,6 +5,10 @@ subfolders together. No files from another skill or the repository root are
 required to use it. Runtime tools, Python/Node packages, model downloads and
 authenticated services are separate prerequisites described in [SKILL.md](SKILL.md).
 
+Keep [LICENSE](LICENSE), [PROVENANCE.md](PROVENANCE.md), and
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) with the folder. The skill's MIT
+license does not replace the terms of separately installed tools, models, or fonts.
+
 ## Codex or another Agent Skills host
 
 Copy this entire `create-karaoke-video` folder into the skills directory used by your host.

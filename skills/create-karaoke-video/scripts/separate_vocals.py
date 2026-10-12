@@ -2,6 +2,7 @@
 import argparse
 import contextlib
 import importlib.util
+import json
 import os
 import shutil
 import subprocess
@@ -199,11 +200,46 @@ def ensure_demucs_available():
         )
 
 
+def validate_model_rights(path, model, use_category):
+    """Check an operator's model-use record, not the legal validity of its claims."""
+    try:
+        record = json.loads(Path(path).read_text(encoding="utf-8-sig"))
+    except (OSError, ValueError) as exc:
+        raise SystemExit(f"Cannot read model rights record: {exc}") from exc
+    if not isinstance(record, dict):
+        raise SystemExit("Model rights record must be a JSON object.")
+    if record.get("model") != model:
+        raise SystemExit("Model rights record does not match the selected model.")
+    if record.get("use_category") != use_category:
+        raise SystemExit("Model rights record does not match the intended use category.")
+    for field in ("intended_use", "evidence"):
+        if not isinstance(record.get(field), str) or not record[field].strip():
+            raise SystemExit(f"Model rights record needs a non-empty {field}.")
+    if record.get("confirmed_by_operator") is not True:
+        raise SystemExit("Model rights record must be confirmed by the operator.")
+    basis = record.get("rights_basis")
+    if basis == "scientific_purposes":
+        if use_category != "scientific_research":
+            raise SystemExit(
+                "Scientific-purpose model terms do not establish permission for this use. "
+                "Use separately permitted weights or a licensed instrumental."
+            )
+    elif basis != "separate_permission":
+        raise SystemExit("Model rights record needs scientific_purposes or separate_permission rights_basis.")
+    return record
+
+
 def main():
     parser = argparse.ArgumentParser(description="Run Demucs vocal separation and print the no-vocals stem path.")
     parser.add_argument("audio", help="Input audio file, such as MP3, M4A, WAV, or FLAC.")
     parser.add_argument("--outdir", default="work/separated", help="Separation output directory.")
     parser.add_argument("--model", default="htdemucs", help="Demucs model name.")
+    parser.add_argument("--rights-record", required=True, help="JSON record of model-specific permission and intended use.")
+    parser.add_argument(
+        "--use-category", required=True,
+        choices=("scientific_research", "personal", "publication", "commercial"),
+        help="Actual intended use; scientific-purpose terms do not cover the other categories.",
+    )
     parser.add_argument("--device", default=None, help="Optional Demucs device, such as cpu or cuda.")
     parser.add_argument("--overwrite", action="store_true", help="Replace an existing complete track output.")
     args = parser.parse_args()
@@ -212,6 +248,7 @@ def main():
     if not audio.is_file():
         raise SystemExit(f"Audio file not found: {audio}")
 
+    validate_model_rights(args.rights_record, args.model, args.use_category)
     ensure_demucs_available()
     outdir = Path(args.outdir).resolve()
     if outdir.exists() and not outdir.is_dir():

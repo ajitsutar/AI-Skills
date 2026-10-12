@@ -28,3 +28,11 @@ For a host that accepts skill ZIPs, zip this entire folder so the archive contai
 `robinhood-ai-trading-agent/SKILL.md` and its sibling resources. Do not zip only `SKILL.md`.
 Keep generated outputs, environments and account configuration outside the package.
 Uploading the package does not configure external tools or grant transaction authority.
+
+## License and notices
+
+Keep the included [MIT License](LICENSE), [third-party notices](THIRD-PARTY-NOTICES.md)
+and [arch license](ARCH-LICENSE.txt) in copies and ZIPs. MIT covers the
+repository-authored skill code and documentation; dependencies, reports and market
+data retain their own terms. [PROVENANCE.md](PROVENANCE.md) records the source audit
+and the unresolved origin of the historical predecessor.

@@ -22,6 +22,23 @@ class StandalonePackagingTests(unittest.TestCase):
         with patch.object(validator, "ROOT", self.root / "missing-repository"):
             validator.validate_skill(self.skill)
 
+    def test_standalone_copy_must_preserve_license_and_notices(self):
+        for name in ("LICENSE", "PROVENANCE.md", "THIRD-PARTY-NOTICES.md"):
+            with self.subTest(name=name):
+                path = self.skill / name
+                original = path.read_bytes()
+                path.unlink()
+                try:
+                    with self.assertRaisesRegex(validator.ValidationError, "standalone notice"):
+                        validator.validate_skill(self.skill)
+                finally:
+                    path.write_bytes(original)
+
+    def test_empty_license_cannot_count_as_preserved_permission(self):
+        (self.skill / "LICENSE").write_text("", encoding="utf-8")
+        with self.assertRaisesRegex(validator.ValidationError, "standalone notice"):
+            validator.validate_skill(self.skill)
+
     def test_existing_reference_outside_skill_is_rejected(self):
         (self.root / "shared.md").write_text("Not bundled", encoding="utf-8")
         with (self.skill / "INSTALL.md").open("a", encoding="utf-8") as stream:

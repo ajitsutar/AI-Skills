@@ -5,6 +5,8 @@ from __future__ import annotations
 
 import argparse
 import json
+import os
+import shutil
 import subprocess
 import sys
 import tempfile
@@ -16,6 +18,25 @@ import numpy as np
 import soundfile as sf
 
 import build_guitar_karaoke as guitar
+
+
+def write_rights_record(root: Path) -> Path:
+    """Synthetic test record, not evidence of rights to any real model."""
+    path = root / "test-rights.json"
+    path.write_text(json.dumps({
+        "schema_version": 1,
+        "checkpoint_sha256": guitar.EXPECTED_MODEL_SHA256,
+        "config_sha256": guitar.EXPECTED_CONFIG_SHA256,
+        "rights_holder": "Synthetic test fixture only",
+        "license_name": "Synthetic test grant",
+        "terms_source": "Unit test fixture, no real permission asserted",
+        "permitted_use": "Mocked tests without inference",
+        "reviewed_by": "Test fixture",
+        "covers_model_weights": True,
+        "covers_config": True,
+        "intended_use_permitted": True,
+    }), encoding="utf-8")
+    return path
 
 
 class TimestampAndMaskTests(unittest.TestCase):
@@ -214,6 +235,12 @@ class SafetyAndCacheTests(unittest.TestCase):
                     "clip_sha256": guitar.hash_file(clip),
                 }],
             }
+            evidence_path = write_rights_record(root)
+            manifest.update({
+                "model_license_evidence_path": str(evidence_path),
+                "model_license_evidence_sha256": guitar.hash_file(evidence_path),
+                "model_license_evidence": json.loads(evidence_path.read_text(encoding="utf-8")),
+            })
             (work / "manifest.json").write_text(json.dumps(manifest), encoding="utf-8")
             self.assertEqual(guitar.load_manifest(work)["work_dir"], str(work))
 
@@ -345,6 +372,140 @@ class SafetyAndCacheTests(unittest.TestCase):
         )
         self.assertNotEqual(completed.returncode, 0)
         self.assertIn("require --stem-file", completed.stderr)
+
+
+class ModelRightsTests(unittest.TestCase):
+    def test_missing_rights_rejected_before_preparation_or_backend(self) -> None:
+        args = argparse.Namespace(stem_file=None, model_license_evidence=None, model_dir=None)
+        with mock.patch.object(guitar, "audio_modules") as modules, mock.patch.object(guitar, "run") as run:
+            with self.assertRaisesRegex(SystemExit, "--stem-file"):
+                guitar.prepare(args, "ffmpeg")
+            modules.assert_not_called()
+            run.assert_not_called()
+
+    def test_code_license_or_asset_mismatch_cannot_authorize_model(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = write_rights_record(root)
+            evidence = json.loads(path.read_text(encoding="utf-8"))
+            evidence["covers_model_weights"] = False
+            path.write_text(json.dumps(evidence), encoding="utf-8")
+            with self.assertRaisesRegex(SystemExit, "weights and config"):
+                guitar.read_model_license_evidence(path)
+            evidence["covers_model_weights"] = True
+            evidence["checkpoint_sha256"] = "0" * 64
+            path.write_text(json.dumps(evidence), encoding="utf-8")
+            with self.assertRaisesRegex(SystemExit, "does not match"):
+                guitar.read_model_license_evidence(path)
+
+    def test_missing_local_model_never_calls_separator_or_download(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = write_rights_record(root)
+            manifest = {
+                "stem_source": guitar.MODEL_LABEL,
+                "models_dir": str(root / "missing-models"),
+                "model_license_evidence_path": str(path),
+                "model_license_evidence_sha256": guitar.hash_file(path),
+                "model_license_evidence": json.loads(path.read_text(encoding="utf-8")),
+            }
+            with mock.patch.object(guitar, "resolve_separator") as resolve, mock.patch.object(guitar, "run") as run:
+                with self.assertRaisesRegex(SystemExit, "Automatic model downloads are disabled"):
+                    guitar.separate(argparse.Namespace(audio_separator=None), manifest, "ffmpeg")
+                resolve.assert_not_called()
+                run.assert_not_called()
+
+    def test_changed_rights_record_rejected_on_resume(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            path = write_rights_record(Path(directory))
+            manifest = {
+                "model_license_evidence_path": str(path),
+                "model_license_evidence_sha256": guitar.hash_file(path),
+                "model_license_evidence": json.loads(path.read_text(encoding="utf-8")),
+            }
+            guitar.verify_model_rights_record(manifest)
+            path.write_text(path.read_text(encoding="utf-8") + "\n", encoding="utf-8")
+            with self.assertRaisesRegex(SystemExit, "changed after preparation"):
+                guitar.verify_model_rights_record(manifest)
+
+
+class MediaMetadataTests(unittest.TestCase):
+    def test_probe_parses_audio_stream_and_case_insensitive_tags(self) -> None:
+        payload = {"format": {"duration": "2.1", "bit_rate": "123456", "tags": {"ARTIST": "Artist"}},
+                   "streams": [{"sample_rate": "44100", "duration": "2.0"}]}
+        with mock.patch.object(guitar.subprocess, "run", return_value=argparse.Namespace(stdout=json.dumps(payload))):
+            info = guitar.media_info(Path("test.wav"), "ffprobe")
+        self.assertEqual(info["duration_seconds"], 2.0)
+        self.assertEqual(info["sample_rate"], 44100)
+        self.assertEqual(info["tags"]["artist"], ["Artist"])
+
+    def test_probe_rejects_missing_audio_or_unknown_duration(self) -> None:
+        for payload in ({"format": {}}, {"streams": [{"duration": "N/A"}]}, {"streams": [{"duration": "NaN"}]}):
+            with mock.patch.object(guitar.subprocess, "run", return_value=argparse.Namespace(stdout=json.dumps(payload))):
+                with self.assertRaises(SystemExit):
+                    guitar.media_info(Path("bad.wav"), "ffprobe")
+
+    def test_metadata_uses_stream_copy_and_only_descriptive_tags(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            destination = root / "delivery.mp3"
+            destination.write_bytes(b"audio")
+            tags = {"albumartist": ["Artist"], "tracknumber": ["2/10"], "title": ["Old"],
+                    "replaygain_track_gain": ["+99 dB"], "encoder": ["Stale"]}
+            with mock.patch.object(guitar, "media_info", return_value={"tags": tags}), mock.patch.object(guitar, "run") as run:
+                result = guitar.copy_safe_metadata(root / "source.mp3", destination, "New = Title", "ffmpeg", "ffprobe")
+            command = run.call_args.args[0]
+            self.assertEqual(command[command.index("-c:a") + 1], "copy")
+            self.assertIn("album_artist=Artist", command)
+            self.assertIn("track=2/10", command)
+            self.assertIn("title=New = Title", command)
+            self.assertFalse(any("replaygain" in part or "Stale" in part for part in command))
+            self.assertEqual(result["fields"], ["album_artist", "title", "track"])
+
+
+FFMPEG = os.environ.get("FFMPEG_BINARY") or shutil.which("ffmpeg")
+FFPROBE = os.environ.get("FFPROBE_BINARY") or shutil.which("ffprobe")
+
+
+@unittest.skipUnless(FFMPEG and FFPROBE, "FFmpeg/ffprobe required for media integration")
+class FFmpegIntegrationTests(unittest.TestCase):
+    def test_real_metadata_remux_preserves_decoded_audio(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            source, delivery = root / "source.mp3", root / "delivery.mp3"
+            subprocess.run([FFMPEG, "-nostdin", "-y", "-v", "error", "-f", "lavfi", "-i",
+                            "sine=frequency=440:duration=1", "-metadata", "artist=Test Artist",
+                            "-metadata", "replaygain_track_gain=+20 dB", "-c:a", "libmp3lame",
+                            str(source)], check=True)
+            shutil.copyfile(source, delivery)
+            def decoded(path):
+                return subprocess.check_output([FFMPEG, "-nostdin", "-v", "error", "-i", str(path),
+                                                "-f", "f32le", "-c:a", "pcm_f32le", "pipe:1"])
+            before = decoded(delivery)
+            guitar.copy_safe_metadata(source, delivery, "Practice Title", FFMPEG, FFPROBE)
+            self.assertEqual(before, decoded(delivery))
+            info = guitar.media_info(delivery, FFPROBE)
+            self.assertEqual(info["tags"]["artist"], ["Test Artist"])
+            self.assertEqual(info["tags"]["title"], ["Practice Title"])
+            self.assertNotIn("replaygain_track_gain", info["tags"])
+            self.assertAlmostEqual(info["duration_seconds"], 1, delta=0.1)
+
+    def test_supplied_stem_cli_produces_exact_float_subtraction(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            stem = np.sin(np.arange(44100, dtype="float32") * 0.01)[:, None] * 0.1
+            stem = np.repeat(stem, 2, axis=1)
+            retained = np.full_like(stem, 0.05)
+            sf.write(root / "source.wav", retained + stem, 44100, subtype="FLOAT")
+            sf.write(root / "guitar.wav", stem, 44100, subtype="FLOAT")
+            subprocess.run([sys.executable, str(Path(guitar.__file__).resolve()), str(root / "source.wav"),
+                            "--stem-file", str(root / "guitar.wav"), "--stem-kind", "aggregate-guitar",
+                            "--scope", "whole", "--work-dir", str(root / "work"), "--output",
+                            str(root / "output.wav"), "--ffmpeg", FFMPEG, "--ffprobe", FFPROBE],
+                           check=True, capture_output=True, text=True)
+            output, rate = sf.read(root / "output.wav", dtype="float32", always_2d=True)
+            self.assertEqual(rate, 44100)
+            np.testing.assert_allclose(output, retained, atol=1e-7)
 
 
 if __name__ == "__main__":

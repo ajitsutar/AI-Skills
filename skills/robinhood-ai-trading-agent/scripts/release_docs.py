@@ -94,7 +94,9 @@ def render(catalog):
 
 
 def input_fingerprint(root):
-    names = {'SKILL.md', 'README.md', 'VERSION', 'INSTALL.md', CATALOG}
+    names = {'SKILL.md', 'README.md', 'VERSION', 'INSTALL.md', CATALOG,
+             'LICENSE', 'PROVENANCE.md', 'SOURCES.md', 'THIRD-PARTY-NOTICES.md',
+             'ARCH-LICENSE.txt'}
     for directory in ('scripts', 'references', 'profiles', 'templates', 'agents', 'examples'):
         for path in (root / directory).rglob('*'):
             if path.is_file() and path.suffix in ('.py', '.md', '.json', '.yaml', '.yml', '.txt', '.csv'):

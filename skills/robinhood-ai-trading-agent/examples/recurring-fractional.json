@@ -1,0 +1,12 @@
+{
+  "plan_id": "fictional-monthly-contribution",
+  "occurrence_id": "2026-10-15",
+  "account_alias": "fictional-agentic",
+  "amounts": {"CORE_A": "10.00", "CORE_B": "15.00"},
+  "prices": {"CORE_A": "300.00", "CORE_B": "700.00"},
+  "available_cash": "30.00",
+  "reserve_amount": "5.00",
+  "allow_fractional": true,
+  "fee_per_share": "0",
+  "fee_per_order": "0"
+}

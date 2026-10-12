@@ -1,8 +1,10 @@
 # Quant research methods and adoption decisions
 
-Research reviewed October 11, 2026. Sources below support method choices; none
-endorses this package or proves its performance. New code is an original
-implementation, not copied source from these publications or repositories.
+Research references reviewed October 12, 2026. Sources below support method choices; none
+endorses this package or proves its performance. The development record identifies
+local implementations of these methods; the bounded source comparison and its
+limits are in [PROVENANCE.md](../PROVENANCE.md). Method citations do not assert
+ownership of the mathematics or redistribute publication text or source code.
 
 ## Statistical evidence
 
@@ -19,7 +21,8 @@ Small samples and strong persistence can still produce poor inference. Pair it w
 report sensitivity to economically plausible block lengths. Bootstrap assumes
 approximate stationarity; it cannot manufacture crisis observations or prove alpha.
 
-`validation.holm` controls familywise testing over the complete supplied family.
+`validation.holm` implements Holm's step-down Bonferroni procedure and controls
+familywise testing over the complete supplied family.
 It does not repair unrecorded trials. `validation.sharpe` reports unannualized PSR
 and DSR diagnostics using skewness, Pearson kurtosis and cross-trial Sharpe variance.
 The selected series must be net excess returns at the same frequency as trial
@@ -37,7 +40,14 @@ independent requirements in `strategy_validation.py`.
 Sources: [Bailey and López de Prado, Deflated Sharpe Ratio](https://www.davidhbailey.com/dhbpapers/deflated-sharpe.pdf),
 [Bailey et al., Probability of Backtest Overfitting](https://www.davidhbailey.com/dhbpapers/backtest-prob.pdf),
 [Newey and West, HAC covariance](https://www.nber.org/papers/t0055),
-[Robust Inference in Time Series Regression](https://www.nber.org/papers/w32554).
+[Robust Inference in Time Series Regression](https://www.nber.org/papers/w32554),
+[Holm, A Simple Sequentially Rejective Multiple Test Procedure (1979)](https://www.jstor.org/stable/4615733),
+and [Politis and Romano, A Circular Block-Resampling Procedure for Stationary Data
+(Stanford technical report, 1991)](https://statistics.stanford.edu/technical-reports/circular-block-resampling-procedure-stationary-data).
+The bootstrap helper samples fixed-length blocks with wraparound and trims the
+concatenated sample to the original length. It does not implement the distinct
+stationary bootstrap with geometrically distributed block lengths. These are
+method references; the package does not redistribute their paper text or code.
 
 ## Risk and construction
 
@@ -61,6 +71,23 @@ including a fractional boundary observation. It reports effective tail sample si
 Negative loss values mean gains. Do not floor them to zero without disclosure.
 Historical ES is not a worst-case bound; add rate, credit, correlation, FX,
 liquidity, counterparty, default and gap stresses appropriate to the book.
+
+`risk.option` in `scripts/multi_asset_risk.py` uses Black-Scholes-Merton
+European option pricing with a continuous dividend yield, constant volatility and
+constant continuously compounded rates. Its delta, gamma and vega are derivatives
+of that model; vega is reported per one percentage-point volatility change. The
+expiry/zero-volatility branch reports discounted intrinsic value and withholds
+kink Greeks. These assumptions do not model early exercise, discrete dividends,
+volatility smiles or an executable market price. The helper is a local
+implementation of the published equations using SciPy's normal CDF/PDF, not an
+imported options-pricing implementation.
+
+Foundational sources: [Black and Scholes, The Pricing of Options and Corporate
+Liabilities (1973)](https://www.journals.uchicago.edu/doi/10.1086/260062),
+[Merton, Theory of Rational Option Pricing (1973)](https://www.jstor.org/stable/3003143),
+and [Merton's preceding MIT working paper (1971)](https://dspace.mit.edu/entities/publication/6e05a2fa-478f-41e6-9e69-a06532002236).
+These citations credit the model, not any claim that the package invented it or
+has permission to redistribute the publications.
 
 Sources: [Ledoit and Wolf, covariance shrinkage](https://ledoit.net/honey.pdf),
 [Boyd et al., Multi-Period Trading via Convex Optimization](https://stanford.edu/~boyd/papers/cvx_portfolio.html),

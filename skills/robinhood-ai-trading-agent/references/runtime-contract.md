@@ -73,7 +73,8 @@ signal_id is stable across polls/restarts for a setup version, symbol, signal ti
 and action. Both deduplicate. A new retry ID must not sidestep the signal key.
 
 asset_type is equity/etf; side is buy/sell; sleeve is core/swing/intraday. The current
-helper supports whole-share DAY limit orders with extended_hours=false. It validates
+helper supports quantity-based DAY limit orders with extended_hours=false, including
+fractional shares under the [fractional contract](fractional-shares.md). It validates
 tick increments, distance from current quote, freshness and expiry. Tactical buys
 require stop_price, target_price and exit_by. Intraday exit_by must precede the
 official close. Core buys must fit the symbol's approved core target.

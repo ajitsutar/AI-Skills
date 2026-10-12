@@ -195,6 +195,10 @@ def validate_skill(skill_dir: Path) -> None:
         fail(f"{skill_dir}: standalone and plugin agent content has drifted")
     if not (skill_dir / "INSTALL.md").is_file():
         fail(f"{skill_dir}: missing standalone INSTALL.md")
+    for notice in ("LICENSE", "PROVENANCE.md", "THIRD-PARTY-NOTICES.md"):
+        path = skill_dir / notice
+        if not path.is_file() or not path.read_text(encoding="utf-8").strip():
+            fail(f"{skill_dir}: missing or empty standalone notice: {notice}")
     validate_containment(skill_dir)
 
 
@@ -237,6 +241,13 @@ def validate_containment(skill_dir: Path) -> None:
 
 
 def validate_package(skill_names: set[str]) -> None:
+    license_path = ROOT / "LICENSE"
+    if not license_path.is_file():
+        fail("Missing repository LICENSE")
+    license_text = license_path.read_text(encoding="utf-8")
+    for name in skill_names:
+        if (SKILLS_DIR / name / "LICENSE").read_text(encoding="utf-8") != license_text:
+            fail(f"{name}: standalone LICENSE differs from repository MIT license")
     plugin_path = ROOT / ".claude-plugin" / "plugin.json"
     marketplace_path = ROOT / ".claude-plugin" / "marketplace.json"
     try:

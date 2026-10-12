@@ -57,7 +57,10 @@ The renderer also accepts standard SRT cues and ASS `Dialogue` events. Every for
 
 ## Rendering Checks
 
-The vocal-separation helper uses an isolated Demucs job directory and publishes one complete track directory under a cross-process lock. It preserves an existing output unless `--overwrite` is explicitly requested.
+The vocal-separation helper requires a [model-use record](../THIRD-PARTY-NOTICES.md#model-weights)
+before invoking Demucs. It uses an isolated job directory and publishes one
+complete track directory under a cross-process lock. It preserves an existing
+output unless `--overwrite` is explicitly requested.
 
 After rendering, inspect:
 
