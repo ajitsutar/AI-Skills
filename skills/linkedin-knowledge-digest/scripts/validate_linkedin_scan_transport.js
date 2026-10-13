@@ -3,6 +3,7 @@ const path = require("path");
 
 const {
   HELPER_NAMES,
+  SEARCH_HELPERS,
   ORCHESTRATOR_NAME
 } = require("./materialize_linkedin_scan_transport");
 
@@ -26,11 +27,21 @@ if (!lines.includes("if automationWindow is not missing value then close automat
 if (lines.some((line) => /javascript\s+"/.test(line))) {
   failures.push("JavaScript must be loaded from files, never inlined into AppleScript");
 }
-if (!lines.includes("repeat with bandIndex from 1 to 10")) {
+const searchMode = lines.some((line) => line.includes("linkedin_search_candidates.js"));
+if (searchMode && lines.some((line) => /https:\/\/www.linkedin.com\/(mynetwork|messaging)\//.test(line))) {
+  failures.push("search mode must not visit private connections/inbox pages");
+}
+if (searchMode && lines.some((line) => line.includes('https://www.linkedin.com/feed/')) && !lines.includes("repeat with networkBandIndex from 1 to 3")) {
+  failures.push("supplemental connections-update scan must be explicitly bounded");
+}
+if (searchMode) {
+  const loops = lines.filter((line) => /^repeat with bandIndex from 1 to /.test(line)).map((line) => Number(line.split(" ").pop()));
+  if (!loops.length || loops.some((n) => n < 3) || loops.reduce((a, b) => a + b, 0) > 10) failures.push("invalid search band bounds");
+} else if (!lines.includes("repeat with bandIndex from 1 to 10")) {
   failures.push("runner must inspect ten bounded feed bands");
 }
 
-for (const helper of HELPER_NAMES) {
+for (const helper of searchMode ? SEARCH_HELPERS : HELPER_NAMES) {
   const loadLine = lines.find((line) => line.includes(`POSIX file`) && line.includes(helper));
   if (!loadLine) {
     failures.push(`missing helper load: ${helper}`);

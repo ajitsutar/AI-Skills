@@ -10,6 +10,7 @@ const orchestrator = require("./linkedin_scan_orchestrator");
 const {
   ORCHESTRATOR_NAME,
   DELIVERY_NAME,
+  buildManifest,
   materialize
 } = require("./materialize_linkedin_scan_transport");
 
@@ -36,7 +37,7 @@ function rawTransport(bands, connections = "{bad", messages = "") {
 function testManifestCommand() {
   const command = orchestrator.buildOsaScriptCommand([
     'tell application "Google Chrome"',
-    'set value to "Ajit\'s digest"',
+    'set value to "Reader\'s digest"',
     "end tell"
   ]);
   assert.ok(command.startsWith(`osascript -e 'tell application "Google Chrome"'`));
@@ -84,7 +85,7 @@ function testCompactSummaryIsPublicAndStateAware() {
     band(3)
   ], JSON.stringify({
     ok: true,
-    items: [{ profile: "https://www.linkedin.com/in/ada", text: "Ada Lovelace Oracle" }]
+    items: [{ profile: "https://www.linkedin.com/in/ada", text: "Ada Lovelace Example University" }]
   }), JSON.stringify({
     ok: true,
     threads: [{ href: "https://www.linkedin.com/messaging/thread/private", text: "private message" }]
@@ -98,7 +99,7 @@ function testCompactSummaryIsPublicAndStateAware() {
       seen: [{ url: seen }]
     },
     currentTimeIso: "2026-09-02T13:00:00Z",
-    priorityOrganizations: ["Oracle"]
+    priorityOrganizations: ["Example University"]
   });
   assert.equal(summary.ok, true);
   assert.equal(summary.candidates.length, 1);
@@ -135,14 +136,14 @@ function testRunsWithoutBrowserUrlGlobal() {
 function testAiFocusAndEvidenceRanking() {
   const parsed = orchestrator.parseMarkedTransport(rawTransport([
     band(1, { posts: [
-      { author: "Familiar Oracle Author", text: "1h AI is changing everything about enterprise software!", engagement: "900,000 reactions", contentUrls: ["https://www.linkedin.com/posts/viral-ai"] },
+      { author: "Familiar Example University Author", text: "1h AI is changing everything about enterprise software!", engagement: "900,000 reactions", contentUrls: ["https://www.linkedin.com/posts/viral-ai"] },
       { author: "Research Lab", text: "2h Machine learning evaluation with reproducible baselines and limitations.", engagement: "3 reactions", contentUrls: ["https://www.linkedin.com/posts/paper-share", "https://example.com/paper"] },
       { author: "Cloud Team", text: "1h Database architecture report with detailed benchmarks.", contentUrls: ["https://example.com/database"] },
       { author: "Recruiter", text: "1h Hiring AI research engineers. Apply now!", contentUrls: ["https://example.com/jobs"] }
     ] }),
     band(2), band(3)
   ]));
-  const input = { transport: parsed, state: { seen: [] }, currentTimeIso: "2026-10-12T13:00:00Z", priorityOrganizations: ["Oracle"] };
+  const input = { transport: parsed, state: { seen: [] }, currentTimeIso: "2026-10-12T13:00:00Z", priorityOrganizations: ["Example University"] };
   const ai = orchestrator.buildCompactSummary(input);
   assert.equal(ai.contentFocus, "ai");
   assert.equal(ai.candidates.length, 2);
@@ -239,6 +240,9 @@ async function testPendingStopsBeforeBrowser() {
 }
 
 async function main() {
+  testSearchMode();
+  testUserConfiguredConnectionPriority();
+  testSearchExtraction();
   testManifestCommand();
   testTransportParsingAndOptionalDegradation();
   testMaterializationIncludesOrchestrator();
@@ -250,6 +254,111 @@ async function main() {
   await testRunCollectsAllChunksWithoutStore();
   await testPendingStopsBeforeBrowser();
   console.log("LinkedIn scan orchestrator tests passed.");
+}
+
+function testSearchMode() {
+  const queries = ["AI research", "LLM engineering", "AI safety"];
+  const lines = buildManifest("/workspace/scripts", { linkedin_mode: "search", linkedin_queries: queries });
+  assert.equal(lines.filter((line) => line === "set automationWindow to make new window").length, 1);
+  assert.ok(!lines.some((line) => /https:\/\/www.linkedin.com\/(feed|mynetwork|messaging)\//.test(line)));
+  assert.ok(lines.every((line) => !/javascript\s+"/.test(line)));
+  const bands = queries.flatMap((query) => [1, 2, 3].map((n) => ({
+    ...band(n), payloadType: "linkedin_search_band", query,
+    completionMetadata: { pageValidated: true, searchBandsInspected: n },
+    posts: n === 1 ? [{ author: "Example University Research", text: "3d AI research benchmark paper with methodology and limitations.", contentUrls: ["https://example.com/paper"] }] : []
+  })));
+  const options = { discoveryMode: "search", searchQueries: queries };
+  const transport = orchestrator.parseMarkedTransport(rawTransport(bands), options);
+  assert.equal(transport.ok, true);
+  assert.equal(transport.searchBandsInspected, 9);
+  const summary = orchestrator.buildCompactSummary({
+    transport, state: { last_successful_run_at: "2026-10-12T13:00:00Z", seen: [] },
+    currentTimeIso: "2026-10-13T13:00:00Z", discoveryMode: "search", maxSourceAgeDays: 7,
+    priorityOrganizations: ["Example University"]
+  });
+  assert.equal(summary.candidates.length, 1);
+  assert.equal(summary.candidates[0].priorityNetwork, false);
+  assert.equal(summary.candidates[0].discovery, "linkedin_search");
+  assert.equal(summary.optionalSources.connectionsOk, false);
+  const network = [1, 2, 3].map((n) => ({
+    ...band(n), payloadType: "linkedin_network_band", query: "",
+    completionMetadata: { pageValidated: true, searchBandsInspected: n },
+    posts: n === 1 ? [{ author: "Connection", connectionDegree: 1, publicAudience: true, text: "1h Database architecture report and technical security analysis.", contentUrls: ["https://example.com/database"] }] : []
+  }));
+  const combined = orchestrator.parseMarkedTransport(rawTransport([...bands, ...network]), { ...options, includeConnectionsUpdates: true });
+  assert.equal(combined.ok, true);
+  const generalConnection = orchestrator.buildCompactSummary({ transport: combined, state: { seen: [] }, currentTimeIso: "2026-10-13T13:00:00Z", discoveryMode: "search" });
+  assert.ok(generalConnection.candidates.some((c) => c.kind === "connection_update" && !c.aiRelevant));
+  assert.equal(orchestrator.parseMarkedTransport(rawTransport(bands), { ...options, includeConnectionsUpdates: true }).ok, false);
+  assert.equal(orchestrator.parseMarkedTransport(rawTransport(bands.slice(0, 8)), options).ok, false);
+  assert.equal(orchestrator.parseMarkedTransport(rawTransport(bands), { ...options, searchQueries: ["other"] }).ok, false);
+  assert.equal(orchestrator.parseMarkedTransport(rawTransport(bands)).ok, false);
+  assert.throws(() => buildManifest("/tmp", { linkedin_mode: "search", linkedin_queries: [] }), /invalid_search_configuration/);
+}
+
+function testUserConfiguredConnectionPriority() {
+  const post = (author, affiliationContext, overrides = {}) => ({
+    author, affiliationContext, connectionDegree: 1, publicAudience: true,
+    text: "1h Database architecture report with measured performance and limitations.",
+    contentUrls: [`https://example.com/${author.toLowerCase()}`], ...overrides
+  });
+  const transport = {
+    bands: [{ payloadType: "linkedin_network_band", posts: [
+      post("Alumna", "Alumna, Example University"),
+      post("FormerColleague", "Engineer at Example Systems"),
+      post("MentionOnly", "Independent engineer", { text: "1h Database architecture report about Example University." }),
+      post("Substring", "Example UniversityPress"),
+      post("NotConnected", "Example University", { connectionDegree: 2 })
+    ] }, { payloadType: "linkedin_search_band", query: "AI research", posts: [
+      post("SearchAuthor", "Example University", { text: "1h AI research evaluation with methodology and limitations." })
+    ] }]
+  };
+  const input = { transport, state: { seen: [] }, currentTimeIso: "2026-10-13T13:00:00Z", discoveryMode: "search" };
+  const configured = orchestrator.buildCompactSummary({ ...input, priorityOrganizations: ["Example University", "Example Systems"] });
+  assert.deepEqual(configured.candidates.filter((item) => item.priorityNetwork).map((item) => item.source).sort(), ["Alumna", "FormerColleague"]);
+  assert.ok(!configured.candidates.some((item) => item.source === "NotConnected"));
+  assert.ok(orchestrator.buildCompactSummary(input).candidates.every((item) => !item.priorityNetwork));
+}
+
+function testSearchExtraction() {
+  const source = fs.readFileSync(path.join(__dirname, "linkedin_search_candidates.js"), "utf8");
+  const makeNode = (index) => ({
+    innerText: `Research Author 3d Visible to anyone AI research evaluation ${"methodology limitations ".repeat(50)}`,
+    getAttribute: () => "",
+    querySelector: (selector) => selector.startsWith('[aria-label') ? null : ({ innerText: "Research Author" }),
+    querySelectorAll: (selector) => selector === "a[href]" ? [
+      { href: `https://example.com/paper-${index}`, innerText: "Paper" },
+      { href: "https://www.linkedin.com/in/person", innerText: "Person" },
+      { href: "https://www.linkedin.com/messaging/thread/private", innerText: "Private" }
+    ] : []
+  });
+  let nodes = Array.from({ length: 40 }, (_, i) => makeNode(i));
+  const main = { innerText: "Search results", querySelectorAll: () => nodes };
+  const context = vm.createContext({ URL, TextEncoder, window: {}, location: { href: "https://www.linkedin.com/search/results/content/?keywords=AI" }, document: { querySelector: () => main } });
+  const first = JSON.parse(vm.runInContext(source, context));
+  assert.equal(first.ok, true);
+  assert.ok(first.posts.length > 0 && first.posts.length <= 4);
+  assert.ok(first.posts.every((post) => post.text.length <= 900 && post.contentUrls.length === 1 && post.publicAudience));
+  assert.ok(Buffer.byteLength(JSON.stringify(first)) < 6000);
+  const second = JSON.parse(vm.runInContext(source, context));
+  assert.equal(second.completionMetadata.searchBandsInspected, 2);
+  assert.ok(!second.posts.some((post) => first.posts.some((prior) => prior.contentUrls[0] === post.contentUrls[0])));
+  nodes = [];
+  assert.equal(JSON.parse(vm.runInContext(source, context)).error, "linkedin_search_layout_unrecognized");
+  main.innerText = "No results found";
+  assert.equal(JSON.parse(vm.runInContext(source, context)).ok, true);
+  context.location.href = "https://www.linkedin.com/checkpoint/";
+  assert.equal(JSON.parse(vm.runInContext(source, context)).ok, false);
+  context.location.href = "https://www.linkedin.com/feed/";
+  main.innerText = "Feed";
+  nodes = [makeNode(100)];
+  assert.equal(JSON.parse(vm.runInContext(source, context)).posts.length, 0);
+  nodes[0].querySelector = (selector) => ({ innerText: selector.includes('__meta') ? "Research Author 1st" : "Research Author" });
+  const connection = JSON.parse(vm.runInContext(source, context));
+  assert.equal(connection.payloadType, "linkedin_network_band");
+  assert.equal(connection.posts[0].connectionDegree, 1);
+  nodes[0].innerText = "1st Proud to announce my promotion and company outing with our research team! This is a sufficiently long promotional post.";
+  assert.equal(JSON.parse(vm.runInContext(source, context)).posts.length, 0);
 }
 
 main().catch((error) => {

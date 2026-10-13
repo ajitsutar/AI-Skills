@@ -65,6 +65,8 @@ Optional public discovery policy:
 - Keep official-source discovery distinct from LinkedIn discovery in the digest. Do not substitute a public sweep for a failed required authenticated scan unless independent operation is explicitly configured.
 
 Incremental scan policy:
+- Resolve `content.discovery.linkedin_mode` before scanning. In search mode follow `references/linkedin-search.md`: run configured LinkedIn-wide topic queries, with optional separately labeled connections updates, and pass discovery mode, queries, source age and connections scope into the runner. Do not replace broad searches with the personal feed. Network updates may be non-AI; they require first-degree evidence and exclude promotions, job changes, hiring, self-promotion, generic advice, bragging and outings.
+- The feed overlap rules below apply only to feed/connection updates. Search-discovered articles use the configured source-age window plus seen/story deduplication, independently of the last successful run. Report bounded search coverage honestly.
 - Scan from the top of the feed, with a [OVERLAP_WINDOW] overlap before the previous successful run.
 - LinkedIn Top feed is not chronological, so do not stop on one stale post. Check at least several feed bands and cap the run at [MAX_FEED_BANDS] feed bands.
 - Skip any content/action URL already present in `seen` unless there is clearly new high-value discussion or a newly linked article/report not previously reported.
@@ -87,7 +89,7 @@ Private inbox policy:
 - Do not send private message text, private sender details, or private thread URLs to the configured destination, regardless of channel. Include only a clearly public, non-sensitive action URL that independently satisfies the content rules; otherwise use a short no-qualifying-item line.
 
 Produce a concise reading list, preserving any existing user-requested layout:
-1. Worth reading: up to five high-quality AI sources, fewer when quality or channel limits demand it.
+1. Worth reading: up to the configured item limit (three by default) across all sections, fewer when quality or channel limits demand it.
 2. Additional perspective: optional substantive analysis that is not a duplicate of a selected source.
 3. Inbox: only if requested, and only public qualifying links or a short no-item line.
 
