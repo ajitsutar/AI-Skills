@@ -62,3 +62,18 @@ package-lock.json
 Thumbs.db
 .vscode/
 .idea/
+
+
+# Keep historical reports in the local workspace, outside skill distributions.
+local-archives/
+review-reports/
+validation-reports/
+/skills/*/REVIEW*.md
+/skills/*/VALIDATION*.txt
+/skills/*/REVISION-*.md
+/skills/*/REVISION-VALIDATION.txt
+/skills/*/RELEASE-VALIDATION*.txt
+/skills/*/EXPORT-REVIEW.md
+/skills/*/EXPORT-VALIDATION.txt
+/skills/*/references/*-validation-20*.md
+/skills/*/references/*-review-[0-9]*.md

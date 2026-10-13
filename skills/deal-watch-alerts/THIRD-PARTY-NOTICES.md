@@ -2,8 +2,8 @@
 
 The skill's code and documentation use the bundled [MIT license](LICENSE).
 No external package implementation, browser executable, merchant content or
-notification service is bundled in this folder. The attribution review is
-described in [Provenance](PROVENANCE.md).
+notification service is bundled in this folder. Source and licensing boundaries
+are described in [Provenance](PROVENANCE.md).
 
 ## Runtime dependencies
 

@@ -28,7 +28,7 @@ Read its [current capabilities and setup](skills/robinhood-ai-trading-agent/READ
 or explore the [prompt catalog for investors, traders and quants](skills/robinhood-ai-trading-agent/EXAMPLE-PROMPTS.md).
 Examples cover supported workflows and useful gap assessments without a fixed count.
 For implementation boundaries and remaining research needs, see the
-[capability review](skills/robinhood-ai-trading-agent/references/institutional-gap-review-4.2.md).
+[capabilities and limits](skills/robinhood-ai-trading-agent/references/capabilities-and-limits.md).
 
 ## Download one skill
 

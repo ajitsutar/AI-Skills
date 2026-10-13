@@ -1,15 +1,17 @@
 # Provenance
 
-This skill's repository history begins with `df4981a` (2026-08-16, “Add flexible guitar karaoke skill”), followed by hardening in `95468c1` and standalone packaging in `bbf1dfa`. The initial commit author is recorded as “AI Skills Export”; that label and the history do not independently establish human authorship or ownership of every line.
-
-The October 2026 review read all 11 then-tracked files and compared the three Python helpers against 120 Python files in the official `audio-separator` 0.44.5 source archive. No exact function match of at least 30 AST nodes or six consecutive normalized meaningful-line match was found. Targeted indexed searches found no confirmed external implementation source. This bounded review is not proof of originality, a patent novelty search, or a legal clearance certificate.
-
 The scripts orchestrate external programs, manipulate supplied audio arrays and render title stills. They do not contain BS-RoFormer architecture code, separator implementations, trained weights, music, album artwork, fonts or external binaries. Raised-cosine fades and overlap/add mixing are general signal-processing techniques. The Windows memory structure follows the documented [Microsoft MEMORYSTATUSEX interface](https://learn.microsoft.com/en-us/windows/win32/api/sysinfoapi/ns-sysinfoapi-memorystatusex).
 
 The optional backend is credited to [Nomad Karaoke / python-audio-separator](https://github.com/nomadkaraoke/python-audio-separator/tree/v0.44.5). Its [model registry](https://raw.githubusercontent.com/nomadkaraoke/python-audio-separator/v0.44.5/audio_separator/models.json) associates BS-Roformer-SW with the rehoster jarredou; this is not a verified original-trainer attribution. Current [model provenance notes](https://huggingface.co/lumabeat/bs-roformer-sw) identify the same pinned checkpoint hash and describe its trainer and license as unknown. The skill makes no claim to own or license that checkpoint.
 
-The licensing remediation removed the direct Mutagen import and replaced metadata processing with standard-library JSON and external FFmpeg/ffprobe commands. It also removed automatic model downloads and made authorized supplied stems the default. The optional local model path is gated by asset hashes and an operator-reviewed rights record. [Backend guidance](references/modes-and-backends.md) explains what that record does and does not prove.
+The media adapter follows [ffprobe's documented JSON output](https://ffmpeg.org/ffprobe.html) and [FFmpeg stream-copy/metadata options](https://ffmpeg.org/ffmpeg.html); it does not vendor their source. Synthetic tests contain generated audio arrays rather than third-party recordings.
 
-The new media adapter follows [ffprobe's documented JSON output](https://ffmpeg.org/ffprobe.html) and [FFmpeg stream-copy/metadata options](https://ffmpeg.org/ffmpeg.html); it does not vendor their source. Synthetic tests contain generated audio arrays rather than third-party recordings.
+Metadata processing uses standard-library JSON and external FFmpeg/ffprobe commands.
+Authorized supplied stems are the default; no model is downloaded automatically.
+The optional local model path requires asset hashes and a model-use rights record.
+[Backend guidance](references/modes-and-backends.md) explains its scope.
 
-The [MIT license](LICENSE) grants rights only to contributions the repository owner can license. Third-party rights remain separate. Historical commits and earlier archives retain their historical contents; this remediation does not rewrite their licenses or erase earlier disclosures. See [third-party notices](THIRD-PARTY-NOTICES.md).
+The [MIT license](LICENSE) covers contributions the repository owner can license.
+Third-party rights remain separate; retain [third-party notices](THIRD-PARTY-NOTICES.md).
+Keep historical source-comparison reports in the local archive. Record original
+sources, modifications and applicable licenses for future external contributions.

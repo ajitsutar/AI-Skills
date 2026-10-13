@@ -2,8 +2,10 @@
 
 Apply this procedure whenever changing or releasing this skill. The README is a
 guide to what the skill does now: purpose, supported workflows, setup, evidence
-requirements and material limits. Keep release history, numbered release summaries
-and dated test milestones in their appropriate review records, not the README.
+requirements and material limits. Keep release history, review reports, audit
+summaries, validation transcripts and dated comparison results in a local archive
+outside the repository and installed skill. Do not publish them or include them
+in standalone packages. Keep current usage guides, test code and licensing notices.
 Retain machine-readable versions in VERSION, package metadata and integrity records.
 
 ## Refresh the examples on every update
@@ -52,5 +54,6 @@ the catalog still must be reviewed and regenerated for the new package.
 Inspect the rendered catalog's links and workflow coverage. Exercise the generator
 and stale-input rejection after changing its behavior. Use tests relevant to any
 investment or execution code changes; prose edits alone do not require rerunning
-expensive financial models or a whole-market acquisition. Review records describe
-checks actually performed; a previous release's test result is historical evidence.
+expensive financial models or a whole-market acquisition. Save reports of checks
+actually performed only in the local archive. Rebuild the package manifest after
+removing reports, and verify no active links refer to removed files.

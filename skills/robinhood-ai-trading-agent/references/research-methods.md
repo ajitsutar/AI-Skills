@@ -1,4 +1,4 @@
-# Research, social evidence and strategy validation
+# Research methods and strategy evaluation
 
 For stock discovery use the configurable universe and value-trap procedure in
 [screening-and-value-traps.md](screening-and-value-traps.md). For intraday setups

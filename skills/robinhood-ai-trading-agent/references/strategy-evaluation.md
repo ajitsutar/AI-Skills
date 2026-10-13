@@ -1,4 +1,4 @@
-# VQM validation protocol and recommendation confidence
+# VQM evaluation methods and recommendation confidence
 
 Status: **not empirically validated**. Freeze a validation plan before requesting
 historical outcomes. Save its hash, data rights, universe/corporate-action rules,
@@ -61,7 +61,7 @@ actual interval; daily GARCH is not automatically Sigma for a year.
 
 ## Recommendation labels and performance evidence
 
-There is no enabled Strong Buy classifier in v3.7. Software will not generate that
+There is no enabled Strong Buy classifier. Software will not generate that
 label. A future version needs a predeclared, empirically supported net excess-return
 threshold with uncertainty bounds, enough independent evaluation evidence, failure
 and drawdown limits, stable regime behavior, and separate current-company evidence.
@@ -105,10 +105,3 @@ eligibility is a separately identified input disagreement.
 Research context for avoiding combinatorial overfitting:
 [Novy-Marx, Backtesting Strategies Based on Multiple Signals](https://www.nber.org/papers/w21329).
 This protocol does not bundle that paper's code or claim its results for this skill.
-
-## Recorded cross-model execution
-
-See [the October 10 validation record](cross-model-validation-2026-10-10.md) for
-actual v3.7 conformance and a separate Yahoo-data approximation that achieved
-100% top-ten overlap. The latter does not relax strict filing eligibility or
-guarantee agreement when models acquire and interpret fresh data independently.
