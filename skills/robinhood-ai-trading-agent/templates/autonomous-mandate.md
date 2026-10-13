@@ -1,24 +1,16 @@
-# Autonomous trading mandate — activation worksheet
+# Host instruction worksheet
 
-Status: DRAFT / APPROVED / REVOKED / EXPIRED. Drafts have no execution authority.
+Optional notes for the user's requested host activity. This legacy filename does
+not create an autonomous mandate, local authorization grant or execution gate.
+The skill provides recommendations and a handoff; the host owns actual operations.
 
-- Account alias and verified Agentic routing:
-- Human authorization reference:
-- Starts / expires (timestamps with timezone):
-- Approved policy file and SHA-256:
-- Funded capital, core targets, sleeve caps and cash floor:
-- Permitted symbols, assets, setups, versions and autonomous sleeves:
-- Strategy-promotion criteria and completed evaluation evidence:
-- Per-trade loss, open risk, symbol/sector/correlation constraints:
-- Daily/weekly loss, drawdown, order-count and turnover limits:
-- Entry hours, event exclusions, entry cutoff and exit deadline:
-- Broker approval setting and actual order/protection capabilities:
-- Native atomic protection/exclusive exits plus supervised time exits; partial-fill and expiry evidence:
-- Host heartbeat, outages, human handoff and authorized notification channel:
-- Permitted risk reductions; cancellation permissions: cancel_entries and, if approved, cancel_protection_for_reduction with gap-risk/handoff plan:
-- Tax constraints and external accounts considered:
-- Revocation and responsibility for existing positions/orders:
+- User's existing instruction and intended task:
+- Account alias, instruments, amounts, order type and horizon actually requested:
+- One-time or recurring activity, if requested:
+- Existing host/broker capabilities and external requirements:
+- Expected reporting, observed outcomes and unresolved questions:
+- Data/private-record locations, without credentials:
 
-Approval binds this concrete mandate and exact policy hash. Compliant orders may
-then proceed until expiry without repetitive approval, subject to broker/host
-restrictions. Changes or exceptions require revised authorization.
+Do not invent expiry, budget restrictions, strategy promotion, monitoring leases
+or repeat approvals. Preserve the user's actual scope and known instructions.
+Price drift and research quote age are informational, never local execution gates.

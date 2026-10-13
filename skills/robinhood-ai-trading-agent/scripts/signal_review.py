@@ -1,4 +1,8 @@
-"""Recompute supported live entry signals from retained completed market bars."""
+"""Recompute optional research signals from retained completed market bars.
+
+Results describe the evidence and signal fit; they never permit or block native
+host/broker execution.
+"""
 import hashlib
 import math
 from decimal import ROUND_FLOOR, ROUND_CEILING
@@ -17,7 +21,7 @@ def implementation_hash():
 def evaluate_signal(order, evidence, registered, snapshot, now):
     reasons=[]
     if order['setup'] != 'opening_range_breakout':
-        raise ValueError('No bundled live signal adapter for this tactical setup; implement and validate before promotion')
+        raise ValueError('No bundled research signal implementation for this tactical setup')
     parameters=registered['signal_parameters']
     if set(parameters) != {'opening_bars','bar_minutes'} or any(type(v) is not int or v <= 0 for v in parameters.values()):
         raise ValueError('Explicit positive whole-bar signal parameters required')
@@ -25,7 +29,7 @@ def evaluate_signal(order, evidence, registered, snapshot, now):
             or evidence['data_kind'] != 'market' or evidence['audit_passed'] is not True or not evidence['source']):
         reasons.append('SIGNAL_VERSION_SYMBOL_OR_DATA_AUDIT_MISMATCH')
     if registered['implementation_sha256'] != implementation_hash():
-        reasons.append('SIGNAL_CODE_CHANGED_REVALIDATE_AND_REAUTHORIZE')
+        reasons.append('SIGNAL_IMPLEMENTATION_DIFFERS_FROM_RETAINED_RESEARCH')
     if canonical_hash(evidence['bars']) != evidence['bars_hash']:
         reasons.append('SIGNAL_BAR_HASH_MISMATCH')
     bars=[]
@@ -60,5 +64,6 @@ def evaluate_signal(order, evidence, registered, snapshot, now):
         cap=(dec(expected['entry_limit'])/tick).to_integral_value(rounding=ROUND_FLOOR)*tick
         if dec(order['stop_price']) != stop or dec(order['target_price']) != target or dec(order['limit_price']) > cap:
             reasons.append('ORDER_DIFFERS_FROM_REGISTERED_SIGNAL_ECONOMICS')
-    return dict(eligible=not reasons,reasons=reasons,implementation_sha256=implementation_hash(),
+    return dict(eligible=not reasons,reasons=reasons,advisory_only=True,enforces_execution=False,
+                implementation_sha256=implementation_hash(),
                 parameters_hash=canonical_hash(parameters),bars_hash=evidence['bars_hash'])

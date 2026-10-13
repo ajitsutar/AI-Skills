@@ -1,46 +1,18 @@
-# Trading parameters worksheet
+# Research and allocation preferences
 
-This is an unapproved worksheet. personal-policy.example.json initializes personal context in draft/paper mode. Its example values and symbols are not permission.
+Optional analytical inputs, not a live policy or execution checklist. Leave
+unknown preferences unknown. Example JSON fixtures do not govern the account.
 
-## Policy mapping
+- Objective, arbitrary holding horizon, benchmark and intended universe:
+- Requested investment amount and actual recurring contributions:
+- Existing holdings and relevant external exposure:
+- User's preferred allocation, instruments, exclusions and liquidity needs:
+- Scenario assumptions, costs, tax considerations and review cadence:
+- Optional volatility model, data window and validation comparison:
+- Catalysts, earnings exposure, thesis invalidation and possible exits:
+- Source coverage, observations and uncertainty:
 
-- Objective, horizon, liquidity requirements and benchmark:
-- Core/swing/intraday capital caps and cash floor:
-- Core target weights and drift bands:
-- Allowed symbols/assets and excluded exposures:
-- Allowed research/paper setups:
-- Strategy versions with completed live-promotion evidence (empty until promotion):
-- Per-trade planned loss and total open stop risk:
-- Per-stock/ETF/sector limits and broader correlation review:
-- Daily/weekly loss and drawdown breakers:
-- Maximum positions, orders per session and gross daily turnover:
-- Quote/account freshness, spread, liquidity and price-deviation limits:
-- Round-trip slippage and fees:
-- GARCH overlay: assess by default; record any explicit user disablement, baseline
-  model, price basis/frequency, training/holdout sizes and annualization factor.
-  Specify whether a valid overlay is required before a tactical proposal may proceed:
-- Entry cutoff, stop/invalidation, target and time exit:
-- Earnings/macro event exclusions:
-- Tax/lot/wash-sale constraints:
-- Actual session calendar and settled-cash source:
-
-## Execution design
-
-- Deployment context: personal; optional learning interlock for offline labs.
-- Current mode: paper.
-- Personal live mode, if explicitly approved: approval or bounded_autonomous.
-- Per-order mode binds each exact order and review.
-- Bounded mode binds the full policy and mandate until expiry; compliant orders do
-  not need repetitive approval. Broker-mandated approvals still apply.
-- Native atomic protection, partial-fill coverage and supervised time-exit procedure:
-- Host failure/heartbeat procedure and human handoff:
-- Permitted cancellations/risk reductions:
-- Mandate start/expiry, revocation and human authorization reference:
-
-Normalize approved values into policy.json before any personal live execution.
-The supplied risk engine supports unlevered long-only whole or fractional equity/ETF
-quantity-limit orders. Fractionals require explicit policy enablement and observed
-broker eligibility, precision and order/fill semantics; see references/fractional-shares.md.
-Do not enable unsupported instruments by changing prose or a Boolean.
-
-See autonomous-mandate.md for the concrete approval worksheet. Follow references/personal-setup.md for personal connection, capability discovery and activation. Installation alone creates no authority.
+Recommendations may discuss concentration, cash, liquidity and price uncertainty
+without imposing thresholds on execution. Preserve the user's existing execution
+instruction through the host handoff; no policy activation or reapproval is needed
+from this skill. The broker/platform applies its own external requirements.

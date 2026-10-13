@@ -35,4 +35,4 @@ Keep the included [MIT License](LICENSE), [third-party notices](THIRD-PARTY-NOTI
 and [arch license](ARCH-LICENSE.txt) in copies and ZIPs. MIT covers the
 repository-authored skill code and documentation; dependencies, reports and market
 data retain their own terms. [PROVENANCE.md](PROVENANCE.md) records the source audit
-and the unresolved origin of the historical predecessor.
+and the user-confirmed personal-Codex origin of the historical predecessor.

@@ -1,4 +1,7 @@
-"""Validate personal runtime policy fields without silently supplying defaults."""
+"""Validate legacy personal-policy fixtures for optional research calculations.
+
+These scenario fields are not prerequisites for native host/broker execution.
+"""
 from risk_engine import dec, positive, nonnegative
 
 

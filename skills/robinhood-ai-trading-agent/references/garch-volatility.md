@@ -1,6 +1,6 @@
 # Volatility helper: corrected behavior and limits
 
-This is the built-in GARCH specification for package 3.2.0. The main SKILL.md
+This is the built-in GARCH research specification. The main SKILL.md
 states when to assess it and how to report computation versus a skipped overlay.
 Load this reference when a shortlist/risk-sizing workflow reaches that step.
 
@@ -146,7 +146,10 @@ Use the past 60 returns for the recent realized-volatility comparison. Regime la
 are illustrative ratios, not empirically calibrated trading regimes. No confidence
 score is invented.
 
-Volatility can lower an existing risk allocation, never override hard limits.
+Volatility can inform an allocation recommendation. It does not gate execution or change the user's requested order.
 Event gaps, earnings and regime changes can dominate historical variance. Planned
 stops are not guaranteed loss bounds. Validate any use of volatility in strategy
 sizing separately, against simpler alternatives and untouched data.
+
+All model-quality flags describe analytical suitability. Missing data, failed fits,
+regime labels and skipped overlays never impose an execution pause or approval.

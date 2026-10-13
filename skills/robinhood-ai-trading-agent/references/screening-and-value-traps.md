@@ -144,54 +144,42 @@ Use transaction and filing dates and avoid double-counting amendments. The
 [SEC investor bulletin](https://www.investor.gov/introduction-investing/general-resources/news-alerts/alerts-bulletins/investor-bulletins-69)
 explains these distinctions. No insider headline is an automatic entry/rejection.
 
-## Event gate, statuses and ranking
+## Event evidence, research statuses and ranking
 
-Check issuer/exchange/regulator/court sources as appropriate for earnings, decisions,
-hearings and other material catalysts. Record verified versus estimated dates,
-timezone/time (or unknown), as-of time, holding horizon and event policy. Use the
-same policy for all candidates, not the same verdict regardless of event distance.
-Events weeks apart may warrant different decisions. A vendor rating is separate
-analyst evidence, never a calendar gate by itself.
+Check issuer/exchange/regulator/court sources for material catalysts. Record
+confirmed versus estimated dates, timezone, as-of time and exposure inside the
+holding horizon. Apply the same declared research criteria across candidates.
+Unknown coverage is not a confirmed clear calendar. A vendor rating is separate
+analyst evidence, not an event fact.
 
-Define each blackout in trading sessions using an exchange calendar, with both
-start and release criteria. A paper tactical policy might exclude the two sessions
-before earnings through a post-release review; this is an editable assumption,
-not a universal cutoff or permission. For uncertain binary events use the whole
-credible date window; unknown calendar coverage cannot mean clear. Recheck before
-an entry, including whether the planned holding period crosses a prohibited event.
-For core research an upcoming event can block a new entry without invalidating an
-existing holding or requiring a sale. Reductions/protection follow their own rules.
+Keep fundamental and event findings separate. Research statuses describe evidence:
 
-Keep **fundamental status** and **event status** separately:
-
-| Display status | Meaning |
+| Display status | Research meaning |
 |---|---|
-| Eligible | Required fundamental work supports consideration and event review is clear; still not order authorization |
-| Watch | Material evidence/normalization/event review remains unresolved; state what would resolve it |
-| Speculative | Material structural/cyclical/profitability risk is evidenced; cannot quietly join the core allocation |
-| Reject | The stated value/growth thesis fails an evidenced required criterion; retain the failure reason |
-| Event-blocked | Otherwise eligible, but an applicable event window blocks a new entry |
+| Eligible | The declared fundamental/horizon review supports consideration |
+| Watch | Material evidence or normalization remains unresolved |
+| Speculative | Material structural, cyclical or profitability risk is evidenced |
+| Reject | The stated investment thesis fails an evidenced research criterion |
+| Event-blocked | Legacy research label for a candidate outside that run's chosen event criteria |
 
-An event flag must not hide a Reject or Speculative fundamental status. Use the
-GARCH overlay on relevant finalists after these reviews, with data audit and actual
-run evidence. NORMAL is neither an eligibility requirement nor evidence of value.
-GARCH may reduce sizing; it cannot rescue failed fundamentals or event clearance.
+None of these labels authorizes, vetoes or pauses execution. Event windows are
+optional selection assumptions, not universal trade blackouts. If the user accepts
+earnings exposure, disclose it without imposing a new entry condition.
 
-Rank comparable eligible candidates by the documented thesis, valuation range,
-growth quality, downside and portfolio fit. Keep Watch/Speculative/Reject records
-visible separately. A Watch ordering is research priority, not investment ranking.
-Report no qualifying choice when appropriate. Portfolio sizing,
-affordability, live quotes, risk_engine and applicable human authorization remain
-subsequent independent steps. `screen_review.py` reports historical judgments;
-never copy its status into a live `event_clear` field without a fresh event check.
+Rank comparable researched candidates by documented valuation, business quality,
+downside, catalysts and portfolio fit. Preserve Watch/Speculative/Reject records
+and do not claim completed diligence when material work is missing. A GARCH result
+can inform risk discussion, but is neither proof of value nor an execution gate.
+`screen_review.py` records analytical judgments. Requested orders use
+[execution-handoff.md](execution-handoff.md) without a subsequent skill risk test.
 
 ## Apply the actual holding mandate
 
 Use [holding-period-planning.md](holding-period-planning.md) for dated holds of any
-length. Verify the latest public financial period before approving a finalist;
+length. Verify the latest public financial period when reviewing a finalist;
 issuer releases can be newer than vendor TTM figures or the latest filing. Record
 what primary work was attempted, what it established and what remains material.
 Do not label a screen complete merely because every candidate was assigned Watch.
 For a ten-year thesis use rolling event and fundamental reviews; for a forced exit
 show the value/price mechanism and scenario outcomes within that specific window.
-No new holding-period research status authorizes or implements live swing orders.
+Holding-period research does not submit orders or impose execution conditions.

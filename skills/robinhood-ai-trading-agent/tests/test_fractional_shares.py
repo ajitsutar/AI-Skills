@@ -13,7 +13,6 @@ from fractional_shares import cash_requirement, round_quantity_down, size_dollar
 from risk_engine import canonical_hash, dec, evaluate, size_tactical, timestamp
 from portfolio_manager import rebalance, recurring_buys
 from broker_bridge import build_request
-from execution_ledger import ExecutionLedger, GateClosed
 from test_personal_components import capability_fixture
 
 
@@ -119,7 +118,7 @@ class FractionalRiskTests(unittest.TestCase):
         return evaluate(self.policy, self.snapshot, self.order, self.now)
 
     def test_fractional_limit_passes_all_existing_paper_risk_gates(self):
-        self.assertTrue(self.result()["allowed"], self.result())
+        self.assertTrue(self.result()["within_research_limits"], self.result())
 
     def test_fractional_permission_metadata_minimum_and_increments(self):
         changes = [({"eligible": None}, "ELIGIBILITY"), ({"quantity_increment": ".01"}, "INCREMENT"),
@@ -130,7 +129,7 @@ class FractionalRiskTests(unittest.TestCase):
         for change, expected in changes:
             with self.subTest(change=change):
                 self.snapshot["quotes"]["DEMO"]["fractional_rules"] = dict(original, **change)
-                self.assertFalse(self.result()["allowed"])
+                self.assertFalse(self.result()["within_research_limits"])
                 self.assertIn(expected, str(self.result()["reasons"]))
 
     def test_opt_out_and_missing_rules_block(self):
@@ -146,17 +145,17 @@ class FractionalRiskTests(unittest.TestCase):
             with self.subTest(field=field, value=value):
                 self.snapshot["quotes"]["DEMO"]["fractional_rules"] = dict(rules(self.now), **{field: value})
                 result = self.result()
-                self.assertFalse(result["allowed"], result)
+                self.assertFalse(result["within_research_limits"], result)
                 self.assertIn("INVALID_OR_MISSING_INPUT", str(result["reasons"]))
         for malformed in (None, [], "enabled"):
             with self.subTest(policy=malformed):
                 self.policy["fractional_shares"] = malformed
-                self.assertFalse(self.result()["allowed"])
+                self.assertFalse(self.result()["within_research_limits"])
         self.policy["fractional_shares"] = dict(enabled=True, max_rules_age_seconds=60)
         for malformed in (None, [], "eligible"):
             with self.subTest(rules=malformed):
                 self.snapshot["quotes"]["DEMO"]["fractional_rules"] = malformed
-                self.assertFalse(self.result()["allowed"])
+                self.assertFalse(self.result()["within_research_limits"])
 
     def test_live_source_requirement_and_native_notional_block(self):
         self.policy["mode"] = "approval"
@@ -169,13 +168,13 @@ class FractionalRiskTests(unittest.TestCase):
         self.order["dollar_budget"] = "12.34"
         self.assertIn("ORDER_EXCEEDS_DOLLAR_BUDGET_INCLUDING_FEES", self.result()["reasons"])
         self.order["dollar_budget"] = "12.36"
-        self.assertTrue(self.result()["allowed"], self.result())
+        self.assertTrue(self.result()["within_research_limits"], self.result())
 
     def test_fractional_risk_gate_uses_same_rounded_fees_as_sizing(self):
         self.order.update(quantity=".08", limit_price="100", stop_price="99", target_price="105")
         self.policy["limits"].update(slippage_bps=0, fee_per_share=".005", risk_per_trade=".000001")
         result = self.result()
-        self.assertTrue(result["allowed"], result)
+        self.assertTrue(result["within_research_limits"], result)
         self.assertEqual(dec(result["metrics"]["planned_loss"]), Decimal(".10"))
         self.order["quantity"] = ".080001"
         self.assertIn("PER_TRADE_RISK_CAP", self.result()["reasons"])
@@ -184,29 +183,10 @@ class FractionalRiskTests(unittest.TestCase):
         self.snapshot["positions"] = [dict(symbol="DEMO", quantity=".2", mark="100", sleeve="intraday", stop_price="98", sector="technology")]
         self.snapshot["cash"] = "99980"
         self.order["side"] = "sell"
-        self.assertTrue(self.result()["allowed"], self.result())
+        self.assertTrue(self.result()["within_research_limits"], self.result())
         self.snapshot["open_orders"] = [dict(local_ref="protect", status="cancel_pending", symbol="DEMO", side="sell", sleeve="intraday", remaining_quantity=".1")]
         self.assertIn("SELL_EXCEEDS_SLEEVE_AVAILABLE_SHARES", self.result()["reasons"])
 
-    def test_decimal_partial_fill_cancel_restart_and_duplicate_protection(self):
-        with tempfile.TemporaryDirectory() as folder:
-            path = Path(folder) / "ledger.db"
-            ledger = ExecutionLedger(path)
-            ledger.claim(self.policy, self.snapshot, self.order, {}, now=self.now)
-            ledger.reconcile(self.order["id"], "PARTIALLY_FILLED", ".023456", "100", self.now)
-            ledger.close()
-            ledger = ExecutionLedger(path)
-            try:
-                row = ledger.reconcile(self.order["id"], "CANCELLED", ".03456789", "100", self.now)
-                self.assertEqual(row["filled"], "0.03456789")  # Actual fills are never rounded to the order-entry grid.
-                self.assertFalse(ledger.unresolved())
-                with self.assertRaisesRegex(GateClosed, "DUPLICATE"):
-                    ledger.claim(self.policy, self.snapshot, self.order, {}, now=self.now)
-                with self.assertRaisesRegex(GateClosed, "EXCESS_FILL"):
-                    ledger.reconcile(self.order["id"], "FILLED", ".13", "100", self.now)
-                self.assertEqual(ledger.unresolved()[0]["state"], "UNKNOWN")
-            finally:
-                ledger.close()
 
 
 class FractionalBrokerTests(unittest.TestCase):
@@ -223,37 +203,29 @@ class FractionalBrokerTests(unittest.TestCase):
     def build(self):
         return build_request(self.caps, "submit", self.inputs, self.now, "demo")
 
-    def test_observed_number_schema_alone_does_not_prove_fractional_execution(self):
-        with self.assertRaisesRegex(ValueError, "Observed fractional"):
-            self.build()
-        self.tool["fractional_share_semantics"] = dict(quantity_based=True, cumulative_fractional_fills=True,
-            order_types=["limit"], time_in_force=["day"], sides=["buy", "sell"], sessions=["regular"], evidence=["fictional schema"])
+    def test_mapping_preserves_fraction_without_claiming_broker_support(self):
         result = self.build()
         self.assertEqual(result["request"]["arguments"]["quantity"], "0.123456")
-        self.assertFalse(result["execution_authorized"])
-        self.tool["fractional_share_semantics"]["cumulative_fractional_fills"] = False
-        with self.assertRaisesRegex(ValueError, "Observed fractional"):
-            self.build()
+        self.assertFalse(result["enforces_execution"])
+        self.assertEqual(result['adapter_role'],'OPTIONAL_SCHEMA_MAPPING')
 
     def test_integer_only_tool_never_truncates_a_fraction(self):
         self.tool["bindings"]["quantity"]["type"] = "integer"
         with self.assertRaisesRegex(ValueError, "Noninteger"):
             self.build()
 
-    def test_malformed_broker_semantic_strings_never_match_by_substring(self):
+    def test_legacy_semantic_flags_do_not_control_native_execution(self):
         valid = dict(quantity_based=True, cumulative_fractional_fills=True, order_types=["limit"],
                      time_in_force=["day"], sides=["buy", "sell"], sessions=["regular"], evidence=["fictional schema"])
         for field, value in (("order_types", "unlimited"), ("time_in_force", "notday"),
                              ("sides", "nobuy"), ("sessions", "irregular"), ("evidence", "unverified")):
             with self.subTest(field=field):
                 self.tool["fractional_share_semantics"] = dict(valid, **{field: value})
-                with self.assertRaisesRegex(ValueError, "nonempty list"):
-                    self.build()
+                self.assertFalse(self.build()['enforces_execution'])
         for malformed in (None, [], "supported"):
             with self.subTest(semantics=malformed):
                 self.tool["fractional_share_semantics"] = malformed
-                with self.assertRaises(ValueError):
-                    self.build()
+                self.assertFalse(self.build()['enforces_execution'])
 
 
 if __name__ == "__main__":

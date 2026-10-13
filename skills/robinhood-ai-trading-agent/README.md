@@ -1,198 +1,140 @@
-# Robinhood portfolio and trading agent
+# Robinhood quant research and portfolio agent
 
-A self-contained skill for stock research, portfolio management, quantitative
-analysis and supervised personal trading. It combines public evidence with
-replayable calculations, separates long-term investing from swing and intraday
-strategies, and keeps research decisions distinct from permission to trade.
+A self-contained skill for investment recommendations, reproducible stock research,
+portfolio analysis and quantitative work across arbitrary holding periods. It
+combines public evidence with replayable calculations and hands requested trades
+to the host's available broker tools.
 
-Use it in Codex or another compatible Agent Skills host. Research is not restricted
-to Robinhood holdings or Yahoo data. The broker-specific execution workflow uses
-the connected official Robinhood Trading MCP and its actual capabilities.
+**The skill has no execution gates.** Research findings and risk diagnostics are
+advisory. It does not require a local policy, grant, ticket, strategy promotion,
+volatility/spread/funding test, supervised lease or repeated approval. Actual host,
+platform and broker requirements remain external; existing user instructions carry
+forward instead of triggering another skill approval.
 
-Start with [example prompts, from first-time investors through quants](EXAMPLE-PROMPTS.md),
-[installation](INSTALL.md), or the [agent instructions](SKILL.md).
+Start with [example prompts](EXAMPLE-PROMPTS.md), [installation](INSTALL.md), or
+[agent instructions](SKILL.md). Research is not restricted to Robinhood holdings or
+Yahoo. The Robinhood name identifies the broker integration context, not the
+research universe.
 
-## What you can do
+## Capabilities
 
-| Workflow | Current capability | Guide |
+| Workflow | What the skill provides | Guide |
 |---|---|---|
-| Find and compare stocks | Screen all U.S. exchange-listed stocks, including listed ADRs, or an explicitly selected universe; retain coverage and exclusion reasons | [Research campaign](references/research-campaign.md) |
-| Evaluate an investment thesis | Review sector-relative valuation, normalized earnings/FCF, balance-sheet risks, business quality, catalysts and downside | [Screening and value traps](references/screening-and-value-traps.md) |
-| Plan a holding period | Resolve same-session trades, dated exits or flexible long-term holds; compare evidence, events and net scenarios at the actual horizon | [Holding-period planning](references/holding-period-planning.md) |
-| Follow news and guidance | Discover relevant issuer, SEC, exchange, macro and financial-publisher sources; poll configured public feeds; triage language and compare reviewed guidance ranges | [News and guidance](references/news-and-guidance.md) |
-| Review analyst evidence | Discover accessible reports and attributed excerpts; compare forward targets, dispersion and revisions; retain provider-reported analyst performance with its methodology | [Analyst research](references/analyst-research.md) |
-| Manage a portfolio | Review contributions, concentration, ETF look-through, rebalance proposals, covariance, stress exposure, tax lots and potential wash-sale interactions | [Portfolio management](references/portfolio-management.md) |
-| Invest small dollar amounts | Size fractional stock/ETF quantities, preserve cash and fee reserves, and prepare each recurring contribution with durable occurrence keys | [Fractional shares](references/fractional-shares.md) |
-| Research swing/day trading | Build a liquid watchlist, review catalysts, evaluate supported completed-bar setups and model entries, stops, targets, costs and time exits | [Short-term trading](references/short-term-trading.md) |
-| Estimate volatility | Run GARCH, GJR-GARCH and supported EGARCH forecasts with chronological baseline comparisons and retained model outputs | [Volatility models](references/garch-volatility.md) |
-| Construct and stress allocations | Calculate cash/cost/risk-constrained weights and selected equity, FX, futures, European-option and fixed-bond scenarios | [Quant workbench](references/quant-workbench.md), [multi-asset scope](references/multi-asset-playbook.md) |
-| Validate a quantitative strategy | Use causal splits, purging, HAC, block bootstrap, multiple-testing controls, factor attribution and retained promotion evidence | [Quant methods](references/quant-research.md) |
-| Measure implementation and performance | Calculate execution shortfall, cash ladders, TWR, XIRR, period attribution and causal portfolio simulations | [Manager workflow](references/institutional-manager.md) |
-| Reproduce and update research | Lock the mandate, preserve source files and calculations, compare replayed outputs, and refresh saved research without losing its audit trail | [Research handoff](references/research-handoff.md), [research library](references/research-memory.md) |
-| Prepare controlled execution | Check settled cash, reserved funds, exposures, strategy evidence and exact requests; track authorizations, fills, cancellation and reconciliation | [Execution controls](references/approval-gated-execution.md) |
+| Stock recommendations | Whole-universe discovery, shared factor ranking, primary evidence, valuation, catalysts and downside | [Research campaign](references/research-campaign.md) |
+| Holding-period decisions | Same-session, dated and flexible long-term research with matching event and scenario analysis | [Holding periods](references/holding-period-planning.md) |
+| Financial diligence | Sector-relative valuation, normalized earnings/FCF, balance-sheet and value-trap analysis | [Investment review](references/screening-and-value-traps.md) |
+| News and guidance | Dynamic source discovery, public feed polling, between-quarter projections and deterministic text triage | [News and guidance](references/news-and-guidance.md) |
+| Analyst evidence | Accessible reports, forward target distributions, revisions and sourced analyst track records | [Analyst research](references/analyst-research.md) |
+| Portfolio decisions | Contributions, fractional allocation, rebalance proposals, ETF look-through, concentration, scenarios and tax-lot review | [Portfolio management](references/portfolio-management.md) |
+| Tactical research | Completed-bar setups, catalysts, liquidity, cost assumptions, stops/targets and holding-period scenarios | [Short-term research](references/short-term-trading.md) |
+| Volatility analysis | GARCH, GJR-GARCH, supported EGARCH and stock-relative interval-move diagnostics | [Volatility models](references/garch-volatility.md) |
+| Quant construction | Constrained allocation, covariance sensitivity, empirical tail loss and multi-asset scenarios | [Quant workbench](references/quant-workbench.md) |
+| Strategy evaluation | Causal splits, purging, HAC, block bootstrap, multiple-testing review and retained evidence | [Quant research](references/quant-research.md) |
+| Performance accounting | Execution shortfall, cash ladders, TWR/XIRR, attribution and portfolio simulation | [Manager workflow](references/institutional-manager.md) |
+| Reproducibility | Frozen research contracts/data, numerical replay, cross-model comparison and incremental refresh | [Research handoff](references/research-handoff.md) |
+| Execution handoff | Preserve the user's order instructions, surface findings as advisory and pass the payload to the host | [Execution handoff](references/execution-handoff.md) |
 
-### Universe and horizon
+Stock discovery defaults to **all U.S. exchange-listed stocks including listed
+ADRs**. S&P 500, custom lists and other universes are explicit choices. Report
+actual membership, coverage, exclusions and unresolved data; do not call a subset
+a full-market screen. There is no fixed number of picks or maximum holding period.
+Instrument-specific calculations remain limited by their implemented models.
 
-When the user does not specify a universe, stock discovery starts with **all U.S.
-exchange-listed stocks, including listed ADRs**. S&P 500 is an explicit preset.
-Liquidity, security type, listing status, currency and missing-data checks still
-determine suitability for the chosen workflow. Research membership does not broaden
-an approved trading allowlist. Other instruments and foreign-only/OTC universes
-require the appropriate configured route.
+## Recommendations and evidence
 
-The skill accepts arbitrary holding periods, with no fixed maximum. Same-session
-day trading is distinct from an overnight hold. Fixed exit dates, rolling thesis
-reviews and future calendar uncertainty are handled explicitly. A model's validated
-horizon remains narrower than the set of horizons the planner can describe.
+The shared Value–Quality–Momentum profile produces a reproducible research queue,
+followed by primary-source, horizon and portfolio review. Keep numerical rank,
+valuation evidence and recommendation confidence distinct. A relative factor score
+is not an expected return. Research labels describe the evidence; they do not
+approve, deny or restrict a broker order.
 
-There is no fixed number of picks. A requested list can remain incomplete when
-evidence is missing, and the correct result can be no suitable trade.
+Use SEC filings, issuer releases and appropriate accessible finance providers.
+Yahoo is one acquisition adapter. Record source dates, accounting basis and
+changes between quarterly filings. Analyst targets and track records are sourced
+opinions/statistics, not guaranteed outcomes. News headlines, accessible reports,
+paywalls and missing sources have different evidentiary value.
 
-### Evidence and reproducibility
+The package has no demonstrated universal alpha or calibrated Strong Buy
+classifier. Make recommendations proportional to the evidence and state material
+uncertainty. A completed calculation or matching model output establishes neither
+investment performance nor professional-manager equivalence.
 
-Fundamental stock discovery uses the shared Value–Quality–Momentum research queue,
-then primary-source, horizon and portfolio review. Saved code, data, assumptions
-and evidence decisions make calculations replayable across models. The skill
-distinguishes research candidates from reviewed selections and never treats a
-factor score as an expected return.
+## Installation and research setup
 
-SEC filings, issuer releases and appropriate accessible providers can supply or
-cross-check facts. Yahoo is one acquisition adapter. New information between
-quarterly reports matters: guidance changes, preannouncements, financing, investor
-days and other material disclosures trigger renewed review. Source corrections
-preserve the original snapshot and require a full reranking when relevant.
+Keep the entire folder together: scripts, references, profiles, templates and tests
+are self-contained. No repository-root files or other skills are required. See
+[INSTALL.md](INSTALL.md) for Codex, Agent Skills and Claude Code locations.
 
-News and analyst research dynamically discover relevant websites and record actual
-access. Full reports, attributed excerpts, headlines, paywalls and unavailable
-sources remain distinct. Repeated coverage of one analyst's call is not independent
-consensus. Forward price targets are separate from historical 52-week highs/lows
-and intrinsic fair-value estimates. Provider-reported analyst success is not an
-independently verified probability of future success.
-
-The news helper supplies a small deterministic language rule set and event-review
-hints. It is not a trained NLP model or calibrated sentiment-return strategy.
-Public feeds support measured polling; complete news access and high-frequency
-execution are not available merely because a feed can be read.
-
-## Get started
-
-Keep the entire skill folder together, including scripts, references, profiles,
-templates and tests. Uploading only `SKILL.md` omits required components. No files
-from another skill or the repository root are needed. See [INSTALL.md](INSTALL.md)
-for standalone Codex/Agent Skills, Claude Code and ZIP installation paths.
-
-Use Python 3.11 or newer. From the extracted skill directory, the following
-PowerShell commands create an isolated environment and a new draft paper runtime
-beside the package:
+Use Python 3.11 or newer. From the extracted skill directory:
 
 ```powershell
 python -m venv ..\trading-env
 ..\trading-env\Scripts\python.exe -m pip install -r requirements-tested.txt
 ..\trading-env\Scripts\python.exe scripts/research_preflight.py
 ..\trading-env\Scripts\python.exe -m unittest discover -s tests -v
-..\trading-env\Scripts\python.exe scripts/personal_runtime.py init ..\robinhood-runtime
-..\trading-env\Scripts\python.exe scripts/personal_runtime.py doctor ..\robinhood-runtime
 ```
 
-Choose unused environment/runtime directories. On macOS/Linux use `python3` and
-the environment's `bin/python`. Preflight checks package integrity and research
-dependencies. Doctor intentionally reports draft/paper findings before personal
-configuration; these are not proof of live readiness.
+Choose an unused environment directory; on macOS/Linux use `python3` and
+`bin/python`. Dependency and integrity findings describe research availability,
+not execution permission. The requirements file pins direct dependencies, not a
+complete transitive environment; retest after changes. Missing optional research
+models should be disclosed without inventing substitute results.
 
-`requirements-tested.txt` pins tested direct dependencies;
-`requirements.txt` provides compatible ranges. Neither is a complete transitive
-lockfile. Retest after dependency changes. An installation copies the skill, not
-credentials, authenticated tools or a ready brokerage connection.
+Keep personal source archives, reports and existing broker/runtime records outside
+the installed skill. Installing or upgrading the package does not change an
+account or erase old execution state. Optional local runtime helpers organize
+research; they do not activate, approve or gate trading.
 
-The [personal setup guide](references/personal-setup.md) covers policy, account
-discovery, runtime commands and session operation. Keep personal policy, research
-archives, evidence and durable account journals outside the installed skill and
-public repository. Use an explicit new installation destination and avoid
-duplicate installed copies; preserve existing runtime state during upgrades.
+## Examples and handoff
 
-## Try the offline workflows
+Run fictional research examples:
 
-After creating the runtime above, run examples with fictional data:
-
-```powershell
-..\trading-env\Scripts\python.exe scripts/learning_demo.py
-..\trading-env\Scripts\python.exe scripts/screen_review.py examples/fictional-horizon-screen.json
-..\trading-env\Scripts\python.exe scripts/quant_workbench.py run examples/fictional-quant-campaign.json --output ..\robinhood-runtime\reports\quant.bundle.json
-..\trading-env\Scripts\python.exe scripts/quant_workbench.py verify ..\robinhood-runtime\reports\quant.bundle.json
+```text
+python scripts/screen_review.py examples/fictional-horizon-screen.json
+python scripts/quant_workbench.py run examples/fictional-quant-campaign.json --output <research-folder>/quant.bundle.json
+python scripts/quant_workbench.py verify <research-folder>/quant.bundle.json
 ```
 
-Use a new result path for each run. Bundled prices, accounts and grants are
-fictional; examples do not create real permissions or demonstrate investment
-performance. The [prompt catalog](EXAMPLE-PROMPTS.md) covers practical research,
-portfolio, tactical and quantitative requests beyond these software examples.
+The [prompt catalog](EXAMPLE-PROMPTS.md) covers novice investing through advanced
+quant research, diagnostics, accounting and host handoff. Example values are not
+personal recommendations or default constraints on the user's orders.
 
-For actual news polling, guidance comparison and analyst arithmetic, follow their
-linked guides and supply the requested sources, timestamps and evidence files.
-One news-poll invocation makes one pass; it does not create a background monitor.
+`scripts/execution_handoff.py` preserves a supplied instruction/payload and advisory
+findings for the host. It performs no broker call and requires no local approval
+record or risk clearance. The host uses its real broker tools and existing user
+instructions. A recommendation-only request is still a recommendation-only request.
+Market execution is the default handoff preference when the user requests a buy
+without specifying an order type; preserve explicit limit instructions.
 
-## Personal execution
+Fractional/native-dollar support depends on the actual broker. A dollar input can
+be converted to shares at a recent price and therefore need not guarantee exact
+spending or a hard final debit. Report actual responses and outcomes, including
+uncertainty. Do not turn an empty tool result into a claimed fill or rejection.
+The skill does not manage authentication, custody, transport retries, background
+execution or broker order-state transitions.
 
-The runtime starts in **paper mode**. Exact-order approval and bounded autonomous
-operation require a current, explicitly authorized policy, verified broker tools,
-strategy evidence and an active supervised session. Installing the package or
-requesting research does not activate live trading.
+## Quant and operational limits
 
-The Python helpers prepare and validate local records; they contain no broker
-credential client or network order path. The host invokes actual authenticated
-broker tools only after the applicable request and authorization checks. Unknown
-submission outcomes require reconciliation before any retry.
+Public news polling is not guaranteed high-frequency data. Sentiment triage is a
+deterministic research helper, not a calibrated return model. Historical validation
+needs appropriate vintages, realistic costs and untouched evaluation data.
+Continuous-weight allocation is not comprehensive multi-period tax/margin
+optimization; unsupported derivatives and pricing assumptions remain explicit.
 
-The execution adapter supports unlevered, long-only U.S. stocks and nonleveraged
-ETFs through regular-session quantity-based DAY limit orders. Fractional quantities
-are supported when the policy, fresh per-symbol rules and observed broker schemas
-permit them. Dollar budgets and recurring contributions can produce fractional
-proposals; whole-share sizing remains configurable. Native dollar-market orders,
-broker recurring-schedule management, options, short selling and extended-hours
-execution require additional adapters. An unsupported broker route stays in
-proposal mode. See [fractional sizing](references/fractional-shares.md).
+Host tools, data rights, entitlements, accounts and reliable infrastructure are
+external. The skill helps with investment-manager analysis but does not establish
+hedge-fund-manager replacement. Historical review/validation files are archival
+evidence, not current operating procedures.
 
-Live tactical entries require verified native atomic protection, partial-fill
-coverage, exclusive exits and a tested time-exit/handoff procedure. The registered
-opening-range-breakout adapter recomputes completed-bar signals; its presence does
-not promote the strategy for live use. Broker support, forward evidence and
-authorization must independently pass. Configure the
-[settled-cash reserve](references/settled-cash-planning.md) before day-trade entries;
-unsettled proceeds cannot satisfy it.
-
-A supervised chat has no guaranteed response latency and stops observing when it
-closes. If required broker protection or supervision is unavailable, retain
-research/paper mode or use human execution. Read
-[broker integration](references/broker-integration.md) for exact capability and
-reconciliation requirements.
-
-## Limits and responsible interpretation
-
-The package implements analytical and operational tools, not a demonstrated source
-of alpha. **Strong Buy is unavailable without a separately validated classifier.**
-Unit tests establish selected software behavior; calculation agreement between
-models does not establish profitable investment performance or identical judgments
-when models acquire different evidence.
-
-Historical validation requires suitable point-in-time data, complete trial records,
-realistic costs and untouched evaluation. The allocator uses continuous weights;
-multi-period tax optimization, comprehensive margin modeling and unsupported
-derivatives remain outside its implemented scope. Source availability, licenses,
-broker entitlements, custody, audited administration and resilient always-on
-infrastructure are external dependencies.
-
-See the [capability and remaining-gap review](references/institutional-gap-review-4.2.md)
-and [strategy validation requirements](references/shared-strategy-validation.md).
-The skill can support an investment manager's research process; equivalent
-professional performance and replacement of a hedge-fund manager are unestablished.
-
-## Provenance and licensing
+## Provenance and license
 
 Read [PROVENANCE.md](PROVENANCE.md), [SOURCES.md](SOURCES.md) and
-[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) for origin, influences and dependency
-notices. The repository-authored code and documentation are available under the
-[MIT License](LICENSE). Keep that license and the notices with standalone copies.
-External dependencies retain their own terms, including the upstream
-[arch notice](ARCH-LICENSE.txt). The MIT grant does not relicense third-party
-material. The predecessor's user-confirmed personal-Codex origin and source audit
-are recorded in PROVENANCE.md. Publisher reports and retrieved market data remain
-subject to their own permissions.
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Repository-authored code and
+prose use the [MIT License](LICENSE); keep it and the notices with standalone
+copies. Dependencies retain their terms, including [arch](ARCH-LICENSE.txt).
+Publisher reports and market data retain their own permissions.
+
+Execution-time price changes, quote age and research-to-market price drift do not
+trigger a skill threshold, pause or repeat approval. Preserve the user's accepted
+market-price uncertainty; state the research as-of time without making it a
+condition for the host handoff.

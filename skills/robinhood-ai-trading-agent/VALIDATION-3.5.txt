@@ -1,3 +1,11 @@
+ARCHIVAL RECORD — historical results and implementation only.
+
+This file is not current setup guidance or execution policy. Previous
+execution gates described below are retired. The current skill imposes
+zero execution gates; research findings are advisory. Consult SKILL.md and references/execution-handoff.md.
+
+---
+
 Version 3.5.0 validation - October 9, 2026
 Python 3.11; dependency requirements unchanged.
 Full offline suite: 261 tests PASS; final integrity suite: 31 tests PASS,

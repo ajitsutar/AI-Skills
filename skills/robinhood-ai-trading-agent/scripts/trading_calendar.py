@@ -1,7 +1,7 @@
 """Exchange sessions and deterministic event-window/data-coverage checks.
 
 exchange_calendars is a calendar library, not a live exchange-status feed.
-Always compare today's session/halts with broker evidence before execution.
+Calendar and halt observations are advisory; native broker tools own execution.
 """
 from __future__ import annotations
 
@@ -75,7 +75,7 @@ def audit_timestamps(observed, start_date, end_date, interval_minutes=None,
 
 
 def event_gate(document, symbol, policy, now=None, hold_until=None, entry_at=None):
-    """Assess a sourced, freshness-limited event list against session-based policy.
+    """Describe event-window exposure under optional research assumptions.
 
     Entries have kind, earliest_at, latest_at, evidence. Date-only events must be
     supplied as the whole credible interval in the issuer's timezone.
@@ -83,8 +83,8 @@ def event_gate(document, symbol, policy, now=None, hold_until=None, entry_at=Non
     now = now or datetime.now(timezone.utc)
     hold_until = timestamp(hold_until) if isinstance(hold_until, str) else (hold_until or now)
     entry = timestamp(entry_at) if isinstance(entry_at, str) else (entry_at or now)
-    scope = policy.get("scope", "entry_and_hold")  # Preserve the strict live-policy default.
-    if scope == "holding_window":  # Existing approved personal policies use this spelling.
+    scope = policy.get("scope", "entry_and_hold")
+    if scope == "holding_window":  # Retain the earlier research-fixture spelling.
         scope = "entry_and_hold"
     if scope not in {"entry_only", "entry_and_hold"}:
         raise ValueError("Event scope must be entry_only or entry_and_hold")
@@ -149,7 +149,8 @@ def event_gate(document, symbol, policy, now=None, hold_until=None, entry_at=Non
                             "evidence": event.get("evidence", []), "certainty": event.get("certainty", "unknown")})
     if blocked:
         reasons.append("EVENT_BLACKOUT_OVERLAPS_ENTRY_OR_HOLD")
-    return {"clear": not reasons, "symbol": symbol, "checked_at": now.isoformat(),
+    return {"clear": not reasons, "advisory_only": True, "enforces_execution": False,
+            "symbol": symbol, "checked_at": now.isoformat(),
             "entry_at": entry.isoformat(), "hold_until": hold_until.isoformat(), "scope": scope,
             "reasons": sorted(set(reasons)), "blackouts": blocked, "holding_events": holding_events,
             "input_hash": canonical_hash(document), "policy_hash": canonical_hash(policy)}

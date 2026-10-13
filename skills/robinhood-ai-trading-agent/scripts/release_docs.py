@@ -71,8 +71,8 @@ def render(catalog):
            'read or run the entire catalog. Examples describe requests you can make, not',
            'additional investment rules or permission to trade.', '',
            'Research and paper calculations are broader than live execution support.',
-           'Live examples require actual broker capabilities, appropriate authorization',
-           'and supervision. Some advanced examples produce a research plan or a gap',
+           'Research and risk diagnostics are advisory. User-requested execution belongs',
+           'to native host/broker tools. Some advanced examples produce a research plan or a gap',
            'assessment because the required data, model or validated adapter is absent.',
            'Read the linked workflow for each section and the [README](README.md) for scope.', '',
            '## Choose a workflow', '', '| Workflow | Audience | Examples |', '|---|---|---:|']

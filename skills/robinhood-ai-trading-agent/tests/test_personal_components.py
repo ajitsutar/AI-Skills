@@ -14,7 +14,6 @@ from research_analytics import normalization_bridge, peer_comparisons, analyst_t
 from portfolio_analytics import lookthrough, covariance_risk, stress
 from accounting_tools import cash_reconciliation, time_weighted_return, select_lots, wash_sale_review
 from broker_bridge import build_request, redact_request, receipt, OFFICIAL_ENDPOINT
-from supervised_session import SupervisedSession, SessionClosed, actions_needed
 
 
 class CalendarTests(unittest.TestCase):
@@ -50,13 +49,15 @@ class CalendarTests(unittest.TestCase):
         document["coverage_verified"] = False
         self.assertFalse(event_gate(document, "DEMO", policy, now)["clear"])
 
-    def test_unknown_future_coverage_and_stale_calendar_block(self):
+    def test_unknown_future_coverage_and_stale_calendar_are_advisory(self):
         now = timestamp("2026-10-07T16:00:00Z")
         document = {"symbol": "DEMO", "source": "fixture", "coverage_verified": True,
             "checked_at": "2026-10-06T12:00:00Z", "coverage_start": "2026-10-01T00:00:00Z",
             "coverage_end": now.isoformat(), "events": []}
         policy = {"before_sessions": 2, "after_sessions": 1, "max_age_seconds": 3600, "blocked_kinds": ["earnings"]}
         result = event_gate(document, "DEMO", policy, now)
+        self.assertTrue(result["advisory_only"])
+        self.assertFalse(result["enforces_execution"])
         self.assertIn("EVENT_CALENDAR_STALE_OR_FUTURE", result["reasons"])
         self.assertIn("EVENT_COVERAGE_INCOMPLETE", result["reasons"])
 
@@ -234,36 +235,12 @@ class BrokerAndSessionTests(unittest.TestCase):
                 "private_routing": {"account": "fictional-private-route"}}
         result = build_request(caps, "submit", data, timestamp(caps["checked_at"]), "demo")
         self.assertNotIn("fictional-private-route", str(redact_request(result, caps)))
-        self.assertFalse(result["execution_authorized"])
+        self.assertFalse(result["enforces_execution"])
         data["order"]["quantity"] = "2.5"
         with self.assertRaisesRegex(ValueError, "Noninteger"):
             build_request(caps, "submit", data, timestamp(caps["checked_at"]), "demo")
 
-    def test_session_cannot_be_stolen_or_silently_revived(self):
-        now = timestamp("2026-10-07T16:00:00Z")
-        with tempfile.TemporaryDirectory() as folder:
-            session = SupervisedSession(Path(folder) / "session.db")
-            try:
-                session.start("demo", "owner1", "policy", "2026-10-07T19:00:00Z", "fictional human ref", now=now)
-                with self.assertRaises(SessionClosed):
-                    session.start("demo", "owner2", "policy", "2026-10-07T19:00:00Z", "other", now=now)
-                with self.assertRaisesRegex(SessionClosed, "HEARTBEAT_LOST"):
-                    session.heartbeat("demo", "owner1", "policy", now + timedelta(seconds=61))
-                session.stop("demo", "owner1", {"disposition": "flat", "evidence_ref": "fixture"}, now)
-                self.assertFalse(session.status("demo", "owner1", "policy", now)["ready"])
-            finally:
-                session.close()
 
-    def test_supervisor_flags_time_exit_even_with_protection(self):
-        now = timestamp("2026-10-07T19:50:00Z")
-        snapshot = {"reconciled": True, "session": {"close": "2026-10-07T20:00:00Z"}}
-        position = {"symbol": "A", "sleeve": "intraday", "quantity": 2, "exit_by": now.isoformat(), 'stop_price': 98}
-        protection = {"symbol": "A", "sleeve": "intraday", "covered_quantity": 2, "state": "working",
-            "native_broker": True, "as_of": now.isoformat(), "protection_ref": "fixture-stop", 'side':'sell',
-            'stop_price':98,'expires_at':'2026-10-07T20:00:00Z'}
-        result = actions_needed(snapshot, [position], [protection], now)
-        self.assertIn("TIME_EXIT_DUE", result["required_actions"][0]["action"])
-        self.assertFalse(result["new_entries_permitted_by_supervisor"])
 
 
 if __name__ == "__main__":

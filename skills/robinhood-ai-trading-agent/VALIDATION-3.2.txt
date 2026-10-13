@@ -1,3 +1,11 @@
+ARCHIVAL RECORD — historical results and implementation only.
+
+This file is not current setup guidance or execution policy. Previous
+execution gates described below are retired. The current skill imposes
+zero execution gates; research findings are advisory. Consult SKILL.md and references/execution-handoff.md.
+
+---
+
 Robinhood trading skill 3.2.0 - local release verification
 Date: October 8, 2026 (America/Los_Angeles)
 Base: fe65aeba9404211651b867a2d81fe3ae29af0e71

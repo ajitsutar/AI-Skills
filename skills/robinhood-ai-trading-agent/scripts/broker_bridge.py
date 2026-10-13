@@ -1,8 +1,9 @@
-"""Schema-bound requests for official broker tools called by the Codex host.
+"""Optional schema-mapping utility for data supplied by a native broker host.
 
 No credential client or guessed Robinhood HTTP API. Codex owns its authenticated
-MCP session. The host discovers actual tools/schemas, supplies exact mappings and
-invokes the returned request only after the execution ledger permits it.
+MCP session. The host discovers actual tools/schemas and supplies exact mappings.
+This utility neither participates in the research handoff nor determines whether
+an order may execute. Native host/broker tools own execution and permissions.
 """
 from __future__ import annotations
 
@@ -15,7 +16,7 @@ from risk_engine import canonical_hash, dec, timestamp
 
 
 OFFICIAL_ENDPOINT = "https://agent.robinhood.com/mcp/trading"
-OPERATIONS = {"quote", "positions", "orders", "account", "review", "submit", "cancel", "advanced_review", "advanced_submit"}
+OPERATIONS = {"quote", "positions", "orders", "fills", "account", "review", "submit", "cancel", "advanced_review", "advanced_submit"}
 
 
 def pointer(document, path):
@@ -57,9 +58,7 @@ def resolve_binding(binding, inputs, redact=False):
     value = pointer(inputs,binding['pointer'])
     kind = binding['type']
     if 'enum_map' in binding:
-        if binding['pointer'] not in {'/order/side','/order/order_type','/order/time_in_force'} or not binding.get('evidence'):
-            raise ValueError('Enum translation needs observed semantic evidence')
-        value = binding['enum_map'][value]
+        value = binding['enum_map'][str(value).lower() if type(value) is bool else value]
     if kind == 'integer':
         numeric = dec(value)
         if numeric != numeric.to_integral_value():
@@ -80,66 +79,20 @@ def resolve_binding(binding, inputs, redact=False):
     return value
 
 
-def build_request(capabilities, operation, inputs, now, expected_alias, max_age_seconds=86400):
+def build_request(capabilities, operation, inputs, now, expected_alias, max_age_seconds=86400, *, execution_profile=None):
     """Bindings map broker argument -> {pointer, type}. No freehand argument rewrite.
 
-    inputs separates order, approved constants and private broker routing. This
+    inputs separates order, supplied constants and private broker routing. This
     function returns real arguments in memory: never print/save routing identifiers.
     Persist only request_hash and redacted_request from redact_request().
     """
     from jsonschema import Draft202012Validator
-    if operation not in OPERATIONS:
-        raise ValueError("Unsupported broker operation")
-    if capabilities["endpoint"] != OFFICIAL_ENDPOINT or capabilities["account_alias"] != expected_alias:
-        raise ValueError("Official endpoint and verified account alias required")
-    if capabilities.get("source") != "connected_official_mcp_schema_observation":
-        raise ValueError("Capabilities must come from the connected official broker tool schemas")
-    if not 0 <= (now - timestamp(capabilities["checked_at"])).total_seconds() <= max_age_seconds:
-        raise ValueError("Broker capabilities expired or future-dated")
+    # Mapping validates only the caller-supplied schema and exact conversions.
+    # Account permissions, freshness, order support and trading policy belong to
+    # native host/broker tools. Legacy profile/clock parameters are not gates.
     tool = capabilities["operations"][operation]
-    if capabilities.get("account_routing_verified") is not True:
-        raise ValueError("Account routing must be verified from the connected broker")
-    if not tool.get("tool_name") or not tool.get("input_schema"):
-        raise ValueError("Missing actual broker tool schema")
     local_schema_only(tool["input_schema"])
-    if canonical_hash(tool["input_schema"]) != tool["schema_hash"]:
-        raise ValueError("Broker schema changed; rediscover and revalidate mapping")
-    arguments = {name:resolve_binding(binding,inputs) for name,binding in tool['bindings'].items()}
-    if operation in {"submit", "advanced_submit", "review", "advanced_review"}:
-        from fractional_shares import validate_broker_fractional_semantics
-        if inputs["order"].get("order_basis", "quantity") != "quantity" or "notional" in inputs["order"]:
-            raise ValueError("Native dollar orders require a separate observed and validated adapter")
-        validate_broker_fractional_semantics(tool, inputs["order"])
-        mapped = set().union(*(binding_sources(binding) for binding in tool['bindings'].values()))
-        required = {"/order/symbol", "/order/side", "/order/quantity", "/order/limit_price",
-                    "/order/order_type", "/order/time_in_force", "/order/extended_hours"}
-        # Some broker tools fix semantics instead of exposing an argument. Each
-        # such field needs an observed, documented value, never a guessed default.
-        for field, observed in tool.get("fixed_semantics", {}).items():
-            if field in {"order_type", "time_in_force", "extended_hours"} and observed.get("evidence"):
-                if observed["value"] != inputs["order"][field]:
-                    raise ValueError("Broker fixed semantics conflict with the approved order")
-                required.discard("/order/" + field)
-        if not required <= mapped:
-            raise ValueError("Exact order identity/economics must map to broker arguments")
-        if inputs["order"]["account_alias"] != expected_alias:
-            raise ValueError("Order account alias differs from capability mapping")
-        if operation in {"advanced_submit", "advanced_review"}:
-            if not {"/order/stop_price", "/order/target_price"} <= mapped:
-                raise ValueError("Attached protective prices must bind to the approved order")
-            semantics = tool.get("protection_semantics", {})
-            if (semantics.get("atomic_with_entry") is not True
-                    or semantics.get("partial_fill_quantity_tracking") is not True
-                    or semantics.get("mutually_exclusive_exits") is not True
-                    or not semantics.get("evidence")):
-                raise ValueError("Verified atomic, partial-fill-aware native protection required")
-    routing = set().union(*(binding_sources(binding) for binding in tool['bindings'].values()))
-    if not any(p.startswith("/private_routing/") for p in routing):
-        scoped = tool.get("connection_scoped_account", {})
-        if scoped.get("account_alias") != expected_alias or not scoped.get("evidence"):
-            raise ValueError("Explicit private account binding or verified connection-scoped account required")
-    if operation == "cancel" and "/private_routing/broker_order_id" not in routing:
-        raise ValueError("Cancellation must bind the exact broker order identifier")
+    arguments = {name: resolve_binding(binding, inputs) for name, binding in tool['bindings'].items()}
     Draft202012Validator.check_schema(tool["input_schema"])
     from jsonschema.exceptions import ValidationError
     try:
@@ -149,7 +102,8 @@ def build_request(capabilities, operation, inputs, now, expected_alias, max_age_
     request = {"tool_name": tool["tool_name"], "arguments": arguments}
     return {"request": request, "request_hash": canonical_hash(request),
             "capability_hash": canonical_hash(capabilities), "operation": operation,
-            "schema_hash": tool["schema_hash"], "execution_authorized": False}
+            "schema_hash": canonical_hash(tool["input_schema"]), "adapter_role": "OPTIONAL_SCHEMA_MAPPING",
+            "advisory_only": True, "enforces_execution": False}
 
 
 def redact_request(prepared, capabilities):
@@ -164,7 +118,7 @@ def redact_request(prepared, capabilities):
     for name, binding in operation["bindings"].items():
         result["request"]["arguments"][name] = scrub(result['request']['arguments'][name],binding)
     result["redacted"] = True
-    result["execution_authorized"] = False
+    result["enforces_execution"] = False
     return result
 
 
@@ -186,11 +140,11 @@ def main():
     parser.add_argument("capabilities", type=Path)
     parser.add_argument("inputs", type=Path, help="Use only sanitized demo inputs on disk; private live routing stays in host memory")
     parser.add_argument("--operation", choices=sorted(OPERATIONS), required=True)
-    parser.add_argument("--as-of", required=True, help="Offline binding verification clock; live host uses its actual clock")
+    parser.add_argument("--as-of", help="Optional retained observation timestamp; not an execution requirement")
     args = parser.parse_args()
     capabilities = json.loads(args.capabilities.read_text(encoding="utf-8-sig"))
     inputs = json.loads(args.inputs.read_text(encoding="utf-8-sig"))
-    prepared = build_request(capabilities, args.operation, inputs, timestamp(args.as_of), capabilities["account_alias"])
+    prepared = build_request(capabilities, args.operation, inputs, timestamp(args.as_of) if args.as_of else None, capabilities.get("account_alias"))
     print(json.dumps(redact_request(prepared, capabilities), indent=2))
 
 

@@ -1,3 +1,11 @@
+ARCHIVAL RECORD — historical results and implementation only.
+
+This file is not current setup guidance or execution policy. Previous
+execution gates described below are retired. The current skill imposes
+zero execution gates; research findings are advisory. Consult ../SKILL.md and ../references/execution-handoff.md.
+
+---
+
 # Muse/Codex quant compatibility — October 11, 2026
 
 **Measured: 27/27 shared-input jobs match**, including rejection and infeasibility

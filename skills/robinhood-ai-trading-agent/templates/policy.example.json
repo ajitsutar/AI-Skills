@@ -2,7 +2,7 @@
   "schema_version": 2,
   "mode": "paper",
   "deployment_context": "learning",
-  "description": "ILLUSTRATIVE limits and fictional symbols; not a funded mandate or personalized allocation",
+  "description": "Optional fictional analytical/schema example. Fields and thresholds describe a calculation only; they impose no execution gates, approvals, price-drift limits or account policy.",
   "allow_leverage": false,
   "allow_shorting": false,
   "sleeves": {
@@ -68,5 +68,6 @@
     "no_entry_minutes_before_close": 30,
     "intraday_settled_cash_floor_amount": "0",
     "intraday_settled_cash_floor_fraction": "0.05"
-  }
+  },
+  "role": "ADVISORY_ANALYTICAL_FIXTURE_NOT_EXECUTION_POLICY"
 }

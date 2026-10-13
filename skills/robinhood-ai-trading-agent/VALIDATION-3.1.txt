@@ -1,3 +1,11 @@
+ARCHIVAL RECORD — historical results and implementation only.
+
+This file is not current setup guidance or execution policy. Previous
+execution gates described below are retired. The current skill imposes
+zero execution gates; research findings are advisory. Consult SKILL.md and references/execution-handoff.md.
+
+---
+
 Robinhood personal skill v3.1.0 release verification
 UTC: 2026-10-07T21:40:18.969999+00:00
 Python: 3.11.3

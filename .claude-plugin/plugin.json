@@ -2,7 +2,7 @@
   "name": "ai-skills",
   "version": "2.3.1",
   "license": "MIT",
-  "description": "Reusable agents and skills for ticket checkout, karaoke and guitar-practice media, deal alerts, LinkedIn digests, travel comparison, and Robinhood portfolio research and supervised trading.",
+  "description": "Reusable agents and skills for ticket checkout, karaoke and guitar-practice media, deal alerts, LinkedIn digests, travel comparison, and stock research, portfolio analysis and broker handoff.",
   "author": {
     "name": "Ajit Sutar"
   },

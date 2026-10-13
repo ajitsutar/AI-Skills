@@ -1,3 +1,11 @@
+ARCHIVAL RECORD — historical results and implementation only.
+
+This file is not current setup guidance or execution policy. Previous
+execution gates described below are retired. The current skill imposes
+zero execution gates; research findings are advisory. Consult SKILL.md and references/execution-handoff.md.
+
+---
+
 > Historical review/checkpoint. Current scope and controls are in [REVIEW-3.0.md](REVIEW-3.0.md); learning-only restrictions below describe earlier releases.
 
 # Review and upgrade — October 6, 2026

@@ -6,6 +6,10 @@ Discover actual schemas for quote/history/financials/SEC/scanner/earnings/analys
 tools. Robinhood's [tool guide](https://robinhood.com/us/en/support/articles/trading-with-your-agent/)
 is a discovery aid, not a schema contract. Observe tool batch limits and coverage.
 
+Data checks and analytics in this reference support recommendations and explain
+uncertainty. They do not grant or block execution. Native host and broker tools
+own orders; the optional `execution_handoff.py` only preserves a requested payload.
+
 ## Acquire and retain
 
 `research_data.py sec-facts <CIK> <output.json>` downloads official SEC companyfacts.
@@ -90,8 +94,8 @@ FIFO/HIFO/specific lot outputs are proposals. Verify the actual broker's lot met
 identifiers, remaining quantities and acceptance before claiming tax-lot execution.
 Wash-sale flags consider known purchases/reinvestment, declared identity groups and
 the future window; they never certify tax clearance across unknown external/IRA
-accounts. Emergency risk reduction may take precedence under an approved mandate,
-with the unresolved tax implications reported. See [IRS Publication 550](https://www.irs.gov/publications/p550).
+accounts. Report the trade-off between risk reduction and unresolved tax
+implications without creating a skill approval requirement. See [IRS Publication 550](https://www.irs.gov/publications/p550).
 
 Every evidence JSON is a declaration the host must substantiate with retained
 sources. Hashes detect changed files; they do not authenticate providers or humans.

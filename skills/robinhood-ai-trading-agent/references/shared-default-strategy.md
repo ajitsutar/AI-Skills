@@ -4,6 +4,10 @@ Version 3.8 begins broad ranked requests with the separate
 [public research campaign](research-campaign.md) and its fixed review queue.
 This reference governs the strict filing-based ranking, not that vendor stage.
 
+Research eligibility, sample-size checks and portfolio constraints below are
+analytical conventions, not execution conditions. The skill neither submits nor
+vetoes orders; native host and broker tools handle requested transactions.
+
 Use **vqm-fundamental 1.0.0** for a strict fundamental equity ranking when the user has
 not selected a different saved strategy. This is the shared default for a one-year
 S&P 500 request. It is a **research baseline without measured alpha or calibrated
@@ -37,7 +41,7 @@ Do not inherit an earlier chat's risk preferences when the prompt says otherwise
 
 For research use the last completed XNYS session, including early closes, as both
 price date and information cutoff. A report released after that close enters the
-next snapshot. Live execution quotes have their own freshness gates. The calendar
+next snapshot. Distinguish the research close from a later broker quote. The calendar
 library is checked against retained exchange/session evidence; it is not a halt
 feed. Choose providers, universe and accounting conventions before fetching.
 
@@ -47,7 +51,7 @@ provider symbol mapping (e.g. a dot versus dash), dated GICS mapping and source
 hashes. Reconcile fund-proxy residuals and effective membership changes. Choose
 the highest ADV20 share class per issuer, breaking ties by exact symbol. ADV20
 is the mean daily traded dollar volume over the last 20 complete sessions.
-Missing class liquidity blocks that issuer; do not choose whichever class has
+Missing class liquidity leaves that issuer unranked; do not choose whichever class has
 the better score. Use the issuer's total common market capitalization across
 classes, even though momentum uses the selected security's return history.
 
@@ -86,7 +90,7 @@ Add `information_as_of` equal to cutoff and `point_in_time_evidence` describing 
 archived filing index/calendar used to reconstruct what was known then. Primary
 publication must precede cutoff; each reconstructed event also needs its own
 `published_at`. The research helper distinguishes retrieval from information time.
-It does not relax live event freshness or authorize backdated broker orders.
+It reconstructs research information without creating broker instructions.
 
 | Adapter | Value inputs, equal weights | Quality inputs, equal weights |
 |---|---|---|
@@ -132,7 +136,7 @@ Momentum is `TRI[t−21] / TRI[t−252] − 1`, using 253 consecutive completed-
 total-return-index observations through t. Splits, dividends, spinoffs and symbol
 changes need an action audit tied to these exact values. This is an explicit daily
 252/21 approximation to 12-minus-1 momentum, not French's exact monthly portfolio.
-Rank momentum across all raw-complete unique issuers, before the peer-size gate.
+Rank momentum across all raw-complete unique issuers, before the peer-size check.
 
 Average the two Value ranks, three Quality ranks, then average V, Q and M equally.
 Use Decimal arithmetic at fixed precision and symbol-ascending final tie breaks.
@@ -171,14 +175,14 @@ For the shared profile, terminal_scenarios requires
 `status: reviewed`, an `assumption` and nonempty `evidence`. Explicitly model
 dividends/distributions for every issuer; zero must be an evidenced assumption,
 not an omitted field or unknown dividend history. Scenario `entry_price` is the
-shared `close_price`; a later executable price needs a separately labeled refresh.
+shared `close_price`; label any comparison using a later broker price separately.
 The cash benchmark freshness allowance is at most seven calendar days, and the
 existing helper checks its actual observation age and exact holding-period basis.
 A stale three-month bill yield cannot certify a one-year excess-return column.
 
 Uniform EPS/multiple shocks are useful **common stress tests**, not company-specific
 fair values, calibrated downside estimates or substitutes for normalization.
-Keep them outside the issuer terminal-valuation gate. Treat contingent guarantees,
+Keep them outside the issuer terminal-valuation evidence test. Treat contingent guarantees,
 financing facilities, customer-issued notes and recognized debt as distinct claims;
 do not conflate similarly named amounts. Preserve entity, units, period and exact
 filing/table reference for material claims and reconciliation differences.
@@ -210,17 +214,17 @@ benchmark exposure. Missing holdings/exposures prevent a complete allocation.
 
 Constraints are explicit: long-only, full funding, issuer cap, active sector cap,
 theme cap, half-L1 turnover cap and per-asset maximums. Set each maximum to the
-stricter approved position limit and liquidity budget (participation × ADV ×
+stricter research position assumption and liquidity budget (participation × ADV ×
 execution days / portfolio equity). Aggregate share classes by issuer and all
 sleeves/account exposure through existing portfolio checks. Infeasibility produces
 no allocation; never silently loosen caps. A top-ten list is not a promise that
 those ten alone can meet benchmark-relative constraints.
 
 The optimizer validates supplied declarations and numerical feasibility, not
-calibration truth or optimal future performance. Apply observed lot/fractional increments,
-settled-cash floors, taxes, account restrictions, fresh prices and risk checks
-afterwards; rerun feasibility on the rounded proposal. It creates no orders.
-GARCH/GJR/EGARCH remain validated risk ceilings only; their volatility cannot add
+calibration truth or optimal future performance. Report the effect of lot/fractional
+increments, settlement, taxes, account terms and prices on the rounded proposal.
+These are planning observations, not skill execution prerequisites. It creates no orders.
+GARCH/GJR/EGARCH remain optional risk estimates; their volatility cannot add
 alpha, reverse the stock ranking or rescale a daily signal into intraday alpha.
 
 ## 5. Validation before performance claims
@@ -234,11 +238,11 @@ implemented formula and passing software tests are not evidence of an edge.
 
 The holding clock accepts arbitrary periods without a strategy-imposed maximum.
 That does not validate one alpha process across all periods. Use this profile for
-fundamental research. Intraday uses registered completed-bar signals and active
-session supervision; swing uses a separately versioned within-window strategy.
+fundamental research. Intraday analysis uses completed-bar signals; swing analysis
+uses a separately versioned within-window strategy.
 Do not automatically replace a one-day/day-trade prompt with VQM. For an unsupported
 strategy/horizon combination, retain the real clock, identify the validation gap
-and keep the analysis in research/paper mode.
+and disclose it without imposing a transaction restriction.
 
 For cross-model testing give each model the same prompt, mandate, snapshot and
 evidence register. Require the same profile/hash, scores/order, selected names and

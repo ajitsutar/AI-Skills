@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-163 examples across 23 workflows, from first-time investing to quantitative research.
+175 examples across 24 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the robinhood-ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -10,8 +10,8 @@ read or run the entire catalog. Examples describe requests you can make, not
 additional investment rules or permission to trade.
 
 Research and paper calculations are broader than live execution support.
-Live examples require actual broker capabilities, appropriate authorization
-and supervision. Some advanced examples produce a research plan or a gap
+Research and risk diagnostics are advisory. User-requested execution belongs
+to native host/broker tools. Some advanced examples produce a research plan or a gap
 assessment because the required data, model or validated adapter is absent.
 Read the linked workflow for each section and the [README](README.md) for scope.
 
@@ -38,7 +38,8 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Cash, settlement and funding](#cash-settlement-and-funding) | Intermediate to quant | 6 |
 | [Performance accounting, execution costs and attribution](#performance-accounting-execution-costs-and-attribution) | Intermediate to quant | 8 |
 | [Day trading and supervised paper sessions](#day-trading-and-supervised-paper-sessions) | Intermediate to expert | 7 |
-| [Execution controls, reconciliation and recovery](#execution-controls-reconciliation-and-recovery) | Expert; broker and authorization dependent | 7 |
+| [Recommendations and requested market handoffs](#recommendations-and-requested-market-handoffs) | All levels; actual broker support and user authorization required | 9 |
+| [Host integration and observed outcomes](#host-integration-and-observed-outcomes) | Expert; broker and authorization dependent | 10 |
 | [Saved research and incremental refresh](#saved-research-and-incremental-refresh) | All levels | 6 |
 | [Cross-model reproducibility and audits](#cross-model-reproducibility-and-audits) | Advanced to quant | 6 |
 | [Institutional research workflows and capability development](#institutional-research-workflows-and-capability-development) | Expert to quant | 7 |
@@ -51,17 +52,17 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 > Check the installed skill, package integrity, Python dependencies, data access and broker capabilities. Explain which workflows I can use now and which need additional inputs or services.
 
-### 2. Understand the operating modes
+### 2. Understand recommendations and handoff
 
-> Explain paper, exact-order approval and bounded autonomous modes using a fictional trade. Identify which checks are required before moving from research to a real order.
+> Explain which investment research and quantitative calculations this skill performs, how its optional handoff preserves my requested order, and which operations belong to the connected host and broker. There are no local execution modes or gates to activate.
 
-### 3. Create a paper workspace
+### 3. Create a research workspace
 
-> Initialize a paper workspace at [DIRECTORY]. Keep my policy, source archives and trade journal outside the installed skill, and show me how to check its health and resume it.
+> Create a research workspace at [DIRECTORY] for source archives, reports and a private observed-outcome journal. Keep it outside the installed skill; do not create an execution policy or approval ledger.
 
-### 4. Draft my investment policy
+### 4. Describe my investment preferences
 
-> Help me define objectives, horizon, contributions, cash needs and tolerable losses. Turn them into a draft portfolio policy and explain conflicts or missing decisions.
+> Help me describe objectives, horizon, contributions, cash needs and losses I want considered. Keep these as research context and distinguish my actual instructions from illustrative preferences.
 
 ### 5. Research a small starting portfolio
 
@@ -73,7 +74,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 7. Run the fictional exercises
 
-> Run the bundled learning exercises and explain the resulting decisions and rejections. Separate fictional investment numbers, software behavior and evidence that would be needed for real investing.
+> Run the bundled learning exercises and explain the resulting analytical findings. Separate fictional investment numbers, software behavior and evidence that would be needed for real investing.
 
 
 ## Research mandates and stock universes
@@ -90,7 +91,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 10. Define a custom universe
 
-> Use [WATCHLIST OR UNIVERSE FILE] with [EXCLUSIONS]. Validate identifiers, duplicates, listing status, currencies and ADR/share-class relationships. Keep this research universe separate from execution permissions.
+> Use [WATCHLIST OR UNIVERSE FILE] with [EXCLUSIONS]. Validate identifiers, duplicates, listing status, currencies and ADR/share-class relationships. Treat universe membership as a research definition, not order permission.
 
 ### 11. Ignore previous preferences for one run
 
@@ -189,7 +190,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 31. Allow earnings with explicit risk
 
-> Review [WATCHLIST] for [HORIZON], allowing holdings through earnings. Separate entry restrictions from holding-event policy, disclose gap risk and confirm that the scenarios include the earnings outcome.
+> Review [WATCHLIST] for [HORIZON], allowing holdings through earnings. Disclose event dates, gap risk and scenario sensitivity without inventing an entry blackout.
 
 ### 32. Avoid holding through specified events
 
@@ -234,7 +235,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 41. Review a trading halt
 
-> Review the latest exchange status for [SYMBOL]. Distinguish halt event time from a feed dateline and quote resumption from trade resumption. Identify what current exchange and broker checks remain necessary before entry.
+> Review the latest exchange status for [SYMBOL]. Distinguish halt event time from a feed dateline and quote resumption from trade resumption. Explain current exchange/broker restrictions as external facts, not new skill gates.
 
 ### 42. Test news data quality
 
@@ -315,9 +316,9 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 > Review [CURRENT EMPLOYER STOCK] and [NET VESTING SCHEDULE]. Account for shares withheld or sold for taxes, separate employment and investment exposure, and compare diversification paths without assuming gross grants are spendable cash.
 
-### 58. Design portfolio sleeves
+### 58. Compare portfolio allocations
 
-> Draft core, swing, intraday and cash allocations for [CAPITAL AND OBJECTIVES]. Propose risk budgets and concentration limits appropriate to the mandate, and keep draft policy distinct from approved execution authority.
+> Compare core, swing, intraday and cash allocations for [CAPITAL AND OBJECTIVES]. Explain concentration and loss scenarios without imposing sample weights or approval requirements on my account.
 
 ### 59. Rebalance with contributions
 
@@ -342,15 +343,15 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ## Fractional shares and recurring contributions
 
-**Audience:** Beginner to quant; execution depends on verified broker support. Guides: [fractional shares](references/fractional-shares.md), [portfolio management](references/portfolio-management.md), [approval gated execution](references/approval-gated-execution.md).
+**Audience:** Beginner to quant; execution depends on verified broker support. Guides: [fractional shares](references/fractional-shares.md), [portfolio management](references/portfolio-management.md), [execution handoff](references/execution-handoff.md).
 
 ### 64. Invest a small dollar budget
 
-> Prepare fractional quantity-limit proposals for [SECURITIES] within a total [DOLLAR BUDGET]. Apply current prices, eligible share increments, minimums, fee reserves and settled-cash constraints. Show maximum debit and unspent cash; do not exclude a suitable security simply because one whole share costs more than my budget.
+> Prepare an allocation and host handoff for [SECURITIES] using the full [DOLLAR BUDGET]. Preserve native dollar instructions where supported; explain fractional quantities, estimated costs and final-debit uncertainty without imposing whole-share or template cash restrictions.
 
 ### 65. Plan one recurring contribution
 
-> For the next occurrence of [CONTRIBUTION PLAN], prepare [DOLLAR AMOUNTS PER SECURITY] using fractional shares. Preserve my cash reserve, check funding and current targets, and give the occurrence a durable identity so a retry cannot invest twice. Produce proposals without creating a recurring schedule.
+> For [CONTRIBUTION OCCURRENCE], calculate [DOLLAR AMOUNTS PER SECURITY] using fractional shares. Show rounding and any user-requested reserve. Produce the requested handoff without creating an unrequested future schedule or a local approval ticket.
 
 ### 66. Compare fractional and whole-share implementation
 
@@ -358,15 +359,15 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 67. Validate fractional execution capabilities
 
-> Using an already authorized connection, inspect the actual broker schemas and symbol tradability for [FRACTIONAL PROPOSALS]. Verify precision, minimums, supported order combinations and fractional fill reporting. Keep native dollar-market orders distinct from this skill's bounded quantity-limit adapter.
+> Inspect actual connected schemas and symbol tradability for [FRACTIONAL PROPOSALS]. Explain precision, minimums, quantity/notional semantics and fill reporting. Preserve requested native dollar-market instructions where supported rather than silently changing the order basis.
 
-### 68. Reconcile a fractional partial fill
+### 68. Interpret fractional partial fills
 
-> Reconcile [FRACTIONAL ORDER AND CUMULATIVE FILLS] with confirmed broker state. Preserve exact filled and remaining quantities, cash reservations and sleeve ownership. Report any residual cash or unsupported small residual sale without rounding up, duplicating fills or automatically topping up the occurrence.
+> Review [FRACTIONAL ORDER AND CUMULATIVE FILLS] against observed broker records. Preserve exact filled and remaining quantities, explain actual fees and residual cash, and distinguish cumulative updates from new fills.
 
-### 69. Size a small tactical position
+### 69. Analyze a small tactical position
 
-> Calculate a fractional tactical position for [ENTRY, STOP, TARGET, CASH AND RISK BUDGET] using explicit quantity increments, minimums and costs. Check actual fractional protective-order and partial-fill support before treating the result as executable; retain paper mode when those capabilities are absent.
+> Calculate hypothetical fractional sizes for [ENTRY, STOP, TARGET, CASH AND LOSS SCENARIOS]. Show sensitivity to gaps and costs. Treat the calculation as advice; do not require protective orders or a volatility model before the host handoff.
 
 
 ## Quantitative portfolio construction
@@ -418,9 +419,9 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 > Compare GARCH, GJR-GARCH and supported EGARCH forecasts on the same audited data and holdout. Record all variants, respect forecast-horizon limitations and separate volatility forecasts from direction.
 
-### 80. Review volatility-dependent sizing
+### 80. Use volatility as advice
 
-> Evaluate whether [VOLATILITY RESULT] may adjust the size of [PROPOSED TRADE]. Apply the configured quality and policy gates, pending exposure and stop-risk limits; show when the adjustment must be skipped.
+> Explain how [VOLATILITY RESULT] changes the risk interpretation of [ALLOCATION]. Compare it with simpler realized-volatility and stress estimates, disclose missing evidence and keep every diagnostic advisory rather than an execution gate.
 
 ### 81. Estimate historical tail losses
 
@@ -500,9 +501,9 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 > Write a research contract for [STRATEGY]: universe, horizon, signal, costs, benchmark, variants, untouched evaluation window and acceptance criteria. Identify data and statistical-design gaps before running it.
 
-### 98. Assess promotion evidence
+### 98. Review strategy evidence
 
-> Evaluate [STRATEGY VERSION] using retained development, validation, untouched-test and forward-paper evidence. Recompute the configured quantitative criteria, check profile/data hashes and all variants, and explain the pass or failure without promoting it automatically.
+> Evaluate [STRATEGY VERSION] using retained development, validation, untouched-test and forward observations. Recompute the chosen quantitative criteria, inspect data/code hashes and all variants, and explain confidence and limitations without creating a live-promotion requirement.
 
 ### 99. Test sensitivity without hindsight
 
@@ -541,9 +542,9 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 > Review [BACKTEST BUNDLE] for survivor bias, revised data, look-ahead, trial selection, unrealistic fills, omitted costs and overlapping labels. Identify what can be reproduced and what cannot support the performance claim.
 
-### 107. Replay the daily trend example
+### 107. Run the daily trend baseline
 
-> Run the bundled daily SMA trend research baseline on [AUDITED DAILY DATA]. Use its actual rules, chronological evaluation and costs, compare with a passive baseline and explain why the example is not a promoted live strategy.
+> Run the bundled daily SMA research baseline on [AUDITED DAILY DATA]. Use its actual chronological rules and costs, compare it with a passive baseline and explain why a successful replay does not establish a profitable strategy.
 
 
 ## Multi-asset research, pricing and hedging
@@ -591,9 +592,9 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate to quant. Guides: [settled cash planning](references/settled-cash-planning.md), [quant workbench](references/quant-workbench.md).
 
-### 117. Preserve an intraday cash reserve
+### 117. Compare a cash buffer
 
-> Evaluate [DAY-TRADING PLAN] with a configurable reserve of [DOLLARS OR PERCENT OF EQUITY]. Account for settled cash and pending reservations so proposed entries do not consume the required buffer.
+> Model [DAY-TRADING PLAN] with an optional reserve of [DOLLARS OR PERCENT OF EQUITY]. Compare settlement paths and available cash under observed account conventions; present the buffer as advice, not a skill-imposed trade gate.
 
 ### 118. Plan staggered cash usage
 
@@ -603,9 +604,9 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 > Run the cash-ladder helper on [SETTLED BALANCES, RESERVATIONS AND CONFIRMED EVENTS]. Enforce currency-specific floors and identify when liabilities exceed available funds.
 
-### 120. Audit reservation releases
+### 120. Analyze reservations and debits
 
-> Reconcile [ORDER RESERVATIONS AND DEBITS]. Release a hold only against its matching confirmed event, avoid double charging or double spending and retain evidence linking each reservation to its order.
+> Analyze [ORDER RESERVATIONS AND DEBITS] for double counting and account cash-flow differences. Match confirmed events, retain source evidence and explain unknown outcomes. This is accounting analysis, not a local execution lock.
 
 ### 121. Review a funding shortfall
 
@@ -665,13 +666,13 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 > Start from the configured stock universe and apply [PRICE, LIQUIDITY AND SPREAD FILTERS] to build a tactical watchlist. Separate membership, tradability and entry-signal qualification.
 
-### 133. Evaluate an opening-range breakout
+### 133. Analyze an opening-range setup
 
-> Evaluate the registered opening-range-breakout setup for [SYMBOL] using completed bars. Report the actual opening range, trigger, invalidation, stop, target, time exit and strategy-promotion status.
+> Evaluate the opening-range-breakout research example for [SYMBOL] using completed bars. Report range, trigger, invalidation, reference exits, costs and evidence limitations. The simulated rules are not execution conditions.
 
 ### 134. Reject premature confirmation
 
-> Review [CHART OR BAR DATA] for a possible breakout. Identify conditions that depend on an unfinished candle, stale quote or missing event check, and explain when the correct action is to wait.
+> Review [CHART OR BAR DATA] for a possible breakout. Distinguish completed from unfinished candles, dated quotes and missing event evidence. Explain how these limitations affect the research conclusion without imposing an execution pause.
 
 ### 135. Size a paper trade after costs
 
@@ -679,71 +680,124 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 136. Run a supervised paper session
 
-> Run a paper session for [WATCHLIST] while this chat stays active. Use supported setups, completed-bar decisions, conservative fills, a journal and session-health checks; stop new entries if required supervision or data fails.
+> Simulate a research session for [WATCHLIST] from available completed bars. Use declared setup rules, conservative fills and a journal. Report missing observations and the limits of the simulation without implying a background service or imposing execution conditions.
 
 ### 137. Handle losses and closing risk
 
-> Review today's marked positions, trades and pending orders against approved loss and exposure limits. Determine whether new entries must stop, preserve protective coverage and prepare the end-of-session handoff.
+> Review today's marked positions, trades and pending orders. Explain realized/unrealized losses, gap and closing risk, and possible responses as advice. Report the actual host/broker state without imposing a new-entry stop or requiring a monitoring lease.
 
 
-## Execution controls, reconciliation and recovery
+## Recommendations and requested market handoffs
 
-**Audience:** Expert; broker and authorization dependent. Guides: [approval gated execution](references/approval-gated-execution.md), [broker integration](references/broker-integration.md), [personal setup](references/personal-setup.md).
+**Audience:** All levels; actual broker support and user authorization required. Guides: [execution handoff](references/execution-handoff.md), [fractional shares](references/fractional-shares.md).
 
-### 138. Inspect live readiness
+### 138. Recommend and hand off one allocation
 
-> Using an already authorized broker connection, run a read-only readiness assessment. Verify account eligibility, actual schemas, restrictions, settled cash, order support, protection and time-exit coverage, then list concrete blockers.
+> Research [UNIVERSE] for [HORIZON] and recommend how to invest the full [BUDGET]. I also instruct the connected host to place those purchases at market. Preserve that instruction without adding skill approvals, grants, tickets, volatility conditions or price-drift thresholds; state recommendation uncertainty honestly.
 
-### 139. Prepare an exact-order proposal
+### 139. Use my existing order instruction
 
-> Prepare [SYMBOL, SIDE, QUANTITY, LIMIT AND SLEEVE] in approval mode. Present the exact order and applicable checks; obtain explicit approval before submission, refresh time-sensitive inputs and reconcile any uncertain outcome.
+> Prepare the host handoff for [EXISTING ORDER INSTRUCTION]. Preserve the requested amounts and order type without asking again because research prices or quote timestamps changed.
 
-### 140. Use an existing bounded mandate
+### 140. Keep market-price uncertainty informational
 
-> During this supervised session, operate only within [EXISTING APPROVED MANDATE]. Verify expiry, instruments, strategies, capital limits and broker capabilities; return exceptions for review and stop new entries when controls fail.
+> For [MARKET ORDER REQUEST], state the research as-of and explain possible market-price and fee differences. I accept that uncertainty; do not pause or request reapproval based on price movement, spreads or quote age.
 
-### 141. Protect sleeve ownership
+### 141. Preserve a native dollar amount
 
-> Audit [CORE, SWING AND INTRADAY HOLDINGS] with open orders and reserved quantities. Resolve ambiguous ownership so a tactical exit cannot sell the long-term sleeve's shares.
+> Prepare [DOLLAR ALLOCATION] for a host that supports native dollar-market instructions. Preserve the amount and explain whether the broker estimates shares from a recent trade price, so final debit may differ. Do not silently round to whole shares.
 
-### 142. Recover an unknown submission
+### 142. Preserve an explicit limit instruction
 
-> The previous session stopped after an uncertain order submission. Reconcile the durable ledger with broker orders, fills, positions and protection before further action, and prevent duplicate submission.
+> Prepare a handoff for [SYMBOL, SIDE, QUANTITY AND USER-SPECIFIED LIMIT]. Preserve my supplied limit exactly; the skill should not replace it with a market order or invent a new price condition.
 
-### 143. Handle a partial fill
+### 143. Keep research findings advisory
 
-> Review [PARTIALLY FILLED ORDER] against confirmed broker state and supported protection. Reconcile filled and remaining quantities, reserved cash, cancel/replace uncertainty and residual risk.
+> Explain the concentration, earnings, volatility, spread and liquidity risks of [ORDER REQUEST], then preserve my existing host instruction. Do not turn any research finding or sample allocation constraint into an execution veto.
 
-### 144. Stop new exposure and hand off
+### 144. Compare stock choices for a small amount
 
-> Activate the local kill switch for new automated exposure, reconcile outstanding orders and positions and prepare a human handoff. Distinguish local authorization changes from confirmed broker actions.
+> Give me [NUMBER] alternative stocks, each suitable for investing the full [BUDGET] for [HORIZON]. Compare dated catalysts, valuation, evidence and downside. Treat them as alternatives rather than splitting the amount unless I ask.
+
+### 145. Handle a recurring request clearly
+
+> Prepare the requested fractional contribution [AMOUNTS AND SECURITIES] and distinguish one occurrence from a broker-native recurring schedule. Preserve any scheduling instruction I actually gave; do not claim a local calculation installed a schedule.
+
+### 146. Explain a broker rejection
+
+> Interpret [ACTUAL BROKER RESPONSE] and separate the broker or platform requirement from this skill. Report exactly what happened without inventing a local live policy or readiness checklist.
+
+
+## Host integration and observed outcomes
+
+**Audience:** Expert; broker and authorization dependent. Guides: [execution handoff](references/execution-handoff.md), [host execution integration](references/host-execution-integration.md), [broker integration](references/broker-integration.md).
+
+### 147. Inspect actual connected tools
+
+> Inspect the available broker tool schemas for [REQUEST]. Explain supported market/share/dollar/limit inputs and actual broker requirements without creating a skill capability gate or inventing unavailable tools.
+
+### 148. Prepare a pure handoff
+
+> Pass [ORDER DETAILS] through execution_handoff.handoff or its CLI. Verify that it preserves the supplied order, needs no runtime policy, grants or evidence, and makes no broker network call.
+
+### 149. Compare exact payloads
+
+> Compare [REQUESTED ORDER PAYLOAD] with [HOST HANDOFF]. Identify changes to side, amount, quantity, type, account routing or time-in-force. Do not equate a correctly formatted payload with a submitted or filled order.
+
+### 150. Explain an empty connector response
+
+> The connector returned an empty object for [ORDER]. Interpret available JSON-RPC errors, MCP isError, content and structured content without assuming acceptance or rejection. Keep credentials and private identifiers out of the report; actual broker reconciliation belongs to the host.
+
+### 151. Interpret known partial fills
+
+> Explain [PARTIAL FILL RECORDS], including cumulative quantity, average price, actual fees, remaining quantity and total spent. Report unknowns without creating a local reservation gate or changing other requested orders.
+
+### 152. Review historical order evidence
+
+> Review [BROKER HISTORY EXPORT] for account/status/date scope, pagination and missing pages. Distinguish a lack of matching evidence from proof that no order exists. Make no broker writes for this review.
+
+### 153. Record observed outcomes privately
+
+> Create a private factual journal of [HOST/BROKER RESPONSES]. Distinguish requested, submitted, accepted, partially filled, filled and unknown outcomes; never fabricate broker status from a local identifier.
+
+### 154. Check handoff privacy
+
+> Test the handoff CLI using fictional account and authentication fields. Verify sensitive values are redacted in its display while the in-memory API preserves the host payload. Do not include actual credentials.
+
+### 155. Explain responsibilities
+
+> Explain which parts of [WORKFLOW] are research, optional payload formatting, host submission, broker acceptance, monitoring and accounting. Identify actual unsupported host features without describing them as skill policy restrictions.
+
+### 156. Audit legacy migration
+
+> Review an older package installation for obsolete execution instructions. Use the current handoff and advisory references; do not reactivate policy.json, grants, tickets, monitoring leases or old live-readiness modules. Preserve private historical data unless I explicitly request its removal.
 
 
 ## Saved research and incremental refresh
 
 **Audience:** All levels. Guides: [research memory](references/research-memory.md), [research handoff](references/research-handoff.md).
 
-### 145. Save a reusable research campaign
+### 157. Save a reusable research campaign
 
 > Save [COMPLETED RESEARCH] in a local immutable library with source evidence, mandate, full-universe coverage, inputs, decisions and replay results. Keep private records outside the distributable skill.
 
-### 146. Refresh without repeating everything
+### 158. Refresh without repeating everything
 
 > Refresh [SAVED CAMPAIGN] for [NEW CUTOFF]. Verify its manifest, reuse unchanged primary evidence after revalidation, refresh changing prices/news/events and rerank the full eligible universe.
 
-### 147. Resume an incomplete full-market scan
+### 159. Resume an incomplete full-market scan
 
 > Resume [RESEARCH ARCHIVE] from its actual outstanding acquisition and evidence backlog. Preserve successful work, retry appropriately and report whether remaining gaps can change the research or final-selection result.
 
-### 148. Detect changed assumptions
+### 160. Detect changed assumptions
 
 > Compare the prior and current research inputs for [COMPANIES]. Identify changed facts, guidance, events, normalization assumptions and mandate settings, and explain which conclusions must be reconsidered.
 
-### 149. Preserve correction provenance
+### 161. Preserve correction provenance
 
 > Correct [KNOWN RESEARCH ERROR] with supporting source bytes and an explicit audit trail. Preserve the original snapshot and show the effect of rerunning the same calculation and decision contract.
 
-### 150. Create a clean research handoff
+### 162. Create a clean research handoff
 
 > Prepare a portable handoff for [CAMPAIGN] with the actual prompt, contract, data, evidence decisions, coverage and hashes. Keep broker credentials, account identifiers and copyrighted full reports out of the shared package.
 
@@ -752,27 +806,27 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Advanced to quant. Guides: [model independent research](references/model-independent-research.md), [quant workbench](references/quant-workbench.md), [research handoff](references/research-handoff.md), [PROVENANCE](PROVENANCE.md), [SOURCES](SOURCES.md), [THIRD PARTY NOTICES](THIRD-PARTY-NOTICES.md).
 
-### 151. Replay a numerical research bundle
+### 163. Replay a numerical research bundle
 
 > Verify [BUNDLE] and rerun its computations from frozen code, profile, data and parameters. Compare actual outputs using the documented numeric tolerance and exact decision/status checks.
 
-### 152. Compare models on identical inputs
+### 164. Compare models on identical inputs
 
 > Prepare a blinded comparison of [MODEL A] and [MODEL B] using the same complete skill, contract and frozen data. Compare numerical results, exclusions and decisions separately from explanation quality.
 
-### 153. Explain different stock lists
+### 165. Explain different stock lists
 
 > Reconcile [RESULT A] and [RESULT B] across universe, cutoff, horizon, profile, data freshness, coverage, prior preferences and review decisions. Distinguish candidate overlap from buy-eligibility agreement.
 
-### 154. Compare independent data acquisition
+### 166. Compare independent data acquisition
 
 > Have each authorized research environment acquire fresh evidence for [SAME MANDATE]. Compare data lineage and coverage before comparing picks; do not label this the same experiment as frozen-input replay.
 
-### 155. Audit a final-selection claim
+### 167. Audit a final-selection claim
 
 > Run the handoff and report checks on [RESEARCH RESULT]. Verify saved release/index evidence, ranking-relevant acquisition failures, review order and unresolved primary or horizon requirements.
 
-### 156. Review method provenance
+### 168. Review method provenance
 
 > Review [METHOD OR SCRIPT] for its actual mathematical assumptions, implementation provenance, dependencies and attributed sources. Distinguish original integration code from imported libraries and data-use rights.
 
@@ -781,31 +835,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Expert to quant. Guides: [institutional manager](references/institutional-manager.md), [institutional gap review 4.2](references/institutional-gap-review-4.2.md).
 
-### 157. Run a manager-style review
+### 169. Run a manager-style review
 
 > Review [PORTFOLIO AND MANDATE] across data quality, theses, construction, risk, costs, accounting and operations. Prioritize unresolved decisions and distinguish analysis support from custody or audited fund administration.
 
-### 158. Audit institutional readiness
+### 170. Audit institutional readiness
 
 > Assess this deployment against the skill's current capability inventory. Separate implemented/tested software, empirically validated investment effectiveness and available data or operational dependencies.
 
-### 159. Plan a point-in-time research database
+### 171. Plan a point-in-time research database
 
 > Design a coverage-first historical-data plan for [STRATEGY AND HORIZON]. Identify which public records can be reconstructed, which observations must be archived prospectively and which gaps may require licensed data.
 
-### 160. Design a sentiment validation study
+### 172. Design a sentiment validation study
 
 > Plan an adjudicated test of issuer matching, timestamp handling, negation and material-event classification for [NEWS DATA]. Separate extraction accuracy from a later causal, after-cost return study.
 
-### 161. Design an analyst-skill study
+### 173. Design an analyst-skill study
 
 > Specify the recommendation ledger, price history, entry/exit rules, benchmark and bias controls needed to measure analyst performance independently. Audit available data before trusting provider rankings or constructing weights.
 
-### 162. Drill operational failures
+### 174. Review host operational evidence
 
-> Design and run supported paper/offline recovery drills for disconnects, stale feeds, duplicate intents, partial fills and restarts. Retain reconciliation evidence and identify production behaviors that the local helpers cannot validate.
+> Review a host-provided offline failure drill for empty responses, disconnects, partial fills and restarts. Distinguish observed behavior from untested claims. Do not create local execution gates or claim this skill controls the host.
 
-### 163. Maintain the documentation
+### 175. Maintain the documentation
 
 > Review the latest implemented capabilities, update the README as a current usage guide and refresh the example-prompt catalog without a fixed count. Regenerate the examples and run the documentation release check before packaging.
 

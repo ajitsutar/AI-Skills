@@ -449,7 +449,8 @@ class ManagerTests(unittest.TestCase):
             [.1, -.1]*30, 252, .2, .5, 40, 2,
             {'minimum_observations': 30, 'max_age_seconds': 60, 'minimum_coverage': .9,
              'max_realized_to_forecast_volatility': 1.5, 'max_cost_bps': 20, 'max_reconciliation_difference': .01})
-        self.assertEqual(out['status'], 'BLOCK_NEW_RISK')
+        self.assertEqual(out['status'], 'ADVISORY_RISK_ALERT')
+        self.assertFalse(out['enforces_execution'])
         self.assertEqual(len(out['reasons']), 5)
         self.assertFalse(out['automatic_retuning_allowed'])
 

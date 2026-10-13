@@ -1,7 +1,7 @@
-"""Deterministic, fail-closed gates for long-only equity/ETF order proposals.
+"""Optional research diagnostics for long-only equity/ETF allocation scenarios.
 
 No networking or broker credentials. Monetary calculations use Decimal. Inputs
-must be normalized from a fresh broker snapshot, never filled in by inference.
+describe the supplied scenario; findings never authorize or block native orders.
 """
 from __future__ import annotations
 
@@ -144,7 +144,11 @@ def size_tactical(equity, entry, stop, risk_fraction, notional_cap,
 
 
 def evaluate(policy, snapshot, order, now=None):
-    """Return all applicable rejection reasons; invalid or missing inputs block."""
+    """Analyze an optional scenario against supplied hypothetical risk limits.
+
+    ``within_research_limits`` describes that optional analytical policy, not
+    execution permission. This result is never consulted by the host handoff.
+    """
     now = now or datetime.now(timezone.utc)
     reasons = []
     metrics = {}
@@ -365,11 +369,12 @@ def evaluate(policy, snapshot, order, now=None):
                        existing_open_risk=str(open_risk))
     except (KeyError, TypeError, ValueError, ArithmeticError) as exc:
         reasons.append("INVALID_OR_MISSING_INPUT: " + str(exc))
-    disposition = "READY_FOR_NEXT_GATE" if not reasons else "BLOCKED"
+    disposition = "WITHIN_RESEARCH_LIMITS" if not reasons else "ADVISORY_RISK_OBSERVATIONS"
     if reasons and set(reasons) <= {"INSUFFICIENT_UNRESERVED_SETTLED_CASH", "INTRADAY_SETTLED_CASH_RESERVE"}:
-        disposition = "WAIT_FOR_CASH_BUDGET"
-    return {"allowed": not reasons, "reasons": sorted(set(reasons)), "metrics": metrics,
-            "entry_disposition": disposition if order.get("side") == "buy" else "NOT_AN_ENTRY",
+        disposition = "SCENARIO_CASH_SHORTFALL"
+    return {"within_research_limits": not reasons, "reasons": sorted(set(reasons)), "metrics": metrics,
+            "advisory_only": True, "enforces_execution": False,
+            "diagnostic_status": disposition,
             "order_hash": canonical_hash(order), "policy_hash": canonical_hash(policy),
             "planned_loss_is_not_guaranteed": True}
 
@@ -385,7 +390,7 @@ def main():
                         (args.policy, args.snapshot, args.order)),
                       now=timestamp(args.as_of) if args.as_of else None)
     print(json.dumps(result, indent=2))
-    return 0 if result["allowed"] else 2
+    return 0
 
 
 if __name__ == "__main__":
