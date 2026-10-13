@@ -118,5 +118,5 @@ A separate personal runtime would need an official MCP connection, real data and
 calendar normalization, an approved capital/risk mandate, validated strategies,
 complete stop/time-exit coverage, reliable monitoring and broker-state recovery.
 No such deployment was performed here. See references/broker-integration.md for
-the integration boundary and references/research-and-validation.md for the
+the integration boundary and references/research-methods.md for the
 evaluation ladder.

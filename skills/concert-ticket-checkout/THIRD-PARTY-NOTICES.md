@@ -3,7 +3,7 @@
 The bundled [MIT license](LICENSE) covers the original material in this skill.
 No third-party implementation, browser runtime, ticket inventory, seat map,
 image or other provider content is bundled. See [Provenance](PROVENANCE.md) for
-the attribution review's scope and limits.
+source and licensing boundaries.
 
 Ticketmaster, AXS, Live Nation and other names identify services used in the
 workflow. Their trademarks, sites and content retain their owners' rights;

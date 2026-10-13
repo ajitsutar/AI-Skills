@@ -281,7 +281,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ## Social hypotheses, ownership and disclosure context
 
-**Audience:** Intermediate. Guides: [research and validation](references/research-and-validation.md), [screening and value traps](references/screening-and-value-traps.md).
+**Audience:** Intermediate. Guides: [research methods](references/research-methods.md), [screening and value traps](references/screening-and-value-traps.md).
 
 ### 51. Research competing public narratives
 
@@ -479,7 +479,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ## Statistical research and model validation
 
-**Audience:** Quant. Guides: [quant research](references/quant-research.md), [quant workbench](references/quant-workbench.md), [research and validation](references/research-and-validation.md).
+**Audience:** Quant. Guides: [quant research](references/quant-research.md), [quant workbench](references/quant-workbench.md), [research methods](references/research-methods.md).
 
 ### 93. Create causal validation folds
 
@@ -516,7 +516,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ## Backtesting and paper-validation design
 
-**Audience:** Advanced to quant. Guides: [quant workbench](references/quant-workbench.md), [research and validation](references/research-and-validation.md), [strategy playbook](references/strategy-playbook.md).
+**Audience:** Advanced to quant. Guides: [quant workbench](references/quant-workbench.md), [research methods](references/research-methods.md), [strategy playbook](references/strategy-playbook.md).
 
 ### 101. Replay a period portfolio
 
@@ -833,7 +833,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ## Institutional research workflows and capability development
 
-**Audience:** Expert to quant. Guides: [institutional manager](references/institutional-manager.md), [institutional gap review 4.2](references/institutional-gap-review-4.2.md).
+**Audience:** Expert to quant. Guides: [institutional manager](references/institutional-manager.md), [capabilities and limits](references/capabilities-and-limits.md).
 
 ### 169. Run a manager-style review
 

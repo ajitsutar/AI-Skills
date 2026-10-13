@@ -123,8 +123,7 @@ optimization; unsupported derivatives and pricing assumptions remain explicit.
 
 Host tools, data rights, entitlements, accounts and reliable infrastructure are
 external. The skill helps with investment-manager analysis but does not establish
-hedge-fund-manager replacement. Historical review/validation files are archival
-evidence, not current operating procedures.
+hedge-fund-manager replacement.
 
 ## Provenance and license
 

@@ -17,10 +17,10 @@ request. Browse [example prompts](../EXAMPLE-PROMPTS.md) to choose a workflow.
 | Run quantitative construction, risk and validation | [Quant workbench](quant-workbench.md), [quant methods](quant-research.md) |
 | Review different instruments | [Multi-asset playbook](multi-asset-playbook.md) |
 | Plan cash and settlement | [Settled-cash planning](settled-cash-planning.md) |
-| Assess strategy evidence | [Research and validation](research-and-validation.md), [shared strategy validation](shared-strategy-validation.md) |
+| Assess strategy evidence | [Research and validation](research-methods.md), [shared strategy validation](strategy-evaluation.md) |
 | Prepare a requested broker handoff | [Execution handoff](execution-handoff.md), [broker integration](broker-integration.md) |
 | Save, refresh or compare research | [Research memory](research-memory.md), [model-independent research](model-independent-research.md) |
-| Review institutional capability and remaining work | [Manager workflow](institutional-manager.md), [capability review](institutional-gap-review-4.2.md) |
+| Review institutional capability and remaining work | [Manager workflow](institutional-manager.md), [capabilities and limits](capabilities-and-limits.md) |
 | Maintain the README and generated prompt catalog | [Documentation maintenance](maintaining-the-skill.md) |
 
 Method origins and dependency notices are maintained in

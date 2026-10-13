@@ -284,7 +284,7 @@
       "title": "Social hypotheses, ownership and disclosure context",
       "audience": "Intermediate",
       "guides": [
-        "references/research-and-validation.md",
+        "references/research-methods.md",
         "references/screening-and-value-traps.md"
       ],
       "prompts": [
@@ -523,7 +523,7 @@
       "guides": [
         "references/quant-research.md",
         "references/quant-workbench.md",
-        "references/research-and-validation.md"
+        "references/research-methods.md"
       ],
       "prompts": [
         {
@@ -566,7 +566,7 @@
       "audience": "Advanced to quant",
       "guides": [
         "references/quant-workbench.md",
-        "references/research-and-validation.md",
+        "references/research-methods.md",
         "references/strategy-playbook.md"
       ],
       "prompts": [
@@ -943,7 +943,7 @@
       "audience": "Expert to quant",
       "guides": [
         "references/institutional-manager.md",
-        "references/institutional-gap-review-4.2.md"
+        "references/capabilities-and-limits.md"
       ],
       "prompts": [
         {

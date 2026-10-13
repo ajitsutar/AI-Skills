@@ -229,7 +229,7 @@ alpha, reverse the stock ranking or rescale a daily signal into intraday alpha.
 
 ## 5. Validation before performance claims
 
-Follow [the validation protocol](shared-strategy-validation.md). The package ships
+Follow [the validation protocol](strategy-evaluation.md). The package ships
 no historical point-in-time database, fitted alpha mapping or validated Strong Buy
 threshold. Do not create one by filling fields with favorable declarations. An
 implemented formula and passing software tests are not evidence of an edge.
