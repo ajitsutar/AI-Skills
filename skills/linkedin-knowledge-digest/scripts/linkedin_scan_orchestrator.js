@@ -42,7 +42,7 @@ const LinkedInScanOrchestrator = (() => {
     }
   }
 
-  function parseMarkedTransport(raw) {
+  function parseMarkedTransport(raw, { discoveryMode = "feed", searchQueries = [], includeConnectionsUpdates = false } = {}) {
     const marker = /<<<LINKEDIN_(BAND|CONNECTIONS|MESSAGES|DONE)>>>/g;
     const sections = [];
     let match;
@@ -61,7 +61,7 @@ const LinkedInScanOrchestrator = (() => {
       const value = parseJson(raw.slice(section.start, section.end).trim());
       if (
         !value
-        || value.payloadType !== "linkedin_digest_band"
+        || !(discoveryMode === "search" ? ["linkedin_search_band", ...(includeConnectionsUpdates ? ["linkedin_network_band"] : [])] : ["linkedin_digest_band"]).includes(value.payloadType)
         || value.ok !== true
         || value.completionMetadata?.pageValidated !== true
       ) {
@@ -71,6 +71,28 @@ const LinkedInScanOrchestrator = (() => {
     }
 
     if (bands.length < 3) return { ok: false, code: "insufficient_feed_bands" };
+    if (discoveryMode === "search") {
+      const searchBands = bands.filter((band) => band.payloadType === "linkedin_search_band");
+      const networkBands = bands.filter((band) => band.payloadType === "linkedin_network_band");
+      if (includeConnectionsUpdates && (networkBands.length !== 3 || networkBands.some((band, i) => band.completionMetadata.searchBandsInspected !== i + 1))) {
+        return { ok: false, code: "network_band_metadata_inconsistent" };
+      }
+      const queries = [...new Set(searchBands.map((band) => band.query))];
+      if (!searchQueries.length || queries.length !== searchQueries.length || queries.some((q) => !searchQueries.includes(q))) {
+        return { ok: false, code: "search_query_coverage_invalid" };
+      }
+      for (const query of queries) {
+        const group = searchBands.filter((band) => band.query === query);
+        if (group.length < 3 || group.some((band, i) => band.completionMetadata.searchBandsInspected !== i + 1)) {
+          return { ok: false, code: "search_band_metadata_inconsistent" };
+        }
+      }
+      return {
+        ok: true, bands, searchBandsInspected: searchBands.length, networkBandsInspected: networkBands.length, searchQueriesInspected: queries,
+        connections: { ok: false, items: [], error: "not_in_scope" },
+        messages: { ok: false, threads: [], error: "not_in_scope" }
+      };
+    }
     const counts = bands.map((band) => Number(band.completionMetadata.feedBandsInspected));
     if (counts.some((count) => !Number.isInteger(count) || count < 1)) {
       return { ok: false, code: "feed_band_metadata_invalid" };
@@ -180,12 +202,12 @@ const LinkedInScanOrchestrator = (() => {
     return score;
   }
 
-  function buildCompactSummary({ transport, state, currentTimeIso, overlapHours = 4, priorityOrganizations = [], contentFocus = "ai" }) {
+  function buildCompactSummary({ transport, state, currentTimeIso, overlapHours = 4, priorityOrganizations = [], contentFocus = "ai", discoveryMode = "feed", maxSourceAgeDays = 7 }) {
     if (!["ai", "general"].includes(contentFocus)) throw new Error("invalid_content_focus");
     const nowMs = Date.parse(currentTimeIso);
     const lastSuccessMs = Date.parse(state.last_successful_run_at || "");
     if (!Number.isFinite(nowMs)) throw new Error("invalid_current_time");
-    const cutoffMs = Number.isFinite(lastSuccessMs)
+    const cutoffMs = discoveryMode === "search" ? nowMs - maxSourceAgeDays * 86400000 : Number.isFinite(lastSuccessMs)
       ? lastSuccessMs - overlapHours * 60 * 60 * 1000
       : nowMs - 7 * 24 * 60 * 60 * 1000;
     const allowedAgeMs = Math.max(0, nowMs - cutoffMs);
@@ -200,25 +222,28 @@ const LinkedInScanOrchestrator = (() => {
       .map((item) => compactWhitespace(item.text).toLowerCase())
       .join("\n");
     const priorityPattern = priorityOrganizations.length
-      ? new RegExp(priorityOrganizations.map((value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|"), "i")
+      ? new RegExp(`\\b(?:${priorityOrganizations.map((value) => String(value).replace(/[.*+?^${}()|[\]\\]/g, "\\$&")).join("|")})\\b`, "i")
       : null;
     const candidates = [];
     const emitted = new Set();
 
     const addCandidate = (candidate) => {
+      const networkUpdate = candidate.networkUpdate === true;
+      if (networkUpdate && candidate.connectionDegree !== 1) return;
       const aiRelevant = AI_SIGNAL.test(candidate.excerpt);
-      if (contentFocus === "ai" && !aiRelevant) return;
+      if (contentFocus === "ai" && !aiRelevant && !networkUpdate) return;
       const urls = [...new Set((candidate.contentUrls || []).map(normalizeContentUrl).filter(Boolean))]
         .filter((url) => !seen.has(url) && !emitted.has(url))
         .sort((left, right) => Number(urlHost(left) === "linkedin.com") - Number(urlHost(right) === "linkedin.com"));
       if (!urls.length) return;
       const relativeAgeMs = parseRelativeAgeMs(candidate.excerpt);
-      if (relativeAgeMs !== null && relativeAgeMs > allowedAgeMs + 60 * 60 * 1000) return;
+      const networkAgeMs = Number.isFinite(lastSuccessMs) ? Math.max(0, nowMs - lastSuccessMs + overlapHours * 3600000) : allowedAgeMs;
+      if (relativeAgeMs !== null && relativeAgeMs > (networkUpdate ? networkAgeMs : allowedAgeMs) + 60 * 60 * 1000) return;
       for (const url of urls) emitted.add(url);
       const source = compactWhitespace(candidate.source) || "LinkedIn";
       const excerpt = compactWhitespace(candidate.excerpt).slice(0, MAX_EXCERPT);
-      const priorityNetwork = Boolean(
-        (priorityPattern && priorityPattern.test(`${source} ${excerpt}`))
+      const priorityNetwork = (networkUpdate || discoveryMode !== "search") && Boolean(
+        (priorityPattern && priorityPattern.test(networkUpdate ? candidate.affiliationContext || "" : `${source} ${excerpt}`))
         || (source.length >= 4 && connectionText.includes(source.toLowerCase()))
       );
       const item = {
@@ -227,6 +252,12 @@ const LinkedInScanOrchestrator = (() => {
         excerpt,
         engagement: compactWhitespace(candidate.engagement).slice(0, 120),
         contentUrls: urls,
+        ...(discoveryMode === "search" ? {
+          discovery: networkUpdate ? "connections_updates" : "linkedin_search", searchQuery: candidate.searchQuery,
+          ...(networkUpdate ? { connectionDegree: 1 } : {}),
+          publicAudience: candidate.publicAudience === true,
+          sourceVerificationRequired: true
+        } : {}),
         priorityNetwork,
         aiRelevant,
         evidenceHint: EVIDENCE_HINT.test(candidate.excerpt),
@@ -236,16 +267,22 @@ const LinkedInScanOrchestrator = (() => {
       candidates.push(item);
     };
 
-    for (const band of transport.bands) {
+    const orderedBands = [...transport.bands].sort((a, b) => Number(b.payloadType === "linkedin_network_band") - Number(a.payloadType === "linkedin_network_band"));
+    for (const band of orderedBands) {
       for (const post of band.posts || []) {
         const excerpt = compactWhitespace(post.text);
         if ((!KNOWLEDGE_SIGNAL.test(excerpt) && !AI_SIGNAL.test(excerpt)) || LOW_VALUE_SIGNAL.test(excerpt)) continue;
         addCandidate({
-          kind: "post",
+          kind: band.payloadType === "linkedin_network_band" ? "connection_update" : "post",
           source: post.author,
           excerpt,
           engagement: post.engagement,
-          contentUrls: post.contentUrls
+          contentUrls: post.contentUrls,
+          searchQuery: band.query,
+          publicAudience: post.publicAudience,
+          networkUpdate: band.payloadType === "linkedin_network_band",
+          connectionDegree: post.connectionDegree,
+          affiliationContext: post.affiliationContext
         });
       }
       for (const news of band.news || []) {
@@ -267,12 +304,19 @@ const LinkedInScanOrchestrator = (() => {
       payloadType: PAYLOAD_TYPE,
       ok: true,
       contentFocus,
+      discoveryMode,
       state: {
         lastSuccessfulRunAt: state.last_successful_run_at || null,
         cutoffAt: new Date(cutoffMs).toISOString(),
         seenCount: seen.size
       },
       scan: {
+        ...(discoveryMode === "search" ? {
+          searchBandsInspected: transport.searchBandsInspected,
+          networkBandsInspected: transport.networkBandsInspected,
+          searchQueriesInspected: transport.searchQueriesInspected,
+          coverage: "Bounded LinkedIn search, not exhaustive platform coverage."
+        } : {}),
         feedBandsInspected: transport.feedBandsInspected,
         feedBandPayloads: transport.bands.length,
         extractedPosts: transport.bands.reduce((sum, band) => sum + (band.posts || []).length, 0),
@@ -361,10 +405,16 @@ const LinkedInScanOrchestrator = (() => {
     overlapHours = 4,
     maxTransportBytes = 60000,
     priorityOrganizations = [],
-    contentFocus = "ai"
+    contentFocus = "ai",
+    discoveryMode = "feed",
+    searchQueries = [],
+    maxSourceAgeDays = 7,
+    includeConnectionsUpdates = false
   }) {
     try {
       if (!["ai", "general"].includes(contentFocus)) throw new Error("invalid_content_focus");
+      if (!["feed", "search"].includes(discoveryMode)) throw new Error("invalid_linkedin_mode");
+      if (!Number.isFinite(maxSourceAgeDays) || maxSourceAgeDays <= 0) throw new Error("invalid_source_age");
       const stateRead = await readJsonFile(tools, statePath, workdir, "state_read_failed");
       if (!stateRead.ok) return { schemaVersion: 1, payloadType: PAYLOAD_TYPE, ...stateRead };
       const state = stateRead.value;
@@ -379,6 +429,12 @@ const LinkedInScanOrchestrator = (() => {
 
       const manifestRead = await readJsonFile(tools, manifestPath, workdir, "manifest_read_failed");
       if (!manifestRead.ok) return { schemaVersion: 1, payloadType: PAYLOAD_TYPE, ...manifestRead };
+      const isSearchManifest = manifestRead.value.some((line) => line.includes("linkedin_search_candidates.js"));
+      if (isSearchManifest !== (discoveryMode === "search")) throw new Error("manifest_discovery_mode_mismatch");
+      if (discoveryMode === "search" && manifestRead.value.includes("repeat with networkBandIndex from 1 to 3") !== includeConnectionsUpdates) throw new Error("manifest_network_scope_mismatch");
+      if (discoveryMode === "search" && (!searchQueries.length || searchQueries.some((q) => !manifestRead.value.some((line) => line.includes(`keywords=${encodeURIComponent(q)}&`))))) {
+        throw new Error("manifest_search_queries_mismatch");
+      }
       const command = buildOsaScriptCommand(manifestRead.value);
       const browser = await collectBrowserOutput(tools, command, workdir);
       if (!browser.ok) {
@@ -402,7 +458,7 @@ const LinkedInScanOrchestrator = (() => {
         };
       }
 
-      const transport = parseMarkedTransport(browser.raw);
+      const transport = parseMarkedTransport(browser.raw, { discoveryMode, searchQueries, includeConnectionsUpdates });
       browser.raw = "";
       if (!transport.ok) {
         return {
@@ -421,7 +477,9 @@ const LinkedInScanOrchestrator = (() => {
         currentTimeIso,
         overlapHours,
         priorityOrganizations,
-        contentFocus
+        contentFocus,
+        discoveryMode,
+        maxSourceAgeDays
       });
       summary.transport = { exitCode: browser.exitCode, byteCount: browser.byteCount };
       return summary;
