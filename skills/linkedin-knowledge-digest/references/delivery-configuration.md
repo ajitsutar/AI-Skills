@@ -16,10 +16,17 @@ Example local draft configuration:
   "content": {
     "focus": "ai",
     "topics": ["AI research", "applied AI engineering", "AI governance"],
-    "max_items": 5,
+    "max_items": 3,
     "max_source_age_days": 7,
     "allow_older_foundational": false,
-    "expand_beyond_linkedin": false
+    "expand_beyond_linkedin": false,
+    "discovery": {
+      "linkedin_mode": "search",
+      "linkedin_queries": ["AI research evaluation", "LLM engineering architecture", "AI safety governance"],
+      "linkedin_bands_per_query": 3,
+      "include_connections_updates": false,
+      "connections_priority_organizations": []
+    }
   },
   "delivery": {
     "channel": "local",
@@ -37,6 +44,8 @@ Accept `channel` values `slack`, `whatsapp`, `sms`, `imessage`, `email`, `local`
 For example, configure WhatsApp with a verified WhatsApp recipient and an available WhatsApp sender; configure SMS with a verified SMS destination and an SMS-capable sender. The same phone number does not make those services interchangeable. "Send to me" still requires resolving the user's exact destination, not copying another installation's contact.
 
 Optional discovery preferences belong under `content.discovery`, independently of delivery. When public expansion is enabled, use the configured official `public_publishers` and `primary_indexes`, an explicit `restrict_public_publishers` boundary, and the separately configured `allow_linkedin_discovered_external` exception. A restricted list must be nonempty and its indexes must belong to verified allowed publishers. Positive `max_candidates`, `max_source_reads`, and `target_max_per_publisher` limits bound work; `recover_public_source_links` and `report_coverage_limitations` control source recovery and coverage notes. Read `article-quality.md` for the selection procedure. Do not treat enabling discovery as authorization to change the delivery route or to bypass a failed required LinkedIn scan.
+
+`connections_priority_organizations` is an optional list of the current user's schools and former employers, empty by default. Keep actual affiliations in private local configuration, never in the published skill. Read `linkedin-search.md` for verified connection matching. `content.max_items` is the combined recommendation cap across all sections, not a per-section allowance.
 
 `delivery.link_format` supports `linked_title` (the default for rich-text channels) and `plain_url`. Use `plain_url` when the user wants links to survive copying into plain-text editors: show each article title as text and put its complete source URL on a separate line. Do not hide the only URL behind a title or shorten it. WhatsApp and SMS/iMessage always use full plain URLs. Include the visible URLs in the character budget and final transaction audit.
 
