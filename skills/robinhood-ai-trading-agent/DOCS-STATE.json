@@ -1,12 +1,12 @@
 {
   "schema_version": 1,
-  "skill_version": "4.3.1",
-  "input_fingerprint_sha256": "bc5e6b1b09b026689fe4d6379aaf047591702f06c5f42a054b04ba879edf8d17",
-  "input_file_count": 139,
-  "catalog_sha256": "56562ea71901a16602d0f519e460587079ffd5dc223d1bfa7d1a6fc0045a4e58",
-  "readme_sha256": "78361f1f9221c2c46bed2cd23395a1593a4719552de5b25325be8e069b49a28d",
-  "examples_sha256": "ca319cb31e5adec439170228729bbb1d48cd3681a1e1027a0f544c50a3ea1fea",
-  "section_count": 23,
-  "example_count": 163,
+  "skill_version": "4.5.0",
+  "input_fingerprint_sha256": "e6712563eb766bfd9aee2d75a74220023519b3cdd87bcfd81fc5475072860e27",
+  "input_file_count": 145,
+  "catalog_sha256": "5f657208347f81b9f76105ca6062b87997d4dac5f9888c84e2f01b6779c1f14e",
+  "readme_sha256": "03df2ccb626b6304d5d6720f6402afbedb7b2e2b93579385147b84cc4bdd2ed9",
+  "examples_sha256": "a0fd37ef949ac0aa005d0a524b2867c33d7a026f0958bb0d25d8b5315b7a5571",
+  "section_count": 24,
+  "example_count": 175,
   "hash_basis": "UTF-8 files with LF/CRLF normalized; excludes generated state and package manifest"
 }

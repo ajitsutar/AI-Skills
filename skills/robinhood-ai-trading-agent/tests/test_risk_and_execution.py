@@ -11,7 +11,6 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / "scripts"))
 from risk_engine import canonical_hash, evaluate, size_tactical, timestamp, InvalidInput
-from execution_ledger import ExecutionLedger, GateClosed
 from portfolio_manager import rebalance, performance
 from install_skill import install
 
@@ -28,13 +27,13 @@ class Fixture(unittest.TestCase):
 
     def blocked(self, code):
         result = self.result()
-        self.assertFalse(result["allowed"], result)
+        self.assertFalse(result["within_research_limits"], result)
         self.assertTrue(any(code in r for r in result["reasons"]), result)
 
 
 class RiskTests(Fixture):
     def test_valid_fixture(self):
-        self.assertTrue(self.result()["allowed"], self.result())
+        self.assertTrue(self.result()["within_research_limits"], self.result())
 
     def test_order_cannot_relabel_stock_as_etf_for_a_larger_cap(self):
         self.order["asset_type"] = "etf"
@@ -83,7 +82,7 @@ class RiskTests(Fixture):
     def test_event_block_or_unknown_cannot_be_clearance(self):
         for state in (False, None, "true"):
             self.snapshot["quotes"]["DEMO"]["event_clear"] = state
-            self.assertFalse(self.result()["allowed"], self.result())
+            self.assertFalse(self.result()["within_research_limits"], self.result())
 
     def test_early_close(self):
         self.snapshot["session"]["close"] = "2026-10-06T14:20:00Z"
@@ -142,7 +141,7 @@ class RiskTests(Fixture):
             "sleeve": "intraday", "stop_price": "98", "sector": "technology"}]
         self.snapshot["cash"] = "98000"
         self.order["side"] = "sell"
-        self.assertTrue(self.result()["allowed"], self.result())
+        self.assertTrue(self.result()["within_research_limits"], self.result())
         self.order["quantity"] = "21"
         self.blocked("SELL_EXCEEDS_SLEEVE_AVAILABLE_SHARES")
 
@@ -184,218 +183,6 @@ class RiskTests(Fixture):
         self.blocked("SYMBOL_HAS_PENDING_ORDER")
 
 
-class ExecutionTests(Fixture):
-    def setUp(self):
-        super().setUp()
-        self.temp = tempfile.TemporaryDirectory()
-        self.path = Path(self.temp.name) / "execution.db"
-        self.ledger = ExecutionLedger(self.path)
-        self.snapshot.update(session_activity_reconciled=True,external_session_order_count=0,external_session_turnover='0',external_setup_entry_counts={})
-        # These tests isolate legacy authorization/journal invariants. Full real
-        # readiness integration (without this mock) is in test_personal_runtime.
-        readiness = patch("personal_readiness.entry_readiness", return_value={
-            "ready": True, "reasons": [], "evidence": {"request_hash": "unit-test-only"}})
-        readiness.start()
-        self.addCleanup(readiness.stop)
-        self.review = {"order_hash": canonical_hash(self.order), "official_mcp": True,
-                       "snapshot_hash": canonical_hash(self.snapshot),
-                       "accepted": True, "supported_order": True, "checked_at": self.now.isoformat(),
-                       "trade_approvals_enabled": False, "warnings": [], "exit_plan_verified": True,
-                       "readiness_inputs": {}}
-
-    def tearDown(self):
-        self.ledger.close()
-        self.temp.cleanup()
-
-    def grant(self, kind="mandate"):
-        personal = json.loads((ROOT / "templates/personal-policy.example.json").read_text())
-        for key in ("schema_version", "configuration_status", "requirements", "event_policies", "strategy_registry", "stress_scenarios"):
-            self.policy[key] = personal[key]
-        for key in ("stress_loss_fraction", "portfolio_annualized_volatility"):
-            self.policy["limits"][key] = personal["limits"][key]
-        self.policy["deployment_context"] = "personal"
-        self.policy["mode"] = "bounded_autonomous" if kind == "mandate" else "approval"
-        self.policy["live_validated_setups"] = ["opening_range_breakout"]
-        grant = {"id": "grant-1", "kind": kind, "policy_hash": canonical_hash(self.policy),
-                 "account_alias": "demo-agentic", "starts_at": "2026-10-06T13:00:00Z",
-                 "expires_at": "2026-10-06T20:00:00Z", "human_authorization_ref": "synthetic-test-only",
-                 "order_hash": canonical_hash(self.order), "review_hash": canonical_hash(self.review)}
-        self.ledger.authorize(grant)
-
-    def claim(self, id=None):
-        return self.ledger.claim(self.policy, self.snapshot, self.order, self.review, id, self.now)
-
-    def test_paper_never_returns_live_permission(self):
-        self.assertFalse(self.claim()["may_submit_once"])
-
-    def test_authorized_bounded_order(self):
-        self.grant()
-        self.assertTrue(self.claim("grant-1")["may_submit_once"])
-
-    def test_live_requires_human_record(self):
-        self.policy["mode"] = "bounded_autonomous"
-        self.policy["deployment_context"] = "personal"
-        self.policy["live_validated_setups"] = ["opening_range_breakout"]
-        with self.assertRaisesRegex(GateClosed, "NO_ACTIVE_HUMAN"):
-            self.claim()
-
-    def test_unvalidated_strategy_blocked(self):
-        self.grant()
-        self.policy["live_validated_setups"] = []
-        with self.assertRaisesRegex(GateClosed, "STRATEGY_NOT_PROMOTED"):
-            self.claim("grant-1")
-
-    def test_policy_change_invalidates_mandate(self):
-        self.grant()
-        self.policy["limits"]["max_order_notional"] = "5001"
-        with self.assertRaisesRegex(GateClosed, "POLICY_CHANGED"):
-            self.claim("grant-1")
-
-    def test_revoked_authorization(self):
-        self.grant()
-        self.ledger.revoke("grant-1")
-        with self.assertRaisesRegex(GateClosed, "NO_ACTIVE_HUMAN"):
-            self.claim("grant-1")
-
-    def test_changed_exact_approval(self):
-        self.grant("order")
-        self.order["quantity"] = "19"
-        with self.assertRaisesRegex(GateClosed, "APPROVED_ORDER_OR_REVIEW_CHANGED"):
-            self.claim("grant-1")
-
-    def test_broker_approval_cannot_be_bypassed(self):
-        self.grant()
-        self.review["trade_approvals_enabled"] = True
-        with self.assertRaisesRegex(GateClosed, "BROKER_REQUIRES_MANUAL"):
-            self.claim("grant-1")
-
-    def test_autonomous_warnings_block(self):
-        self.grant()
-        self.review["warnings"] = ["New warning"]
-        with self.assertRaisesRegex(GateClosed, "NEW_BROKER_WARNINGS"):
-            self.claim("grant-1")
-
-    def test_protection_is_required(self):
-        self.grant()
-        self.review["exit_plan_verified"] = False
-        with self.assertRaisesRegex(GateClosed, "NO_VERIFIED_PROTECTION"):
-            self.claim("grant-1")
-
-    def test_duplicate_across_restart(self):
-        self.claim()
-        self.ledger.close()
-        self.ledger = ExecutionLedger(self.path)
-        with self.assertRaisesRegex(GateClosed, "DUPLICATE"):
-            self.claim()
-
-    def test_timeout_blocks_other_intents(self):
-        self.claim()
-        self.ledger.reconcile(self.order["id"], "UNKNOWN", "0")
-        self.order["id"] = "another"
-        self.order["signal_id"] = "different-signal"
-        with self.assertRaisesRegex(GateClosed, "UNRESOLVED_PRIOR"):
-            self.claim()
-
-    def test_partial_cancel_retains_fills_and_is_idempotent(self):
-        self.claim()
-        self.ledger.reconcile(self.order["id"], "PARTIALLY_FILLED", "5", "100")
-        self.ledger.reconcile(self.order["id"], "CANCEL_PENDING", "5", "100")
-        self.assertEqual(len(self.ledger.unresolved()), 1)
-        r = self.ledger.reconcile(self.order["id"], "CANCELLED", "7", "100")
-        self.assertEqual(r["filled"], "7")
-        self.ledger.reconcile(self.order["id"], "CANCELLED", "7", "100")
-        self.assertFalse(self.ledger.unresolved())
-        with self.assertRaisesRegex(GateClosed, "CONTRADICTORY_TERMINAL"):
-            self.ledger.reconcile(self.order["id"], "FILLED", "20", "100")
-
-    def test_cumulative_fill_cannot_regress_or_overfill(self):
-        self.claim()
-        self.ledger.reconcile(self.order["id"], "PARTIALLY_FILLED", "5", "100")
-        for filled in (4, 21):
-            with self.assertRaisesRegex(GateClosed, "NONMONOTONIC_OR_EXCESS"):
-                self.ledger.reconcile(self.order["id"], "PARTIALLY_FILLED", filled, 100)
-
-    def test_filled_requires_entire_quantity(self):
-        self.claim()
-        with self.assertRaisesRegex(GateClosed, "FILLED_REQUIRES_FULL"):
-            self.ledger.reconcile(self.order["id"], "FILLED", 5, 100)
-
-    def test_contradictory_terminal_state_latches_unknown_across_restart(self):
-        self.claim()
-        self.ledger.reconcile(self.order["id"], "CANCELLED", 0)
-        with self.assertRaisesRegex(GateClosed, "CONTRADICTORY_TERMINAL"):
-            self.ledger.reconcile(self.order["id"], "OPEN", 0)
-        self.ledger.close()
-        self.ledger = ExecutionLedger(self.path)
-        self.snapshot["reconciled_through_intent"] = self.order["id"]
-        self.order["id"], self.order["signal_id"] = "after-conflict", "after-conflict-signal"
-        with self.assertRaisesRegex(GateClosed, "UNRESOLVED_PRIOR"):
-            self.claim()
-
-    def test_identical_terminal_fill_accepts_equivalent_decimal_format(self):
-        self.claim()
-        self.ledger.reconcile(self.order["id"], "FILLED", 20, "100.00")
-        self.ledger.reconcile(self.order["id"], "FILLED", "20.0", "100")
-        self.assertFalse(self.ledger.unresolved())
-
-    def test_live_mode_switch_does_not_reset_daily_order_count(self):
-        self.policy["limits"]["max_orders_per_day"] = 1
-        self.grant()
-        self.claim("grant-1")
-        previous = self.order["id"]
-        self.ledger.reconcile(previous, "CANCELLED", 0)
-        self.policy["mode"] = "approval"
-        self.snapshot["reconciled_through_intent"] = previous
-        self.order["id"], self.order["signal_id"] = "next-live", "next-live-signal"
-        self.review["order_hash"] = canonical_hash(self.order)
-        self.review["snapshot_hash"] = canonical_hash(self.snapshot)
-        self.ledger.authorize({"id": "grant-2", "kind": "order", "policy_hash": canonical_hash(self.policy),
-            "account_alias": self.snapshot["account_alias"], "starts_at": "2026-10-06T13:00:00Z",
-            "expires_at": "2026-10-06T20:00:00Z", "human_authorization_ref": "test-only",
-            "order_hash": canonical_hash(self.order), "review_hash": canonical_hash(self.review)})
-        with self.assertRaisesRegex(GateClosed, "DAILY_ORDER_LIMIT"):
-            self.claim("grant-2")
-
-    def test_new_order_requires_snapshot_reconciliation_after_last_fill(self):
-        self.claim()
-        self.ledger.reconcile(self.order["id"], "FILLED", 20, 100)
-        self.order["id"] = "new-after-fill"
-        self.order["signal_id"] = "next-signal"
-        with self.assertRaisesRegex(GateClosed, "REFRESH_BROKER_SNAPSHOT"):
-            self.claim()
-
-    def test_changed_broker_snapshot_needs_new_review(self):
-        self.grant()
-        self.snapshot["day_pnl_ex_flows"] = "1"
-        with self.assertRaisesRegex(GateClosed, "BROKER_SNAPSHOT_CHANGED"):
-            self.claim("grant-1")
-
-    def test_concurrent_claims_only_one_wins(self):
-        def worker(n):
-            ledger = ExecutionLedger(self.path)
-            order = dict(self.order, id="thread-" + str(n), signal_id="signal-" + str(n))
-            try:
-                ledger.claim(self.policy, self.snapshot, order, {}, now=self.now)
-                return True
-            except GateClosed:
-                return False
-            finally:
-                ledger.close()
-        with ThreadPoolExecutor(max_workers=2) as pool:
-            self.assertEqual(sum(pool.map(worker, (1, 2))), 1)
-
-    def test_new_id_cannot_replay_same_signal_after_fill(self):
-        self.claim()
-        self.ledger.reconcile(self.order["id"], "FILLED", 20, 100)
-        self.snapshot["reconciled_through_intent"] = self.order["id"]
-        self.order["id"] = "same-signal-new-id"
-        with self.assertRaisesRegex(GateClosed, "DUPLICATE"):
-            self.claim()
-
-    def test_learning_context_blocks_even_with_live_mode(self):
-        self.policy["mode"] = "bounded_autonomous"
-        with self.assertRaisesRegex(GateClosed, "LEARNING_CONTEXT_LIVE_EXECUTION_DISABLED"):
-            self.claim()
 
 
 class InstallerTests(unittest.TestCase):

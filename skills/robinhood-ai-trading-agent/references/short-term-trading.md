@@ -1,137 +1,70 @@
-# Tactical operating model
+# Tactical research and recommendations
 
-Keep intraday and swing capital separate from core holdings. No borrowed funds,
-automatic loss replenishment, martingale sizing, averaging down to rescue a failed
-setup, or relabeling a day trade as a long-term holding.
+Intraday and swing research use their own horizon, liquidity and catalyst analysis.
+They do not inherit a long-term valuation screen or a template portfolio sleeve.
+All findings here are advisory. Execution follows [the common host handoff](execution-handoff.md),
+with no skill-required signal registration, strategy promotion, protection order,
+GARCH result, cash reserve, lease, spread threshold or repeated approval.
 
-## Planning
+## Research workflow
 
-This workflow is separate from long-term value investing: configurable liquid
-watchlist -> session/catalyst/event checks -> registered completed-bar setup ->
-entry/stop/target/time exit and net costs -> sizing/risk gates -> authorized paper
-or authorized personal live execution -> fills/protection/exit reconciliation. Undervaluation,
-analyst upside and an Eligible research label are neither prerequisites nor
-substitutes for an intraday setup. Default membership is all U.S. exchange-listed
-stocks, including listed ADRs; derive the liquid intraday watchlist from declared
-filters. S&P 500 or a narrower watchlist requires an explicit universe setting.
-There is no candidate-count quota.
+Start with the requested universe; unspecified stock searches cover U.S. exchange-listed
+stocks including listed ADRs. Derive and disclose any liquid watchlist filters,
+actual coverage and missing observations. There is no candidate-count quota.
 
-Prepare the watchlist before the session where possible. Use dollar volume,
-current spread/liquidity, reliable quotes/bars, relevant catalysts, session-relative
-volume, volatility and sector/index context. Relative volume needs comparable
-time-of-day history; a full-day average is not an opening-minute baseline. Record
-rules/version and actual screening coverage. Only policy-allowed symbols/setups
-can reach execution; research membership cannot extend that authorization.
+Compare dollar volume, spreads, relative volume, volatility, catalysts, sector/index
+context and scheduled events. Relative volume needs a comparable time-of-day
+baseline. Record publication, event and observation times. Use
+[news-and-guidance.md](news-and-guidance.md) for source access and between-report
+updates. Unknown coverage is an uncertainty, never a claimed clean news check.
 
-Use read-only scout/analyst and risk-review roles, followed by a sole authorized
-execution stage. These are logical responsibilities; the skill does not require or
-implicitly authorize additional agents.
+Explain the setup, expected holding period, directional thesis, invalidation,
+possible exits and estimated costs. Distinguish proposed price levels from actual
+orders. A daily GARCH forecast is background context; square-root-time scaling
+alone does not establish a five-minute model. Any optional intraday volatility
+diagnostic is advice, not a condition for handing off an order.
 
-Classify trend/range, volatility, liquidity, sector/index context and scheduled
-events. Missing regime evidence means wait or research, not a fabricated label.
-Choose only a registered setup that fits the available data and intended horizon.
+State earnings, halt, liquidity, gap and overnight risks. A stop can fill beyond
+its level and an exchange halt can prevent an intended exit. A DAY order does not
+close a filled position at the end of the day. The skill does not impose an earnings
+blackout, fixed loss threshold or a universal spread cap.
 
-Specify signal timestamp/version, entry trigger and limit, stop/invalidation,
-target, time exit, event exclusions and planned loss. Size after defining the stop.
-Use current bid/ask and costs. Assess GARCH under the explicit SKILL.md procedure;
-report a computation or a specific skip/failure reason. Its sizing effect is
-conditional on model quality and policy, not automatically applied because it ran.
+## Sizing and cash planning
 
-Daily GARCH is background risk context. An intraday model needs audited bars,
-session-gap/seasonality treatment and validation at its actual horizon against
-simpler estimates. Square-root-time scaling alone does not validate a five-minute
-model. LOW/NORMAL must not loosen capital limits or determine a directional entry.
+Compare allocations using the user's actual budget and requested loss scenarios.
+Do not invent a 5% sleeve or 10% position cap. Small budgets may use fractional
+shares or native dollar instructions through the host's supported broker tools;
+see [fractional-shares.md](fractional-shares.md). Distinguish a requested dollar
+amount from a guaranteed final debit.
 
-Define event blackouts in the strategy card with sourced dates/timezones, start
-and release conditions. Recheck the calendar, material news and halts before entry.
-Use [news-and-guidance.md](news-and-guidance.md) for source discovery, free-feed
-access/freshness receipts and between-report updates. Its language triage is not a
-registered entry signal. Feed failure or missing critical news coverage cannot be
-reported as a passed news check; verify the current exchange/broker halt state.
-Unknown event coverage is not clear. A future catalyst-reaction strategy needs its
-own validated post-event rules; it cannot waive the breakout setup's event block.
+Account type and settlement affect real buying power. Use
+[settled-cash-planning.md](settled-cash-planning.md) to explain possible cash-flow
+paths and optional reserves. Those calculations do not authorize, veto or schedule
+orders; the broker applies its actual account rules.
 
-## Gates
+## Replay and validation
 
-The local helper checks cash/settlement, open-order reservations, hard sleeve and
-symbol/sector caps, exact core targets, tactical stop-risk/reward after friction,
-loss/drawdown breakers, current session bounds, quote freshness, halt/tradability,
-liquidity, allowed setups and limit-price increments.
+The bundled research examples include opening-range and moving-average rules.
+Signals use completed bars and simulated entries use subsequent prices. Record
+slippage, fees, gaps, partial liquidity, session boundaries and residual positions.
+When an OHLC bar touches both barriers, the conservative research convention uses
+the stop first; a gap can fill at the worse open. Zero-volume bars cannot establish
+a simulated fill. Full fills and fixed friction remain approximations.
 
-Personal readiness also checks policy-required covariance, look-through/stress, actual event windows, strategy evidence and GARCH. Tax and data-vendor validity still need source-backed review. Loss metrics must include unrealized marked changes and exclude external
-flows. Unknown inputs cannot be interpreted as zero risk.
+Report net return, drawdown, exposure, costs, sample size and benchmarks. Profit
+factor is undefined without losing trades. Do not annualize tiny samples or claim
+an edge from synthetic fixtures. Forward observations and untouched validation
+increase confidence; they are not skill execution prerequisites.
 
-## Intraday lifecycle
+## Horizon and host responsibilities
 
-Before open: reconcile, check actual calendar and event exclusions, verify data
-quality and protection coverage. During the session: completed bars generate
-candidates; fresh quotes and account state govern executable parameters. Stop new
-entries at the configured cutoff.
+A one-day day trade exits within its entry session; an explicit 24-hour position
+includes overnight exposure. Resolve arbitrary durations with
+[holding-period-planning.md](holding-period-planning.md). Explain whether catalysts
+fit inside the horizon and what an exit plan would entail.
 
-Before close: manage only the tactical shares, cancel outstanding entry orders when
-authorized, and verify exits/remaining protection. An exchange halt can prevent
-liquidation; never promise a guaranteed flat close. Missing/illiquid exit bars in
-the replay retain a residual position and report the limitation.
-
-Record signal expiry, entry cutoff, time-exit deadline, maximum open risk and loss
-breakers. DAY validity does not create a stop or close a filled position. A fresh
-signal needs fresh quotes/account state; an uncertain submit needs reconciliation.
-The replay expires an intraday entry when its immediately following expected bar
-is missing, rather than filling the stale signal later in the session.
-
-A strategy signal is not approval. Follow [approval-gated-execution.md](approval-gated-execution.md)
-for either an exact grant or bounded mandate. Autonomous tactical entry requires
-verified native protection and supervised time-exit coverage. The active session uses supervised_session.py and personal_runtime.py; it has no always-on process after Codex closes. Follow personal-setup.md and the durable cancellation workflow.
-
-Small-account sizing uses actual settled cash and broker-specific restrictions.
-Do not assume intraday sale proceeds are reusable immediately or hard-code an
-obsolete universal account rule. Keep core shares/cash reserved. At $500 equity,
-the illustrative 5% intraday sleeve permits at most $25 notional before stricter
-risk/cash/cost limits. Use observed fractional increments where supported; a valid
-size may still be zero. Do not increase
-the sleeve, enable leverage or choose illiquid cheap shares to manufacture activity.
-Fractional trading follows [fractional-shares.md](fractional-shares.md), including
-verified fractional protection and cumulative fill semantics. Use
-`size_tactical(..., quantity_increment=observed_increment, min_notional=observed_minimum)`.
-
-For a configurable usable-cash reserve, read
-[settled-cash-planning.md](settled-cash-planning.md). Budget before buying so that
-exiting positions does not leave all capital waiting for settlement. Symbol
-rotation cannot create settled cash. A cash-blocked entry stays local and must be
-reassessed with a fresh signal; never park it at the broker awaiting funds.
-
-## Costs and replay
-
-Signals use completed bars; simulated entries use the next open and must meet the
-prior signal's price cap. Slippage and fees reduce cash and P&L. When an OHLC bar
-touches both barriers, assume the stop occurred first; a stop gap fills at the worse
-open. Zero-volume bars cannot fill. Full fills and fixed friction remain simplified
-assumptions, not executable liquidity estimates.
-
-Report net returns, drawdown, trades, exposure, costs, residual positions and a
-benchmark. Profit factor is undefined when there are no losing trades; report null
-rather than infinity. Do not annualize tiny samples or claim positive expectancy
-from a synthetic fixture.
-
-## Current implementation boundary
-
-The executable live signal adapter is opening_range_breakout. It validates the
-current complete session bar grid, recomputes the signal, verifies its economics
-and enforces a per-symbol session entry limit across restart and mode changes.
-The default limit is one attempted entry per symbol/session, including cancelled
-attempts. Snapshot external_setup_entry_counts includes unmatched broker activity.
-No bundled setup is approved for live trading; a positive synthetic replay is not
-promotion evidence. The SMA example remains research-only until a matching live
-signal/exit adapter and evaluation are added. This does not restrict the separate
-long-term core portfolio workflow.
-
-## Holding-period boundary
-
-Read [holding-period-planning.md](holding-period-planning.md) when a duration is
-specified. A one-day day trade exits in its entry session; a 24-hour overnight
-position is a swing. The standalone horizon_review helper can resolve the clock
-without imposing a fundamental screen. Arbitrary longer holds route to swing or
-long-term research with their own evidence, events and review cadence. Do not
-extend an intraday exit or reuse its live adapter for a multi-session strategy.
-Event scope defaults to entry_and_hold for compatibility with approved live
-policies; entry_only is a different policy choice, not an automatic relaxation.
+The skill does not run an always-on service, install protection or manage broker
+order state. The user's host handles requested submission, monitoring, cancellation
+and schedules under its own capabilities and instructions. Preserve the user's
+existing authority without adding a skill approval cycle. Report observed results
+honestly, including an uncertain response or a partial fill.

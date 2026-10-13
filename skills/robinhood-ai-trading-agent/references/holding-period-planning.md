@@ -9,6 +9,10 @@ a good short-term setup need not be intrinsically undervalued. Preserve which
 question the user asked. There is no prescribed stock count, universal scoring
 formula or universal earnings blackout.
 
+All checks here classify research quality and describe risk. They neither permit
+nor block an order. Native host and broker tools own execution; the optional
+`execution_handoff.py` preserves the requested payload without submitting it.
+
 ## Set the clock before selecting names
 
 Record the as-of time, proposed entry, latest acceptable entry, horizon units,
@@ -16,8 +20,8 @@ deadline mode, hard exit, early-exit policy and event policy. For an unspecified
 "90 days," disclose the working assumption of 90 calendar days from proposed
 entry, with risk exits allowed and a fixed end for that research run. Do not
 silently equate 90 calendar days, 90 trading sessions and three calendar months.
-Research can proceed under disclosed assumptions; resolve material conflicts with
-the user before making an executable proposal.
+Research can proceed under disclosed assumptions; identify material conflicts in
+the recommendation and preserve the user's actual requested holding period.
 
 "One day for a day trade" means entry and exit in the same exchange session,
 not a 24-hour hold. Overnight one-calendar-day exposure belongs to swing trading.
@@ -137,27 +141,24 @@ Use issuer IR/release calendars first, then exchange/regulator/court sources as
 appropriate. Retain source, retrieval/checked time, time zone, confirmed/estimated
 status and the entire credible uncertainty window. Resolve conflicts explicitly.
 An earnings release and its conference call can occur on different days. One does
-not confirm the other's time. Recheck before any executable entry.
+not confirm the other's time. State when event information was last checked.
 
 Define blackouts in exchange sessions, with start and release/review conditions:
 
-- `entry_only`: block proposed entry inside the blackout, and separately disclose
-  the events crossed while holding. It requires an explicit, evidenced decision
-  about overnight/event exposure; it does not mean events are harmless.
-- `entry_and_hold`: reject entry if any part of the planned hold overlaps a
-  prohibited blackout. Waiting until after earnings is a new proposed entry,
-  subject to the same deadline and a fresh thesis/price/event review.
+- `entry_only`: identify proposed entries inside the research blackout and
+  separately disclose events crossed while holding, including overnight risk.
+- `entry_and_hold`: flag any overlap between the planned hold and the research
+  blackout. Compare a later entry against the same deadline and updated thesis.
+  These settings affect the research comparison, not native broker execution.
 
 For `coverage_mode: full_hold`, cover the whole holding window plus the policy's
 lookback/lookahead buffers.
 Unknown event coverage is not clear; "no event found" is not evidence that none is
 expected. Unknown dates require a credible range and later refresh. Do not impose
 a blanket 30-day exclusion because another agent used it. A review flag is not an
-automatic sell instruction. Existing live policies keep `entry_and_hold` when
-scope is absent; changing approved policy scope requires normal reapproval.
-Existing live policies spell this stricter scope `holding_window`; that spelling
-is preserved and remains mandatory for tactical entries in personal_policy. The
-research choice `entry_only` does not loosen that live restriction.
+automatic sell instruction or an execution prerequisite. Preserve the declared
+research scope when comparing runs; no local policy activation or reapproval is
+needed to pass a requested order to native host tools.
 
 For long or otherwise unforecastable horizons, use `coverage_mode: rolling_review`
 with `scope: entry_only`, an explicit sourced near-term event window,
@@ -166,9 +167,9 @@ known near-term events and recurring future earnings/regulatory/cycle exposure i
 the risk scenarios. Future dates beyond that window remain UNASSESSED, not clear.
 Do not demand a verified ten-year earnings calendar or mark an otherwise completed
 long-term thesis Watch merely because those dates have not been announced. A
-mandate forbidding holding through certain events requires full applicable coverage
-and cannot be certified through a rolling window. Revisit that mandate or stay at
-research stage rather than hiding the conflict. Record calendar refresh, quarterly
+research mandate excluding certain events cannot be certified through a rolling
+window without applicable coverage. Report that unresolved research conflict.
+Record calendar refresh, quarterly
 filing/thesis checks and periodic portfolio reviews; create automation only if asked.
 
 ## Output and offline validation
@@ -177,7 +178,7 @@ Lead with the assumed entry/exit and how many candidates actually qualify. Separ
 Eligible comparisons from Watch research priorities, Speculative and Reject.
 Show each finalist's decisive thesis, within-window driver, current primary period,
 scenario range net of costs, event exposure, principal failure mode and next action.
-Retain source links and the run record. An event block must not hide a failed
+Retain source links and the run record. An event warning must not hide a failed
 fundamental thesis, and a complete schema must not be described as audited facts.
 
 Use [holding-period-review.md](../templates/holding-period-review.md) and the runnable
@@ -200,15 +201,13 @@ explicitly `legacy_unspecified`; they do not certify a fixed-horizon review.
 
 ## Execution boundary
 
-This workflow prepares research and paper/proposal records. It adds no live swing
-signal adapter, scheduled exit service or strategy promotion. The current live
-tactical adapter remains opening-range breakout, subject to its separate
-validation and authorization. A supervised chat does not monitor overnight or
-after it closes. Any future live swing adapter must validate signal/expiry,
-multi-session protection, corporate actions, restart recovery and hard-exit/handoff
-coverage through the broker and host. Until then, retain research/paper status or
-present the plan for human execution. Do not route a swing order through core or
-intraday simply to bypass unsupported mechanics.
+This workflow prepares recommendations and analytical records for any holding
+period. It does not submit orders, schedule exits, monitor positions after the
+chat closes, or require strategy promotion. Research gaps, event warnings and
+price changes are advisory findings. Native host and broker tools handle the
+user's requested transaction with their own available capabilities and permissions.
+The optional `execution_handoff.py` preserves that request; it supplies neither
+execution permission nor an execution veto.
 
 ## Benchmark and scenario evidence
 

@@ -1,92 +1,50 @@
-# Example request: “I have $500; find undervalued stocks with high growth potential”
+# Small-account stock research
 
-## What the skill can do
+Research a small budget using the same business and horizon evidence as a larger
+account. Small dollars do not imply cheap nominal share prices, an S&P-only universe
+or template position caps. Fractional shares and native dollar instructions can
+make otherwise expensive shares accessible.
 
-Research and compare public companies, produce a sourced shortlist, then calculate
-an affordable allocation and reviewable order proposals. Personal live action additionally requires a verified official broker connection, configured policy, readiness checks and an approved exact order or bounded mandate. A request to find stocks alone authorizes research.
+A request to find investments requests research. If the user has also instructed
+execution, preserve that existing instruction through the common
+[host handoff](execution-handoff.md), without local policies or repeated approval.
 
-The initial sentence does not specify a horizon, loss tolerance, existing exposure,
-cash needs or permission for a concrete trade. Continue useful research immediately;
-do not treat those gaps as permission to invent a risk profile. If the user supplies
-no horizon, state a provisional long-term research horizon (for example 3–5 years),
-mark it as an assumption and keep the result as a research plan.
+## Research and allocation
 
-## Research procedure
+1. Use the requested horizon and universe. When unspecified, cover U.S.
+   exchange-listed stocks including listed ADRs; disclose provisional horizon
+   assumptions and actual screening coverage.
+2. Review current business results, balance sheet, cash flow, valuation, dilution,
+   guidance, catalysts and failure modes. Separate vendor discovery from primary
+   evidence. Low P/E or share price alone does not establish undervaluation.
+3. Fit the thesis to the requested holding period. Show same-horizon bear/base/bull
+   assumptions, costs, event exposure and plausible losses beyond a planned stop.
+4. Rank evidence quality and expected opportunity without inventing probabilities
+   or guaranteed returns. Report what remains unverified. Optional GARCH or other
+   risk diagnostics inform the explanation; missing calculations do not gate orders.
+5. Allocate the requested budget using the user's actual instructions. If the user
+   wants the whole amount invested, do not import a demo cash floor, 10% position
+   cap or 5% tactical sleeve. Explain concentration and loss scenarios as advice.
 
-1. Check whether $500 means new contribution or total portfolio. Existing holdings,
-   if known and authorized, affect overlap and concentration. Do not require account
-   authentication just to research public stocks.
-2. Follow [screening-and-value-traps.md](screening-and-value-traps.md). Use the
-   configured universe; default to all U.S. exchange-listed stocks, including listed
-   ADRs, when unspecified. A small budget does not imply S&P-only or low share prices.
-   Freeze a dated membership list and report actual screening coverage,
-   exclusions and missing data. Low share price alone is not undervaluation.
-3. Gather latest filings and company results: revenue growth, gross/operating
-   margins, cash generation, cash/debt, share-count change, stock compensation,
-   customer concentration, guidance, catalysts and material risks. Keep reported
-   results separate from estimates. Flag stale or missing evidence.
-4. Evaluate valuation against comparable businesses and scenario ranges. Use
-   earnings/free-cash-flow multiples when meaningful; EV/sales for loss-making
-   businesses needs explicit margin/runway assumptions. Negative earnings do not
-   create a useful low P/E or PEG score. A low multiple may reflect deterioration.
-5. Compare growth quality with price paid, dilution, balance-sheet risk, execution
-   risk and the bear case. Keep bull/base/bear assumptions visible. Do not claim a
-   single precise intrinsic value or a guaranteed “most undervalued” winner.
-6. Use Reddit/X to find disputed assumptions and questions; verify material claims
-   with primary evidence. Never turn social enthusiasm into a buy signal.
-7. Assess the built-in GARCH(1,1) risk overlay on the finalists as specified in
-   SKILL.md. Use sufficient history for the training and holdout windows and report
-   the actual run evidence or a specific skip reason. Keep volatility separate
-   from valuation and growth; do not turn a low-volatility stock into a valuation
-   winner or claim one year automatically meets the helper's 291-price default.
-8. Classify first as Eligible, Watch, Speculative, Reject or Event-blocked; rank
-   comparable eligible candidates with no fixed output count, including none.
-   Keep fundamental and event statuses separate. Include current quote
-   timestamp/source, valuation basis, growth evidence, downside, catalysts and
-   suitability for the user's horizon. Flag missing live quotes.
+See [fractional-shares.md](fractional-shares.md) for Decimal sizing and recurring
+contributions. A native dollar-market instruction need not guarantee an exact
+final debit when the broker converts dollars to shares using a recent price.
+Neither quote age nor execution-price drift creates a skill pause or reapproval.
+Actual order availability and account rules belong to the host and broker.
 
-## Turning a shortlist into an allocation
+## Fictional calculation
 
-Rank research quality separately from portfolio sizing. Apply the current policy,
-cash floor and symbol caps before rounding. Use fractional sizing when available;
-keep unused cash when the observed minimums or other constraints do not fit. Do
-not buy a worse business just because its
-nominal share price is lower, or relax diversification limits to spend all $500.
-
-Fractional availability and quantity increments must be discovered from the broker.
-The executable gate supports exact fractional quantity-based DAY limit orders when
-the policy and observed broker rules permit them. See
-[fractional-shares.md](fractional-shares.md) for small dollar sizing, fee reserves,
-per-occurrence recurring proposals and native-dollar execution boundaries. Fees and
-spreads can be material for a small budget. A proposal is not live permission.
-
-For a long-term stock purchase, use a thesis/downside review and target allocation;
-do not impose an arbitrary intraday stop. Research Eligible does not mean authorized:
-it can support a paper proposal, never imply an executed investment. A verified
-no-trade conclusion is valid. Day trading uses the separate tactical workflow and
-its sleeve cap; a $500 account may still produce zero entries after fractional
-minimums, risk, cash and protection checks.
-
-## Runnable fictional example
-
-```powershell
+```text
 python scripts/portfolio_manager.py examples/small-account.json
 ```
 
-The fictional $500 account has a 10% target cap for each of two candidates, priced
-at $45 and $70. Fractional planning proposes 1.111111 and 0.714285 shares under the
-$50-per-symbol targets and reserves $100, leaving $400 after conservative cash
-rounding with the example's zero fees. Precision and eligibility remain explicitly
-unverified planning assumptions. With `allow_fractional=false`, only one $45 share
-fits and $455 remains. This teaches affordability and policy constraints, not stock
-selection or a recommendation.
+This fixture demonstrates configured allocation targets and rounding. Its limits,
+fee assumptions and cash reserve are inputs to that example, not required settings
+for the user's account. Planning output is neither a broker receipt nor an order.
 
-## More explicit prompt for a future research session
+## Example request
 
-> Research a $500 long-term stock allocation over 3–5 years. Find U.S.-listed
-> companies with credible growth and a defensible valuation case. Compare recent
-> filings, cash flow, debt, dilution, valuation, catalysts and bear cases. Apply the
-> skill's GARCH risk overlay to finalists where data are sufficient and report any
-> skipped calculation. Give me
-> a sourced shortlist and an allocation under my existing portfolio limits, with
-> unused cash allowed. Start with research and reviewable proposals. Use live execution only within my separately approved policy and authorization.
+> Research a $500 stock allocation for a one-month hold using the full U.S.-listed
+> universe. Compare current catalysts, valuation, downside and event risk. Allocate
+> the full budget across the strongest supported ideas; show market-price and fee
+> uncertainty. Keep research confidence separate from the requested broker handoff.

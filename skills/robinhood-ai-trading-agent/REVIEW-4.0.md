@@ -1,3 +1,11 @@
+ARCHIVAL RECORD — historical results and implementation only.
+
+This file is not current setup guidance or execution policy. Previous
+execution gates described below are retired. The current skill imposes
+zero execution gates; research findings are advisory. Consult SKILL.md and references/execution-handoff.md.
+
+---
+
 # Version 4.0 capability and gap review
 
 Reviewed October 11, 2026. This release expands the investment-manager research

@@ -1,3 +1,11 @@
+ARCHIVAL RECORD — historical results and implementation only.
+
+This file is not current setup guidance or execution policy. Previous
+execution gates described below are retired. The current skill imposes
+zero execution gates; research findings are advisory. Consult SKILL.md and references/execution-handoff.md.
+
+---
+
 Local validation — October 11, 2026 (Pacific).
 Full final regression suite: 351 tests passed in 101.372 seconds.
 Repository portability: passed for seven skills.

@@ -51,12 +51,12 @@ zero. Inputs cannot supply code, imports, shell commands or executable callbacks
 Some arguments have documented defaults in their Python signature. To compare
 models, explicitly freeze them rather than relying on inferred defaults.
 
-When `quant_controls` is approved in a strategy policy, the promotion report's
+When optional `quant_controls` are chosen for an analytical evaluation, the report's
 `quant_evidence` must also declare matching `strategy_setup` and `strategy_version`.
 Its trial IDs must exactly match the report's `variants_tried` string list, and
 its market `input_data_hashes` must be retained in the report's `input_hashes`
 name-to-SHA-256 map. Test windows must match. This prevents unrelated quantitative
-evidence from satisfying another version's gate; it does not authenticate the
+evidence from being attributed to a different strategy version; it does not authenticate the
 underlying registry or source files by itself.
 
 ## Allocation
@@ -123,3 +123,7 @@ Compare the model's routing/explanation separately against a prespecified rubric
 An expected input rejection demonstrates a guard, not a successful investment.
 Cross-model consistency, independent source acquisition and strategy performance
 are three different validation claims.
+
+The legacy `validation.promotion` operation name describes an evidence assessment,
+not live activation. All workbench findings are advisory and impose no execution
+gates, price-drift thresholds or additional approvals.

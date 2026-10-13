@@ -7,7 +7,6 @@ from decimal import Decimal
 from pathlib import Path
 
 from test_risk_and_execution import Fixture
-from execution_ledger import ExecutionLedger, GateClosed
 
 
 class SettledCashReserveTests(Fixture):
@@ -22,14 +21,14 @@ class SettledCashReserveTests(Fixture):
         self.policy['limits'].pop('intraday_settled_cash_floor_amount', None)
         self.snapshot['settled_cash'] = str(self.cost + self.floor - Decimal('.01'))
         result = self.result()
-        self.assertFalse(result['allowed'])
+        self.assertFalse(result['within_research_limits'])
         self.assertEqual(result['reasons'], ['INTRADAY_SETTLED_CASH_RESERVE'])
-        self.assertEqual(result['entry_disposition'], 'WAIT_FOR_CASH_BUDGET')
+        self.assertEqual(result['diagnostic_status'], 'SCENARIO_CASH_SHORTFALL')
         self.assertEqual(Decimal(result['metrics']['cash_budget_shortfall']), Decimal('.01'))
 
     def test_exact_floor_after_fees_is_allowed(self):
         self.snapshot['settled_cash'] = str(self.cost + self.floor)
-        self.assertTrue(self.result()['allowed'], self.result())
+        self.assertTrue(self.result()['within_research_limits'], self.result())
 
     def test_dollar_floor_can_be_configured_without_fraction(self):
         self.policy['limits'].update(intraday_settled_cash_floor_fraction='0',
@@ -37,7 +36,7 @@ class SettledCashReserveTests(Fixture):
         self.snapshot['settled_cash'] = str(self.cost + 7999)
         self.blocked('INTRADAY_SETTLED_CASH_RESERVE')
         self.snapshot['settled_cash'] = str(self.cost + 8000)
-        self.assertTrue(self.result()['allowed'], self.result())
+        self.assertTrue(self.result()['within_research_limits'], self.result())
 
     def test_larger_of_fraction_and_amount_is_used(self):
         for amount, expected in [('1000', '6000'), ('7000', '7000')]:
@@ -50,7 +49,7 @@ class SettledCashReserveTests(Fixture):
         self.policy['limits'].update(intraday_settled_cash_floor_fraction='0',
                                      intraday_settled_cash_floor_amount='0')
         self.snapshot['settled_cash'] = str(self.cost)
-        self.assertTrue(self.result()['allowed'], self.result())
+        self.assertTrue(self.result()['within_research_limits'], self.result())
         self.snapshot['settled_cash'] = str(self.cost - 1)
         self.blocked('INSUFFICIENT_UNRESERVED_SETTLED_CASH')
 
@@ -72,23 +71,23 @@ class SettledCashReserveTests(Fixture):
                     'reservation_price': '100', 'sector': 'technology'}]
                 self.blocked('INTRADAY_SETTLED_CASH_RESERVE')
         self.snapshot['open_orders'] = []  # Only after broker confirms terminal and reconciliation.
-        self.assertTrue(self.result()['allowed'], self.result())
+        self.assertTrue(self.result()['within_research_limits'], self.result())
 
     def test_round_trips_consume_cash_across_symbols_until_broker_settles(self):
         self.snapshot['settled_cash'] = str(self.floor + 2 * self.cost)
-        self.assertTrue(self.result()['allowed'], self.result())
+        self.assertTrue(self.result()['within_research_limits'], self.result())
         # A buy and break-even sale restore ledger cash, but not settled cash.
         self.snapshot['settled_cash'] = str(self.floor + self.cost)
         self.policy['allowed_symbols'].append('OTHER')
         self.snapshot['quotes']['OTHER'] = copy.deepcopy(self.snapshot['quotes']['DEMO'])
         self.order['symbol'] = 'OTHER'
-        self.assertTrue(self.result()['allowed'], self.result())
+        self.assertTrue(self.result()['within_research_limits'], self.result())
         self.snapshot['settled_cash'] = str(self.floor)
         self.blocked('INTRADAY_SETTLED_CASH_RESERVE')
         self.order['symbol'] = 'DEMO'
         self.blocked('INTRADAY_SETTLED_CASH_RESERVE')
         self.snapshot['settled_cash'] = str(self.floor + 2 * self.cost)  # Actual broker confirmation.
-        self.assertTrue(self.result()['allowed'], self.result())
+        self.assertTrue(self.result()['within_research_limits'], self.result())
 
     def test_next_day_does_not_release_cash_without_broker_confirmation(self):
         self.snapshot['settled_cash'] = str(self.floor)
@@ -105,7 +104,7 @@ class SettledCashReserveTests(Fixture):
         self.order['expires_at'] = (self.now - timedelta(seconds=1)).isoformat()
         self.snapshot['settled_cash'] = '100000'
         self.blocked('PROPOSAL_EXPIRED')
-        self.assertEqual(self.result()['entry_disposition'], 'BLOCKED')
+        self.assertEqual(self.result()['diagnostic_status'], 'ADVISORY_RISK_OBSERVATIONS')
 
     def test_core_and_swing_do_not_inherit_intraday_reserve(self):
         self.policy['limits']['intraday_settled_cash_floor_amount'] = '99000'
@@ -114,7 +113,7 @@ class SettledCashReserveTests(Fixture):
             with self.subTest(sleeve=sleeve):
                 self.order.update(sleeve=sleeve, setup=setup)
                 self.policy['core_targets'] = {'DEMO': '.05'}
-                self.assertTrue(self.result()['allowed'], self.result())
+                self.assertTrue(self.result()['within_research_limits'], self.result())
 
     def test_reserve_never_blocks_sale_of_owned_tactical_shares(self):
         self.snapshot['settled_cash'] = '0'
@@ -123,20 +122,9 @@ class SettledCashReserveTests(Fixture):
         self.snapshot['cash'] = '98000'
         self.order['side'] = 'sell'
         self.snapshot['kill_switch'] = True
-        self.assertTrue(self.result()['allowed'], self.result())
-        self.assertEqual(self.result()['entry_disposition'], 'NOT_AN_ENTRY')
+        self.assertTrue(self.result()['within_research_limits'], self.result())
+        self.assertEqual(self.result()['diagnostic_status'], 'WITHIN_RESEARCH_LIMITS')
 
-    def test_failed_cash_gate_never_creates_executable_journal_intent(self):
-        self.snapshot['settled_cash'] = str(self.floor)
-        with tempfile.TemporaryDirectory() as directory:
-            ledger = ExecutionLedger(Path(directory) / 'execution.db')
-            try:
-                with self.assertRaisesRegex(GateClosed, 'INTRADAY_SETTLED_CASH_RESERVE'):
-                    ledger.claim(self.policy, self.snapshot, self.order, {}, now=self.now)
-                self.assertEqual(ledger.db.execute('SELECT COUNT(*) FROM orders').fetchone()[0], 0)
-                self.assertEqual(ledger.unresolved(), [])
-            finally:
-                ledger.close()
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@
 Read for multi-asset allocation, quant strategy development, hedging, or requests to
 operate as an investment manager. Use [quant-research.md](quant-research.md) for
 method selection and [quant-workbench.md](quant-workbench.md) for executable inputs.
-The scope is decision support and supervised operations. Do not describe a chat
+The scope is research, recommendations and advisory operational analysis. Do not describe a chat
 session as a fiduciary, custodian, audited fund administrator or always-on OMS.
 
 ## Start with the mandate
@@ -11,7 +11,7 @@ session as a fiduciary, custodian, audited fund administrator or always-on OMS.
 Record base currency, objectives, benchmark, capital, liabilities/redemptions,
 tax/account jurisdiction, permitted instruments, leverage/short permissions,
 holding/exit contract, drawdown and liquidity budgets, concentration/factor limits,
-execution mode and authorization expiry. Keep requested research separate from
+the requested transaction context when relevant. Keep requested research separate from
 authorization to trade. When the user requests a screen without personal
 preferences, apply its documented research contract; do not invent an investment
 policy or demand a personal questionnaire before useful research.
@@ -39,7 +39,7 @@ quotes. Store every tested variant in a trial registry, including failures.
 The model's role is to acquire/review evidence, choose the authorized saved workflow,
 and explain outputs. Numeric operations run through retained code. Model narration
 cannot modify a computed ranking, waive a failed constraint, change a time horizon,
-or promote a strategy. Record discretionary judgments and their affected names
+or turn research results into execution permission. Record discretionary judgments and their affected names
 separately. A second model must receive the same complete package and contract,
 not another model's picks. Compare data completeness and rejection decisions as
 well as numbers. Same-input replay tests and independent-data agreement are
@@ -95,19 +95,19 @@ For strategy development use causal data, purged expanding-window splits, a fina
 untouched test, net costs, a complete variant registry, serial-dependence-aware
 inference, and forward paper execution. The period portfolio simulator and the
 intraday event simulator have different scope; neither validates queue fills or
-entitlements. New policy templates include `quant_controls`; the existing promotion
-gate recomputes those approved tests from retained trial returns. Existing approved
-policies are not silently migrated or approved.
+entitlements. Optional `quant_controls` recompute research tests from retained
+trial returns. Their results describe evidence quality and do not create an
+execution prerequisite or a strategy-promotion requirement.
 
 Use [multi-asset-playbook.md](multi-asset-playbook.md) for the instrument/strategy
-route. Unsupported instruments stay in research/proposal mode; never encode an
-option, swap or leveraged product as an ordinary share to pass a broker gate.
-Use existing broker discovery, idempotency, sole-writer, protection, reconciliation
-and supervised-session procedures for each permitted live order.
+route. Identify missing analytical models and preserve the instrument's actual
+type. Native host and broker tools determine available transactions and enforce
+their own permissions. The skill has no execution gates; `execution_handoff.py`
+preserves a requested payload without submitting it or issuing approval.
 
 ## Daily operation and incidents
 
-Before new risk: reconcile cash, positions, corporate actions, open orders and
+For portfolio analysis, compare cash, positions, corporate actions, open orders and
 manual activity; refresh quotes/events; check settled cash and currency-specific
 liabilities/collateral; run exposure, tail loss, full scenario and liquidity checks.
 Use `ops.cash_ladder` to expose funding gaps without spending unconfirmed sales.
@@ -115,16 +115,16 @@ Broker availability, not a calendar estimate, controls a real purchase.
 
 During the session: check fills, partial protection, stale feeds, spreads/halts,
 borrow recalls, margin/settlement restrictions, model drift and risk consumption.
-`monitor.assess` blocks new risk on configured stale data, coverage, volatility,
-cost or reconciliation breaches. It is supplementary to the actual live gate.
-Continue authorized risk reductions only through existing execution safeguards.
-Do not cancel valid protection, retune a strategy or increase caps automatically.
+`monitor.assess` reports advisory alerts for stale data, coverage, volatility,
+cost or reconciliation differences. It never blocks an order, cancels protection,
+retunes a strategy or changes a broker setting.
 
 On disconnect/unknown submission: preserve the journal, reconcile broker state and
 handoff residual exposure. No blind retries. On close: match broker fills/cash/lots,
 record valuation uncertainty, residual positions and upcoming obligations. Measure
 TWR, investor money-weighted return, costs, drawdown and benchmark/factor attribution
-separately. Reopen an incident only with recorded resolution and current authority.
+separately. Preserve incident history and distinguish observed resolution from
+an assumption; historical records are not local execution locks.
 
 ## What must remain external
 

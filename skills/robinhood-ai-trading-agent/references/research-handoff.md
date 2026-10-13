@@ -20,7 +20,7 @@ timezones. `count` is the user's requested number; there is no fixed skill quota
 `explicit_in_this_mandate`: copy applicable user instructions explicitly, never
 silently inherit another model's assertions about standing rules.
 `earnings_policy` is `allow_with_disclosure` or `exclude_during_hold` according to
-the actual mandate. Neither research setting loosens live execution controls.
+the actual mandate. These settings affect research selection only; the skill imposes no execution controls.
 `selection_mode` is `computed_order`; `custom_filters` is `[]` for this shared
 profile. `allowed_statuses` is `["Eligible"]`, or `["Eligible", "Speculative"]`
 for an explicitly aggressive speculative research comparison. This is not a

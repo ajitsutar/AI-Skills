@@ -3,7 +3,9 @@
 For stock discovery use the configurable universe and value-trap procedure in
 [screening-and-value-traps.md](screening-and-value-traps.md). For intraday setups
 use [short-term-trading.md](short-term-trading.md); the long-term valuation pipeline
-does not replace session-aware signal, cost, event and execution checks.
+does not replace session-aware signal, cost and event analysis. All findings here
+are advisory research results, not execution prerequisites. Native host and broker
+tools own transactions; `execution_handoff.py` only preserves the requested payload.
 
 ## Evidence register
 
@@ -55,9 +57,9 @@ criteria. Keep the current rules fixed while evaluating a test interval.
    orders/fills, and replay disconnects, duplicates, partial fills, rejection,
    cancellation races, manual trades and restart recovery. Offline OHLC replay is
    insufficient to demonstrate these live adapter behaviors.
-6. Promotion: present evidence and operational readiness against user-approved
-   criteria. Freeze version and policy, then obtain the concrete live mandate. Any
-   small-capital live pilot also needs explicit authorization and broker controls.
+6. Assessment: present evidence against the predeclared research criteria, retain
+   the model version and explain what the results support. The assessment neither
+   grants nor withholds permission for a native broker transaction.
 
 The included replay has fixed illustrative rules, constant per-share fees/slippage,
 one symbol/position, no order-book queue, no data-vendor connector and no portfolio
@@ -69,32 +71,29 @@ as a continuous account record. It does not claim statistical significance.
 
 Track signal drift, stale/late data, changes in realized cost, rejected orders,
 liquidity and regime. Distinguish data errors, fill-model errors, strategy variance
-and true degradation before changing parameters. Pause entries on a broken feed or
-unresolved broker state. Preserve broker protection and hand off open risk when the
-host cannot continue monitoring.
+and true degradation before changing parameters. Report broken feeds and unresolved
+broker state as concrete observations. The skill does not pause entries or alter
+broker orders; monitoring and transaction handling belong to the native host.
 
-## Executable promotion and signal checks
+## Reproducible strategy and signal diagnostics
 
 strategy_validation.py checks chronological nonoverlapping development/validation/
 test/forward-paper windows, future dates, costs, variant history, untouched test,
 benchmark, positive net expectancy, drawdown/trade thresholds and cost stress.
-Criteria are explicit user-approved choices, not universal statistical proof.
-The host verifies retained market data and reports before recording their approved
-hash; the helper cannot authenticate a self-written performance assertion.
+Criteria are explicit research choices, not universal statistical proof. Retain
+the underlying market data and reports with hashes; the helper cannot authenticate
+a self-written performance assertion.
 
-personal_readiness also recomputes the current supported setup from completed bars
-through signal_review.py. It binds version, implementation and parameter hashes,
-signal timestamp, actual stop/target/limit and the per-symbol session entry cap.
-The bundled live signal adapter is opening_range_breakout only; it remains
-unpromoted until real validation succeeds. Daily SMA remains a research baseline.
-Long-term core execution follows the distinct portfolio/fundamental route.
+`signal_review.py` recomputes the supported opening-range research setup from
+completed bars and compares version, implementation/parameter hashes, timestamps
+and proposed signal economics. Daily SMA remains a research baseline. These
+diagnostics do not select a broker execution route or require strategy promotion.
 
-Version 4 draft criteria add `quant_controls`. Once explicitly approved, the
-promotion gate recomputes HAC, Holm and block-bootstrap checks from retained
+The optional `quant_controls` research criteria recompute HAC, Holm and block-bootstrap checks from retained
 aligned net-excess returns for the complete trial family. Quantitative evidence
 must match the strategy setup/version, market-data hashes, trial registry and
 test window. Read [quant-workbench.md](quant-workbench.md) for the evidence
 contract and [quant-research.md](quant-research.md) for assumptions. Missing raw
-evidence fails this gate; statistical acceptance does not waive forward-paper,
-source authenticity, operational or broker checks. Existing approved policies
-require explicit review before adding these criteria.
+evidence leaves the research assessment incomplete; statistical acceptance is not
+proof of source authenticity or future profitability. Neither outcome controls
+native host or broker execution.

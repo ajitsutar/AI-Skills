@@ -11,13 +11,13 @@ Reusable Agent Skills in self-contained folders. Download any one folder under `
 - `linkedin-knowledge-digest`: Filter LinkedIn feed and inbox activity into concise knowledge-bearing digests with clickable source links while excluding career milestones, hiring posts, self-promotion, and low-value outreach.
 - `travel-deal-finder`: Compare current travel deals across flights, hotels, packages, and rental cars with clear ranking rules and source verification.
 
-- `robinhood-ai-trading-agent`: Research and manage a long-term portfolio core with separately budgeted supervised swing/day trading, arbitrary holding periods, a configurable settled-cash reserve for day trading, a shared Value–Quality–Momentum fundamental ranking with sector accounting adapters, evidence-backed financial normalization and frozen inputs, replayable research bundles, GARCH/GJR/EGARCH risk analysis and broker-verified execution gates. The shared ranking is an uncalibrated research baseline, not a Strong Buy classifier. Starts in paper mode; live execution requires the official Robinhood Trading MCP and applicable human authorization.
+- `robinhood-ai-trading-agent`: Research and recommend stocks, analyze portfolios and day/swing strategies over arbitrary holding periods, and produce reproducible Value–Quality–Momentum rankings, evidence-backed financial normalization, and GARCH/GJR/EGARCH risk diagnostics. Research findings are advisory. Order intent goes to the host's normal broker workflow with zero execution gates imposed by this skill. The shared ranking is an uncalibrated research baseline, not a Strong Buy classifier.
 
 The trading skill supports current stock research, portfolio management, news and
 guidance review, analyst evidence, statistical strategy validation, multi-asset
-risk, cash/performance accounting, fractional-share sizing and supervised execution
-workflows. Small-dollar and recurring-contribution proposals preserve budget ceilings,
-fees and settled-cash reserves; live fractional orders require observed broker support.
+risk, cash/performance accounting, fractional-share sizing and order-intent handoff.
+Small-dollar and recurring-contribution research includes budget, fee and settlement
+analysis. The host and broker handle execution independently of the research skill.
 Stock
 discovery defaults to all U.S. exchange-listed stocks and listed ADRs; S&P 500 is
 an explicit preset. Its saved contracts and numerical helpers support reproducible
@@ -254,7 +254,7 @@ license has not been established, and Demucs's software license does not establi
 permission for its pretrained weights. Use verified supplied stems/instrumentals,
 or follow the affected skill's model-specific permission workflow.
 
-The trading skill has separate Python dependencies in `skills/robinhood-ai-trading-agent/requirements-tested.txt`. Use its isolated environment and paper-runtime setup instructions. Packaging it as a Claude agent does not establish broker availability or validate live trading on that host.
+The trading skill has separate Python dependencies in `skills/robinhood-ai-trading-agent/requirements-tested.txt`. Use its isolated research environment. Packaging it as a Claude agent does not establish broker availability; order execution belongs to the host's broker integration.
 
 Agents inherit the tools and MCP servers enabled in the user's Claude Code session. Live browser, web, Slack/email, or other external operations require the corresponding configured capability and authenticated session; the agents stop clearly when a required capability is unavailable.
 

@@ -200,5 +200,5 @@ do not turn an error into an empty favorable result.
 Missing analyst evidence does not authorize replacing the shared factor profile.
 News, guidance and analyst evidence can expose thesis risks and require further
 review, but they do not silently add weights, rerank the official candidate queue,
-enable Strong Buy labels or authorize execution. Follow the existing handoff,
-horizon, portfolio and execution contracts.
+establish calibrated Strong Buy labels. Findings inform recommendations and do
+not authorize, veto or pause the common host handoff.

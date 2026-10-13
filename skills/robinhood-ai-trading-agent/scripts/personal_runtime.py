@@ -1,150 +1,74 @@
-"""Portable local runtime for a supervised personal Codex host.
-
-No brokerage calls, login or tokens. Mutations consume JSON from stdin, using the
-actual clock; private broker routing is not written to the journal or output.
-"""
-from __future__ import annotations
-
+"""Optional research workspace and dependency diagnostics; no execution gates."""
 import argparse
 import importlib.metadata
 import json
-import sys
-from datetime import datetime, timezone
 from pathlib import Path
-
-from execution_ledger import ExecutionLedger
-from risk_engine import canonical_hash, evaluate, validate_policy
-from supervised_session import SupervisedSession
+import sys
+from execution_handoff import handoff, redact_private
 
 ROOT = Path(__file__).resolve().parents[1]
 
-
 def initialize(directory):
     directory = Path(directory).resolve()
-    if directory == ROOT or ROOT in directory.parents:
-        raise ValueError("Runtime must be outside the installed skill")
-    directory.mkdir(parents=True, exist_ok=False)
-    policy = json.loads((ROOT / "templates/personal-policy.example.json").read_text(encoding="utf-8"))
-    (directory / "policy.json").write_text(json.dumps(policy, indent=2) + "\n", encoding="utf-8")
-    for name in ("evidence", "reports"):
-        (directory / name).mkdir()
-    ledger = ExecutionLedger(directory / "execution.db")
-    ledger.close()
-    session = SupervisedSession(directory / "supervised-session.db")
-    session.close()
-    return {"runtime": str(directory), "mode": "paper", "configuration_status": "draft",
-            "next": "Configure investor policy and personal broker capability mapping; no live authority created"}
+    directory.mkdir(parents=True, exist_ok=True)
+    for name in ('evidence', 'reports'):
+        (directory/name).mkdir(exist_ok=True)
+    return {'runtime':str(directory), 'purpose':'OPTIONAL_RESEARCH_WORKSPACE',
+            'existing_files_preserved':True, 'skill_execution_gates':[]}
 
-
-def doctor(directory):
-    directory = Path(directory).resolve()
-    checks, failures, warnings = {}, [], []
-    for dependency in ("numpy", "scipy", "exchange_calendars", "yfinance", "jsonschema", "requests", "tzdata", "arch"):
+def doctor(directory=None):
+    checks, warnings = {}, []
+    for dependency in ('numpy','scipy','exchange_calendars','yfinance','jsonschema','requests','tzdata','arch'):
         try:
             checks[dependency] = importlib.metadata.version(dependency)
         except importlib.metadata.PackageNotFoundError:
-            checks[dependency] = "NOT_INSTALLED"
-            (warnings if dependency == "arch" else failures).append("MISSING_DEPENDENCY:" + dependency)
-    checks["garch_capability"] = "AVAILABLE" if checks.get("arch") != "NOT_INSTALLED" else "SKIPPED_MISSING_DEPENDENCIES"
-    checks["skill_version"] = (ROOT / "VERSION").read_text(encoding="utf-8").strip()
-    try:
-        policy = json.loads((directory / "policy.json").read_text(encoding="utf-8-sig"))
-        validate_policy(policy)
-        checks["policy_hash"] = canonical_hash(policy)
-        checks["mode"] = policy["mode"]
-        if policy["schema_version"] != 3 or policy.get("configuration_status") != "approved":
-            failures.append("PERSONAL_POLICY_REQUIRES_CONFIGURATION_AND_APPROVAL")
-        if policy["mode"] == "paper":
-            failures.append("PAPER_MODE_NO_LIVE_AUTHORITY")
-    except (OSError, ValueError, KeyError, TypeError) as exc:
-        failures.append("POLICY_INVALID_OR_MISSING:" + type(exc).__name__)
-    for filename in ("execution.db", "supervised-session.db"):
-        if not (directory / filename).is_file():
-            failures.append("MISSING_RUNTIME_DATABASE:" + filename)
-    if (directory / "execution.db").is_file():
-        ledger = ExecutionLedger(directory / "execution.db")
-        try:
-            checks["unresolved_intents"] = len(ledger.unresolved())
-            checks['unresolved_cancellations'] = len(ledger.unresolved_cancellations())
-            if checks["unresolved_intents"] or checks['unresolved_cancellations']:
-                failures.append("UNRESOLVED_INTENTS_REQUIRE_BROKER_RECONCILIATION")
-        finally:
-            ledger.close()
-    return {"local_checks_passed": not failures, "failures": failures, "warnings": warnings, "checks": checks,
-            "live_readiness": "Requires an exact claim with fresh broker evidence, active session and human authorization"}
-
+            checks[dependency] = 'NOT_INSTALLED'
+            warnings.append('MISSING_DEPENDENCY:' + dependency)
+    checks['garch_capability'] = 'AVAILABLE' if checks['arch'] != 'NOT_INSTALLED' else 'SKIPPED_MISSING_DEPENDENCIES'
+    checks['skill_version'] = (ROOT/'VERSION').read_text(encoding='utf-8').strip()
+    return {'local_checks_passed':True, 'failures':[], 'warnings':warnings, 'checks':checks,
+            'advisory_only':True, 'skill_execution_gates':[], 'execution_owner':'native_host_and_broker'}
 
 def dispatch(directory, operation, request):
-    directory = Path(directory).resolve()
-    if not (directory / "execution.db").is_file():
-        raise ValueError("Initialize an explicit runtime directory first")
-    if "now" in request or "now" in request.get("inputs", {}):
-        raise ValueError("The personal command interface does not accept a caller-supplied clock")
-    now = datetime.now(timezone.utc)
-    policy = json.loads((directory / "policy.json").read_text(encoding="utf-8-sig"))
-    if operation == "session":
-        session = SupervisedSession(directory / "supervised-session.db")
-        try:
-            action = request["operation"]
-            if action not in {"start", "heartbeat", "status", "stop"}:
-                raise ValueError("Unknown session action")
-            inputs = dict(request["inputs"])
-            if action != "stop":
-                inputs["policy_hash"] = canonical_hash(policy)
-            return getattr(session, action)(**inputs, now=now) or {"state": "STOPPED"}
-        finally:
-            session.close()
-    if operation == "risk":
-        return evaluate(policy, request["snapshot"], request["order"], now)
-    ledger = ExecutionLedger(directory / "execution.db")
-    try:
-        if operation == "authorize":
-            if request["policy_hash"] != canonical_hash(policy):
-                raise ValueError("Authorization must bind the currently saved policy")
-            ledger.authorize(request)
-            return {"recorded": request["id"], "caveat": "Host must have verified the actual human grant"}
-        if operation == "revoke":
-            ledger.revoke(request["authorization_id"])
-            return {"revoked": request["authorization_id"], "existing_broker_orders_unchanged": True}
-        if operation == "claim":
-            return ledger.claim(policy, request["snapshot"], request["order"], request["review"],
-                                request.get("authorization_id"), now)
-        if operation == "reconcile":
-            row = ledger.reconcile(request["order_id"], request["state"], request["cumulative_filled"],
-                                   request.get("average_price"), now)
-            return {k: row[k] for k in ("id", "state", "filled", "average_price")}
-        if operation == 'claim-cancel':
-            return ledger.claim_cancel(policy,request['snapshot'],request['action'],request['review'],request['authorization_id'],now)
-        if operation == 'reconcile-cancel':
-            return ledger.reconcile_cancel(request['action_id'],request['target_state'],request['evidence_ref'],now)
-        if operation == "unresolved":
-            return dict(orders=[{k: row[k] for k in ("id", "state", "filled")} for row in ledger.unresolved()],
-                        cancellations=ledger.unresolved_cancellations())
-        raise ValueError("Unsupported local operation")
-    finally:
-        ledger.close()
-
+    if operation == 'risk':
+        from risk_engine import evaluate
+        policy = request.get('policy')
+        if policy is None:
+            path = Path(directory)/'policy.json'
+            if not path.is_file():
+                return {'within_research_limits':None,'diagnostic_status':'DATA_UNAVAILABLE',
+                        'reasons':['OPTIONAL_SCENARIO_POLICY_NOT_SUPPLIED'],
+                        'advisory_only':True,'enforces_execution':False}
+            policy = json.loads(path.read_text(encoding='utf-8-sig'))
+        if not {'snapshot','order'} <= set(request):
+            return {'within_research_limits':None,'diagnostic_status':'DATA_UNAVAILABLE',
+                    'reasons':['OPTIONAL_SCENARIO_INPUTS_NOT_SUPPLIED'],
+                    'advisory_only':True,'enforces_execution':False}
+        result = evaluate(policy, request['snapshot'], request['order'])
+        result.update(advisory_only=True, enforces_execution=False)
+        return result
+    if operation == 'unresolved':
+        from execution_ledger import ExecutionLedger
+        ledger = ExecutionLedger(Path(directory)/'execution.db')
+        return {'historical_local_records_only':True, 'advisory_only':True, 'skill_execution_gates':[],
+                'orders':ledger.unresolved(), 'incidents':ledger.unresolved_incidents(),
+                'cancellations':ledger.unresolved_cancellations()}
+    return handoff(request, source='personal_runtime.' + operation + '_retired')
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("operation", choices=["init", "doctor", "risk", "authorize", "revoke", "claim", "reconcile", "unresolved", "session", "claim-cancel", "reconcile-cancel"])
-    parser.add_argument("runtime", type=Path)
+    parser.add_argument('operation')
+    parser.add_argument('runtime', type=Path, nargs='?', default=Path('.'))
     args = parser.parse_args()
-    try:
-        if args.operation == "init":
-            result = initialize(args.runtime)
-        elif args.operation == "doctor":
-            result = doctor(args.runtime)
-        else:
-            result = dispatch(args.runtime, args.operation, {} if args.operation == "unresolved" else json.load(sys.stdin))
-        print(json.dumps(result, indent=2, allow_nan=False))
-        if isinstance(result, dict) and (result.get("allowed") is False or result.get("local_checks_passed") is False):
-            return 2
-        return 0
-    except (ValueError, KeyError, TypeError, OSError) as exc:
-        print(json.dumps({"blocked": True, "error": str(exc)}))
-        return 2
+    if args.operation == 'init':
+        result = initialize(args.runtime)
+    elif args.operation == 'doctor':
+        result = doctor(args.runtime)
+    else:
+        raw = '' if args.operation == 'unresolved' else sys.stdin.read()
+        result = dispatch(args.runtime, args.operation, json.loads(raw) if raw.strip() else {})
+    print(json.dumps(redact_private(result),indent=2,allow_nan=False))
+    return 0
 
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     raise SystemExit(main())

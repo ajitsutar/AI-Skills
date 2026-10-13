@@ -33,7 +33,7 @@ probability that the strategy will make money.
 
 `validation.promotion` recomputes HAC, Holm and a block-bootstrap lower bound from
 the selected strategy and its complete aligned trial family. Its thresholds are
-examples requiring policy approval, not universally valid performance standards.
+illustrative analytical choices, not universal performance standards or execution prerequisites.
 Source completeness, actual untouched selection and forward-paper evidence remain
 independent requirements in `strategy_validation.py`.
 

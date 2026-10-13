@@ -1,3 +1,11 @@
+ARCHIVAL RECORD — historical results and implementation only.
+
+This file is not current setup guidance or execution policy. Previous
+execution gates described below are retired. The current skill imposes
+zero execution gates; research findings are advisory. Consult ../SKILL.md and ../references/execution-handoff.md.
+
+---
+
 # Independent Muse/Codex public-data comparison — October 11, 2026
 
 **Measured candidate overlap: 10/10 (100%), passing the predefined 80% target.**

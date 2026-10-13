@@ -16,16 +16,16 @@
           "prompt": "Check the installed skill, package integrity, Python dependencies, data access and broker capabilities. Explain which workflows I can use now and which need additional inputs or services."
         },
         {
-          "title": "Understand the operating modes",
-          "prompt": "Explain paper, exact-order approval and bounded autonomous modes using a fictional trade. Identify which checks are required before moving from research to a real order."
+          "title": "Understand recommendations and handoff",
+          "prompt": "Explain which investment research and quantitative calculations this skill performs, how its optional handoff preserves my requested order, and which operations belong to the connected host and broker. There are no local execution modes or gates to activate."
         },
         {
-          "title": "Create a paper workspace",
-          "prompt": "Initialize a paper workspace at [DIRECTORY]. Keep my policy, source archives and trade journal outside the installed skill, and show me how to check its health and resume it."
+          "title": "Create a research workspace",
+          "prompt": "Create a research workspace at [DIRECTORY] for source archives, reports and a private observed-outcome journal. Keep it outside the installed skill; do not create an execution policy or approval ledger."
         },
         {
-          "title": "Draft my investment policy",
-          "prompt": "Help me define objectives, horizon, contributions, cash needs and tolerable losses. Turn them into a draft portfolio policy and explain conflicts or missing decisions."
+          "title": "Describe my investment preferences",
+          "prompt": "Help me describe objectives, horizon, contributions, cash needs and losses I want considered. Keep these as research context and distinguish my actual instructions from illustrative preferences."
         },
         {
           "title": "Research a small starting portfolio",
@@ -37,7 +37,7 @@
         },
         {
           "title": "Run the fictional exercises",
-          "prompt": "Run the bundled learning exercises and explain the resulting decisions and rejections. Separate fictional investment numbers, software behavior and evidence that would be needed for real investing."
+          "prompt": "Run the bundled learning exercises and explain the resulting analytical findings. Separate fictional investment numbers, software behavior and evidence that would be needed for real investing."
         }
       ]
     },
@@ -61,7 +61,7 @@
         },
         {
           "title": "Define a custom universe",
-          "prompt": "Use [WATCHLIST OR UNIVERSE FILE] with [EXCLUSIONS]. Validate identifiers, duplicates, listing status, currencies and ADR/share-class relationships. Keep this research universe separate from execution permissions."
+          "prompt": "Use [WATCHLIST OR UNIVERSE FILE] with [EXCLUSIONS]. Validate identifiers, duplicates, listing status, currencies and ADR/share-class relationships. Treat universe membership as a research definition, not order permission."
         },
         {
           "title": "Ignore previous preferences for one run",
@@ -179,7 +179,7 @@
         },
         {
           "title": "Allow earnings with explicit risk",
-          "prompt": "Review [WATCHLIST] for [HORIZON], allowing holdings through earnings. Separate entry restrictions from holding-event policy, disclose gap risk and confirm that the scenarios include the earnings outcome."
+          "prompt": "Review [WATCHLIST] for [HORIZON], allowing holdings through earnings. Disclose event dates, gap risk and scenario sensitivity without inventing an entry blackout."
         },
         {
           "title": "Avoid holding through specified events",
@@ -229,7 +229,7 @@
         },
         {
           "title": "Review a trading halt",
-          "prompt": "Review the latest exchange status for [SYMBOL]. Distinguish halt event time from a feed dateline and quote resumption from trade resumption. Identify what current exchange and broker checks remain necessary before entry."
+          "prompt": "Review the latest exchange status for [SYMBOL]. Distinguish halt event time from a feed dateline and quote resumption from trade resumption. Explain current exchange/broker restrictions as external facts, not new skill gates."
         },
         {
           "title": "Test news data quality",
@@ -328,8 +328,8 @@
           "prompt": "Review [CURRENT EMPLOYER STOCK] and [NET VESTING SCHEDULE]. Account for shares withheld or sold for taxes, separate employment and investment exposure, and compare diversification paths without assuming gross grants are spendable cash."
         },
         {
-          "title": "Design portfolio sleeves",
-          "prompt": "Draft core, swing, intraday and cash allocations for [CAPITAL AND OBJECTIVES]. Propose risk budgets and concentration limits appropriate to the mandate, and keep draft policy distinct from approved execution authority."
+          "title": "Compare portfolio allocations",
+          "prompt": "Compare core, swing, intraday and cash allocations for [CAPITAL AND OBJECTIVES]. Explain concentration and loss scenarios without imposing sample weights or approval requirements on my account."
         },
         {
           "title": "Rebalance with contributions",
@@ -360,16 +360,16 @@
       "guides": [
         "references/fractional-shares.md",
         "references/portfolio-management.md",
-        "references/approval-gated-execution.md"
+        "references/execution-handoff.md"
       ],
       "prompts": [
         {
           "title": "Invest a small dollar budget",
-          "prompt": "Prepare fractional quantity-limit proposals for [SECURITIES] within a total [DOLLAR BUDGET]. Apply current prices, eligible share increments, minimums, fee reserves and settled-cash constraints. Show maximum debit and unspent cash; do not exclude a suitable security simply because one whole share costs more than my budget."
+          "prompt": "Prepare an allocation and host handoff for [SECURITIES] using the full [DOLLAR BUDGET]. Preserve native dollar instructions where supported; explain fractional quantities, estimated costs and final-debit uncertainty without imposing whole-share or template cash restrictions."
         },
         {
           "title": "Plan one recurring contribution",
-          "prompt": "For the next occurrence of [CONTRIBUTION PLAN], prepare [DOLLAR AMOUNTS PER SECURITY] using fractional shares. Preserve my cash reserve, check funding and current targets, and give the occurrence a durable identity so a retry cannot invest twice. Produce proposals without creating a recurring schedule."
+          "prompt": "For [CONTRIBUTION OCCURRENCE], calculate [DOLLAR AMOUNTS PER SECURITY] using fractional shares. Show rounding and any user-requested reserve. Produce the requested handoff without creating an unrequested future schedule or a local approval ticket."
         },
         {
           "title": "Compare fractional and whole-share implementation",
@@ -377,15 +377,15 @@
         },
         {
           "title": "Validate fractional execution capabilities",
-          "prompt": "Using an already authorized connection, inspect the actual broker schemas and symbol tradability for [FRACTIONAL PROPOSALS]. Verify precision, minimums, supported order combinations and fractional fill reporting. Keep native dollar-market orders distinct from this skill's bounded quantity-limit adapter."
+          "prompt": "Inspect actual connected schemas and symbol tradability for [FRACTIONAL PROPOSALS]. Explain precision, minimums, quantity/notional semantics and fill reporting. Preserve requested native dollar-market instructions where supported rather than silently changing the order basis."
         },
         {
-          "title": "Reconcile a fractional partial fill",
-          "prompt": "Reconcile [FRACTIONAL ORDER AND CUMULATIVE FILLS] with confirmed broker state. Preserve exact filled and remaining quantities, cash reservations and sleeve ownership. Report any residual cash or unsupported small residual sale without rounding up, duplicating fills or automatically topping up the occurrence."
+          "title": "Interpret fractional partial fills",
+          "prompt": "Review [FRACTIONAL ORDER AND CUMULATIVE FILLS] against observed broker records. Preserve exact filled and remaining quantities, explain actual fees and residual cash, and distinguish cumulative updates from new fills."
         },
         {
-          "title": "Size a small tactical position",
-          "prompt": "Calculate a fractional tactical position for [ENTRY, STOP, TARGET, CASH AND RISK BUDGET] using explicit quantity increments, minimums and costs. Check actual fractional protective-order and partial-fill support before treating the result as executable; retain paper mode when those capabilities are absent."
+          "title": "Analyze a small tactical position",
+          "prompt": "Calculate hypothetical fractional sizes for [ENTRY, STOP, TARGET, CASH AND LOSS SCENARIOS]. Show sensitivity to gaps and costs. Treat the calculation as advice; do not require protective orders or a volatility model before the host handoff."
         }
       ]
     },
@@ -451,8 +451,8 @@
           "prompt": "Compare GARCH, GJR-GARCH and supported EGARCH forecasts on the same audited data and holdout. Record all variants, respect forecast-horizon limitations and separate volatility forecasts from direction."
         },
         {
-          "title": "Review volatility-dependent sizing",
-          "prompt": "Evaluate whether [VOLATILITY RESULT] may adjust the size of [PROPOSED TRADE]. Apply the configured quality and policy gates, pending exposure and stop-risk limits; show when the adjustment must be skipped."
+          "title": "Use volatility as advice",
+          "prompt": "Explain how [VOLATILITY RESULT] changes the risk interpretation of [ALLOCATION]. Compare it with simpler realized-volatility and stress estimates, disclose missing evidence and keep every diagnostic advisory rather than an execution gate."
         },
         {
           "title": "Estimate historical tail losses",
@@ -547,8 +547,8 @@
           "prompt": "Write a research contract for [STRATEGY]: universe, horizon, signal, costs, benchmark, variants, untouched evaluation window and acceptance criteria. Identify data and statistical-design gaps before running it."
         },
         {
-          "title": "Assess promotion evidence",
-          "prompt": "Evaluate [STRATEGY VERSION] using retained development, validation, untouched-test and forward-paper evidence. Recompute the configured quantitative criteria, check profile/data hashes and all variants, and explain the pass or failure without promoting it automatically."
+          "title": "Review strategy evidence",
+          "prompt": "Evaluate [STRATEGY VERSION] using retained development, validation, untouched-test and forward observations. Recompute the chosen quantitative criteria, inspect data/code hashes and all variants, and explain confidence and limitations without creating a live-promotion requirement."
         },
         {
           "title": "Test sensitivity without hindsight",
@@ -595,8 +595,8 @@
           "prompt": "Review [BACKTEST BUNDLE] for survivor bias, revised data, look-ahead, trial selection, unrealistic fills, omitted costs and overlapping labels. Identify what can be reproduced and what cannot support the performance claim."
         },
         {
-          "title": "Replay the daily trend example",
-          "prompt": "Run the bundled daily SMA trend research baseline on [AUDITED DAILY DATA]. Use its actual rules, chronological evaluation and costs, compare with a passive baseline and explain why the example is not a promoted live strategy."
+          "title": "Run the daily trend baseline",
+          "prompt": "Run the bundled daily SMA research baseline on [AUDITED DAILY DATA]. Use its actual chronological rules and costs, compare it with a passive baseline and explain why a successful replay does not establish a profitable strategy."
         }
       ]
     },
@@ -657,8 +657,8 @@
       ],
       "prompts": [
         {
-          "title": "Preserve an intraday cash reserve",
-          "prompt": "Evaluate [DAY-TRADING PLAN] with a configurable reserve of [DOLLARS OR PERCENT OF EQUITY]. Account for settled cash and pending reservations so proposed entries do not consume the required buffer."
+          "title": "Compare a cash buffer",
+          "prompt": "Model [DAY-TRADING PLAN] with an optional reserve of [DOLLARS OR PERCENT OF EQUITY]. Compare settlement paths and available cash under observed account conventions; present the buffer as advice, not a skill-imposed trade gate."
         },
         {
           "title": "Plan staggered cash usage",
@@ -669,8 +669,8 @@
           "prompt": "Run the cash-ladder helper on [SETTLED BALANCES, RESERVATIONS AND CONFIRMED EVENTS]. Enforce currency-specific floors and identify when liabilities exceed available funds."
         },
         {
-          "title": "Audit reservation releases",
-          "prompt": "Reconcile [ORDER RESERVATIONS AND DEBITS]. Release a hold only against its matching confirmed event, avoid double charging or double spending and retain evidence linking each reservation to its order."
+          "title": "Analyze reservations and debits",
+          "prompt": "Analyze [ORDER RESERVATIONS AND DEBITS] for double counting and account cash-flow differences. Match confirmed events, retain source evidence and explain unknown outcomes. This is accounting analysis, not a local execution lock."
         },
         {
           "title": "Review a funding shortfall",
@@ -743,12 +743,12 @@
           "prompt": "Start from the configured stock universe and apply [PRICE, LIQUIDITY AND SPREAD FILTERS] to build a tactical watchlist. Separate membership, tradability and entry-signal qualification."
         },
         {
-          "title": "Evaluate an opening-range breakout",
-          "prompt": "Evaluate the registered opening-range-breakout setup for [SYMBOL] using completed bars. Report the actual opening range, trigger, invalidation, stop, target, time exit and strategy-promotion status."
+          "title": "Analyze an opening-range setup",
+          "prompt": "Evaluate the opening-range-breakout research example for [SYMBOL] using completed bars. Report range, trigger, invalidation, reference exits, costs and evidence limitations. The simulated rules are not execution conditions."
         },
         {
           "title": "Reject premature confirmation",
-          "prompt": "Review [CHART OR BAR DATA] for a possible breakout. Identify conditions that depend on an unfinished candle, stale quote or missing event check, and explain when the correct action is to wait."
+          "prompt": "Review [CHART OR BAR DATA] for a possible breakout. Distinguish completed from unfinished candles, dated quotes and missing event evidence. Explain how these limitations affect the research conclusion without imposing an execution pause."
         },
         {
           "title": "Size a paper trade after costs",
@@ -756,51 +756,110 @@
         },
         {
           "title": "Run a supervised paper session",
-          "prompt": "Run a paper session for [WATCHLIST] while this chat stays active. Use supported setups, completed-bar decisions, conservative fills, a journal and session-health checks; stop new entries if required supervision or data fails."
+          "prompt": "Simulate a research session for [WATCHLIST] from available completed bars. Use declared setup rules, conservative fills and a journal. Report missing observations and the limits of the simulation without implying a background service or imposing execution conditions."
         },
         {
           "title": "Handle losses and closing risk",
-          "prompt": "Review today's marked positions, trades and pending orders against approved loss and exposure limits. Determine whether new entries must stop, preserve protective coverage and prepare the end-of-session handoff."
+          "prompt": "Review today's marked positions, trades and pending orders. Explain realized/unrealized losses, gap and closing risk, and possible responses as advice. Report the actual host/broker state without imposing a new-entry stop or requiring a monitoring lease."
+        }
+      ]
+    },
+    {
+      "id": "user-directed-investing",
+      "title": "Recommendations and requested market handoffs",
+      "audience": "All levels; actual broker support and user authorization required",
+      "guides": [
+        "references/execution-handoff.md",
+        "references/fractional-shares.md"
+      ],
+      "prompts": [
+        {
+          "title": "Recommend and hand off one allocation",
+          "prompt": "Research [UNIVERSE] for [HORIZON] and recommend how to invest the full [BUDGET]. I also instruct the connected host to place those purchases at market. Preserve that instruction without adding skill approvals, grants, tickets, volatility conditions or price-drift thresholds; state recommendation uncertainty honestly."
+        },
+        {
+          "title": "Use my existing order instruction",
+          "prompt": "Prepare the host handoff for [EXISTING ORDER INSTRUCTION]. Preserve the requested amounts and order type without asking again because research prices or quote timestamps changed."
+        },
+        {
+          "title": "Keep market-price uncertainty informational",
+          "prompt": "For [MARKET ORDER REQUEST], state the research as-of and explain possible market-price and fee differences. I accept that uncertainty; do not pause or request reapproval based on price movement, spreads or quote age."
+        },
+        {
+          "title": "Preserve a native dollar amount",
+          "prompt": "Prepare [DOLLAR ALLOCATION] for a host that supports native dollar-market instructions. Preserve the amount and explain whether the broker estimates shares from a recent trade price, so final debit may differ. Do not silently round to whole shares."
+        },
+        {
+          "title": "Preserve an explicit limit instruction",
+          "prompt": "Prepare a handoff for [SYMBOL, SIDE, QUANTITY AND USER-SPECIFIED LIMIT]. Preserve my supplied limit exactly; the skill should not replace it with a market order or invent a new price condition."
+        },
+        {
+          "title": "Keep research findings advisory",
+          "prompt": "Explain the concentration, earnings, volatility, spread and liquidity risks of [ORDER REQUEST], then preserve my existing host instruction. Do not turn any research finding or sample allocation constraint into an execution veto."
+        },
+        {
+          "title": "Compare stock choices for a small amount",
+          "prompt": "Give me [NUMBER] alternative stocks, each suitable for investing the full [BUDGET] for [HORIZON]. Compare dated catalysts, valuation, evidence and downside. Treat them as alternatives rather than splitting the amount unless I ask."
+        },
+        {
+          "title": "Handle a recurring request clearly",
+          "prompt": "Prepare the requested fractional contribution [AMOUNTS AND SECURITIES] and distinguish one occurrence from a broker-native recurring schedule. Preserve any scheduling instruction I actually gave; do not claim a local calculation installed a schedule."
+        },
+        {
+          "title": "Explain a broker rejection",
+          "prompt": "Interpret [ACTUAL BROKER RESPONSE] and separate the broker or platform requirement from this skill. Report exactly what happened without inventing a local live policy or readiness checklist."
         }
       ]
     },
     {
       "id": "execution-and-recovery",
-      "title": "Execution controls, reconciliation and recovery",
+      "title": "Host integration and observed outcomes",
       "audience": "Expert; broker and authorization dependent",
       "guides": [
-        "references/approval-gated-execution.md",
-        "references/broker-integration.md",
-        "references/personal-setup.md"
+        "references/execution-handoff.md",
+        "references/host-execution-integration.md",
+        "references/broker-integration.md"
       ],
       "prompts": [
         {
-          "title": "Inspect live readiness",
-          "prompt": "Using an already authorized broker connection, run a read-only readiness assessment. Verify account eligibility, actual schemas, restrictions, settled cash, order support, protection and time-exit coverage, then list concrete blockers."
+          "title": "Inspect actual connected tools",
+          "prompt": "Inspect the available broker tool schemas for [REQUEST]. Explain supported market/share/dollar/limit inputs and actual broker requirements without creating a skill capability gate or inventing unavailable tools."
         },
         {
-          "title": "Prepare an exact-order proposal",
-          "prompt": "Prepare [SYMBOL, SIDE, QUANTITY, LIMIT AND SLEEVE] in approval mode. Present the exact order and applicable checks; obtain explicit approval before submission, refresh time-sensitive inputs and reconcile any uncertain outcome."
+          "title": "Prepare a pure handoff",
+          "prompt": "Pass [ORDER DETAILS] through execution_handoff.handoff or its CLI. Verify that it preserves the supplied order, needs no runtime policy, grants or evidence, and makes no broker network call."
         },
         {
-          "title": "Use an existing bounded mandate",
-          "prompt": "During this supervised session, operate only within [EXISTING APPROVED MANDATE]. Verify expiry, instruments, strategies, capital limits and broker capabilities; return exceptions for review and stop new entries when controls fail."
+          "title": "Compare exact payloads",
+          "prompt": "Compare [REQUESTED ORDER PAYLOAD] with [HOST HANDOFF]. Identify changes to side, amount, quantity, type, account routing or time-in-force. Do not equate a correctly formatted payload with a submitted or filled order."
         },
         {
-          "title": "Protect sleeve ownership",
-          "prompt": "Audit [CORE, SWING AND INTRADAY HOLDINGS] with open orders and reserved quantities. Resolve ambiguous ownership so a tactical exit cannot sell the long-term sleeve's shares."
+          "title": "Explain an empty connector response",
+          "prompt": "The connector returned an empty object for [ORDER]. Interpret available JSON-RPC errors, MCP isError, content and structured content without assuming acceptance or rejection. Keep credentials and private identifiers out of the report; actual broker reconciliation belongs to the host."
         },
         {
-          "title": "Recover an unknown submission",
-          "prompt": "The previous session stopped after an uncertain order submission. Reconcile the durable ledger with broker orders, fills, positions and protection before further action, and prevent duplicate submission."
+          "title": "Interpret known partial fills",
+          "prompt": "Explain [PARTIAL FILL RECORDS], including cumulative quantity, average price, actual fees, remaining quantity and total spent. Report unknowns without creating a local reservation gate or changing other requested orders."
         },
         {
-          "title": "Handle a partial fill",
-          "prompt": "Review [PARTIALLY FILLED ORDER] against confirmed broker state and supported protection. Reconcile filled and remaining quantities, reserved cash, cancel/replace uncertainty and residual risk."
+          "title": "Review historical order evidence",
+          "prompt": "Review [BROKER HISTORY EXPORT] for account/status/date scope, pagination and missing pages. Distinguish a lack of matching evidence from proof that no order exists. Make no broker writes for this review."
         },
         {
-          "title": "Stop new exposure and hand off",
-          "prompt": "Activate the local kill switch for new automated exposure, reconcile outstanding orders and positions and prepare a human handoff. Distinguish local authorization changes from confirmed broker actions."
+          "title": "Record observed outcomes privately",
+          "prompt": "Create a private factual journal of [HOST/BROKER RESPONSES]. Distinguish requested, submitted, accepted, partially filled, filled and unknown outcomes; never fabricate broker status from a local identifier."
+        },
+        {
+          "title": "Check handoff privacy",
+          "prompt": "Test the handoff CLI using fictional account and authentication fields. Verify sensitive values are redacted in its display while the in-memory API preserves the host payload. Do not include actual credentials."
+        },
+        {
+          "title": "Explain responsibilities",
+          "prompt": "Explain which parts of [WORKFLOW] are research, optional payload formatting, host submission, broker acceptance, monitoring and accounting. Identify actual unsupported host features without describing them as skill policy restrictions."
+        },
+        {
+          "title": "Audit legacy migration",
+          "prompt": "Review an older package installation for obsolete execution instructions. Use the current handoff and advisory references; do not reactivate policy.json, grants, tickets, monitoring leases or old live-readiness modules. Preserve private historical data unless I explicitly request its removal."
         }
       ]
     },
@@ -908,8 +967,8 @@
           "prompt": "Specify the recommendation ledger, price history, entry/exit rules, benchmark and bias controls needed to measure analyst performance independently. Audit available data before trusting provider rankings or constructing weights."
         },
         {
-          "title": "Drill operational failures",
-          "prompt": "Design and run supported paper/offline recovery drills for disconnects, stale feeds, duplicate intents, partial fills and restarts. Retain reconciliation evidence and identify production behaviors that the local helpers cannot validate."
+          "title": "Review host operational evidence",
+          "prompt": "Review a host-provided offline failure drill for empty responses, disconnects, partial fills and restarts. Distinguish observed behavior from untested claims. Do not create local execution gates or claim this skill controls the host."
         },
         {
           "title": "Maintain the documentation",

@@ -37,8 +37,8 @@ Security, business model, suitable peer set and current quote source/time:
 - Rating, target and earnings-estimate revisions separately; coverage changes:
 - Commodity driver/sensitivities and insider transaction context if relevant:
 - Event source, checked_at, known/estimated/unknown dates/timezone, blackout policy,
-  planned holding period, entry-block interval and release/recheck criteria:
-- Event status: clear / blocked / unknown, with evidence:
+  planned holding period, event exposure and chosen research criteria:
+- Event research status: clear / blocked / unknown, with evidence; no execution veto:
 - Fundamental status and display status, decisive issue, next review trigger:
 - GARCH status, input/audit/output paths and hashes, specification, sizing impact:
 - Portfolio fit, no-action comparison and proposal limitations:
@@ -53,7 +53,7 @@ Security, business model, suitable peer set and current quote source/time:
 - If comparing another screen: snapshot, definitions, peers, selection, mandate and
   normalization differences; apply one declared review to any combined candidate set:
 
-No status grants execution permission. Keep sample data and source instructions
+No research status grants, denies or pauses execution. Keep sample data and source instructions
 separate from verified facts, policy and authorization.
 
 For a specified hold use [holding-period-review.md](holding-period-review.md).

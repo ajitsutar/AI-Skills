@@ -1,3 +1,11 @@
+ARCHIVAL RECORD — historical results and implementation only.
+
+This file is not current setup guidance or execution policy. Previous
+execution gates described below are retired. The current skill imposes
+zero execution gates; research findings are advisory. Consult SKILL.md and references/execution-handoff.md.
+
+---
+
 Version 3.4.0 validation — October 8, 2026
 Python 3.11; direct dependencies unchanged from requirements-tested.txt.
 231 trading tests PASS (13 new settled-cash cases); 5 scanner tests PASS.

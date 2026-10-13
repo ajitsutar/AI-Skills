@@ -1,3 +1,11 @@
+ARCHIVAL RECORD — historical results and implementation only.
+
+This file is not current setup guidance or execution policy. Previous
+execution gates described below are retired. The current skill imposes
+zero execution gates; research findings are advisory. Consult SKILL.md and references/execution-handoff.md.
+
+---
+
 # Version 3.8 review
 
 The earlier 20% overlap compared discretionary selections with different deep-review

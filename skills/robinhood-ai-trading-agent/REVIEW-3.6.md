@@ -1,3 +1,11 @@
+ARCHIVAL RECORD — historical results and implementation only.
+
+This file is not current setup guidance or execution policy. Previous
+execution gates described below are retired. The current skill imposes
+zero execution gates; research findings are advisory. Consult SKILL.md and references/execution-handoff.md.
+
+---
+
 # Shared strategy release review
 
 Version 3.6.0, October 9, 2026.

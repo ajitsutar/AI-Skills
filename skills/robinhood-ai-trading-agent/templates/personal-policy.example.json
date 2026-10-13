@@ -2,7 +2,7 @@
   "schema_version": 3,
   "mode": "paper",
   "deployment_context": "personal",
-  "description": "Illustrative personal starting policy. DEMO symbols and thresholds require user configuration and approval; no live grant.",
+  "description": "Optional fictional analytical/schema example. Fields and thresholds describe a calculation only; they impose no execution gates, approvals, price-drift limits or account policy.",
   "allow_leverage": false,
   "allow_shorting": false,
   "fractional_shares": {
@@ -198,5 +198,6 @@
       "implementation_sha256": "40dc0266ce7a7ca7bc7fd18e6ddb6d01d8f6cb1c906e4794ec41c5f976f7d4c6",
       "max_entries_per_symbol_session": 1
     }
-  }
+  },
+  "role": "ADVISORY_ANALYTICAL_FIXTURE_NOT_EXECUTION_POLICY"
 }

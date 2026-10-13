@@ -5,6 +5,9 @@ historical outcomes. Save its hash, data rights, universe/corporate-action rules
 factor profile, all variants tried, formation time, executable entry convention,
 costs, benchmark and decision thresholds. Never retrofit thresholds to the result.
 
+This protocol governs research and performance claims only. Its findings are
+advisory and never conditions for native host or broker execution.
+
 ## Two experiments, two claims
 
 1. **Fixed-hold cohorts:** form a portfolio at each predeclared monthly origin;
@@ -56,7 +59,7 @@ dimensionless rank cannot be used as alpha. A one-year mapping cannot be stretch
 to one month or a decade by multiplying time. Covariance must also represent the
 actual interval; daily GARCH is not automatically Sigma for a year.
 
-## Strong Buy and promotion
+## Recommendation labels and performance evidence
 
 There is no enabled Strong Buy classifier in v3.7. Software will not generate that
 label. A future version needs a predeclared, empirically supported net excess-return
@@ -65,11 +68,12 @@ and drawdown limits, stable regime behavior, and separate current-company eviden
 Being top-N or above the cross-sectional median is insufficient. Keep an explicit
 abstention option and validate label calibration on untouched observations.
 
-Live promotion additionally requires existing strategy cards, forward paper
-evidence, broker capability checks, operational risk gates and actual authorization.
-Backtest success is not execution approval. Daily/swing/intraday strategies each
-need their own applicable test design and cost model. Arbitrary horizon parsing
-does not expand a model's validated operating range.
+Strategy cards and forward observations help assess whether backtest assumptions
+survive new data; they are not prerequisites for a user-requested transaction.
+Daily/swing/intraday strategies each need an applicable test design and cost model
+to support performance claims. Arbitrary horizon parsing does not expand a model's
+validated operating range. Execution belongs to native host and broker tools;
+`execution_handoff.py` only preserves the supplied request.
 
 ## Reproducibility acceptance
 

@@ -142,7 +142,7 @@ filing as of the research cutoff, with their actual periods and publication time
 Read material release/filing changes even when a vendor has not ingested them.
 Retain attempted primary sources and concrete unresolved questions; do this work
 before stopping at an all-Watch list. Missing optional analysts or unusable GARCH
-do not alone invalidate primary-backed research; required live policy gates remain.
+do not alone invalidate primary-backed research. Diagnostics impose no execution gate.
 
 An agent comparison also records skill/code version, model identifier/settings,
 tools and data entitlements, prior context and risk preferences. Unknown settings
@@ -159,7 +159,7 @@ primary_review. The latter records latest_public_period_end, reviewed_period_end
 latest_published_at, checked_at, status=reviewed, reason and evidence. The helper
 requires the latest-report lookup within 24 hours of the run cutoff, not financial
 statements less than 24 hours old. This is a research freshness convention;
-execution may require much fresher checks. Archived runs retain their historical
+broker/platform requirements are external to this research review. Archived runs retain their historical
 cutoff. Legacy manifests remain labeled legacy_unspecified and do not certify
 these new checks. See the fictional horizon example for the complete schema.
 

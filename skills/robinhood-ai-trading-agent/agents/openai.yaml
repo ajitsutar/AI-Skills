@@ -1,4 +1,4 @@
 interface:
-  display_name: "Robinhood Quant Portfolio Agent"
-  short_description: "Quant research, portfolio risk and supervised trading"
-  default_prompt: "Use $robinhood-ai-trading-agent to review my portfolio, configure its research universe and check readiness in paper mode."
+  display_name: "Robinhood Quant Research Agent"
+  short_description: "Investment recommendations, quant research and broker handoff"
+  default_prompt: "Use $robinhood-ai-trading-agent to recommend investments for my horizon, explain the evidence and prepare the requested broker handoff."

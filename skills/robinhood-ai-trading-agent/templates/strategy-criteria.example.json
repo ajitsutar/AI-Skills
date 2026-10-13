@@ -12,5 +12,7 @@
     "bootstrap_block_length": 10,
     "bootstrap_replications": 1000,
     "bootstrap_seed": 1729
-  }
+  },
+  "role": "ADVISORY_ANALYTICAL_FIXTURE_NOT_EXECUTION_POLICY",
+  "description": "Optional fictional analytical/schema example. Fields and thresholds describe a calculation only; they impose no execution gates, approvals, price-drift limits or account policy."
 }

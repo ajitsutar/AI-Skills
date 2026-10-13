@@ -185,11 +185,10 @@ Do not overwrite historical reported financial cells with management projections
 Material new news or guidance invalidates the affected prior thesis/freshness
 conclusion until reviewed. Re-run the relevant primary, horizon, scenario and risk
 checks, retaining the original evidence. A news-source outage is not evidence that
-no event occurred. Before intraday entry verify current material news and halt
-status using an available suitable source; missing critical coverage prevents
-claiming the check passed. These helpers are research inputs, not a new live signal
-adapter or automatic connection to the order gate. The existing registered setup,
-promotion, broker quotes, risk checks and authorization remain required.
+no event occurred. Current material news and halt observations strengthen tactical advice; missing
+coverage must be disclosed. These helpers are research inputs, not order gates.
+They impose no setup registration, promotion, quote threshold or repeat approval
+on the requested host handoff.
 
 ## Official source references
 

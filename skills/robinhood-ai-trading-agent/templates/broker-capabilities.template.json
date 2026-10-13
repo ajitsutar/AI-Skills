@@ -4,5 +4,7 @@
   "account_routing_verified": false,
   "source": "UNOBSERVED_TEMPLATE",
   "checked_at": null,
-  "operations": {}
+  "operations": {},
+  "role": "ADVISORY_ANALYTICAL_FIXTURE_NOT_EXECUTION_POLICY",
+  "description": "Optional fictional analytical/schema example. Fields and thresholds describe a calculation only; they impose no execution gates, approvals, price-drift limits or account policy."
 }

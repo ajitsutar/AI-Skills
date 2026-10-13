@@ -74,12 +74,11 @@ speculative research comparison use `report.kind=screened_hypotheses`, not an
 Eligible label. Final `report.ranked_symbols` must equal the computed list in order.
 Scores are ranking preferences, not return predictions or probabilities.
 
-Day trading keeps the existing registered signal parameters, exact bar snapshot,
-strategy implementation hash, event/quote freshness and risk gates. Compare the
-same signal implementation on the same bars; do not route an intraday request
-through the fundamental ranking helper. A swing or decade-long thesis uses its
-own saved profile and resolved horizon. Research reproducibility creates no live
-execution or background-monitoring authority.
+For day-trading comparisons, preserve signal parameters, exact bars, implementation
+hashes and analytical assumptions. Compare the same signal on the same inputs;
+do not route an intraday request through the fundamental ranking helper. A swing
+or decade-long thesis uses its own profile and horizon. All research-quality
+checks are analytical, with no execution gate or background service.
 
 ## Portable bundles and completion
 

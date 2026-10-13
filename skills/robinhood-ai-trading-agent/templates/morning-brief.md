@@ -1,35 +1,15 @@
-# Portfolio and trading session brief
+# Portfolio and research session brief
 
-- Date, timezone, data observation time:
-- Environment/mode, active session owner, heartbeat/expiry and approved policy hash:
-- Data source/quality and missing inputs:
+- Date, timezone, observations and source coverage:
+- Holdings, account cash context and contributions/withdrawals:
+- Allocation, concentration, ETF overlap and factor exposures:
+- Net return versus benchmark, separated from external cash flows:
+- Material news, earnings/guidance changes and research priorities:
+- Candidate thesis, horizon, valuation, catalyst and failure modes:
+- Optional volatility/cost/scenario diagnostics and their limitations:
+- Requested handoff details and actual host/broker response, if any:
+- Partial fills, unknown outcomes or missing accounting evidence:
+- Next research review and any user-requested follow-up:
 
-## Portfolio and budgets
-
-| Sleeve | Current value | Pending buys | Capital cap | Planned open risk | Net P&L |
-|---|---:|---:|---:|---:|---:|
-| Core | | | | n/a | |
-| Swing | | | | | |
-| Intraday | | | | | |
-
-- Equity, gross cash, settled cash, broker buying power and reserved cash:
-- Concentration, ETF overlap and factor risks:
-- Cash flows separated from returns; benchmark and comparison period:
-- Order reconciliation, unresolved intents, protective coverage:
-- Breachers/kill switch/authorization expiry:
-
-## Material changes and decisions
-
-| Holding/candidate | Sleeve | What changed | Evidence/date | Decision | Invalidation |
-|---|---|---|---|---|---|
-
-## Proposals and evidence gaps
-
-- Exact order, intent/signal ID, policy/risk verdict:
-- Planned loss including costs; gap-loss caveat:
-- Review status and applicable grant/mandate, if any:
-- Missing broker capability, stale data or unverified assumption:
-- Next review/exit deadline and responsibility:
-- Source links and provenance; distinguish fictional from observed data:
-- GARCH overlay per finalist: status, implementation, data window/counts, model,
-  horizon, volatility units/annualization, holdout versus baseline, sizing impact:
+All diagnostics are advisory. This brief does not activate a trading mode, approve
+or veto an order, or require a new confirmation when the user already instructed it.

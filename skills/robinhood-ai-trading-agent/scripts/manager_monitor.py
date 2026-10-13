@@ -34,11 +34,12 @@ def assess(as_of, observations_at, returns, periods_per_year, forecast_volatilit
         reasons.append('EXECUTION_COST_BREACH')
     if difference > max_difference:
         reasons.append('RECONCILIATION_BREAK')
-    return {'status': 'BLOCK_NEW_RISK' if reasons else 'CHECKED_METRICS_WITHIN_LIMITS',
+    return {'status': 'ADVISORY_RISK_ALERT' if reasons else 'CHECKED_METRICS_WITHIN_LIMITS',
+            'advisory_only': True, 'enforces_execution': False,
             'reasons': reasons, 'realized_volatility': realized,
             'realized_to_forecast_ratio': None if realized is None else realized/forecast,
             'automatic_retuning_allowed': False, 'execution_authorized': False,
-            'limitation': 'Threshold monitor is supplementary; requires matched frequency/window, authenticated broker state, kill switch and protection. A clear monitor alone cannot authorize an order.'}
+            'limitation': 'Research diagnostics require matched frequency and window. Alerts neither authorize nor block native host/broker orders.'}
 
 
 if __name__ == '__main__':

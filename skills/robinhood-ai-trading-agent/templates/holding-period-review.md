@@ -1,6 +1,7 @@
 # Holding-period run record
 
-Use with [screen-review.md](screen-review.md); this does not authorize an order.
+Use with [screen-review.md](screen-review.md). Research-quality findings are advisory
+and do not authorize, veto or pause a host order.
 
 - Skill/code/data versions, run as-of time and market timezone:
 - User objective and risk/cash-availability needs:
@@ -22,7 +23,7 @@ Use with [screen-review.md](screen-review.md); this does not authorize an order.
 - Primary sources attempted, normalized bridge, unresolved material questions:
 - Thesis timing: before-exit mechanism, expectations already priced in, falsifier:
 - Events: release versus call, confirmed/estimated window/timezone, source;
-  entry blackout, holding exposure and explicit decision about that exposure:
+  holding exposure and the effect on the investment thesis:
 - Terminal valuation: same-exit downside/base/upside, assumptions and evidence;
   distributions, round-trip costs, net returns and same-period cash benchmark:
 - Downside/liquidity: overnight gap, correlated shock, forced-sale and halt risk:
@@ -30,7 +31,7 @@ Use with [screen-review.md](screen-review.md); this does not authorize an order.
 - Exit plan: trigger/expiry, early-exit rule, hard deadline, supervision/handoff:
 - GARCH computation/audit/validation/sizing status or explicit skip reason:
 - Fundamental, horizon and event statuses separately; final disposition:
-- What changes at a later entry or different price? Required rerun/next review:
+- How could a later entry or different price change the research estimate?
 
 ## Final report
 

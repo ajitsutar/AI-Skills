@@ -40,14 +40,15 @@
       "constituents_source": "Nasdaq Trader nasdaqlisted.txt plus otherlisted.txt",
       "constituents_as_of": null,
       "frozen_security_list_path": null,
-      "filter_rule": "Apply declared intraday liquidity, spread, price and tradability constraints before selecting the watchlist; no S&P membership requirement"
+      "filter_rule": "Declare any liquidity, spread, price or tradability filters used for research watchlist selection; these do not gate host orders"
     },
     "registered_setup": "opening_range_breakout",
     "bar_interval_minutes": 5,
     "regular_session_only": true,
     "require_long_term_value_eligibility": false,
     "volatility_context": "daily_background_or_separately_validated_intraday_model",
-    "event_blackout_policy": "Define session-based windows and release conditions in the strategy card before entries"
+    "event_blackout_policy": "Optional analytical event-exposure discussion or explicitly chosen backtest assumption; never an execution prerequisite"
   },
-  "execution_authorized": false
+  "advisory_only": true,
+  "enforces_execution": false
 }

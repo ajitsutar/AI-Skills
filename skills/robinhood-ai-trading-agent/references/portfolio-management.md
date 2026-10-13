@@ -1,17 +1,16 @@
 # Long-term portfolio management
 
-## Investment policy and ownership
+## Investment objectives and ownership
 
 Record objective, horizon, liquidity needs, contributions/withdrawals, benchmark,
 tax location, excluded instruments and loss tolerance. Core/swing/intraday weights
 refer to total account equity. They are maximum deployment budgets, not a command
 to stay fully invested. Never replenish a losing tactical sleeve automatically.
 
-The example 80/10/5 plus 5% cash is an implementation illustration. Obtain actual
-targets and funding before live use. Maintain a separate ownership map for each
-position/lot and strategy; map manual positions explicitly. The risk helper rejects
-new symbol overlap across sleeves and never permits an intraday sell to consume
-core shares.
+Sample sleeve weights are illustrative analytical inputs. Use the user's actual
+objectives, holdings and contribution instructions. Position/lot ownership helps
+avoid mistaken exposure attribution; it is not a skill execution permission map.
+All allocation and risk findings are advisory.
 
 ## Allocation and rebalance
 
@@ -24,11 +23,10 @@ separately; unfilled sales are never spendable funding for a new buy.
 reviews, prioritizing largest dollar underweights with deterministic tie-breaking.
 It rounds down to fractional quantities by default, with configurable whole-share
 mode, preserves the cash floor and caps turnover including fee reserves. Its
-prices are planning inputs, not live executable quotes. Supply current fees,
-fetch fresh broker state, and run each final order through the execution gate. Read
-[fractional-shares.md](fractional-shares.md) for observed precision/eligibility and
-per-occurrence recurring contribution proposals. The executable core gate
-also enforces approved per-symbol targets and the core sleeve cap.
+prices are planning inputs. Read [fractional-shares.md](fractional-shares.md) for
+fractional planning and per-occurrence contributions. The planner's target, cash
+and turnover constraints apply only to its calculation. They do not impose an
+execution gate; use [execution-handoff.md](execution-handoff.md) for actual requests.
 
 Core holding decisions use thesis durability, valuation ranges, cash generation,
 balance sheet, material guidance changes and portfolio fit. Record a bear case,
@@ -38,8 +36,8 @@ intraday stops for long-term holdings merely because a tactical model uses them.
 ## Concentration and scenario review
 
 Aggregate sector/theme, country, currency, factor and underlying issuer exposure.
-Review ETF constituents and overlapping funds. The local sector cap is only as good
-as the supplied classification. Personal readiness additionally computes constituent look-through; ETF fund labels are not treated as corporate sectors.
+Review ETF constituents and overlapping funds. Classification quality matters; ETF fund labels are not corporate sectors. Use
+constituent look-through and disclose uncovered exposures.
 
 Where sufficient aligned point-in-time return data exist, review covariance,
 correlation clusters and component risk contributions. Distinguish estimation
@@ -48,8 +46,9 @@ returns and call that a better portfolio. Compare a simple allocation baseline.
 
 Review plausible equity selloffs, sector shocks, rate moves and correlation spikes,
 including a gap through tactical stops. Estimated stop loss is not worst-case loss.
-Flag correlated positions even when individual symbol limits pass. These broader
-analytics are implemented in portfolio_analytics.py and rerun from policy-required retained inputs in personal_readiness.py. The host still verifies source quality and external exposures.
+Explain correlated positions even when each weight appears modest.
+portfolio_analytics.py supplies optional covariance, look-through and stress
+calculations; report source quality and unknown external exposures.
 
 ## Taxes and lot-aware selling
 

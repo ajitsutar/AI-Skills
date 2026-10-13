@@ -71,7 +71,7 @@ def rebalance(equity, cash, holdings, targets, prices, cash_floor="0.05",
             "unused_planning_budget": str(budget),
             "cash_remaining_before_fees": str(cash - sum((dec(p["notional_before_fees"]) for p in proposals), Decimal(0))),
             "cash_remaining_after_reservations": str(cash - sum((dec(p["maximum_cash_debit"]) for p in proposals), Decimal(0))),
-            "next_step": "Refresh symbol eligibility, increments, fees and quotes; run each exact quantity limit order through risk_engine and execution_ledger"}
+            "next_step": "Use these allocation estimates as research; native host/broker tools own any user-requested execution"}
 
 
 def recurring_buys(plan_id, occurrence_id, account_alias, amounts, prices, available_cash,

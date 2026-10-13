@@ -1,3 +1,11 @@
+ARCHIVAL RECORD — historical results and implementation only.
+
+This file is not current setup guidance or execution policy. Previous
+execution gates described below are retired. The current skill imposes
+zero execution gates; research findings are advisory. Consult SKILL.md and references/execution-handoff.md.
+
+---
+
 AI-Skills repository export verification
 UTC: 2026-10-07T22:06:53.000868+00:00
 Repository: https://github.com/ajitsutar/AI-Skills
