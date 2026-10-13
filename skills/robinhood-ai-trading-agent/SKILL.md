@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible stock research, portfolio 
 
 # Robinhood Quant Research and Portfolio Agent
 
-Package version: **4.6.1 — October 13, 2026**.
+Package version: **4.7.1 — October 13, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -122,6 +122,13 @@ movement diagnostics likewise describe evidence and uncertainty; they neither
 approve nor veto an order. Never claim an unrun model was computed.
 
 ## Handoff and reporting
+
+For numeric conclusions supported by retained helper outputs, use their named
+facts with the applicable units, denominator and horizon. The optional
+[report facts](references/report-facts.md) adapter provides a traceable table.
+Identify additional calculations and inference separately, retaining the helper
+result or calculation code supporting any new number. The adapter preserves
+unknown metadata; it does not validate prose or create an execution prerequisite.
 
 Present the recommendation, intended dollar amount or quantity, user-specified
 order details and material findings. For an investment instruction without a

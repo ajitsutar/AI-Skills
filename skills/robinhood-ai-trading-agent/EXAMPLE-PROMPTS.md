@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-176 examples across 24 workflows, from first-time investing to quantitative research.
+179 examples across 25 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the robinhood-ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -43,6 +43,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Saved research and incremental refresh](#saved-research-and-incremental-refresh) | All levels | 6 |
 | [Cross-model reproducibility and audits](#cross-model-reproducibility-and-audits) | Advanced to quant | 7 |
 | [Institutional research workflows and capability development](#institutional-research-workflows-and-capability-development) | Expert to quant | 7 |
+| [Traceable report facts](#traceable-report-facts) | Investors, research authors and quantitative reviewers | 3 |
 
 ## Getting started and learning
 
@@ -866,6 +867,23 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 ### 176. Maintain the documentation
 
 > Review the latest implemented capabilities, update the README as a current usage guide and refresh the example-prompt catalog without a fixed count. Regenerate the examples and run the documentation release check before packaging.
+
+
+## Traceable report facts
+
+**Audience:** Investors, research authors and quantitative reviewers. Guides: [report facts](references/report-facts.md).
+
+### 177. Report facts from a quant bundle
+
+> Create a private JSON facts artifact and a readable Markdown report from [QUANT BUNDLE]. Retain source hashes and pointers, computation and nested result status, supported units and denominators, and explicit missing or unknown metadata. Distinguish modeled portfolio equity drawdown from return-series drawdown, and report rejected jobs without stale numeric results. Explain what requires a separate calculation or source check.
+
+### 178. Explain a public VQM queue from retained facts
+
+> Create a private report-facts table from [PUBLIC VQM BUNDLE] and render the supported facts in Markdown. Preserve the actual queue order, score ties, exact score strings, supported factor definitions, source pointers and coverage limitations. Distinguish research rank from investment eligibility and leave unsupported measurement metadata unknown.
+
+### 179. Add declared labels to selected source fields
+
+> Use [CUSTOM BINDINGS] to add selected exact source pointers from [BUNDLE] to a private report-facts artifact. Keep custom metric names, units, basis and horizon explicitly declared and unverified, preserve the built-in facts, and expose missing pointers. Render a readable report without treating custom labels as semantic proof or evaluating expressions.
 
 ## Keeping this catalog current
 

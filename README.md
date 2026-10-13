@@ -22,7 +22,8 @@ Stock
 discovery defaults to all U.S. exchange-listed stocks and listed ADRs; S&P 500 is
 an explicit preset. Its saved contracts and numerical helpers support reproducible
 calculations while retaining source quality, coverage and unvalidated-performance
-limits.
+limits. It can also project retained numerical results into private, traceable
+JSON facts and readable Markdown, preserving source pointers and explicit unknowns.
 
 Read its [current capabilities and setup](skills/robinhood-ai-trading-agent/README.md)
 or explore the [prompt catalog for investors, traders and quants](skills/robinhood-ai-trading-agent/EXAMPLE-PROMPTS.md).

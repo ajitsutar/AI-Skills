@@ -54,6 +54,9 @@ Record each field's period, units, observation age and source lineage. Delayed 1
 holdings or settlement-date short interest are not live positioning; apparent
 options flow does not identify the investor's net direction. Irrelevant or missing
 fields remain explicit, rather than collecting every website for its own sake.
+A dated borrow fee is a cost observation; it does not establish current locate,
+inventory availability or recall status. Describing a fee as normal or high
+requires a sourced comparison basis.
 
 ## Keep a coverage and evidence ledger
 
@@ -61,7 +64,11 @@ For every attempted source retain issuer, query/topic, URL, original publisher,
 underlying firm/analyst when known, publication time, observation time, source/data
 provider, access status, usable fields and unresolved conflicts. Use distinctions
 such as `FULL_REPORT`, `ATTRIBUTED_EXCERPT`, `SNIPPET_ONLY`, `PAYWALL`,
-`AUTH_REQUIRED`, `ACCESS_DENIED`, `FAILED` or `NO_RELEVANT_RESULT`.
+`AUTH_REQUIRED`, `ACCESS_DENIED`, `FAILED`, `NO_RELEVANT_RESULT` or `NOT_ATTEMPTED`.
+Use `NO_RELEVANT_RESULT` only for a completed query with a retained response or
+receipt supporting that result and its search scope. A planned query or one that
+could not be issued because tools or access were unavailable is `NOT_ATTEMPTED`;
+record the reason separately.
 
 A readable article quoting a target supports that attributed target, not a claim
 to have read the underlying research report. A headline without an attributable
@@ -111,6 +118,10 @@ Yahoo's, MSN's and another site's averages into a new consensus; their populatio
 may overlap. Distinguish the helper's partial observed cohort from a provider's
 larger pool. Investigate material differences in coverage, freshness, basis and
 statistic instead of selecting the highest target.
+Observed pool differences are facts; their proposed explanation of a numerical
+discrepancy remains a hypothesis. Call the discrepancy reconciled only when
+compatible constituent values, vintages and methodology reproduce it. Otherwise
+retain the unresolved discrepancy alongside the known differences.
 
 If a verified quote on the same currency/share basis is supplied, the helper
 calculates `(median target / price - 1) * 100`. This is implied price change to the
@@ -147,7 +158,9 @@ settings and current methodology; do not treat a displayed win rate as a probabi
 the next recommendation succeeds. [TipRanks methodology FAQ](https://www.tipranks.com/glossary/f/faq%26apos%3B).
 
 Record professional role, verifiable sector experience, methodology transparency,
-corrections and disclosed conflicts as qualitative evidence. Firm prestige,
+corrections and disclosed conflicts as qualitative evidence. A correction
+establishes that something changed, not its impact; keep impact unknown unless
+before/after values or a substantiated impact assessment support it. Firm prestige,
 social followers, article count and favorable ratings do not establish forecasting
 ability. Read compensation, ownership, investment-banking and sponsored-content
 disclosures where supplied; FINRA's research rule describes several relevant

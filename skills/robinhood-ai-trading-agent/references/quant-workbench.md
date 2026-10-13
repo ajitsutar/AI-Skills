@@ -67,6 +67,14 @@ differences. A failed optimizer, unsupported operation or missing dependency is 
 observed outcome; do not replace it with a claimed successful model computation.
 Code replay proves that calculation's reproducibility, not investment effectiveness.
 
+Use retained named helper facts for numeric conclusions they support, preserving
+their units, denominator and horizon. Identify additional calculations and
+inference separately and retain supporting calculation code or helper results.
+For an optional JSON/Markdown table of retained results, use
+[report facts](report-facts.md). The adapter names supported metrics and retains
+source pointers, including rejected/nested statuses; it does not replay the job
+or establish the validity of selected inputs or a surrounding narrative.
+
 When optional `quant_controls` are chosen for an analytical evaluation, the report's
 `quant_evidence` must also declare matching `strategy_setup` and `strategy_version`.
 Its trial IDs must exactly match the report's `variants_tried` string list, and

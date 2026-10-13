@@ -5,7 +5,7 @@
   "provider": "Bundled synthetic learning fixture",
   "provider_field": "fictional-daily.csv:close",
   "retrieved_at": "2026-10-07T16:00:00Z",
-  "csv_sha256": "049a463d266d1ca673b95694aebeef353f7ddfbf300ec71623ecec548d19f205",
+  "csv_sha256": "961b458791cbd3908e2980164b00b02d2f3c4b8926d69b7060f5120d01c72568",
   "close_column": "close",
   "timestamp_column": "timestamp",
   "bar_interval": "1d",
