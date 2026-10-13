@@ -15,16 +15,28 @@
       "frozen_security_list_path": null
     },
     "peer_basis": "industry_and_business_model_first_sector_as_context",
-    "horizon_years_assumption": [
-      3,
-      5
-    ],
+    "horizon_years_assumption": null,
+    "horizon_rule": "Preserve the requested horizon; declare a provisional comparison date when needed, never infer a forced sale",
     "candidate_count_rule": "evidence_and_suitability_no_fixed_count",
     "risk_profile": null,
     "run_record": "templates/screen-review.md; optional structured run_spec documented in references/research-run-methodology.md",
-    "selection_method": "Default vqm-fundamental 1.0.0 via shared_strategy and vqm_snapshot; explicit saved custom profiles only",
+    "selection_method": "Default public-vqm-discovery research queue followed by primary and requested-horizon review through research_handoff; see references/research-campaign.md",
     "report_rule": "Classify first; separate Eligible comparison, Watch research priorities and speculative ideas",
-    "profile_path": "profiles/vqm-fundamental-v1.json",
+    "profile_path": "profiles/public-vqm-discovery-v1.json",
+    "strict_alternative": {
+      "selection_method": "Explicitly requested strict filing-derived vqm-fundamental route",
+      "profile_path": "profiles/vqm-fundamental-v1.json"
+    },
+    "mandate_defaults": {
+      "count": null,
+      "capital": null,
+      "research_intent": "ranking",
+      "risk_posture": "unspecified",
+      "early_exit_policy": "unspecified",
+      "earnings_policy": "allow_with_disclosure",
+      "horizon_mode": "comparison",
+      "forced_exit": false
+    },
     "research_cutoff": "last_completed_XNYS_session",
     "strong_buy_enabled": false
   },

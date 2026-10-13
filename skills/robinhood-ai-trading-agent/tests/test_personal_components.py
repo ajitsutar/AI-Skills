@@ -3,6 +3,7 @@ import sys
 import tempfile
 import unittest
 from datetime import timedelta
+from decimal import Decimal
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -175,7 +176,13 @@ class PortfolioAnalyticsTests(unittest.TestCase):
     def test_lot_methods_are_explicit_and_quantity_conserved(self):
         lots = [{"lot_ref": str(i), "symbol": "A", "quantity": 2, "cost_per_share": cost,
                  "acquired_at": f"2026-01-0{i+1}T16:00:00Z"} for i, cost in enumerate([10, 20])]
-        self.assertEqual(select_lots(lots, 3, "HIFO")["lots"][0]["lot_ref"], "1")
+        proposal = select_lots(lots, 3, "HIFO")
+        self.assertEqual(proposal["lots"][0]["lot_ref"], "1")
+        self.assertEqual(sum(Decimal(row["quantity"]) for row in proposal["lots"]), 3)
+        self.assertFalse(proposal["execution_authorized"])
+        self.assertIn("user's existing instructions", proposal["next_step"])
+        self.assertIn("actual support and acceptance", proposal["next_step"])
+        self.assertNotIn("approval", proposal["next_step"].lower())
         with self.assertRaisesRegex(ValueError, "Insufficient"):
             select_lots(lots, 5)
 

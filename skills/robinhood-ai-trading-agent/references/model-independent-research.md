@@ -8,10 +8,67 @@ discretionary final recommendation. For broad fundamental acquisition, follow
 arithmetic and research coverage before the strict evidence review described here.
 Public candidates and Eligible selections are distinct outputs.
 
+## Establish the actual implementation and experiment
+
+Read the supplied package's `VERSION` and `SKILL.md`, run
+`scripts/research_preflight.py`, and retain the loaded absolute path, package and
+manifest hashes, actual interpreter, dependencies and accessible tools. An attached
+ZIP, matching filename or remembered version is not proof that its code was used.
+Use that package's scripts explicitly; do not silently import an older active
+installation. This is research provenance, not an execution prerequisite.
+
+Before comparing models, identify which experiment is being performed:
+
+| Experiment | Shared inputs | What agreement can establish |
+|---|---|---|
+| Frozen calculation | Code, profile, parameters, raw data and any reviewed extraction/decision register | Arithmetic, ordering and decision replay for those declared inputs |
+| Independent extraction | Same source bytes and extraction policy; separately generated facts/judgments | Extraction consistency; differences must be adjudicated before ranking |
+| Independent acquisition | Same mandate, cutoff, universe policy and source rules; separately retrieved evidence | Coverage and data agreement, followed by conditional selection overlap |
+
+For quant operations, use `quant_workbench.py operations` and `prepare` as described
+in [quant-workbench.md](quant-workbench.md). Freeze explicit defaults, units,
+frequency, horizon, seed and constraints instead of allowing each model to choose
+them. Keep missing required values explicit. Sharing final picks or answer keys
+with another model before it freezes its result invalidates a blind comparison.
+
+Retain a separately identifiable response and actual tool artifacts for every test
+prompt. Record whether prompts used fresh model contexts or shared batches. Prompt
+classification, one calculation replay, or matching generic refusals do not prove
+that an entire prompt catalog was executed successfully. Report full, partial,
+missing-input and unsupported work separately. Compare numeric values using the
+helper's declared tolerance and categorical decisions exactly; wording may differ.
+Two empty selections do not count as perfect stock-pick overlap. A passing frozen
+test does not establish model-independent live research or future investment gains.
+
+For recurring research, reuse downloaded data only with its original source and
+observation dates. Follow [research-memory.md](research-memory.md), refresh material
+stale/missing facts, and rerank the declared universe rather than prior winners.
+Shared-cache work must be labeled shared/incremental acquisition. A download date
+cannot replace a completed price session, filing period or analyst action date.
+
 The same prompt alone does not fix data access, cutoff, sector membership,
 normalization judgments or strategy preferences. Aim for the same picks by sharing
 those inputs and using deterministic selection. Do not force models to agree by
 concealing evidence differences or lowering the research gates.
+
+## Reconcile request and file inputs
+
+Before preparing calculations, retain a compact record of each material value,
+unit or basis and provenance from the current request, its case context, supplied
+files and observed sources. Explicit current instructions take precedence over
+generic examples and optional helper defaults. An omitted JSON field does not
+erase a value supplied in the request; do not import another case's facts.
+
+Keep declared assumptions distinct from verified observations and preserve both
+sides of a source conflict instead of silently replacing one. For example, daily
+returns and 252 periods/year supplied in the request are usable as declared
+frequency even without timestamps independently proving exchange sessions. Record
+defaults only for unresolved optional inputs and report genuinely missing required
+values. Reconcile narrative units, exposure arithmetic and outcome status with the
+input record and actual helper output before reporting. A fill does not establish
+settlement, a transport error does not establish broker rejection, and different
+financial-period and quote dates alone do not establish stale financials. This
+improves research provenance; it introduces no execution gate or repeated approval.
 
 ## Reuse a run contract
 

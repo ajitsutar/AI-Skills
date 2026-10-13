@@ -369,7 +369,7 @@
         },
         {
           "title": "Plan one recurring contribution",
-          "prompt": "For [CONTRIBUTION OCCURRENCE], calculate [DOLLAR AMOUNTS PER SECURITY] using fractional shares. Show rounding and any user-requested reserve. Produce the requested handoff without creating an unrequested future schedule or a local approval ticket."
+          "prompt": "For [CONTRIBUTION OCCURRENCE], calculate [DOLLAR AMOUNTS PER SECURITY] using fractional shares. Show rounding and any user-requested reserve, but retain the original per-symbol dollar amounts for a supported native dollar handoff. Label quantity and cash-debit outputs as reference-price estimates, not guaranteed market spending or submitted orders. Keep supplied account, plan and occurrence context with a standalone handoff artifact, using companion context when the broker schema has no matching fields. Produce the requested handoff without creating an unrequested future schedule or a local approval ticket."
         },
         {
           "title": "Compare fractional and whole-share implementation",
@@ -456,7 +456,7 @@
         },
         {
           "title": "Estimate historical tail losses",
-          "prompt": "Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. State frequency, sample size, missing data and why historical tail estimates may miss future gaps."
+          "prompt": "Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps."
         },
         {
           "title": "Run portfolio stress scenarios",
@@ -934,6 +934,10 @@
         {
           "title": "Review method provenance",
           "prompt": "Review [METHOD OR SCRIPT] for its actual mathematical assumptions, implementation provenance, dependencies and attributed sources. Distinguish original integration code from imported libraries and data-use rights."
+        },
+        {
+          "title": "Freeze calculation defaults",
+          "prompt": "Reconcile [CURRENT REQUEST AND CASE CONTEXT] with [RAW QUANT INPUTS], retaining each material value, unit, frequency, horizon, cost and constraint with its provenance. Preserve explicit inputs even when a file omits them, expose conflicts, then use the helper's operation contract to materialize optional defaults and identify missing required inputs. Record the prepared-input hash and runtime, compute and verify the frozen bundle, and check that the explanation agrees with resolved inputs and actual outputs without inventing data."
         }
       ]
     },

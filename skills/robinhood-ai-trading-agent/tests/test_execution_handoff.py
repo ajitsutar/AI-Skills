@@ -133,6 +133,59 @@ class HandoffTests(unittest.TestCase):
         self.assertNotIn('FICTIONAL-PRIVATE',completed.stdout)
         self.assertEqual(output['payload']['arguments']['dollar_amount'],'133.33')
 
+    def test_private_key_variants_are_redacted_in_nested_display_copies_only(self):
+        private_keys = ('account_id', 'accountAlias', 'ACCOUNT-NUMBER', 'account.identifier',
+                        'Account UUID', 'brokerAccountId', 'privateRouting', 'authorizationHeader',
+                        'accessToken', 'refresh-token', 'session_token', 'clientSecret',
+                        'API KEY', 'X-API-Key', 'set-cookie', 'brokerOrderID')
+        payload = {'orders': [{'details': {key: 'FICTIONAL-'+str(i)}} for i, key in enumerate(private_keys)],
+                   'account_status': 'active', 'token_count': 0, 'quantity': '0.123456',
+                   'notional': '25.00', 'limit_price': '100.02', 'order_type': 'limit'}
+        before = copy.deepcopy(payload)
+        result = handoff(payload)
+        shown = redact_private(result)
+        self.assertEqual(result['payload'], before)
+        self.assertEqual(payload, before)
+        for row in shown['payload']['orders']:
+            self.assertEqual(row['details'], {key: '<PRIVATE_HOST_VALUE>' for key in row['details']})
+        for key in ('account_status', 'token_count', 'quantity', 'notional', 'limit_price', 'order_type'):
+            self.assertEqual(shown['payload'][key], payload[key])
+        self.assertNotIn('FICTIONAL-', json.dumps(shown))
+        shown['payload']['quantity'] = '999'
+        self.assertEqual(result['payload'], before)
+
+    def test_private_containers_and_tuple_members_do_not_leak_on_display(self):
+        payload = {'account': {'id': 'FICTIONAL-ACCOUNT'},
+                   'credentials': {'custom_name': 'FICTIONAL-CREDENTIAL'},
+                   'rows': ({'nested': [{'accountAlias': 'FICTIONAL-ALIAS'}]},)}
+        before = copy.deepcopy(payload)
+        self.assertNotIn('FICTIONAL-', json.dumps(redact_private(payload)))
+        self.assertEqual(handoff(payload)['payload'], before)
+        self.assertEqual(payload, before)
+
+    def test_every_handoff_display_entrypoint_uses_private_field_redaction(self):
+        payload = {'orders': [{'symbol': 'DEMO', 'side': 'buy', 'notional': '25.00',
+                    'order_type': 'market', 'accountId': 'FICTIONAL-ACCOUNT-ID',
+                    'account_alias': 'FICTIONAL-ACCOUNT-ALIAS',
+                    'routing': {'Authorization-Header': 'FICTIONAL-AUTH'}}]}
+        commands = [('execution_handoff.py', []),
+                    ('guarded_execution.py', ['submit', 'missing-runtime']),
+                    ('user_directed_execution.py', ['submit', 'missing-runtime']),
+                    ('personal_runtime.py', ['submit', 'missing-runtime'])]
+        for filename, arguments in commands:
+            with self.subTest(filename=filename):
+                completed = subprocess.run([sys.executable, '-B', str(ROOT/'scripts'/filename), *arguments],
+                    input=json.dumps(payload), capture_output=True, text=True, check=True)
+                shown = json.loads(completed.stdout)
+                self.assertHandoff(shown)
+                self.assertNotIn('FICTIONAL-', completed.stdout + completed.stderr)
+                order = shown['payload']['orders'][0]
+                self.assertEqual(order['notional'], '25.00')
+                self.assertEqual(order['order_type'], 'market')
+                self.assertEqual(order['accountId'], '<PRIVATE_HOST_VALUE>')
+                self.assertEqual(order['account_alias'], '<PRIVATE_HOST_VALUE>')
+        self.assertEqual(handoff(payload)['payload'], payload)
+
     def test_legacy_cli_operations_return_handoff_with_no_runtime_lookup(self):
         for filename in ('guarded_execution.py','user_directed_execution.py'):
             with self.subTest(filename=filename):

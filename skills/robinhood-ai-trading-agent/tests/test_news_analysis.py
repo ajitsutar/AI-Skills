@@ -25,6 +25,31 @@ def report(rows):
 
 
 class NewsTriageTests(unittest.TestCase):
+    def test_base_form_negation_retains_opposing_margin_clause(self):
+        result = na.sentiment('Demand improved. Margin did not improve.')
+        self.assertEqual(result['label'], 'MIXED')
+        self.assertEqual([h['direction'] for h in result['hits']], [1, -1])
+        self.assertEqual(result['rule_score'], 0)
+
+    def test_negation_boundaries_and_contractions(self):
+        self.assertEqual(na.sentiment("Margin didn't improve")['label'], 'NEGATIVE_LANGUAGE')
+        self.assertEqual(na.sentiment('Margin didn\u2019t improve')['label'], 'NEGATIVE_LANGUAGE')
+        self.assertEqual(na.sentiment('No update. Growth improved')['label'], 'POSITIVE_LANGUAGE')
+        self.assertEqual(na.sentiment('No update; growth improved')['label'], 'POSITIVE_LANGUAGE')
+        self.assertEqual(na.sentiment('Not only improved but exceeded expectations')['label'], 'POSITIVE_LANGUAGE')
+
+    def test_financial_decimal_and_abbreviation_do_not_reverse_negation(self):
+        for phrase in ('No 3% decline', 'No 3.5% decline'):
+            self.assertEqual(na.sentiment(phrase)['label'], 'POSITIVE_LANGUAGE')
+        for phrase in ('Did not report 1.2% growth', 'No U.S. growth', 'No US growth'):
+            self.assertEqual(na.sentiment(phrase)['label'], 'NEGATIVE_LANGUAGE')
+        self.assertEqual(na.sentiment('No 3.5% decline. Growth improved')['label'], 'POSITIVE_LANGUAGE')
+
+    def test_temporal_yet_preserves_negation(self):
+        for phrase in ('Margins have not yet improved', 'Demand has never yet improved',
+                       "Margins haven't yet improved"):
+            self.assertEqual(na.sentiment(phrase)['label'], 'NEGATIVE_LANGUAGE')
+
     def test_negation_mixed_language_and_unscored_text_do_not_invent_predictions(self):
         negated = na.sentiment('Demo did not improve but will not beat expectations')
         self.assertEqual(negated['label'], 'NEGATIVE_LANGUAGE')

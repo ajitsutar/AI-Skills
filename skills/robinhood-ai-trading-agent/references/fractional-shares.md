@@ -33,6 +33,26 @@ arithmetic rounds down and reports estimated cost and unused budget. Its maximum
 cash-debit estimate depends on its supplied price and assumptions; it is not a
 market-order spending guarantee or a broker permission decision.
 
+The sizing output preserves `requested_dollar_budget` and `request_basis` separately
+from its legacy `order_basis: quantity` estimate. `estimated_cash_debit` aliases
+`maximum_cash_debit`; both use the supplied reference price and fee assumptions.
+`cash_debit_is_guaranteed: false` applies even when cent rounding exhausts the
+budget. A different fill price can exceed that estimate. `calculation_only: true`
+does not indicate a submitted order or a broker response.
+
+Recurring results retain per-symbol `requested_amounts` even if cash/reserve
+assumptions yield `WAIT_FOR_SETTLED_CASH`, or a symbol is skipped by the sizing
+calculation. Preserve those amounts in a native dollar handoff where the actual
+host supports it. Never replace them with rounded quantities or estimated debit.
+When emitting a standalone handoff artifact, retain the supplied account alias,
+plan and contribution occurrence as context alongside the native payload. If the
+actual broker schema has no corresponding fields, use a separate envelope or
+companion context; do not invent broker fields or imply a schedule or submission.
+The legacy status and `execution_authorized: false` describe this helper's local
+calculation; they create no cash test, execution gate or additional approval.
+Actual host/broker capabilities, submission and fills must come from observed tools
+and results. This helper cannot establish them.
+
 `portfolio_manager.rebalance` defaults to fractional planning with configurable
 minimums. Offline assumptions are marked `OFFLINE_ASSUMPTIONS_UNVERIFIED`.
 Per-symbol `quantity_rules` can improve the calculation; the calculation's skipped

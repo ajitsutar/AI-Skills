@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-175 examples across 24 workflows, from first-time investing to quantitative research.
+176 examples across 24 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the robinhood-ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -41,7 +41,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Recommendations and requested market handoffs](#recommendations-and-requested-market-handoffs) | All levels; actual broker support and user authorization required | 9 |
 | [Host integration and observed outcomes](#host-integration-and-observed-outcomes) | Expert; broker and authorization dependent | 10 |
 | [Saved research and incremental refresh](#saved-research-and-incremental-refresh) | All levels | 6 |
-| [Cross-model reproducibility and audits](#cross-model-reproducibility-and-audits) | Advanced to quant | 6 |
+| [Cross-model reproducibility and audits](#cross-model-reproducibility-and-audits) | Advanced to quant | 7 |
 | [Institutional research workflows and capability development](#institutional-research-workflows-and-capability-development) | Expert to quant | 7 |
 
 ## Getting started and learning
@@ -351,7 +351,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 65. Plan one recurring contribution
 
-> For [CONTRIBUTION OCCURRENCE], calculate [DOLLAR AMOUNTS PER SECURITY] using fractional shares. Show rounding and any user-requested reserve. Produce the requested handoff without creating an unrequested future schedule or a local approval ticket.
+> For [CONTRIBUTION OCCURRENCE], calculate [DOLLAR AMOUNTS PER SECURITY] using fractional shares. Show rounding and any user-requested reserve, but retain the original per-symbol dollar amounts for a supported native dollar handoff. Label quantity and cash-debit outputs as reference-price estimates, not guaranteed market spending or submitted orders. Keep supplied account, plan and occurrence context with a standalone handoff artifact, using companion context when the broker schema has no matching fields. Produce the requested handoff without creating an unrequested future schedule or a local approval ticket.
 
 ### 66. Compare fractional and whole-share implementation
 
@@ -425,7 +425,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 81. Estimate historical tail losses
 
-> Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. State frequency, sample size, missing data and why historical tail estimates may miss future gaps.
+> Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps.
 
 ### 82. Run portfolio stress scenarios
 
@@ -830,36 +830,40 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 > Review [METHOD OR SCRIPT] for its actual mathematical assumptions, implementation provenance, dependencies and attributed sources. Distinguish original integration code from imported libraries and data-use rights.
 
+### 169. Freeze calculation defaults
+
+> Reconcile [CURRENT REQUEST AND CASE CONTEXT] with [RAW QUANT INPUTS], retaining each material value, unit, frequency, horizon, cost and constraint with its provenance. Preserve explicit inputs even when a file omits them, expose conflicts, then use the helper's operation contract to materialize optional defaults and identify missing required inputs. Record the prepared-input hash and runtime, compute and verify the frozen bundle, and check that the explanation agrees with resolved inputs and actual outputs without inventing data.
+
 
 ## Institutional research workflows and capability development
 
 **Audience:** Expert to quant. Guides: [institutional manager](references/institutional-manager.md), [capabilities and limits](references/capabilities-and-limits.md).
 
-### 169. Run a manager-style review
+### 170. Run a manager-style review
 
 > Review [PORTFOLIO AND MANDATE] across data quality, theses, construction, risk, costs, accounting and operations. Prioritize unresolved decisions and distinguish analysis support from custody or audited fund administration.
 
-### 170. Audit institutional readiness
+### 171. Audit institutional readiness
 
 > Assess this deployment against the skill's current capability inventory. Separate implemented/tested software, empirically validated investment effectiveness and available data or operational dependencies.
 
-### 171. Plan a point-in-time research database
+### 172. Plan a point-in-time research database
 
 > Design a coverage-first historical-data plan for [STRATEGY AND HORIZON]. Identify which public records can be reconstructed, which observations must be archived prospectively and which gaps may require licensed data.
 
-### 172. Design a sentiment validation study
+### 173. Design a sentiment validation study
 
 > Plan an adjudicated test of issuer matching, timestamp handling, negation and material-event classification for [NEWS DATA]. Separate extraction accuracy from a later causal, after-cost return study.
 
-### 173. Design an analyst-skill study
+### 174. Design an analyst-skill study
 
 > Specify the recommendation ledger, price history, entry/exit rules, benchmark and bias controls needed to measure analyst performance independently. Audit available data before trusting provider rankings or constructing weights.
 
-### 174. Review host operational evidence
+### 175. Review host operational evidence
 
 > Review a host-provided offline failure drill for empty responses, disconnects, partial fills and restarts. Distinguish observed behavior from untested claims. Do not create local execution gates or claim this skill controls the host.
 
-### 175. Maintain the documentation
+### 176. Maintain the documentation
 
 > Review the latest implemented capabilities, update the README as a current usage guide and refresh the example-prompt catalog without a fixed count. Regenerate the examples and run the documentation release check before packaging.
 

@@ -41,13 +41,20 @@ universe, horizon descriptor and exact prompt. The contract is saved before fetc
 ```text
 python scripts/research_preflight.py
 python scripts/public_research_fetch.py --output /outside-skill/run-A --decision-at <timezone-bearing-now> --hold P1Y --prompt-file /outside-skill/prompt.txt
-python scripts/public_research.py rank /outside-skill/run-A/snapshot.json /outside-skill/run-A/result.bundle.json --count <user-count>
+python scripts/public_research.py rank /outside-skill/run-A/snapshot.json /outside-skill/run-A/result.bundle.json --count <requested-count-or-finite-universe-size>
 python scripts/public_research.py verify /outside-skill/run-A/result.bundle.json
 ```
 
 `P1Y` is an example, not a fixed default or a maximum. Resolve the actual holding
 clock through `horizon_review.py`; the public helper only records the descriptor.
-No output count is hard-coded. New runs default to `--universe-preset us-listed`:
+No output count is hard-coded. Keep absent `count` and pure-ranking `capital` null
+in the locked mandate. The scorer CLI still takes a positive display bound: for
+an unbounded request use the frozen universe security count (at least one), not an
+invented selection target. `research_handoff.evaluate` applies that bound itself
+and distinguishes exhaustive review from meeting a user-specified count. With no
+earnings instruction, the lock documents `allow_with_disclosure`; unknown risk and
+early-exit preferences remain `unspecified`, not inferred constraints.
+New runs default to `--universe-preset us-listed`:
 all U.S. exchange-listed stocks including listed ADRs. For an explicitly requested
 S&P 500 screen add `--universe-preset sp500`. These presets are mutually exclusive
 with `--universe`. Other universes can use `--universe` with a dated

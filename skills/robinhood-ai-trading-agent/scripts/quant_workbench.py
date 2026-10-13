@@ -6,9 +6,12 @@ Cross-model agreement means identical inputs/contracts plus verified calculation
 from __future__ import annotations
 
 import argparse
+import copy
 import importlib.metadata
+import inspect
 import json
 import math
+import platform
 from pathlib import Path
 from numpy.linalg import LinAlgError
 
@@ -56,6 +59,38 @@ def implementation_hash():
     return digest(sources)
 
 
+def operation_catalog():
+    """Describe actual allowlisted interfaces; no guessed model-specific defaults."""
+    operations = {}
+    for name, function in sorted(OPERATIONS.items()):
+        parameters = inspect.signature(function).parameters
+        operations[name] = {
+            'required': [k for k, p in parameters.items() if p.default is inspect.Parameter.empty],
+            'defaults': {k: p.default for k, p in parameters.items() if p.default is not inspect.Parameter.empty}}
+    return {'implementation_sha256': implementation_hash(), 'operations': operations,
+            'scope': 'Offline computations only; required observations are not supplied by these defaults.'}
+
+
+def resolved_inputs(operation, inputs):
+    require(operation in OPERATIONS, 'OPERATION_NOT_ALLOWED:'+operation)
+    require(isinstance(inputs, dict), 'JOB_INPUT_OBJECT_REQUIRED')
+    bound = inspect.signature(OPERATIONS[operation]).bind(**inputs)
+    bound.apply_defaults()
+    return copy.deepcopy(dict(bound.arguments))
+
+
+def prepare(document):
+    """Make helper defaults explicit before models compute or exchange a job."""
+    result = copy.deepcopy(document)
+    require(result.get('schema_version') == 1, 'WORKBENCH_SCHEMA')
+    jobs = result.get('jobs')
+    require(isinstance(jobs, list) and jobs and
+            len({j['id'] for j in jobs}) == len(jobs), 'UNIQUE_JOB_IDS')
+    for job in jobs:
+        job['inputs'] = resolved_inputs(job['operation'], job['inputs'])
+    return result
+
+
 def run(document):
     require(document.get('schema_version') == 1, 'WORKBENCH_SCHEMA')
     contract = document['contract']
@@ -71,7 +106,7 @@ def run(document):
         require(job['operation'] in OPERATIONS, 'OPERATION_NOT_ALLOWED:'+job['operation'])
         require(isinstance(job['inputs'], dict), 'JOB_INPUT_OBJECT_REQUIRED')
         try:
-            inputs = job['inputs']
+            inputs = resolved_inputs(job['operation'], job['inputs'])
             if job['operation'] == 'portfolio.construct':
                 require(inputs['document']['horizon_id'] == contract['horizon_id'] and
                         inputs['document']['currency'] == contract['base_currency'], 'WORKBENCH_PORTFOLIO_CONTRACT')
@@ -86,9 +121,11 @@ def run(document):
                 require(timestamp(inputs['as_of']) <= timestamp(contract['as_of']), 'FUTURE_STATE_SNAPSHOT')
             if job['operation'] == 'backtest.portfolio':
                 require(all(timestamp(r['end']) <= timestamp(contract['as_of']) for r in inputs['document']['periods']), 'FUTURE_BACKTEST_DATA')
-            result = OPERATIONS[job['operation']](**job['inputs'])
+            result = OPERATIONS[job['operation']](**inputs)
             result['execution_authorized'] = False
-            results.append({'id': job['id'], 'operation': job['operation'], 'status': 'COMPUTED', 'result': result})
+            results.append({'id': job['id'], 'operation': job['operation'], 'status': 'COMPUTED', 'result': result,
+                            'resolved_inputs_sha256': digest(inputs),
+                            'defaults_used': {k: v for k, v in inputs.items() if k not in job['inputs']}})
         except LinAlgError as exc:
             results.append({'id': job['id'], 'operation': job['operation'], 'status': 'CALCULATION_FAILED',
                             'reason': 'NUMERICAL_ERROR:'+str(exc), 'execution_authorized': False})
@@ -120,8 +157,15 @@ def differences(left, right, path='$', absolute=1e-8, relative=1e-7):
 
 def freeze(document):
     result = run(document)
+    versions = {}
+    for name in ('numpy', 'scipy', 'pandas', 'arch', 'exchange_calendars', 'tzdata'):
+        try:
+            versions[name] = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            versions[name] = 'UNAVAILABLE'
     return {'input': document, 'result': result, 'result_sha256': digest(result),
-            'environment': {n: importlib.metadata.version(n) for n in ('numpy', 'scipy')}}
+            'environment': {**versions, 'python': platform.python_version(),
+                            'platform': platform.system(), 'machine': platform.machine()}}
 
 
 def verify(bundle):
@@ -147,13 +191,19 @@ def compare(left, right):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=['run', 'verify', 'compare'])
-    parser.add_argument('input', type=Path)
+    parser.add_argument('command', choices=['operations', 'prepare', 'run', 'verify', 'compare'])
+    parser.add_argument('input', nargs='?', type=Path)
     parser.add_argument('other', nargs='?', type=Path)
     parser.add_argument('--output', type=Path)
     args = parser.parse_args()
-    document = json.loads(args.input.read_text(encoding='utf-8-sig'))
-    if args.command == 'run':
+    if args.command != 'operations':
+        require(args.input is not None, 'INPUT_REQUIRED')
+        document = json.loads(args.input.read_text(encoding='utf-8-sig'))
+    if args.command == 'operations':
+        result = operation_catalog()
+    elif args.command == 'prepare':
+        result = prepare(document)
+    elif args.command == 'run':
         result = freeze(document)
     elif args.command == 'verify':
         result = verify(document)

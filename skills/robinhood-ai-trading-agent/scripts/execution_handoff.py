@@ -12,9 +12,21 @@ import json
 import sys
 
 
-PRIVATE_FIELDS = {'account_number', 'broker_order_id', 'private_routing', 'authorization',
-                  'authorization_header', 'headers', 'cookies', 'token', 'access_token',
-                  'refresh_token', 'password', 'secret', 'api_key'}
+PRIVATE_FIELDS = {'account', 'accounts', 'account_id', 'account_alias', 'account_number',
+                  'account_identifier', 'account_uuid', 'account_ref', 'account_url',
+                  'account_uri', 'broker_account_id', 'account_routing', 'broker_order_id',
+                  'private_routing', 'authorization', 'authorization_header',
+                  'authentication', 'credentials', 'headers', 'cookies', 'set_cookie',
+                  'token', 'access_token', 'refresh_token', 'session_token', 'bearer_token',
+                  'password', 'secret', 'client_secret', 'api_key', 'x_api_key'}
+
+
+def _field_name(key):
+    """Match common snake/camel/kebab/space spellings without changing payload keys."""
+    return ''.join(char for char in key.casefold() if char.isalnum()) if isinstance(key, str) else ''
+
+
+_PRIVATE_FIELD_NAMES = frozenset(_field_name(key) for key in PRIVATE_FIELDS)
 
 
 def handoff(payload=None, *, source='execution_handoff'):
@@ -32,11 +44,18 @@ def handoff(payload=None, *, source='execution_handoff'):
 
 
 def redact_private(value):
+    """Return a display copy with recognized private structured fields removed.
+
+    This is not a free-text secret scanner. The handoff API never calls this
+    function: actual host payloads, including routing, remain exact.
+    """
     if isinstance(value, dict):
-        return {key: '<PRIVATE_HOST_VALUE>' if key.lower() in PRIVATE_FIELDS else redact_private(child)
+        return {key: '<PRIVATE_HOST_VALUE>' if _field_name(key) in _PRIVATE_FIELD_NAMES else redact_private(child)
                 for key, child in value.items()}
     if isinstance(value, list):
         return [redact_private(child) for child in value]
+    if isinstance(value, tuple):
+        return tuple(redact_private(child) for child in value)
     return value
 
 

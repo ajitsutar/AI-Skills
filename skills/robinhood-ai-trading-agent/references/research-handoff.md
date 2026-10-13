@@ -10,17 +10,30 @@ beta, analyst-count, price-momentum or earnings-blackout filters.
 ## Lock the actual mandate
 
 Before selecting names, save a JSON object with `prompt`, `universe`, `hold`,
-`count`, `capital`, `risk_posture`, `early_exit_policy`, `information_cutoff`,
-`price_date`, `entry_at`, `exit_at`, `standing_preferences`, `earnings_policy`,
-`selection_mode`, `allowed_statuses`, and `custom_filters`.
+`information_cutoff`, `price_date`, `entry_at`, `comparison_at` (or the legacy
+`exit_at` comparison-clock name), `standing_preferences`, `selection_mode`,
+`allowed_statuses`, and `custom_filters`. Preserve supplied `count`, `capital`,
+`risk_posture`, `early_exit_policy`, and `earnings_policy`; do not invent them.
 
-Resolve the horizon through horizon_review.py first. Timestamp fields must include
-timezones. `count` is the user's requested number; there is no fixed skill quota.
+Resolve the analytical comparison clock through horizon_review.py first. Timestamp
+fields must include timezones. `count` is optional: omitted or null means no output
+quota, and the entire finite research queue must be reviewed for final completion.
+A supplied positive count is a requested target, not a guarantee of that many
+supported choices. `capital` is optional for `research_intent: ranking` (the default)
+and required for `research_intent: allocation`; sizing must not invent a budget.
+These inputs do not change the public factor formula.
+
+Omitted `risk_posture` and `early_exit_policy` become `unspecified`, with
+`field_provenance` set to `unresolved`. Omitted `earnings_policy` becomes
+`allow_with_disclosure` with provenance `documented_default`. An explicit exclusion
+remains `exclude_during_hold`. An explicitly null/invalid earnings policy must be
+resolved; it is not silently treated as the omission default. Supplied fields use
+`user` provenance unless the caller already records a valid provenance value.
+Keep unknown intent descriptive; do not turn it into inferred filters or limits.
 `standing_preferences` is `ignore` only when requested, otherwise
 `explicit_in_this_mandate`: copy applicable user instructions explicitly, never
 silently inherit another model's assertions about standing rules.
-`earnings_policy` is `allow_with_disclosure` or `exclude_during_hold` according to
-the actual mandate. These settings affect research selection only; the skill imposes no execution controls.
+These settings affect research selection only; the skill imposes no execution controls.
 `selection_mode` is `computed_order`; `custom_filters` is `[]` for this shared
 profile. `allowed_statuses` is `["Eligible"]`, or `["Eligible", "Speculative"]`
 for an explicitly aggressive speculative research comparison. This is not a
@@ -32,10 +45,32 @@ python scripts/research_handoff.py lock /run/mandate.json /run/contract.json
 
 The contract pins implementation hashes and profile. It grants no trading authority.
 Changing its rules requires a new contract, not editing an already frozen run.
+Schema 2 adds optional intent and explicit horizon metadata. Archived contracts
+remain bound to their original implementation and must be replayed with that code.
+Verification does not silently migrate schema, hashes or previously accepted
+explicit mandate values. Create a new contract for a new run after an upgrade.
 Complete packages must pass research_preflight.py, including manifest verification.
 SKILL.md alone, stale agent entrypoints, or a version string without files do not
 establish the installed implementation. Instructions cannot force a model to use
 tools; require execution artifacts and reject unsubstantiated conformance claims.
+
+## A comparison date is not a forced sale
+
+`horizon_mode: comparison` is the default and carries `forced_exit: false` and
+`hard_exit_at: null`. Use `flexible_review` for an explicitly flexible thesis-review
+horizon, also with no forced exit. Set `fixed_exit` only for an actual user-specified
+hard exit; it carries `forced_exit: true` and `hard_exit_at` matching the comparison
+date. These are research intent metadata, not an order or automatic sell schedule.
+
+The current adapter still calls the full `fixed_horizon` analytical comparison
+review, so primary evidence, scenarios, event coverage and exact timestamps retain
+the same requirements. Its `exit_at` is the compatibility name for `comparison_at`;
+never copy it into a host sell instruction for a flexible/comparison mandate. If a
+flexible request supplies no comparison date, declare a provisional valuation or
+review date before running this helper rather than inventing a hard sale date.
+Long-term event coverage can use the existing sourced `rolling_review` mode; dates
+beyond that window remain unassessed. A bare `decision_mode: long_term` review does
+not replace the handoff's exact-horizon evidence contract.
 
 ## Check release freshness, not just retrieval time
 
@@ -134,8 +169,23 @@ existing primary/horizon review, and walks the queue in score order. Higher-rank
 unresolved cases block final selections; complete evidenced rejections can be
 passed over. Ranking-relevant acquisition failures also prevent final selection even if all
 reviewed candidates pass. The proposed final order cannot be rewritten by narrative preference.
-Publish `research_candidates` and `selected_symbols` separately. An empty final
-list is not a passing three-pick test, and Watch names are not substitute buys.
+Once the requested number has qualified, unresolved lower-ranked reviews do not
+change the existing frontier rule; known stale data or ranking-relevant acquisition
+failures anywhere still prevent completion. With no quota, or fewer choices than
+requested, the frontier extends through the entire queue. All contenders must be
+resolved and the universe fully scored before an exhaustive comparison can complete.
+An unscored issuer cannot disappear merely because the scored subset was reviewed.
+
+Results report `requested_count`, `requested_count_met`, `count_shortfall`,
+`review_queue_exhausted` and `completion_basis`. A fully reviewed universe with only
+two qualifying names may complete a three-choice request with two names and a
+shortfall of one. A fully evidenced rejection of every name can complete with zero
+selections; this is an exhausted research result, not a passing three-pick test.
+
+Publish `research_candidates` and `selected_symbols` separately. Watch names are
+not substitute buys. For no-quota mandates, the handoff passes the finite universe
+size as an internal display bound to the unchanged public scorer; it is not an
+invented user stock count and does not alter scores or profile weights.
 Any separately requested discretionary alternative must be labeled nonconforming
 to this selection test, with no overlap promise.
 

@@ -112,6 +112,18 @@ publication times and future times are flagged. Nasdaq's midnight item dateline
 is not the halt time: structured Eastern-time halt fields are retained separately;
 ambiguous DST times remain unresolved. Quote resumption does not mean trades resumed.
 
+Triage independently rechecks imported records: effective availability is the
+latest of required `available_at` and `first_seen_at`, plus any supplied publication,
+update, provider-observation and event times. A claimed earlier `available_at`
+cannot admit a future disclosure. Missing required or malformed supplied timestamps
+produce `UNRESOLVED_AVAILABILITY_TIMESTAMP`; optional absent/null dates stay unknown.
+Undated recent observations remain review context without becoming fresh issuer
+sentiment. Source timestamps are retained unchanged; no missing date is invented.
+Revision selection compares parsed effective availability, then parsed update or
+publication time, then event ID. Equal instants use the same tie-break regardless
+of timezone spelling; unknown revision dates sort before known dates. Output
+records follow effective availability chronologically, with event ID breaking ties.
+
 Source revisions are retained by content hash; use the latest available revision
 at the cutoff. The same headline/issuer cluster counts once across syndication.
 Recently observed corrections remain visible even when a publisher leaves its old

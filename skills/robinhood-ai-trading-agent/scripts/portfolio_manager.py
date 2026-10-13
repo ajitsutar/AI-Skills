@@ -80,9 +80,10 @@ def recurring_buys(plan_id, occurrence_id, account_alias, amounts, prices, avail
     """Prepare one scheduled occurrence; never create a broker recurring schedule.
 
     The caller resolves the scheduled occurrence using an actual exchange calendar
-    and supplies settled, unreserved cash. Never run the same plan through both a
-    native broker schedule and this host loop. Stable signal keys survive changed
-    prices/restarts; the execution ledger enforces deduplication when claimed.
+    and supplies settled, unreserved cash for this planning calculation. Stable
+    signal keys identify the same occurrence across changed prices/restarts;
+    this helper does not submit, deduplicate or schedule orders. The native host
+    and broker own any requested execution and recurring schedule.
     """
     for value in (plan_id, occurrence_id, account_alias):
         if not isinstance(value, str) or not value.strip() or len(value) > 200:
@@ -94,8 +95,21 @@ def recurring_buys(plan_id, occurrence_id, account_alias, amounts, prices, avail
         raise InvalidInput("Recurring dollar allocations require whole cents")
     cash, reserve = nonnegative(available_cash), nonnegative(reserve_amount)
     total = sum(budgets.values(), Decimal(0))
+    intent = {
+        "plan_id": plan_id, "occurrence_id": occurrence_id, "account_alias": account_alias,
+        "request_basis": "dollar_budget",
+        "requested_amounts": {symbol: str(budgets[symbol]) for symbol in sorted(budgets)},
+        "calculation_only": True,
+        "handoff_guidance": (
+            "Preserve requested_amounts as native dollar instructions where the actual host/broker supports them; "
+            "estimated quantities are not replacement order instructions. "
+            "Legacy maximum_cash_debit is a reference-price estimate, not a guaranteed market debit. "
+            "Local status and execution_authorized describe this calculation, not permission for host execution. "
+            "This helper submits nothing; report submission and fills only from actual host/broker results."
+        ),
+    }
     if total > max(Decimal(0), cash - reserve):
-        return {"status": "WAIT_FOR_SETTLED_CASH", "buy_candidates": [],
+        return {**intent, "status": "WAIT_FOR_SETTLED_CASH", "buy_candidates": [],
                 "requested_budget": str(total), "available_after_reserve": str(max(Decimal(0), cash - reserve)),
                 "execution_authorized": False}
     proposals, skipped = [], []
@@ -116,10 +130,12 @@ def recurring_buys(plan_id, occurrence_id, account_alias, amounts, prices, avail
                               account_alias=account_alias, symbol=symbol, side="buy", sleeve="core",
                               setup="core_rebalance", quantity_rules_status=rule_status))
     spend = sum((dec(row["maximum_cash_debit"]) for row in proposals), Decimal(0))
-    return {"status": "PROPOSALS_ONLY", "buy_candidates": proposals, "skipped": skipped,
+    return {**intent, "status": "PROPOSALS_ONLY", "buy_candidates": proposals, "skipped": skipped,
+            "estimated_cash_debit": str(spend), "cash_debit_is_guaranteed": False,
+            "estimate_basis": "quantity_at_reference_price_with_supplied_fee_assumptions",
             "maximum_cash_debit": str(spend), "cash_remaining_after_reservations": str(cash - spend),
             "schedule_created": False, "execution_authorized": False,
-            "next_step": "For this occurrence refresh broker state, policy targets and each exact limit order; claim once through the durable ledger. Native recurring schedules use a different broker workflow."}
+            "next_step": "Use these estimates for the requested occurrence; preserve the user's amounts and order type in the native host/broker handoff. The host and broker own submission, duplicate handling and any explicitly requested recurring schedule."}
 
 
 def performance(equity_path, net_flows):

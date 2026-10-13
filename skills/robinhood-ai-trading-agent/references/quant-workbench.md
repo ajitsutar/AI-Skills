@@ -7,7 +7,9 @@ interfaces below; it is synthetic test data, not an investment result.
 
 ```text
 python scripts/research_preflight.py
-python scripts/quant_workbench.py run examples/fictional-quant-campaign.json --output ../runtime/quant.bundle.json
+python scripts/quant_workbench.py operations
+python scripts/quant_workbench.py prepare examples/fictional-quant-campaign.json --output ../runtime/quant.inputs.json
+python scripts/quant_workbench.py run ../runtime/quant.inputs.json --output ../runtime/quant.bundle.json
 python scripts/quant_workbench.py verify ../runtime/quant.bundle.json
 python scripts/quant_workbench.py compare ../runtime/codex.bundle.json ../runtime/muse.bundle.json
 ```
@@ -49,7 +51,21 @@ zero. Inputs cannot supply code, imports, shell commands or executable callbacks
 | `monitor.assess` | `as_of,observations_at,returns,periods_per_year,forecast_volatility,coverage,execution_cost_bps,reconciliation_difference,limits` |
 
 Some arguments have documented defaults in their Python signature. To compare
-models, explicitly freeze them rather than relying on inferred defaults.
+models, run `operations` to inspect the actual allowlisted signatures and `prepare`
+to materialize those defaults in a new input document before computing. Preparation
+preserves explicit arguments, does not fill missing observations, and does not
+choose portfolio constraints, forecasts or nested strategy settings for the user.
+It reports missing required or unknown arguments instead of inventing them.
+Each computed job records its resolved-input hash and any defaults applied at run
+time. Compare these with the retained raw input, rather than reconstructing an
+operation from a prose answer. Prepared inputs with the same contract produce the
+same calculation request irrespective of the model that launches them.
+
+Bundles record Python, platform and relevant installed dependency versions. Use
+the pinned requirements for a controlled comparison and report remaining platform
+differences. A failed optimizer, unsupported operation or missing dependency is an
+observed outcome; do not replace it with a claimed successful model computation.
+Code replay proves that calculation's reproducibility, not investment effectiveness.
 
 When optional `quant_controls` are chosen for an analytical evaluation, the report's
 `quant_evidence` must also declare matching `strategy_setup` and `strategy_version`.

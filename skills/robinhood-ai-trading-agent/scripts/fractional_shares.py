@@ -54,8 +54,8 @@ def fee_reservation(quantity, fee_per_share="0", fee_per_order="0"):
 def cash_requirement(quantity, price, fee_per_share="0", fee_per_order="0"):
     """Conservative USD reservation: round notional and aggregate fees up to cents.
 
-    This is a maximum planning debit, not invented realized brokerage fees. Actual
-    cash and fees must be reconciled from broker records after execution.
+    This is a reference-price planning estimate, not a guaranteed market debit.
+    Actual cash and fees must be reconciled from broker records after execution.
     """
     qty, price = nonnegative(quantity), positive(price)
     if not qty:
@@ -74,13 +74,14 @@ def round_trip_friction(quantity, entry, slippage_bps="0", fee_per_share="0", fe
 def size_dollar_buy(dollar_budget, price, quantity_increment="0.000001",
                    min_notional="1", min_quantity="0", fee_per_share="0",
                    fee_per_order="0"):
-    """Convert a cash ceiling into a quantity-based limit proposal, rounding down.
+    """Estimate a quantity at the supplied reference price, rounding down.
 
     Six decimals is an offline planning assumption, not a Robinhood precision
     claim. Pass observed rules for broker-review proposals. A quantity limit order
     can leave cash unspent; it is not a native dollar-market order.
     """
-    budget = nonnegative(dollar_budget).quantize(CENT, rounding=ROUND_FLOOR)
+    requested_budget = nonnegative(dollar_budget)
+    budget = requested_budget.quantize(CENT, rounding=ROUND_FLOOR)
     price, step = positive(price), quantity_step(quantity_increment)
     floor, minimum = nonnegative(min_notional), nonnegative(min_quantity)
     variable, fixed = nonnegative(fee_per_share), nonnegative(fee_per_order)
@@ -103,7 +104,11 @@ def size_dollar_buy(dollar_budget, price, quantity_increment="0.000001",
             "reference_price": str(price), "notional_before_fees": str(qty * price),
             "fee_reserve": str(debit - (qty * price).quantize(CENT, rounding=ROUND_CEILING)),
             "maximum_cash_debit": str(debit), "unspent_budget": str(budget - debit),
-            "execution_authorized": False}
+            "execution_authorized": False,
+            "request_basis": "dollar_budget", "requested_dollar_budget": str(requested_budget),
+            "estimate_basis": "quantity_at_reference_price_with_supplied_fee_assumptions",
+            "estimated_cash_debit": str(debit), "cash_debit_is_guaranteed": False,
+            "calculation_only": True}
 
 
 def validate_fractional_policy(policy):

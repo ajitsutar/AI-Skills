@@ -79,8 +79,10 @@ Widen uncertainty and use sensitivity analysis instead of spurious price precisi
 ## Research for the remaining window
 
 Freeze a configurable universe and record the method using
-[research-run-methodology.md](research-run-methodology.md). Fundamental rankings use [the shared VQM default](shared-default-strategy.md)
-unless the user selects another saved strategy. Swing/intraday requests retain
+[research-run-methodology.md](research-run-methodology.md). Unspecified ranked
+fundamental requests start with [public-vqm-discovery](research-campaign.md),
+then primary and horizon review. The [strict filing VQM route](shared-default-strategy.md)
+is an explicitly requested alternative. Swing/intraday requests retain
 their separate within-window price/catalyst or completed-bar profile. Arbitrary
 horizon support does not imply a validated alpha model for every interval. Define any technical rule before choosing
 names and retain its actual inputs; a hindsight chart narrative is not a tested
@@ -198,6 +200,13 @@ Intraday research uses the standalone clock plus the registered signal workflow;
 `screen_review` intentionally refuses to make intraday setups pass a fundamental
 screen. The clock does not rank stocks or verify economics. Legacy manifests are
 explicitly `legacy_unspecified`; they do not certify a fixed-horizon review.
+
+When passing a flexible thesis-review request to `research_handoff`, use
+`horizon_mode: flexible_review`, `forced_exit: false`, and an explicit
+`comparison_at` for valuation scenarios. The helper retains the existing
+fixed-horizon analytical checks; its internal `exit_at` comparison alias is not a
+sell instruction. `horizon_mode: fixed_exit` is reserved for a user-specified hard
+deadline. See [research-handoff.md](research-handoff.md) for the exact adapter.
 
 ## Execution boundary
 

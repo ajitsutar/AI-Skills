@@ -8,9 +8,11 @@ Research eligibility, sample-size checks and portfolio constraints below are
 analytical conventions, not execution conditions. The skill neither submits nor
 vetoes orders; native host and broker tools handle requested transactions.
 
-Use **vqm-fundamental 1.0.0** for a strict fundamental equity ranking when the user has
-not selected a different saved strategy. This is the shared default for a one-year
-S&P 500 request. It is a **research baseline without measured alpha or calibrated
+Use **vqm-fundamental 1.0.0** when the user explicitly requests the strict filing-based
+fundamental route. Unspecified ranked fundamental requests, including a one-year
+S&P 500 request, start with **public-vqm-discovery** as documented in
+[research-campaign.md](research-campaign.md), then primary and horizon review.
+The strict route is a **research baseline without measured alpha or calibrated
 recommendation confidence**. Equal family weights are a low-complexity convention,
 not an optimized result. Never silently fall back to P/E/PEG, analyst upside or a
 new model-created score because required data are inconvenient.

@@ -99,7 +99,7 @@ def select_lots(lots, quantity, method="FIFO", specific=None):
     if remaining:
         raise ValueError("Insufficient shares in the selected lots")
     return {"method": method, "lots": selected, "execution_authorized": False,
-            "next_step": "Verify broker supports this method/lot instruction and obtain applicable order approval"}
+            "next_step": "Present this lot proposal with the user's existing instructions to the native host/broker; report its actual support and acceptance without treating the calculation as an executed lot assignment"}
 
 
 def wash_sale_review(symbol, proposed_sale_at, loss_expected, transactions, identity_groups=None,

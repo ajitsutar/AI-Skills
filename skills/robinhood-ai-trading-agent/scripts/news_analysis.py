@@ -7,9 +7,9 @@ from pathlib import Path
 import re
 from news_sources import digest, stamp, iso, save_json
 
-METHOD = 'news-language-triage-1.0.0'
+METHOD = 'news-language-triage-1.2.0'
 # Original small rule set, not a copied proprietary lexicon or trained classifier.
-POSITIVE = {'beat', 'beats', 'exceeded', 'exceeds', 'growth', 'record', 'upgrade', 'upgrades', 'improved', 'improves'}
+POSITIVE = {'beat', 'beats', 'exceeded', 'exceeds', 'growth', 'record', 'upgrade', 'upgrades', 'improve', 'improved', 'improves'}
 NEGATIVE = {'miss', 'misses', 'missed', 'decline', 'declines', 'downgrade', 'downgrades', 'loss', 'losses', 'default', 'fraud', 'bankruptcy', 'recall', 'breach'}
 NEGATORS = {'no', 'not', 'never', 'without', 'unlikely'}
 EVENTS = {
@@ -25,13 +25,26 @@ EVENTS = {
 
 
 def sentiment(text):
-    words = re.findall(r"[a-z]+", text.lower())
     hits = []
-    for i, word in enumerate(words):
-        direction = 1 if word in POSITIVE else -1 if word in NEGATIVE else 0
-        if direction:
-            negated = any(w in NEGATORS for w in words[max(0, i-3):i])
-            hits.append({'word': word, 'direction': -direction if negated else direction, 'negated': negated})
+    # Keep the deliberately small rule set reproducible. Negation cannot cross a
+    # sentence/clause boundary; apostrophe contractions otherwise lost their "not".
+    normalized = re.sub(r"n['\u2019]t\b", ' not', text.lower())
+    # Decimal points and common abbreviations are not sentence ends. Dropping
+    # numeric punctuation here affects token boundaries only, never financial math.
+    normalized = re.sub(r'(?<=\d)\.(?=\d)', '', normalized)
+    normalized = re.sub(r'\b(?:[a-z]\.){2,}', lambda m: m[0].replace('.', ''), normalized)
+    normalized = re.sub(r'\b(inc|corp|co|ltd|plc|approx|vs)\.', r'\1', normalized)
+    for clause in re.split(r'[.!?;:\n]+|\b(?:but|however)\b', normalized):
+        words = re.findall(r"[a-z]+", clause)
+        for i, word in enumerate(words):
+            direction = 1 if word in POSITIVE else -1 if word in NEGATIVE else 0
+            if direction:
+                before = words[max(0, i-3):i]
+                # "not only improved" is emphasis, not a negated improvement.
+                negated = any(w in NEGATORS and not
+                              (w == 'not' and j+1 < len(before) and before[j+1] == 'only')
+                              for j, w in enumerate(before))
+                hits.append({'word': word, 'direction': -direction if negated else direction, 'negated': negated})
     signs = {h['direction'] for h in hits}
     label = 'MIXED' if len(signs) == 2 else 'POSITIVE_LANGUAGE' if signs == {1} else 'NEGATIVE_LANGUAGE' if signs == {-1} else 'UNSCORED'
     return {'label': label, 'rule_score': sum(h['direction'] for h in hits), 'hits': hits,
@@ -58,15 +71,29 @@ def analyze(report, config, as_of, lookback_hours=72):
         raise ValueError('Positive finite lookback required')
     latest, rejected = {}, []
     for record in report['records']:
-        if stamp(record['available_at']) > cutoff:
+        # Imported reports may not have passed news_sources.normalize. An earlier
+        # availability claim cannot override publication or observation evidence.
+        try:
+            availability_times = [stamp(record.get('available_at')), stamp(record.get('first_seen_at'))]
+            availability_times.extend(stamp(record[key]) for key in
+                                      ('published_at', 'updated_at', 'provider_seen_at', 'event_at')
+                                      if record.get(key) is not None)
+            effective_available = max(availability_times)
+        except (ValueError, TypeError, OverflowError):
+            rejected.append({'event_id': record['event_id'], 'reason': 'UNRESOLVED_AVAILABILITY_TIMESTAMP'})
+            continue
+        if effective_available > cutoff:
             rejected.append({'event_id': record['event_id'], 'reason': 'NOT_YET_OBSERVED_OR_FUTURE_DATED'})
             continue
         key = (record['source_id'], record.get('source_item_id') or record['url'] or record['title'])
-        rank = lambda r: (r['available_at'], r.get('updated_at') or r.get('published_at') or '', r['event_id'])
-        if key not in latest or rank(record) > rank(latest[key]):
-            latest[key] = record
+        revision = record.get('updated_at') or record.get('published_at')
+        # Unknown revision dates sort before known dates without inventing one.
+        rank = (effective_available, (revision is not None, stamp(revision) if revision is not None else None),
+                record['event_id'])
+        if key not in latest or rank > latest[key][0]:
+            latest[key] = (rank, record)
     records = []
-    for record in latest.values():
+    for _, record in sorted(latest.values(), key=lambda item: (item[0][0], item[1]['event_id'])):
         published = record.get('updated_at') or record.get('published_at') or record.get('event_at')
         window_start = cutoff - timedelta(hours=lookback_hours)
         recent_date = published is not None and stamp(published) >= window_start
@@ -92,7 +119,6 @@ def analyze(report, config, as_of, lookback_hours=72):
                         'recency_basis': 'DATED_EVENT_WITHIN_WINDOW' if recent_date else 'RECENT_OBSERVATION_OLD_OR_UNKNOWN_DATELINE' if recent_observation else 'EXCHANGE_STATUS_RECHECK_REQUIRED',
                         'cluster_id': cluster, 'issuer_sentiment_usable_for_research': eligible,
                         'requires_primary_review': True})
-    records.sort(key=lambda r: (r['available_at'], r['event_id']))
     clusters = {}
     for r in records:
         if r['issuer_sentiment_usable_for_research']:

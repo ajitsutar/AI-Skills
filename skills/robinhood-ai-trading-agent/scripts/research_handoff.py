@@ -29,22 +29,68 @@ def implementation():
 
 
 def lock(mandate):
-    """Do this before selection; no defaults inherited from previous conversations."""
+    """Freeze explicit intent and documented defaults, never prior-chat preferences.
+
+    A comparison date is analytical. It is not an instruction to sell. Existing
+    contracts remain immutable and implementation-bound; lock a new contract to
+    adopt this schema rather than rewriting an archived contract in place.
+    """
     m = copy.deepcopy(mandate)
+    provenance = m.setdefault('field_provenance', {})
+    require(isinstance(provenance, dict), 'FIELD_PROVENANCE_MUST_BE_OBJECT')
+    defaults = {'count': None, 'capital': None, 'risk_posture': 'unspecified',
+                'early_exit_policy': 'unspecified', 'earnings_policy': 'allow_with_disclosure',
+                'research_intent': 'ranking', 'horizon_mode': 'comparison'}
+    for field, value in defaults.items():
+        if field not in m:
+            m[field] = value
+            provenance[field] = ('unresolved' if field in {'capital', 'risk_posture', 'early_exit_policy'}
+                                 else 'documented_default')
+        else:
+            provenance.setdefault(field, 'user' if m[field] is not None else 'unresolved')
+    require(all(v in {'user', 'documented_default', 'unresolved'} for v in provenance.values()),
+            'INVALID_FIELD_PROVENANCE')
     for field in ('prompt', 'universe', 'hold', 'risk_posture', 'early_exit_policy'):
         require(isinstance(m.get(field), str) and m[field].strip(), 'MANDATE_REQUIRED:' + field)
-    require(type(m.get('count')) is int and m['count'] > 0, 'COUNT_REQUIRED')
+    require(m['count'] is None or (type(m['count']) is int and m['count'] > 0), 'INVALID_OPTIONAL_COUNT')
+    require(m['research_intent'] in {'ranking', 'allocation'}, 'INVALID_RESEARCH_INTENT')
+    if m['capital'] is None:
+        require(m['research_intent'] == 'ranking', 'CAPITAL_REQUIRED_FOR_ALLOCATION')
+    else:
+        require(number(m['capital']) > 0, 'CAPITAL_MUST_BE_POSITIVE')
     require(m.get('standing_preferences') in {'ignore', 'explicit_in_this_mandate'}, 'PREFERENCE_SCOPE_REQUIRED')
     require(m.get('earnings_policy') in {'allow_with_disclosure', 'exclude_during_hold'}, 'EARNINGS_POLICY_REQUIRED')
     require(m.get('selection_mode') == 'computed_order', 'DISCRETIONARY_SUBSTITUTION_NOT_ALLOWED')
     require(m.get('allowed_statuses') in [['Eligible'], ['Eligible', 'Speculative']], 'ALLOWED_STATUSES_REQUIRED')
     require(m.get('custom_filters') == [], 'CUSTOM_PROFILE_REQUIRES_SEPARATE_VERSIONED_IMPLEMENTATION')
-    a, entry, end = [timestamp(m[k]) for k in ('information_cutoff', 'entry_at', 'exit_at')]
+    mode = m['horizon_mode']
+    require(mode in {'comparison', 'flexible_review', 'fixed_exit'}, 'INVALID_HORIZON_MODE')
+    forced = mode == 'fixed_exit'
+    if 'forced_exit' in m:
+        require(type(m['forced_exit']) is bool and m['forced_exit'] == forced, 'FORCED_EXIT_MODE_CONFLICT')
+    else:
+        m['forced_exit'] = forced
+        provenance['forced_exit'] = 'user' if forced else 'documented_default'
+    # Preserve exit_at as the compatibility name for the comparison clock used
+    # by existing primary/horizon review. Its presence never grants execution.
+    comparison = m.get('comparison_at', m.get('exit_at'))
+    require(comparison is not None, 'COMPARISON_DATE_REQUIRED')
+    if m.get('exit_at') is not None:
+        require(timestamp(m['exit_at']) == timestamp(comparison), 'COMPARISON_CLOCK_CONFLICT')
+    m['comparison_at'] = comparison
+    m['exit_at'] = comparison
+    if forced:
+        hard_exit = m.get('hard_exit_at', comparison)
+        require(timestamp(hard_exit) == timestamp(comparison), 'HARD_EXIT_CLOCK_CONFLICT')
+        m['hard_exit_at'] = hard_exit
+    else:
+        require(m.get('hard_exit_at') is None, 'FLEXIBLE_HORIZON_HAS_HARD_EXIT')
+        m['hard_exit_at'] = None
+    a, entry, end = [timestamp(m[k]) for k in ('information_cutoff', 'entry_at', 'comparison_at')]
     require(a < entry < end, 'MANDATE_CLOCK_INVALID')
     require(date.fromisoformat(m['price_date']) <= a.date(), 'FUTURE_PRICE_DATE')
-    require(number(m.get('capital')) > 0, 'CAPITAL_REQUIRED')
     # Horizon parsing is not a performance claim. No untested tactical score is invented.
-    return {'schema_version': 1, 'mandate': m, 'mandate_sha256': digest(m),
+    return {'schema_version': 2, 'mandate': m, 'mandate_sha256': digest(m),
             'implementation': implementation(), 'profile_sha256': digest(profile()),
             'route': 'PUBLIC_VQM_RESEARCH_THEN_HORIZON_REVIEW',
             'source_policy': 'OPEN_SOURCES_PRIMARY_PRECEDENCE_WITH_AUDITED_CORRECTIONS_V1',
@@ -131,7 +177,11 @@ def evaluate(contract, snapshot, ledger, review_document=None, source_root=None)
         require(timestamp(overlay['information_cutoff']) <= cutoff, 'CORRECTION_AFTER_CUTOFF')
         require(ledger.get('source_overlay_sha256') == overlay['overlay_sha256'], 'CORRECTION_LEDGER_MISMATCH')
         require(ledger.get('corrected_input_sha256') == digest(snapshot), 'CORRECTED_INPUT_BINDING')
-    discovery = make_bundle(snapshot, m['count'])
+    # The unchanged scorer needs a positive display length. With no requested
+    # quota, the finite membership size includes the whole issuer review queue;
+    # this internal bound is not a user-selected number of stocks.
+    discovery_limit = m['count'] if m['count'] is not None else max(1, len(snapshot['universe_symbols']))
+    discovery = make_bundle(snapshot, discovery_limit)
     r = discovery['result']; audits = {a['symbol']: a for a in r['field_audit']}
     records = {a['symbol']: a for a in declared}
     reviewed = {}
@@ -154,7 +204,8 @@ def evaluate(contract, snapshot, ledger, review_document=None, source_root=None)
             reason = 'EVIDENCED_REJECTION'
         elif a['status'] != 'CURRENT':
             reason = 'FINANCIAL_FRESHNESS_UNRESOLVED'
-        elif v and v['event_status'] == 'blocked':
+        elif (v and v['event_status'] == 'blocked' and v.get('primary_evidence_complete')
+              and not v['unresolved_checks'] and v.get('horizon_review', {}).get('evidence_complete')):
             reason = 'EVENT_BLOCKED'
         elif v and (v['status'] in m['allowed_statuses'] and not v['unresolved_checks']
                     and v.get('primary_evidence_complete') and v.get('horizon_review', {}).get('evidence_complete')
@@ -169,12 +220,21 @@ def evaluate(contract, snapshot, ledger, review_document=None, source_root=None)
             pending.append(symbol)
         rows.append({**q, 'freshness': a, 'decision_reason': reason,
                      'classification': v['status'] if v else 'Watch'})
-    provisional = provisional[:m['count']]
-    frontier = next((q['rank'] for q in rows if provisional and q['symbol'] == provisional[-1]), len(rows))
+    requested_count = m['count']
+    provisional = provisional[:requested_count] if requested_count is not None else provisional
+    target_met = requested_count is not None and len(provisional) == requested_count
+    # Below a requested target (or without one), every contender must be resolved.
+    # The last accepted name is not a sufficient review frontier in that case.
+    frontier = (next(q['rank'] for q in rows if q['symbol'] == provisional[-1])
+                if target_met else len(rows))
     blockers = [q['symbol'] for q in rows if q['rank'] <= frontier and q['symbol'] in pending]
     stale = [q['symbol'] for q in rows if q['freshness']['status'] == 'STALE_OR_MISMATCHED']
     # A known stale lower-ranked name may leapfrog the frontier after correction.
-    complete = (not blockers and not stale and len(provisional) == m['count']
+    queue_exhausted = not pending
+    # Unscored issuers remain explicit gaps. An exhausted scored subset cannot
+    # establish that no additional selections exist in the requested universe.
+    exhaustion_complete = queue_exhausted and r['full_universe_scored']
+    complete = (not blockers and not stale and (target_met or exhaustion_complete)
                 and not r['ranking_relevant_acquisition_failures'])
     # Incomplete review is never a license to cherry-pick familiar lower-ranked names.
     return {'schema_version': 1, 'contract_sha256': digest(contract), 'input_sha256': digest(snapshot),
@@ -183,6 +243,14 @@ def evaluate(contract, snapshot, ledger, review_document=None, source_root=None)
             'research_candidates': r['research_candidates'], 'provisional_reviewed_choices': provisional,
             'selected_symbols': provisional if complete else [],
             'selection_status': 'COMPUTED_REVIEWED_COMPARISON' if complete else 'INCOMPLETE_REVIEW',
+            'requested_count': requested_count, 'selected_count': len(provisional) if complete else 0,
+            'requested_count_met': (target_met and complete) if requested_count is not None else None,
+            'count_shortfall': (max(0, requested_count - len(provisional))
+                                if complete and requested_count is not None else None),
+            'review_queue_exhausted': queue_exhausted,
+            'completion_basis': ('REQUESTED_COUNT_REVIEWED' if target_met else 'EXHAUSTIVE_UNIVERSE_REVIEW') if complete else None,
+            'horizon_mode': m['horizon_mode'], 'forced_exit': m['forced_exit'],
+            'comparison_at': m['comparison_at'], 'hard_exit_at': m['hard_exit_at'],
             'blocking_review_symbols': blockers, 'known_stale_symbols_requiring_rerank': stale, 'decisions': rows,
             'coverage': {k: r[k] for k in ('universe_securities', 'scored_issuers', 'acquisition_failure_securities',
                          'ranking_relevant_acquisition_failures', 'full_universe_scored')},

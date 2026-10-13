@@ -95,6 +95,12 @@ class SizingTests(unittest.TestCase):
         self.assertEqual(len(first["buy_candidates"]), 2)
         self.assertGreaterEqual(dec(first["cash_remaining_after_reservations"]), 5)
         self.assertFalse(first["schedule_created"])
+        self.assertFalse(first["execution_authorized"])
+        self.assertIn("user's amounts and order type", first["next_step"])
+        self.assertIn("host and broker own submission", first["next_step"])
+        for obsolete in ("policy", "claim", "ledger", "exact limit", "approval"):
+            self.assertNotIn(obsolete, first["next_step"].lower())
+            self.assertNotIn(obsolete, recurring_buys.__doc__.lower())
         inputs["prices"]["A"] = "750"
         again = recurring_buys(**inputs)
         self.assertEqual(first["buy_candidates"][0]["signal_id"], again["buy_candidates"][0]["signal_id"])

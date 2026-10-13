@@ -31,7 +31,7 @@ research universe.
 | Quant construction | Constrained allocation, covariance sensitivity, empirical tail loss and multi-asset scenarios | [Quant workbench](references/quant-workbench.md) |
 | Strategy evaluation | Causal splits, purging, HAC, block bootstrap, multiple-testing review and retained evidence | [Quant research](references/quant-research.md) |
 | Performance accounting | Execution shortfall, cash ladders, TWR/XIRR, attribution and portfolio simulation | [Manager workflow](references/institutional-manager.md) |
-| Reproducibility | Frozen research contracts/data, numerical replay, cross-model comparison and incremental refresh | [Research handoff](references/research-handoff.md) |
+| Reproducibility | Frozen contracts/data, explicit calculation defaults, runtime receipts, numerical replay and separate acquisition comparisons | [Model-independent research](references/model-independent-research.md) |
 | Execution handoff | Preserve the user's order instructions, surface findings as advisory and pass the payload to the host | [Execution handoff](references/execution-handoff.md) |
 
 Stock discovery defaults to **all U.S. exchange-listed stocks including listed
@@ -58,6 +58,12 @@ The package has no demonstrated universal alpha or calibrated Strong Buy
 classifier. Make recommendations proportional to the evidence and state material
 uncertainty. A completed calculation or matching model output establishes neither
 investment performance nor professional-manager equivalence.
+
+For calculations, retain material values from the current request and its context
+alongside file inputs, with their units and provenance. A value is not missing
+merely because it is absent from a JSON file. Distinguish declared assumptions
+from source observations and disclose conflicts; apply helper defaults only to
+unresolved optional fields. See [input provenance](references/model-independent-research.md#reconcile-request-and-file-inputs).
 
 ## Installation and research setup
 
@@ -91,7 +97,9 @@ Run fictional research examples:
 
 ```text
 python scripts/screen_review.py examples/fictional-horizon-screen.json
-python scripts/quant_workbench.py run examples/fictional-quant-campaign.json --output <research-folder>/quant.bundle.json
+python scripts/quant_workbench.py operations
+python scripts/quant_workbench.py prepare examples/fictional-quant-campaign.json --output <research-folder>/quant.inputs.json
+python scripts/quant_workbench.py run <research-folder>/quant.inputs.json --output <research-folder>/quant.bundle.json
 python scripts/quant_workbench.py verify <research-folder>/quant.bundle.json
 ```
 
@@ -110,6 +118,12 @@ Fractional/native-dollar support depends on the actual broker. A dollar input ca
 be converted to shares at a recent price and therefore need not guarantee exact
 spending or a hard final debit. Report actual responses and outcomes, including
 uncertainty. Do not turn an empty tool result into a claimed fill or rejection.
+Recurring calculations preserve requested per-symbol dollar amounts separately
+from rounded quantity and reference-price debit estimates, including when a local
+cash/reserve assumption leaves no candidates. These estimates do not establish a
+guaranteed market debit, submission or fill, and do not impose a host execution gate.
+See [fractional planning](references/fractional-shares.md) for the output fields.
+
 The skill does not manage authentication, custody, transport retries, background
 execution or broker order-state transitions.
 
@@ -118,6 +132,8 @@ execution or broker order-state transitions.
 Public news polling is not guaranteed high-frequency data. Sentiment triage is a
 deterministic research helper, not a calibrated return model. Historical validation
 needs appropriate vintages, realistic costs and untouched evaluation data.
+News triage rechecks disclosure and observation timestamps in imported reports so
+an earlier availability claim cannot admit information from after the cutoff.
 Continuous-weight allocation is not comprehensive multi-period tax/margin
 optimization; unsupported derivatives and pricing assumptions remain explicit.
 
