@@ -1,6 +1,6 @@
 ---
 name: linkedin-knowledge-digest
-description: Find high-quality AI articles, research, and analysis from LinkedIn or supplied content and produce a concise daily reading digest with direct source links. Use for LinkedIn knowledge monitoring, feed/article triage, or configurable delivery through available authorized Slack, WhatsApp, SMS/iMessage, email, or local tools. Broader topics and local-only inbox triage are optional.
+description: Find high-quality AI articles through LinkedIn-wide search or supplied sources, optionally surface substantive updates from connections across topics, and deliver a concise linked digest through available authorized Slack, WhatsApp, SMS/iMessage, email, or local tools.
 ---
 
 # LinkedIn Knowledge Digest
@@ -21,7 +21,8 @@ Do not expose private ranking criteria unless the user asks. Use the user's prio
 Collect or infer these inputs:
 
 - Access method: authenticated browser session, exported/pasted content, screenshots, or connector output.
-- Content focus: AI by default, specific AI topics, or a broader knowledge digest; desired item count and source-age window.
+- Discovery scope: LinkedIn-wide article search or personal feed; an optional, separate connections-update section. Do not substitute the personal feed for a requested platform-wide search.
+- Content focus: AI articles by default, specific AI topics, or a broader knowledge digest; desired item count and source-age window. Connections updates may cover all substantive professional topics independently of the AI article focus.
 - Delivery configuration: channel, draft/send mode, exact recipient or destination, available authorized sender, and length limits. Slack is one option, not a dependency or implicit default.
 - Priority signals: people, companies, schools, communities, industries, technical topics, roles, or keywords.
 - Exclusion rules: categories the user does not want to see.
@@ -53,12 +54,15 @@ Do not recommend headless Chrome as a way to conceal or bypass website automatio
 1. Confirm access and scope.
    - Resolve the user's content and delivery preferences. For send mode, preflight the configured sender and destination before scanning; do not collect a digest for an unavailable channel or silently choose another one.
    - Use the authenticated browser/session when available.
-   - If browser automation is used, scroll enough to sample multiple feed bands.
+   - For LinkedIn-wide discovery, use bounded topic searches through the approved path. See [LinkedIn search](references/linkedin-search.md) for setup and validation. Search is not exhaustive and can still be personalized by LinkedIn.
+   - If personal-feed discovery is explicitly selected, sample multiple feed bands.
    - Check inbox/messages only if the user requested inbox triage.
    - For recurring automations, read the canonical state before scanning. Treat a non-null `pending_digest` as possibly delivered: stop new scans/sends. When receipt reconciliation is authorized, follow [delivery-recovery.md](references/delivery-recovery.md); otherwise report the blocker without advancing state. Never clear pending merely because it is old or has zero URLs.
    - If the run cannot read or later update required state, stop before producing a content digest that could duplicate old items.
 
 2. Build a background priority map.
+   - Skip network boosts for LinkedIn-wide article discovery. An optional connections-update section requires actual first-degree relationship evidence, not matching an employer or school. It may cover non-AI professional insights, significant product/industry developments, engineering, research, policy, or thoughtful analysis.
+   - Exclude promotions, job changes, hiring/job listings, self-promotional articles, generic advice, bragging, company outings, and team social events. Require a public exact link and substantive source evidence; do not export a connections-only post.
    - Identify the user's specified priority people, organizations, groups, topics, and recently interacted-with contacts.
    - Treat this as ranking context, not as a visible section by default.
    - Boost posts from trusted people only when the post itself contains useful knowledge.
@@ -82,7 +86,7 @@ Do not recommend headless Chrome as a way to conceal or bypass website automatio
    - Do not rank a post highly just because it is from a priority person.
 
 6. Produce a concise digest.
-   - Default to at most five reads, fewer when quality or channel length demands it. Do not fill a quota with weak links.
+   - Default to at most three recommendations in total, fewer when quality or channel length demands it. Respect a user's explicit count. Do not fill a quota with weak links or add hidden extra recommendations in other sections.
    - Lead each item with its linked article title and source. Add the main finding and why it is worth reading, with an important caveat when needed.
    - Render for the configured channel and `delivery.link_format`. For copy-safe `plain_url` output, put each complete URL on its own line after the article title or takeaway, including on Slack. For SMS, prefer one or two complete linked items over truncating URLs or sending extra messages without authorization.
    - Separate inbox triage from feed/article recommendations.
@@ -117,6 +121,7 @@ Use these stricter rules when building or running an unattended LinkedIn digest 
 - Accumulate long-running output completely. When browser extraction yields a background session/process, poll it until exit and combine every chunk before parsing. Validate required feed JSON and completion metadata before filtering. Keep parsing and compaction in that same orchestration cell and render only the compact public candidate summary. A run-scoped object store may be used as an optional cache, but later steps must never depend on retrieving it; cross-cell object stores are not a transaction boundary.
 - Degrade optional sources independently. Feed extraction is required. A malformed or unavailable optional connections/inbox result must not suppress or trigger a retry of an otherwise valid public-feed digest; normalize it to an explicit unavailable result and continue.
 - Scan incrementally. Use the previous successful run plus an overlap window, but do not rely on one stale feed item as a stop condition because LinkedIn Top feed is not chronological. Check at least several feed bands and cap the scan at a reasonable number of bands.
+- Apply that incremental overlap only to feed/connection updates. LinkedIn-wide article search uses the configured source-age window plus seen/story deduplication, so a previously unreported article is not excluded just because it predates yesterday's run.
 - Audit links immediately before delivery. Remove every bullet that lacks an actual content/action link. Profile links may support attribution but must not be the only link for an item.
 - Protect private inbox data. Unless the user explicitly authorizes it and the destination permits it, do not export private message text, sender details, or private thread links to another service. Prefer public action URLs or a local-only triage note.
 - Keep failure behavior conservative. Do not retry a required extraction failure in a second browser window during the same run. If authenticated access, required extraction, delivery, or state finalization fails, do not advance successful-run state.
@@ -159,6 +164,7 @@ Read `references/automation-prompt-template.md` when creating a reusable schedul
 
 ## Included Extraction Helpers
 
+- `scripts/linkedin_search_candidates.js` extracts bounded LinkedIn-wide search results and optional verified-first-degree feed updates. It records discovery provenance and public-audience evidence; source verification is still required before sending.
 - `scripts/linkedin_digest_candidates.js` extracts bounded, deduplicated, knowledge-bearing feed candidates and returns primitive JSON text with a validated-page flag and cumulative feed-band count.
 - `scripts/linkedin_messages_candidates.js` extracts a bounded local inbox candidate list and returns primitive JSON text. Apply the delivery privacy policy before exporting any result.
 - `scripts/linkedin_connections_candidates.js` extracts a bounded recent-connections list for private ranking context.
