@@ -23,6 +23,19 @@ silently equate 90 calendar days, 90 trading sessions and three calendar months.
 Research can proceed under disclosed assumptions; identify material conflicts in
 the recommendation and preserve the user's actual requested holding period.
 
+Preserve a supplied, supported entry expiry. If none is supplied, record latest
+acceptable entry as unknown; do not copy the proposed entry or invent an expiry
+to satisfy a helper. In horizon schema version 1, omit `latest_entry_at` or set it
+to null. The resolver returns null and `latest_entry_status: UNKNOWN`, while still
+calculating the proposed entry's `exit_at`. A supplied timestamp returns
+`latest_entry_status: SUPPLIED` and retains the session and chronology checks;
+this status means supplied, not independently authenticated. With an unknown
+latest entry, `latest_possible_exit_at` is the known fixed deadline for `fixed_end`
+and null for `rolling_from_entry`. `calendar_scope: proposed_entry_only` then
+limits calendar confirmation to the proposed plan in either mode; it does not
+confirm an entry window. A supplied expiry uses `calendar_scope: entry_window`.
+Neither unknown expiry nor a resolved clock grants execution authority.
+
 "One day for a day trade" means entry and exit in the same exchange session,
 not a 24-hour hold. Overnight one-calendar-day exposure belongs to swing trading.
 Normalize fractional periods into exact smaller units (for example 1.5 years to
@@ -229,5 +242,22 @@ the horizon review cannot become Eligible. Scenario `arithmetic_valid` is separa
 from `valuation_evidence_status=DECLARED_NOT_VERIFIED`; neither authenticates a
 valuation. Preserve EPS/FCF period, GAAP/adjusted bridge, terminal multiple and
 other model inputs alongside assumptions/evidence, including downside cases.
+Use the resolved buffered `exit_at` for both equity scenarios and the cash
+comparison, with the same proposed entry. A calculation through the session close
+is a separately labeled sensitivity, with its own matching equity/cash interval;
+it cannot replace the primary buffered-exit comparison. Preserve the original
+timestamps and values of supplied terminal assumptions. If they refer to another
+time, report the mismatch as unresolved, or explicitly label and justify a
+conditional assumption that transfers them to the resolved exit while retaining
+their source time. Changing a timestamp alone does not establish that an earnings,
+multiple, dividend or terminal-price assumption applies at the new time.
+
+Preserve year/month uncertainty for catalysts such as contract renewals. Use the
+existing `evidence.event_window` operation to compare the entire supplied range
+with the holding window. For example, a year-only renewal in the exit year can
+overlap a January exit; it is neither definitely after exit nor confirmed before
+exit. Do not replace the year with an invented day. Calendar-date comparisons
+and exact timestamp comparisons have different precision; supply explicit
+offsets only when supported, and retain unresolved mixed-precision diagnostics.
 The shared event policy is validated even for an empty candidate list. Put cadence,
 evidence and next_review_at under `horizon.review_schedule`, not event_policy.

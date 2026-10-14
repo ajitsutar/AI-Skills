@@ -1,6 +1,6 @@
 # Shared default: Value, Quality and Momentum
 
-Version 3.8 begins broad ranked requests with the separate
+Broad ranked requests begin with the separate
 [public research campaign](research-campaign.md) and its fixed review queue.
 This reference governs the strict filing-based ranking, not that vendor stage.
 

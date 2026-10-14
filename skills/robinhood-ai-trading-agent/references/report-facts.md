@@ -1,5 +1,13 @@
 # Deterministic report facts
 
+The installed `profiles/report-facts-v2.json` also maps supported cash, financial,
+strategy, forward-evidence and comparison result fields. Its identity is included
+in the current workbench hash. Unmapped fields retain explicit unknown metadata;
+an input's currency or holding horizon does not establish its amount scale or
+observation frequency. Supported historical workbench schema fingerprints retain
+their known original labels, with `known_historical_schema` reported separately
+from `code_mapping_matches`. Historical interpretation is not current-code replay.
+
 Use `scripts/report_facts.py` when a report needs a traceable table of values from
 a retained quant-workbench bundle or public VQM ranking bundle. This optional
 adapter copies values and names supported metrics; it does not calculate returns,
@@ -66,3 +74,58 @@ source pointer resolves. They add facts; they do not overwrite built-in facts or
 certify a user's semantic claim. New numerical claims still need an existing
 helper or separately retained calculation code. This adapter does not assess
 whether the selected inputs, denominator or source joins were appropriate.
+
+## Verify a retained projection
+
+Verification recomputes the canonical projection from the original artifact and
+compares the entire JSON structure, including fact order, types, metadata and
+checks. JSON whitespace and object-key order may differ. Original source bytes,
+custom-binding bytes, adapter/semantics fingerprints and source-text options are
+bound exactly. Retain those source files alongside the report; a facts-only file
+cannot establish what its original omitted. Custom bindings now have a top-level
+`custom_bindings_sha256`, including an empty custom declaration, so omitted and
+explicitly supplied bindings remain distinguishable.
+
+```text
+python scripts/report_facts.py quant /private/run/quant.bundle.json --verify-projection /private/run/facts.json --private-output /private/run/facts-check.json
+python scripts/report_facts.py quant /private/run/quant.bundle.json --custom-bindings /private/run/bindings.json --include-source-text --verify-projection /private/run/extended-facts.json --private-output /private/run/extended-facts-check.json
+```
+
+Use the same custom bindings and source-text setting used for projection. The
+candidate is always JSON; `--format markdown` changes only the diagnostic output.
+Existing projection commands are unchanged. Verification writes its diagnostic
+file privately and exits `0` for `VERIFIED_PROJECTION`, `1` for
+`PROJECTION_MISMATCH` or `INVALID_PROJECTION`, and `2` for an invalid original,
+invalid custom declarations, unavailable file/path or an existing output file.
+
+Python callers can use
+`verify_projection(raw, kind, projection_raw, custom_raw=None, include_source_text=False)`.
+All raw arguments are UTF-8 JSON bytes. The returned dictionary includes `status`,
+`matches`, `expected_bindings`, per-field `binding_matches`,
+`metadata_mismatch_paths`, `facts_sequence_matches`, `builtin_facts`,
+`custom_facts`, and `source_mapping_checks`. Fact diagnostics list missing, added
+and altered records by fact index, source pointer and hash; altered records include
+changed field paths without copying the selected values. Changed identities can
+appear as missing plus added. Malformed candidate JSON/schema returns
+`INVALID_PROJECTION`; invalid original/custom inputs raise the same exceptions as
+`project()`.
+
+Here **built-in facts** means every fact emitted before custom declarations,
+including unmapped values, missingness, outer and nested statuses, warnings and
+rejection reasons. It does not mean only facts with known built-in units. Keep
+this complete canonical sequence when appending custom facts. A custom-only
+projection, duplicated fact, silently dropped rejection, changed pointer, or
+changed unit/value fails the comparison. A shorter reader-facing report may cite
+selected canonical facts, but it is not the complete projection being verified.
+
+`VERIFIED_PROJECTION` establishes consistency with the supplied source and local
+adapter only. Inspect `source_mapping_checks` separately: an exact projection can
+faithfully retain an unknown implementation or an inconsistent embedded hash.
+Known historical source schemas remain marked `known_historical_schema`, with
+`code_mapping_matches` and `calculation_replayed` false. A historical adapter's
+export is not accepted as a current-adapter projection; retain it and make a
+separate projection from the original when a current comparison is useful.
+Verification does not authenticate sources, replay calculations, validate custom
+semantic declarations or establish that selected inputs answer the research
+question. In reports, identify additional source joins, inferred dates and causal
+interpretations separately from the retained facts that support them.

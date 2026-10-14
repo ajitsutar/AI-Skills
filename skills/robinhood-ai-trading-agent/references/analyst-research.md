@@ -140,11 +140,27 @@ revision trend, compare frozen observations with matched firm, issuer, fiscal
 period, metric, currency and accounting basis. Report additions/drops in coverage
 and the fraction of comparable observations. The current helper does not calculate
 an estimate-revision signal or automatically extract historical revisions.
+Keep each attribute attached to its actual metric: an EPS forecast's fiscal year,
+GAAP/adjusted label and diluted-share definition do not establish the horizon or
+share basis of an adjacent price target. A record containing both needs separate
+metadata for each; do not describe a price target as adjusted EPS or infer its
+expiry from the EPS fiscal year.
 
 Morningstar intrinsic fair value belongs in a separate valuation field, not a
 forward-price-target pool; its published methodology distinguishes those concepts.
 Record moat, uncertainty and star-rating definitions alongside the estimate.
 [Morningstar equity methodology](https://www.morningstar.in/docs/methodology/equitiesresearchmethodology.pdf).
+
+When comparing fair value, forward targets and a past trading range, retain each
+item's own currency, share class and split/adjustment basis. Do not inherit those
+fields from the best-documented neighboring record. Before cross-item ratios or
+range-position calculations, run `evidence.operand_compatibility` for the required
+issuer/security, currency and share-basis dimensions. Missing metadata remains
+unknown. The conceptual comparison can proceed; numerical cross-item results need
+a compatible basis or a separately labeled conditional same-basis assumption.
+An evidence-consistent excerpt does not prove that the DCF was independently
+reproduced or that the historical price series was checked. Keep those coverage
+claims separate from the arithmetic.
 
 ## Analyst success rate and reputation
 

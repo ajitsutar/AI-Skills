@@ -51,8 +51,47 @@ zero. Inputs cannot supply code, imports, shell commands or executable callbacks
 | `ops.attribution` | `groups` with beginning portfolio/benchmark weights and returns, including cash |
 | `data.sec_extract` | `payload,cik,information_cutoff,concepts:[{name,namespace,tag,unit}]` |
 | `data.coverage` | Existing strict `normalization_input`; recomputes actual missing-field tasks |
+| `data.normalize_flows` | `document` with explicit source bytes, observations and reviewed mappings; delegates to the installed normalizer; [contract](flow-normalization.md) |
 | `backtest.portfolio` | `document` with aligned returns, causal decisions, costs, capacity and benchmark |
 | `monitor.assess` | `as_of,observations_at,returns,periods_per_year,forecast_volatility,coverage,execution_cost_bps,reconciliation_difference,limits` |
+| `planning.trade_costs`, `planning.cash_plan`, `planning.cash_projection` | Explicit cost units/transaction phase, cash event types/currencies/times, and declared interest assumptions in `document` |
+| `planning.budget_sizing`, `planning.friction_context`, `planning.allocation_context` | Explicit sizing, quote/cost roles and portfolio context; [contract](portfolio-decision-calculations.md) |
+| `planning.input_roles`, `planning.reference_comparison` | Supplied semantic roles, bounds and reference exposures without inferred preferences; [contract](planning-input-roles.md) |
+| `planning.dated_projection`, `planning.tax_sensitivity` | Dated flows, denominators and explicit tax assumptions; [contract](portfolio-projection.md) |
+| `planning.alternative_comparison`, `planning.settlement_transfer_paths` | Supplied comparable criteria and date-level timing assumptions; [contract](planning-comparison.md) |
+| `planning.allocate` | Explicit allocation policy; [contract](allocation-policy.md) |
+| `planning.vest_reconciliation`, `planning.portfolio_reconciliation` | Grant/share/sale distinctions and declared equity versus identified assets in `document` |
+| `planning.cash_reconciliation`, `planning.trade_history_costs`, `planning.session_pnl` | Explicit ledger/P&L basis and timing in `document`; no buying-power or missing-session inference |
+| `financial.owner_cash_bridge`, `financial.acquisition_cash` | Explicit financial periods, tax/cash assumptions and cash-flow scope in `document` |
+| `financial.price_scenarios`, `financial.terminal_scenarios`, `financial.corporate_action_return` | Dated price scenarios, whole-year operating model, or split/dividend return contract in `document` |
+| `backtest.dual_sma`, `backtest.dual_sma_variants`, `backtest.opening_range` | `bars,as_of` plus exact declared strategy parameters; variants retained, no algorithm substitution |
+| `validation.forward_observations`, `validation.paper_study_forward` | `document`; paper-study adapter also takes `as_of`; declarations and evidence admissibility, not proven live observation |
+| `analysis.covariance_comparison`, `analysis.hedge_scenarios`, `analysis.compare_claim` | Explicit matrices, expiry/linear hedge scenarios or typed comparison in `document` |
+
+`ops.attribution` returns an arithmetic Brinson-Fachler decomposition. Its
+`selection` component does not establish investment-selection skill or distinguish
+market exposure from execution effects. If benchmark weights are absent, do not
+promote portfolio weights into observed benchmark weights. An explicitly requested
+equal-weight comparison is a conditional scenario: zero allocation/interaction is
+then true by construction. Preserve unknown period, currency and benchmark identity;
+a blended portfolio result needs compatible sleeve coverage and units.
+
+When endpoint values already include fees, add back only the disclosed fees for
+an accounting bridge and do not deduct them again. A loss remaining after that
+addback is an unexplained residual, not proven investment loss: spreads, slippage,
+timing, market exposure and other costs may still be present. Causal execution or
+policy attribution needs linked decisions, fills and the actual mandate. Use
+`analysis.compare_claim` and `evidence.operand_compatibility` to preserve missing
+comparison dimensions before interpreting benchmark excess.
+
+See [alignment calculation contracts](alignment-calculations.md) for these nested
+schemas and implemented limits. `financial.price_scenarios` supports arbitrary dated
+holding periods from supplied terminal prices; the annual operating projection in
+`financial.terminal_scenarios` deliberately requires a whole number of model years.
+Neither interface invents forecasts. The example campaign illustrates operations,
+including explicit non-computation examples; it is not a market recommendation
+or an exhaustive capability test. Additional planning contracts and their tests
+cover the input roles, dated projections and comparisons linked above.
 
 Some arguments have documented defaults in their Python signature. To compare
 models, run `operations` to inspect the actual allowlisted signatures and `prepare`

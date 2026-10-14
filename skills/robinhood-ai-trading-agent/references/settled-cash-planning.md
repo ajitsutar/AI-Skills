@@ -22,16 +22,24 @@ to the broker and connected host.
 
 ## Optional reserve analysis
 
-If the user asks to maintain liquidity, compare cash paths using:
+If the user asks to maintain liquidity, preserve each input's meaning with
+[planning input roles](planning-input-roles.md): observation, minimum, maximum,
+target, pending item or hypothetical scenario. A pending item is not automatically
+an additional cash reservation. Missing amounts are unknown, not zero.
 
-`reserve = max(requested_dollar_reserve, equity * requested_reserve_fraction)`
+Only when the user specifies two minimum reserves for the same purpose and
+denominator may they be combined as
+`reserve = max(minimum_dollar_reserve, declared_equity * minimum_reserve_fraction)`.
+Do not convert a target or maximum into a minimum.
 
-`planning_cash = max(0, available_cash - pending_buy_reservations - reserve)`
-
-Use a consistently defined cash balance so reservations are not subtracted twice.
-Include realistic fees and distinguish current cash, pending sales and expected
-settlements. Reserves are user-selected planning preferences; sample values are
-not mandatory constraints on another request.
+Use an explicit cash basis and compute the signed result first:
+`cash_after_reserve = cash_before_reservations - not_yet_deducted_reservations - reserve`.
+A separate illustrative purchase budget can be `max(0, cash_after_reserve)`, but
+retain any negative shortfall. Never subtract reservations already reflected in
+the supplied cash. An earmarked tax reserve remains an account asset; an actual
+tax payment leaves the account. Include fees and distinguish current cash,
+pending sales and expected settlements. Reserves are user-selected planning
+preferences; sample values are not mandatory constraints on another request.
 
 For a fictional $500 cash account, a $250 reserve leaves $250 for purchases before
 costs. A completed $200 round trip may leave $300 settled and $200 unsettled,
@@ -41,6 +49,13 @@ the symbol for the next purchase does not change the settlement arithmetic.
 An expected settlement date is an estimate. Broker-reported balances establish
 actual availability, including holidays, transfer holds, fees and partial fills.
 A calendar forecast does not itself create cash or a scheduled order.
+
+Use `planning.cash_plan` for declared currency-specific cash events and
+`planning.dated_projection` for holdings, dated flows and a consistent portfolio
+denominator; see [portfolio projection](portfolio-projection.md). Use
+`planning.settlement_transfer_paths` for supplied settlement/transfer dates and
+lags; see [planning comparison](planning-comparison.md). A date alone does not
+establish an intraday cutoff or prove that a same-day transfer can meet a deadline.
 
 ## Report and handoff
 

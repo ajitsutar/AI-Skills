@@ -1,5 +1,17 @@
 # Model-independent research and reproducible selection
 
+For supplied-data runs, compose the work through the
+[source-bound workflow](source-bound-workflow.md). Project numeric conclusions
+from its generated report and keep judgment separate. Check canonical fact
+preservation, copied-value fidelity, source roles and task coverage as well as
+numerical replay. No checker establishes the truth of unconstrained prose.
+
+For request/source-role binding, evidence inventory and the supported cash,
+financial, horizon and strategy calculations, use [research alignment](research-alignment.md).
+Measure source-selection fidelity, numerical replay, artifact completeness and
+narrative agreement separately. A new helper does not retroactively fix a failed
+answer; rerun the actual request and review its new artifacts before claiming closure.
+
 For current ranked research, first follow [research-handoff.md](research-handoff.md).
 Its executable contract binds actual user preferences, earnings policy, source
 freshness and final order. Do not equate a deterministic public queue with a

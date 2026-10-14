@@ -1,4 +1,4 @@
-"""Local deterministic projection of helper results; no calculations or narrative validation."""
+"""Local deterministic projection and projection verification; no helper replay."""
 from __future__ import annotations
 
 import argparse
@@ -8,20 +8,49 @@ import json
 import math
 from pathlib import Path
 import re
+from functools import lru_cache
+from collections import defaultdict, deque
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = 'report-facts-1'
 STATUSES = {'COMPUTED', 'REJECTED_INPUT', 'CALCULATION_FAILED', 'RESEARCH_QUEUE_ONLY', 'SIMULATED',
             'SHORTFALL', 'PROJECTED_COVERED', 'AMBIGUOUS_OR_NONCONVENTIONAL_CASHFLOWS',
             'ROOT_OUTSIDE_NUMERICAL_BRACKET', 'NO_VERIFIED_FEASIBLE_SOLUTION',
-            'RESEARCH_PROPOSAL', 'ADVISORY_RISK_ALERT', 'CHECKED_METRICS_WITHIN_LIMITS'}
+            'RESEARCH_PROPOSAL', 'ADVISORY_RISK_ALERT', 'CHECKED_METRICS_WITHIN_LIMITS',
+            'INCOMPARABLE', 'UNKNOWN_COMPARABILITY', 'CHECKED', 'PARTIAL', 'PARTIAL_ANALYSIS', 'ASSESSED',
+            'NOT_ADMISSIBLE', 'ADMISSIBLE_DECLARATION', 'NOT_ESTABLISHED', 'SOURCE_BYTES_BOUND',
+            'RECONCILED', 'UNRESOLVED_DIFFERENCE', 'UNEXPLAINED_EQUITY_DIFFERENCE',
+            'UNFUNDED_SHORTFALL', 'FILLED', 'ALREADY_LONG', 'ALREADY_CASH',
+            'MISSED_ENTRY_SCENARIO', 'UNFILLED_NO_VOLUME', 'UNFILLED_BEYOND_DATA',
+            'INPUTS_UNRESOLVED', 'EXPLICIT_COST_MODEL', 'PARTIAL_CONTEXT', 'COMPUTED_CONTEXT',
+            'NOT_SUPPLIED', 'UNRESOLVED', 'ALREADY_INCLUDED_NO_EXTRA_CHARGE',
+            'EXPLICIT_ONE_WAY_MODEL', 'NO_KNOWN_FUND_NOTIONAL', 'COMPLETE_SUPPLIED_WEIGHTS',
+            'INTERPRETED', 'COMPARED', 'NO_SHOCKS_SUPPLIED', 'NOT_APPLICABLE', 'UNKNOWN_MODEL',
+            'COMPUTED_SCENARIO', 'COMPUTED_SCENARIOS', 'COMPUTED_CONDITIONAL_PROJECTION',
+            'DATE_PATHS_MODELED', 'EXCLUDED_BY_EXPLICIT_ASSUMPTION', 'UNRESOLVED_CALENDAR_COVERAGE',
+            'POSSIBLE_INTRADAY_ACCEPTANCE_UNKNOWN', 'CONDITIONAL_DATE_PATH',
+            'BEFORE_DEADLINE_DATE', 'ON_DEADLINE_DATE_INTRADAY_UNRESOLVED', 'AFTER_DEADLINE_DATE',
+            'INDETERMINATE', 'LEFT_DOMINATES', 'RIGHT_DOMINATES', 'EQUIVALENT_ON_DECLARED_CRITERIA', 'TRADEOFF',
+            'MAPPING_REQUIRED', 'DRAFT_UNVERIFIED', 'PRIMARY_EVIDENCE_REQUIRED', 'READY', 'INCOMPLETE', 'NOT_ASSESSED'}
+# The original workbench numerical modules and existing schemas were inspected
+# byte-for-text-identical before the additive operation extension. This identifies
+# a known historical schema, not a successful replay with the current code.
+COMPATIBLE_QUANT_SCHEMAS = frozenset({
+    '6294350238ac62bbb0c452a1d5a3e1179c69662139cfdeb62b59c4fe77aacc7c'})
 OMIT_FIELDS = {'execution_authorized', 'validated_for_live', 'skill_submitted_order',
                'external_permissions_changed', 'point_in_time_evidence_verified'}
 QUANT_FILES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
                'quant_portfolio.py', 'multi_asset_risk.py', 'investment_ops.py',
                'primary_financial_data.py', 'price_audit.py', 'financial_normalize.py',
                'filing_extract.py', 'deterministic_rank.py', 'portfolio_backtest.py',
-               'manager_monitor.py')
+               'manager_monitor.py', 'analysis_checks.py', 'planning_alignment.py', 'financial_alignment.py',
+               'portfolio_analytics.py', 'accounting_tools.py', 'strategy_research.py',
+               'strategy_lab.py', 'risk_engine.py', 'forward_evidence.py', 'report_facts.py',
+               'research_analytics.py', 'evidence_semantics.py', 'ranking_alignment.py',
+               'vqm_research.py', 'public_research.py', 'research_bundle.py', 'screen_review.py',
+               'horizon_review.py', 'cash_benchmark.py', 'trading_calendar.py', 'allocation_policy.py',
+               'portfolio_decision.py', 'planning_roles.py', 'portfolio_projection.py', 'planning_comparison.py',
+               'flow_normalization.py')
 
 
 def digest(value):
@@ -36,7 +65,28 @@ def code_hash(name):
 def quant_hash():
     sources = {name: (ROOT / 'scripts' / name).read_text(encoding='utf-8') for name in QUANT_FILES}
     sources['financial-normalization-v1.json'] = (ROOT / 'profiles/financial-normalization-v1.json').read_text(encoding='utf-8')
+    sources['report-facts-v2.json'] = (ROOT / 'profiles/report-facts-v2.json').read_text(encoding='utf-8')
+    for name in ('vqm-fundamental-v1.json', 'public-vqm-discovery-v1.json'):
+        sources[name] = (ROOT / 'profiles' / name).read_text(encoding='utf-8')
     return digest(sources)
+
+
+@lru_cache(maxsize=1)
+def extended_semantics():
+    """Installed, versioned schema only; source files cannot supply this mapping."""
+    profile = json.loads((ROOT / 'profiles/report-facts-v2.json').read_text(encoding='utf-8'))
+    if profile.get('schema_version') != 1 or not isinstance(profile.get('operations'), dict):
+        raise ValueError('EXTENDED_FACTS_SCHEMA')
+    return profile['operations']
+
+
+def extended_spec(operation, relative_path):
+    parts = relative_path.split('/')
+    for pattern, item in extended_semantics().get(operation, {}).items():
+        keys = pattern.split('/')
+        if len(keys) == len(parts) and all(a == '*' or a == b for a, b in zip(keys, parts)):
+            return tuple(item.get(k) for k in ('metric', 'unit', 'denominator', 'basis'))
+    return None
 
 
 def strict_json(raw):
@@ -124,9 +174,11 @@ SIMPLE = {
         'replications': ('Bootstrap replications', 'count', None, 'number of resampled series'),
         'seed': ('Bootstrap random seed', 'integer_seed', None, 'NumPy default_rng seed; recorded runtime and algorithm')},
     'ops.xirr': {'annual_xirr': ('Annualized XIRR', 'annual_return_fraction', 'dated investor cash flows', 'ACT/365 conventional cash-flow root')},
-    'ops.attribution': {k: (name, 'return_fraction', 'consistent beginning group weights', 'single-period Brinson-Fachler') for k, name in [
+    'ops.attribution': {**{k: (name, 'return_fraction', 'consistent beginning group weights', 'single-period arithmetic Brinson-Fachler; component names do not establish causal effects or benchmark appropriateness') for k, name in [
         ('active_return', 'Portfolio minus benchmark return'), ('allocation', 'Allocation effect'),
-        ('selection', 'Selection effect'), ('interaction', 'Interaction effect'), ('reconciliation_error', 'Attribution reconciliation residual')]},
+        ('selection', 'Selection component'), ('interaction', 'Interaction component'), ('reconciliation_error', 'Attribution reconciliation residual')]},
+        'benchmark_appropriateness': ('Benchmark appropriateness', 'status', None, 'not assessed by arithmetic decomposition'),
+        'causal_attribution_assessed': ('Causal attribution assessed', 'boolean', None, 'no causal identification from aggregate returns')},
     'ops.shortfall': {k: (name, unit, denominator, 'decision/arrival/terminal price accounting; positive cost on either side') for k, name, unit, denominator in [
         ('total_shortfall', 'Total implementation shortfall', 'input_currency_amount', None),
         ('fees', 'Explicit fees', 'input_currency_amount', None),
@@ -156,6 +208,7 @@ class Projector:
         self.text = include_source_text
         self.facts = []
         self.notices = []
+        self.custom_hash = None
 
     def fact(self, path, metric, unit=None, denominator=None, basis=None, horizon=None,
              assumptions=None, mapping='UNMAPPED', metadata_sources=None, context=None):
@@ -186,7 +239,9 @@ class Projector:
         result, base = (doc['result'], '/result') if wrapped else (doc, '')
         if not isinstance(result.get('results'), list):
             raise ValueError('QUANT_RESULTS_REQUIRED')
-        known = result.get('implementation_sha256') == quant_hash()
+        current_code = result.get('implementation_sha256') == quant_hash()
+        legacy_schema = result.get('implementation_sha256') in COMPATIBLE_QUANT_SCHEMAS
+        known = current_code or legacy_schema
         inputs = doc.get('input') if wrapped else None
         if isinstance(inputs, dict) and (not isinstance(inputs.get('jobs'), list) or
                 any(not isinstance(x, dict) for x in inputs['jobs']) or
@@ -194,7 +249,8 @@ class Projector:
             raise ValueError('INVALID_EMBEDDED_INPUT_SCHEMA')
         bound = isinstance(inputs, dict) and digest(inputs) == result.get('input_sha256')
         result_bound = wrapped and doc.get('result_sha256') == digest(result)
-        self.notices.append({'code_mapping_matches': known, 'embedded_input_hash_matches': bound,
+        self.notices.append({'code_mapping_matches': current_code, 'known_historical_schema': legacy_schema and not current_code,
+                             'semantics_mapping_known': known, 'embedded_input_hash_matches': bound,
                              'embedded_result_hash_matches': result_bound, 'calculation_replayed': False})
         for i, job in enumerate(result.get('results', [])):
             if not isinstance(job, dict) or not isinstance(job.get('operation'), str):
@@ -228,6 +284,8 @@ class Projector:
                     continue
                 if known:
                     spec = SIMPLE.get(op, {}).get(rel)
+                    if spec is None and current_code:
+                        spec = extended_spec(op, rel)
                     if op == 'validation.tail':
                         spec = TAIL.get(rel)
                     elif op == 'backtest.portfolio':
@@ -299,6 +357,7 @@ class Projector:
         declarations = strict_json(raw)
         if not isinstance(declarations, dict) or set(declarations) != {'facts'}:
             raise ValueError('CUSTOM_FACTS_OBJECT_REQUIRED')
+        self.custom_hash = hashlib.sha256(raw).hexdigest()
         for item in declarations['facts']:
             if not isinstance(item, dict) or set(item) - {'pointer', 'metric', 'unit', 'denominator', 'basis', 'horizon', 'assumptions'}:
                 raise ValueError('CUSTOM_FIELD_NOT_ALLOWED')
@@ -321,6 +380,7 @@ class Projector:
         return {'schema_version': 1, 'adapter_version': VERSION, 'kind': self.kind,
                 'adapter_code_sha256': code_hash('report_facts.py'),
                 'source_artifact_sha256': self.hash, 'source_text_exported': self.text,
+                'custom_bindings_sha256': self.custom_hash,
                 'semantics_code_sha256': {'quant_workbench': quant_hash(), 'public_research.py': code_hash('public_research.py')},
                 'checks': self.notices, 'facts': self.facts,
                 'limits': ['Projection only: no helper replay, source authentication, narrative validation or new calculation.',
@@ -343,6 +403,127 @@ def project(raw, kind, custom_raw=None, include_source_text=False):
     if custom_raw is not None:
         p.custom(custom_raw)
     return p.report()
+
+
+def _changed_paths(expected, actual, path=''):
+    """Structured, type-sensitive differences without copying selected values."""
+    if type(expected) is not type(actual):
+        return [path]
+    if isinstance(expected, dict):
+        differences = []
+        for key in sorted(expected.keys() | actual.keys()):
+            child = path + '/' + escape(key)
+            if key not in expected or key not in actual:
+                differences.append(child)
+            else:
+                differences.extend(_changed_paths(expected[key], actual[key], child))
+        return differences
+    if isinstance(expected, list):
+        differences = []
+        for index in range(max(len(expected), len(actual))):
+            child = path + '/' + str(index)
+            if index >= len(expected) or index >= len(actual):
+                differences.append(child)
+            else:
+                differences.extend(_changed_paths(expected[index], actual[index], child))
+        return differences
+    return [] if expected == actual else [path]
+
+
+def _fact_differences(expected, actual):
+    """Match exact facts first, then stable identities to explain altered fields.
+
+    Matching is diagnostic only: verification separately compares the complete
+    ordered projection. A changed identity can be reported as missing + added.
+    """
+    remaining_expected = dict(expected)
+    remaining_actual = dict(actual)
+
+    def match(key):
+        candidates = defaultdict(deque)
+        for index, fact in remaining_actual.items():
+            candidates[key(fact)].append(index)
+        pairs = []
+        for index, fact in list(remaining_expected.items()):
+            choices = candidates.get(key(fact))
+            if choices:
+                other = choices.popleft()
+                pairs.append((index, other, remaining_expected.pop(index), remaining_actual.pop(other)))
+        return pairs
+
+    exact = match(digest)
+    def identity(fact, field):
+        source = fact.get('source')
+        value = source.get('pointer') if field == 'pointer' and isinstance(source, dict) else fact.get(field)
+        return digest([value, fact.get('context'), fact.get('semantic_mapping')])
+    altered = match(lambda f: identity(f, 'pointer'))
+    altered.extend(match(lambda f: identity(f, 'metric')))
+
+    def reference(index, fact):
+        source = fact.get('source')
+        return {'index': index, 'pointer': source.get('pointer') if isinstance(source, dict) else None,
+                'fact_sha256': digest(fact)}
+    return {'expected_count': len(expected), 'actual_count': len(actual),
+            'exact_match_count': len(exact),
+            'missing': [reference(i, f) for i, f in remaining_expected.items()],
+            'added': [reference(i, f) for i, f in remaining_actual.items()],
+            'altered': [{'expected': reference(i, e), 'actual': reference(j, a),
+                         'changed_fields': _changed_paths(e, a)} for i, j, e, a in altered]}
+
+
+def verify_projection(raw, kind, projection_raw, custom_raw=None, include_source_text=False):
+    """Reproject source bytes and compare the complete canonical JSON structure.
+
+    Source/custom errors have the same exceptions as project(). An unreadable or
+    malformed candidate returns INVALID_PROJECTION. No helper is replayed and a
+    successful comparison does not establish source authenticity or correctness.
+    """
+    expected = project(raw, kind, custom_raw, include_source_text)
+    binding_fields = ('schema_version', 'adapter_version', 'kind', 'adapter_code_sha256',
+                      'source_artifact_sha256', 'source_text_exported',
+                      'custom_bindings_sha256', 'semantics_code_sha256')
+    result = {'schema_version': 1, 'status': 'INVALID_PROJECTION', 'matches': False,
+              'expected_bindings': {k: expected[k] for k in binding_fields},
+              'binding_matches': None,
+              'projection_artifact_sha256': hashlib.sha256(projection_raw).hexdigest(),
+              'expected_projection_content_sha256': digest(expected),
+              'actual_projection_content_sha256': None,
+              'metadata_mismatch_paths': None, 'facts_sequence_matches': None,
+              'builtin_facts': None, 'custom_facts': None,
+              'source_mapping_checks': expected['checks'], 'calculation_replayed': False,
+              'limits': ['Exact projection consistency only; no helper replay, source authentication or narrative validation.',
+                         'Historical schema recognition is not current-code replay; unknown mappings stay unknown.',
+                         'Fact pointers and hashes can be private even though selected values are not copied into these diagnostics.']}
+    try:
+        actual = strict_json(projection_raw)
+    except (ValueError, TypeError):
+        result['reason'] = 'INVALID_PROJECTION_JSON'
+        return result
+    if (not isinstance(actual, dict) or not isinstance(actual.get('facts'), list)
+            or any(not isinstance(fact, dict) for fact in actual['facts'])):
+        result['reason'] = 'PROJECTION_OBJECT_AND_FACTS_REQUIRED'
+        return result
+    result['actual_projection_content_sha256'] = digest(actual)
+    result['binding_matches'] = {k: k in actual and not _changed_paths(expected[k], actual[k])
+                                 for k in binding_fields}
+    result['metadata_mismatch_paths'] = _changed_paths(
+        {k: v for k, v in expected.items() if k != 'facts'},
+        {k: v for k, v in actual.items() if k != 'facts'})
+    result['facts_sequence_matches'] = digest(expected['facts']) == digest(actual['facts'])
+    for name, custom in (('builtin_facts', False), ('custom_facts', True)):
+        def selected(facts):
+            return [(i, f) for i, f in enumerate(facts)
+                    if (f.get('semantic_mapping') == 'CUSTOM_DECLARED_UNVERIFIED') == custom]
+        result[name] = _fact_differences(selected(expected['facts']), selected(actual['facts']))
+    result['matches'] = result['expected_projection_content_sha256'] == result['actual_projection_content_sha256']
+    result['status'] = 'VERIFIED_PROJECTION' if result['matches'] else 'PROJECTION_MISMATCH'
+    return result
+
+
+def verification_markdown(diagnostics):
+    # JSON is rendered literally; candidate metadata must not become active markup.
+    literal = html.escape(json.dumps(diagnostics, indent=2, ensure_ascii=False, allow_nan=False))
+    return 'Report projection verification: ' + diagnostics['status'] + '\n\n<pre>' + literal + '</pre>\n'
 
 
 def markdown(report):
@@ -383,21 +564,30 @@ def main():
     parser.add_argument('--private-output', required=True, help='Explicit local export path; never printed to stdout.')
     parser.add_argument('--format', choices=('json', 'markdown'), default='json')
     parser.add_argument('--custom-bindings', help='Optional local JSON pointers with declared/unverified labels.')
+    parser.add_argument('--verify-projection', help='Compare a local JSON projection against this source and options; export diagnostics instead of facts.')
     parser.add_argument('--include-source-text', action='store_true', help='Explicitly export selected source strings, including status/reason/security labels. Review privately before sharing.')
     args = parser.parse_args()
     try:
         source, output = local_path(args.input), local_path(args.private_output)
         if output.is_relative_to(ROOT):
             raise ValueError('OUTPUT_OUTSIDE_SKILL_REQUIRED')
-        report = project(source.read_bytes(), args.kind,
-                         local_path(args.custom_bindings).read_bytes() if args.custom_bindings else None,
-                         args.include_source_text)
-        rendered = markdown(report) if args.format == 'markdown' else json.dumps(report, indent=2, ensure_ascii=False, allow_nan=False) + '\n'
+        raw = source.read_bytes()
+        custom_raw = local_path(args.custom_bindings).read_bytes() if args.custom_bindings else None
+        if args.verify_projection:
+            report = verify_projection(raw, args.kind, local_path(args.verify_projection).read_bytes(),
+                                       custom_raw, args.include_source_text)
+            render_markdown = verification_markdown
+        else:
+            report = project(raw, args.kind, custom_raw, args.include_source_text)
+            render_markdown = markdown
+        rendered = render_markdown(report) if args.format == 'markdown' else json.dumps(report, indent=2, ensure_ascii=False, allow_nan=False) + '\n'
         with output.open('x', encoding='utf-8', newline='\n') as handle:
             handle.write(rendered)
     except (ValueError, KeyError, TypeError, IndexError, OSError):
         # Avoid dumping source values or private paths on a terminal error.
         parser.exit(2, 'Report export failed: invalid input/schema/path, unavailable file, or existing output. Source values were not printed.\n')
+    if args.verify_projection and not report['matches']:
+        parser.exit(1)
 
 
 if __name__ == '__main__':

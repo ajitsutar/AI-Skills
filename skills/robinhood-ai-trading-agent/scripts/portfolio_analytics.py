@@ -4,6 +4,7 @@ from __future__ import annotations
 import argparse
 import json
 from collections import defaultdict
+from datetime import date
 from pathlib import Path
 
 from research_analytics import fraction, number
@@ -45,8 +46,15 @@ def lookthrough(positions, equity, funds):
             issuer["UNKNOWN:" + symbol] += value
             sector["UNKNOWN"] += value
             return
-        timestamp(fund["as_of"])
-        sources[symbol] = {"as_of": fund["as_of"], "evidence": fund["evidence"], "hash": canonical_hash(fund)}
+        supplied_as_of = fund["as_of"]
+        if isinstance(supplied_as_of, str) and len(supplied_as_of) == 10:
+            date.fromisoformat(supplied_as_of)
+            precision = 'date'
+        else:
+            timestamp(supplied_as_of)
+            precision = 'timestamp'
+        sources[symbol] = {"as_of": supplied_as_of, 'as_of_precision': precision,
+                           "evidence": fund["evidence"], "hash": canonical_hash(fund)}
         total = sum(fraction(h["fraction"]) for h in fund["holdings"])
         if total > 1.00000001:
             raise ValueError("Fund weights exceed one")

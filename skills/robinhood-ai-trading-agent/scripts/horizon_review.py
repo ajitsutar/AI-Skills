@@ -38,12 +38,16 @@ def finite(value, name, minimum=0):
 
 
 def resolve_horizon(spec):
-    """Resolve a proposed fill and hard exit; any actual fill change needs rerun."""
+    """Resolve a proposed fill and hard exit without inventing an entry expiry.
+
+    Omitted/null latest_entry_at is unknown. Any actual fill change needs rerun.
+    """
     if not isinstance(spec, dict) or spec.get("schema_version") != 1:
         raise ValueError("fixed_horizon requires horizon schema_version 1")
-    as_of, entry, latest = (timestamp(spec[k]) for k in ("as_of", "entry_at", "latest_entry_at"))
-    if not as_of <= entry <= latest:
-        raise ValueError("Require as_of <= proposed entry <= latest entry")
+    as_of, entry = (timestamp(spec[k]) for k in ("as_of", "entry_at"))
+    latest = timestamp(spec["latest_entry_at"]) if spec.get("latest_entry_at") is not None else None
+    if as_of > entry or (latest is not None and entry > latest):
+        raise ValueError("Require as_of <= proposed entry and proposed entry <= latest entry when supplied")
     mode = spec.get("deadline_mode")
     if mode not in {"fixed_end", "rolling_from_entry"}:
         raise ValueError("Declare fixed_end or rolling_from_entry")
@@ -63,8 +67,11 @@ def resolve_horizon(spec):
     exchange = spec.get("exchange", "XNYS")
     if exchange not in {"XNYS", "XNAS"}:
         raise ValueError("This helper supports US equity calendars XNYS/XNAS only")
-    entry_day, latest_day = (t.astimezone(ZONE).date() for t in (entry, latest))
+    entry_day = entry.astimezone(ZONE).date()
+    latest_day = latest.astimezone(ZONE).date() if latest is not None else None
     for when, day in ((entry, entry_day), (latest, latest_day)):
+        if when is None:
+            continue
         row = sessions(day, day, exchange)
         if not row or not timestamp(row[0]["open"]) <= when < timestamp(row[0]["close"]):
             raise ValueError("Proposed/latest entry must be inside a regular exchange session")
@@ -118,25 +125,31 @@ def resolve_horizon(spec):
         return deadline, row["date"], exit_at
 
     raw, exit_day, exit_at = exit_for(anchor, anchor_at)
-    if entry >= exit_at or (mode == "fixed_end" and latest >= exit_at):
+    if entry >= exit_at or (mode == "fixed_end" and latest is not None and latest >= exit_at):
         raise ValueError("Entry window must precede the fixed exit deadline")
-    latest_exit = exit_for(latest_day, latest)[2] if mode == "rolling_from_entry" else exit_at
-    if latest >= latest_exit:
+    latest_exit = exit_at
+    if mode == "rolling_from_entry":
+        latest_exit = exit_for(latest_day, latest)[2] if latest is not None else None
+    if latest is not None and latest >= latest_exit:
         raise ValueError('Latest entry must precede its buffered exit deadline')
     if route == "intraday" and (iso_date(exit_day) != entry_day
-            or latest_exit.astimezone(ZONE).date() != latest_day):
+            or (latest is not None and latest_exit.astimezone(ZONE).date() != latest_day)):
         raise ValueError("Intraday positions must exit in their entry session; use swing for overnight risk")
+    calendar_exit = latest_exit if latest_exit is not None else exit_at
     return {"as_of": as_of.isoformat(), "entry_at": entry.isoformat(),
-            "latest_entry_at": latest.isoformat(), "deadline_mode": mode,
+            "latest_entry_at": latest.isoformat() if latest is not None else None,
+            "latest_entry_status": "SUPPLIED" if latest is not None else "UNKNOWN", "deadline_mode": mode,
             "duration": duration, "strategy_route": route, "anchor_date": anchor.isoformat(),
             "raw_deadline_date": raw.isoformat(), "exit_session": exit_day,
-            "exit_at": exit_at.isoformat(), "latest_possible_exit_at": latest_exit.isoformat(),
+            "exit_at": exit_at.isoformat(),
+            "latest_possible_exit_at": latest_exit.isoformat() if latest_exit is not None else None,
             "planned_calendar_days": (iso_date(exit_day) - entry_day).days,
             "subsequent_sessions": (len(sessions(entry_day + timedelta(days=1), exit_day, exchange))
                                     if iso_date(exit_day) > entry_day else 0),
             "early_exit_policy": spec["early_exit_policy"], "exchange": exchange,
-            "calendar_status": "PROVISIONAL" if latest_exit.astimezone(ZONE).date() > confirmed_through else "DECLARED_CONFIRMED",
-            "calendar_refresh_required": latest_exit.astimezone(ZONE).date() > confirmed_through,
+            "calendar_scope": "entry_window" if latest is not None else "proposed_entry_only",
+            "calendar_status": "PROVISIONAL" if calendar_exit.astimezone(ZONE).date() > confirmed_through else "DECLARED_CONFIRMED",
+            "calendar_refresh_required": calendar_exit.astimezone(ZONE).date() > confirmed_through,
             "execution_authorized": False,
             "limitations": "Calendar calculation and declared evidence only; no guaranteed fill or settlement"}
 

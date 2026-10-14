@@ -8,7 +8,8 @@
       "audience": "Beginner",
       "guides": [
         "references/personal-setup.md",
-        "references/small-account-research.md"
+        "references/small-account-research.md",
+        "references/portfolio-decision-calculations.md"
       ],
       "prompts": [
         {
@@ -316,7 +317,11 @@
       "audience": "Beginner to expert",
       "guides": [
         "references/portfolio-management.md",
-        "references/institutional-manager.md"
+        "references/institutional-manager.md",
+        "references/portfolio-decision-calculations.md",
+        "references/planning-input-roles.md",
+        "references/portfolio-projection.md",
+        "references/planning-comparison.md"
       ],
       "prompts": [
         {
@@ -360,7 +365,8 @@
       "guides": [
         "references/fractional-shares.md",
         "references/portfolio-management.md",
-        "references/execution-handoff.md"
+        "references/execution-handoff.md",
+        "references/portfolio-decision-calculations.md"
       ],
       "prompts": [
         {
@@ -653,7 +659,10 @@
       "audience": "Intermediate to quant",
       "guides": [
         "references/settled-cash-planning.md",
-        "references/quant-workbench.md"
+        "references/quant-workbench.md",
+        "references/planning-input-roles.md",
+        "references/portfolio-projection.md",
+        "references/planning-comparison.md"
       ],
       "prompts": [
         {
@@ -688,7 +697,8 @@
       "audience": "Intermediate to quant",
       "guides": [
         "references/portfolio-management.md",
-        "references/quant-workbench.md"
+        "references/quant-workbench.md",
+        "references/portfolio-decision-calculations.md"
       ],
       "prompts": [
         {
@@ -731,7 +741,9 @@
       "audience": "Intermediate to expert",
       "guides": [
         "references/short-term-trading.md",
-        "references/strategy-playbook.md"
+        "references/strategy-playbook.md",
+        "references/portfolio-decision-calculations.md",
+        "references/planning-input-roles.md"
       ],
       "prompts": [
         {
@@ -770,7 +782,9 @@
       "audience": "All levels; actual broker support and user authorization required",
       "guides": [
         "references/execution-handoff.md",
-        "references/fractional-shares.md"
+        "references/fractional-shares.md",
+        "references/allocation-policy.md",
+        "references/portfolio-decision-calculations.md"
       ],
       "prompts": [
         {
@@ -1037,6 +1051,150 @@
         {
           "title": "Distinguish reproducibility from model adherence",
           "prompt": "Compare [MODEL OUTPUTS] against their retained quant or analyst reports. Report helper invocation, artifact completeness, numerical replay, source-selection fidelity and narrative agreement separately. Preserve old results and explicitly list missing acquisitions and unsupported custom algorithms instead of declaring them fixed by a successful helper test."
+        }
+      ]
+    },
+    {
+      "id": "research-alignment",
+      "title": "Request fidelity and accounting alignment",
+      "audience": "Investors, portfolio analysts and quantitative reviewers",
+      "guides": [
+        "references/research-alignment.md",
+        "references/run-and-report.md",
+        "references/portfolio-decision-calculations.md",
+        "references/planning-input-roles.md",
+        "references/portfolio-projection.md",
+        "references/planning-comparison.md",
+        "references/flow-normalization.md"
+      ],
+      "prompts": [
+        {
+          "title": "Audit selected and ignored inputs",
+          "prompt": "Bind [REQUEST] to its allowed source files and JSON pointers. Distinguish actual account observations, the mandate, scenarios and sample policies; retain selected, unused and conflicting fields. Check record identity and metadata dates before calculating, and explain what the receipt cannot infer about my intent."
+        },
+        {
+          "title": "Audit source availability and acquisition coverage",
+          "prompt": "Inventory [SOURCE PACKET] against its allowlist and byte hashes. Keep missing bytes, unknown security types, confirmed exclusions, publication dates, retrieval dates and unavailable acquisition receipts distinct. Execute applicable retained-source and report checks; do not interpret absent failure records as a verified successful acquisition."
+        },
+        {
+          "title": "Preserve a flexible review date",
+          "prompt": "Review [HOLDING] until [COMPARISON DATE] as an intended horizon, not a forced sale. Use the horizon router, retain an existing entry date if supplied and report event coverage through its actual endpoint. Label any proposed planning deadlines without moving my review date to a prior trading session."
+        },
+        {
+          "title": "Audit the requested scoring method",
+          "prompt": "Compare the requested ranking profile and implementation with [OBSERVED RESEARCH]. Bind both profiles to retained bytes and show method or parameter mismatches. Run the requested supported scorer and preserve its queue; explain that method identity alone does not prove execution, undervaluation or a buy recommendation."
+        },
+        {
+          "title": "Size a purchase after explicit costs",
+          "prompt": "Use the trade-cost contract to calculate [ORDER] against [BUDGET] with the supplied quantity increment, slippage and fee units. Separate quoted notional from after-cost debit and both sides of a round trip. Treat the calculation as an estimate and add no execution permission requirement."
+        },
+        {
+          "title": "Find the cash trough at actual withdrawal times",
+          "prompt": "Use [DATED CASH EVENTS] to calculate the lowest modeled available balance and the largest gap to my planning floor. Preserve actual withdrawal demand times and trade settlement availability; keep future stock grants outside cash funding. Disclose missing confirmations and broker buying-power evidence."
+        },
+        {
+          "title": "Project interest with an intermediate withdrawal",
+          "prompt": "Project [CASH PLAN] using the supplied annual-effective rate and exact event dates. Remove withdrawals when they occur, disclose the day-count basis and reconcile opening cash, flows, interest and ending cash. Do not infer borrowing after an unfunded cash shortfall."
+        },
+        {
+          "title": "Reconcile gross vesting, taxes, shares and cash",
+          "prompt": "Reconcile [RSU GRANTS] into gross shares, shares withheld, shares sold for taxes and net shares. Show future assumed values separately from observed settled sale proceeds, without pooling different dates into current portfolio concentration or treating tax withholding as the final tax liability."
+        },
+        {
+          "title": "Reconcile portfolio denominators",
+          "prompt": "Look through [POSITIONS AND FUNDS], compare declared account equity with identified assets and explicit cash, and show unexplained differences. Label concentration against each denominator. Model supplied contribution-only changes at explicit unchanged marks without assuming that a no-sales example makes concentration permanent."
+        },
+        {
+          "title": "Separate session and lifetime performance",
+          "prompt": "Review [POSITIONS AND TRADES] for session P&L only where prior marks, flows, distributions, fees and session timing support it. Keep cost-basis unrealized P&L separate. Show gross and net trade statistics and decline unsupported attribution of losses to investment versus execution causes."
+        },
+        {
+          "title": "Reconcile owner cash without unsupported addbacks",
+          "prompt": "Build the explicit cash bridge for [FINANCIAL RECORDS]: reported CFO, all capex, maintenance-only cash, growth reinvestment, acquisitions, working capital and SBC treatment. Separate earnings adjustments from cash adjustments and retain missing cash timing or tax evidence as unresolved."
+        },
+        {
+          "title": "Distinguish acquisition cash from deal value",
+          "prompt": "Model [ACQUISITION SCENARIOS] with stated synergy ramps, delays, integration cash and financing tax treatment. Calculate share dilution and incremental cash by year. Compute total deal NPV only from a separately complete acquisition cash-flow contract; do not equate negative interim synergy cash with destruction of deal value."
+        },
+        {
+          "title": "Build terminal valuation and reinvestment sensitivities",
+          "prompt": "Run [VALUATION CONTRACT] with its explicit revenue, margin, shares, debt, exit multiples, capex and working-capital assumptions. Retain terminal share price, dividends, both-side costs, total return and present value as distinct fields. Calculate the declared sensitivities and expose missing interim cash flow or financing assumptions."
+        },
+        {
+          "title": "Reconcile splits, dividends and return windows",
+          "prompt": "Calculate price and non-reinvested total returns from [CORPORATE ACTIONS AND MARKS]. Preserve old/new share basis and dividend dates, and do not claim a requested terminal return when its final mark is missing. Keep provider EPS publication dates attached to their own security and period."
+        },
+        {
+          "title": "Test a causal dual moving-average strategy",
+          "prompt": "Run the explicit dual-SMA long/cash strategy on [COMPLETED DAILY BARS] with my fast/slow windows, next-open delay, costs, capital fraction and terminal policy. Retain every declared variant, pending unfilled orders, both-side fees and marked equity. Check that later data changes cannot change earlier signals or fills."
+        },
+        {
+          "title": "Preserve the opening-range baseline",
+          "prompt": "Run the supported opening-range breakout on [COMPLETED INTRADAY BARS], retaining its strategy identity, opening-bar count, cadence, volume rule, next-open timing, sizing, stops, target and buffered exit. Report the exact parameters and input hash without substituting a different range or enabling shorts."
+        },
+        {
+          "title": "Check whether a study contains forward observations",
+          "prompt": "Assess [PAPER STUDY] against its protocol window, freeze time, decision/outcome availability, data kind and implementation evidence. Keep synthetic, retrospective and inadmissible rows out of the declared forward count. Compare supplied code identities and change records without claiming that matching prose proves fill agreement."
+        },
+        {
+          "title": "Check risk and numerical explanations",
+          "prompt": "Compare [COVARIANCE MATRICES OR HEDGE SCENARIOS] using the supported arithmetic checks. Show individual variance multipliers, ratio changes, every option-expiry payoff and assumed residual hedge sensitivity. Use typed comparisons for numerical statements, retaining unknown units, exact inequality boundaries and declared floating-point tolerances."
+        },
+        {
+          "title": "Verify complete model-alignment evidence",
+          "prompt": "Evaluate [TWO FROZEN MODEL RUNS] on request fidelity, helper invocation, complete artifacts, numerical replay and the final explanation separately. Keep original failed runs, review every new response against the allowed evidence and report remaining gaps. Do not present matching calculations as a guarantee of identical future investment decisions."
+        }
+      ]
+    },
+    {
+      "id": "source-bound-research",
+      "title": "Source-bound calculations and evidence meaning",
+      "audience": "Investor to quant",
+      "guides": [
+        "references/source-bound-workflow.md",
+        "references/evidence-semantics.md",
+        "references/ranking-alignment.md"
+      ],
+      "prompts": [
+        {
+          "title": "Run research from original fields",
+          "prompt": "Analyze these supplied files through the source-bound workflow. Bind the calculation inputs to exact source fields, identify unused material inputs, and return the generated report with assumptions and unresolved questions."
+        },
+        {
+          "title": "Audit a report projection",
+          "prompt": "Verify whether this numeric report preserves every canonical fact from its source bundle, including rejections and unknowns. Show any altered, missing or added fields and preserve valid custom facts."
+        },
+        {
+          "title": "Reconcile price and earnings identity",
+          "prompt": "Before comparing these valuation multiples, check security identity, currency, fiscal period, accounting definition and split basis. Distinguish missing metadata from a demonstrated mismatch."
+        },
+        {
+          "title": "Handle imprecise catalysts",
+          "prompt": "The contract renewal is known only to a year and the earnings event only to a month. Compare those ranges with my intended hold without inventing event dates."
+        },
+        {
+          "title": "Separate facts from inferred states",
+          "prompt": "Review the quoted borrow fee, review flag, proposed gold labels and performance residual. Tell me which states are evidenced and which availability, selection, adjudication or causal claims remain unknown."
+        },
+        {
+          "title": "Replay the matching scorer",
+          "prompt": "Identify the scoring profile bound to this retained snapshot, replay only its compatible installed scorer, and distinguish the requested production route from a separately labeled historical diagnostic."
+        },
+        {
+          "title": "Compare decisions without false agreement",
+          "prompt": "Compare these two ranked research outputs on candidates, scores, horizon, preferences and reviewed decisions. Treat dimensions missing on both sides as unknown, not agreement."
+        },
+        {
+          "title": "Check numeric conclusions against artifacts",
+          "prompt": "Use result pointers to verify these stated conclusions against the actual calculation outputs. Preserve the units, denominators, horizons and nested evidence states in the final answer."
+        },
+        {
+          "title": "Review after the last cash event",
+          "prompt": "Reconcile the complete cash path through every deferred purchase and withdrawal. Show unknown intraday settlement ordering and signed shortfalls rather than stopping at an earlier favorable balance."
+        },
+        {
+          "title": "Respect an offline research scope",
+          "prompt": "Analyze only the attached frozen data, with no network acquisition. Run all supported calculations, retain missing source limitations, and separate that offline result from any proposed future data collection."
         }
       ]
     }

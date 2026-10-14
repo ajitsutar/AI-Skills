@@ -25,6 +25,13 @@ execution, preserve that existing instruction through the common
 5. Allocate the requested budget using the user's actual instructions. If the user
    wants the whole amount invested, do not import a demo cash floor, 10% position
    cap or 5% tactical sleeve. Explain concentration and loss scenarios as advice.
+6. When comparing affordability, use `planning.budget_sizing` for total debit
+   including supplied entry costs and explicit whole/fractional increments.
+   Each full-budget single-stock alternative is its own scenario. Use
+   `planning.allocation_context` for the selected scenario's known concentration,
+   fund coverage and monetary-volume facts. Do not infer costs, broker increments
+   or liquidity cutoffs. Keep an observed full spread separate from modeled
+   one-way slippage; see [decision calculations](portfolio-decision-calculations.md).
 
 See [fractional-shares.md](fractional-shares.md) for Decimal sizing and recurring
 contributions. A native dollar-market instruction need not guarantee an exact

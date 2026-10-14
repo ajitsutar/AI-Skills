@@ -7,6 +7,13 @@ versioned separately by [financial-normalization 1.0.0](../profiles/financial-no
 Both hashes identify the methodology. Never compare results across accounting
 policy changes as though the inputs were unchanged.
 
+Raw observations need not arrive preformatted as a normalization input. Use
+`data.normalize_flows` with the [explicit flow mapping](flow-normalization.md)
+contract to retain source bytes, periods, units, precision and reviewed concept
+mappings, then delegate to this same normalizer. Missing mappings are mapping
+work; do not substitute a model-written TTM formula or invent source verification.
+The normalization input itself is schema 1; snapshot schema 2 embeds that input.
+
 ## Run the pipeline
 
 From the skill directory, with a user-chosen output directory outside the skill:

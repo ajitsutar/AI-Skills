@@ -1,5 +1,10 @@
 # Run calculations and retain their reports
 
+For a complete supplied-data analysis, start with the
+[source-bound workflow](source-bound-workflow.md). It composes these adapters,
+retains source selections and checks declared task coverage and result claims.
+The individual commands below remain available for an already bound request.
+
 Use these offline helpers when the requested calculation or evidence review has a
 supported explicit input contract. They connect existing calculations to retained
 facts, reducing opportunities to copy the wrong parameters or reconstruct results
@@ -11,6 +16,8 @@ an existing parent directory. "Private" means caller-selected access-controlled
 storage; these exports do not encrypt files or establish Windows access controls.
 
 Select the operation and source fields from the current request before running.
+Use [research alignment](research-alignment.md) for the implemented request/evidence
+receipts and calculation routing across cash, financial, strategy and horizon work.
 Record conflicts between the request, examples and unrelated scenarios. A hash
 can establish which bytes were used; it cannot establish that the chosen source
 was the one the user intended. Do not silently substitute a nearby supported

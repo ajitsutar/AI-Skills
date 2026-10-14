@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "network_mode": "offline",
+  "contract": {
+    "prompt": "Review supplied synthetic returns, valuation comparability and an imprecise event.",
+    "purpose": "fictional research demonstration",
+    "base_currency": "USD",
+    "horizon_id": "P106D",
+    "as_of": "2030-10-31T16:00:00Z"
+  },
+  "sources": [
+    {
+      "id": "fictional",
+      "path": "fictional-source-bound-inputs.json",
+      "sha256": "312407b6e86e385b8f79e784028ca05f94e03d711d0791d3070ea8162119169e",
+      "format": "json",
+      "role": "fictional observations and declared planning dates"
+    }
+  ],
+  "jobs": [
+    {
+      "id": "tail",
+      "operation": "validation.tail",
+      "arguments": {
+        "returns": {
+          "$source": {
+            "id": "fictional",
+            "pointer": "/returns"
+          }
+        }
+      }
+    },
+    {
+      "id": "identity",
+      "operation": "evidence.operand_compatibility",
+      "arguments": {
+        "operands": {
+          "$source": {
+            "id": "fictional",
+            "pointer": "/valuation_operands"
+          }
+        },
+        "required_dimensions": {
+          "$assumption": [
+            "security_id",
+            "currency",
+            "share_basis"
+          ],
+          "reason": "Dimensions needed for this declared price/EPS comparison"
+        }
+      }
+    },
+    {
+      "id": "event",
+      "operation": "evidence.event_window",
+      "arguments": {
+        "event": {
+          "$source": {
+            "id": "fictional",
+            "pointer": "/event"
+          }
+        },
+        "start": {
+          "$source": {
+            "id": "fictional",
+            "pointer": "/holding_start"
+          }
+        },
+        "end": {
+          "$source": {
+            "id": "fictional",
+            "pointer": "/holding_end"
+          }
+        }
+      }
+    }
+  ],
+  "requirements": [
+    {
+      "id": "sample-tail",
+      "question": "Describe the supplied return sample tail without invented frequency.",
+      "job_ids": [
+        "tail"
+      ],
+      "expected_operations": [
+        "validation.tail"
+      ]
+    },
+    {
+      "id": "valuation-basis",
+      "question": "Can these declared operands be compared?",
+      "job_ids": [
+        "identity"
+      ],
+      "expected_operations": [
+        "evidence.operand_compatibility"
+      ]
+    },
+    {
+      "id": "event-time",
+      "question": "What can be known about event timing?",
+      "job_ids": [
+        "event"
+      ],
+      "expected_operations": [
+        "evidence.event_window"
+      ]
+    }
+  ],
+  "claims": [
+    {
+      "id": "tail",
+      "job_id": "tail",
+      "pointer": "/result"
+    },
+    {
+      "id": "identity",
+      "job_id": "identity",
+      "pointer": "/result"
+    },
+    {
+      "id": "event",
+      "job_id": "event",
+      "pointer": "/result"
+    }
+  ]
+}

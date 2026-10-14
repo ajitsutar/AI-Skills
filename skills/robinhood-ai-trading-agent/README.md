@@ -22,10 +22,12 @@ research universe.
 |---|---|---|
 | Stock recommendations | Whole-universe discovery, shared factor ranking, primary evidence, valuation, catalysts and downside | [Research campaign](references/research-campaign.md) |
 | Holding-period decisions | Same-session, dated and flexible long-term research with matching event and scenario analysis | [Holding periods](references/holding-period-planning.md) |
-| Financial diligence | Sector-relative valuation, normalized earnings/FCF, balance-sheet and value-trap analysis | [Investment review](references/screening-and-value-traps.md) |
+| Financial diligence | Sector-relative valuation, normalized earnings/FCF, explicit raw-observation mapping, balance-sheet and value-trap analysis | [Investment review](references/screening-and-value-traps.md), [flow normalization](references/flow-normalization.md) |
 | News and guidance | Dynamic source discovery, public feed polling, between-quarter projections and deterministic text triage | [News and guidance](references/news-and-guidance.md) |
 | Analyst evidence | Accessible reports, forward target distributions, revisions and sourced analyst track records | [Analyst research](references/analyst-research.md) |
-| Portfolio decisions | Contributions, fractional allocation, rebalance proposals, ETF look-through, concentration, scenarios and tax-lot review | [Portfolio management](references/portfolio-management.md) |
+| Portfolio decisions | Contributions, fractional allocation, fee-inclusive sizing, ETF look-through, concentration, volume context, rebalance proposals, tax-lot review and explicit comparisons with missing allocations | [Portfolio management](references/portfolio-management.md), [allocation baseline](references/allocation-policy.md), [decision calculations](references/portfolio-decision-calculations.md), [input roles](references/planning-input-roles.md) |
+| Dated portfolio scenarios | Net vests, withdrawals, tax earmarks versus payments, conditional tax treatments and consistent post-flow denominators | [Dated portfolio projections](references/portfolio-projection.md) |
+| Planning tradeoffs | Compare explicit alternatives without invented objective weights; model separate settlement, transfer and arrival dates with unresolved cutoff timing | [Planning comparisons](references/planning-comparison.md) |
 | Tactical research | Completed-bar setups, catalysts, liquidity, cost assumptions, stops/targets and holding-period scenarios | [Short-term research](references/short-term-trading.md) |
 | Volatility analysis | GARCH, GJR-GARCH, supported EGARCH and stock-relative interval-move diagnostics | [Volatility models](references/garch-volatility.md) |
 | Quant construction | Constrained allocation, covariance sensitivity, empirical tail loss and multi-asset scenarios | [Quant workbench](references/quant-workbench.md) |
@@ -34,6 +36,9 @@ research universe.
 | Reproducibility | Frozen contracts/data, explicit calculation defaults, runtime receipts, numerical replay and separate acquisition comparisons | [Model-independent research](references/model-independent-research.md) |
 | Report facts | Private JSON facts and readable Markdown from retained quant/public-VQM results, with source pointers, supported units and denominators, explicit unknowns and separately declared custom labels | [Report facts](references/report-facts.md) |
 | Run and report | Execute explicit quant jobs or analyst cohorts and retain their inputs, results and reports; inspect exact handoff payload differences without execution gates | [Run and report](references/run-and-report.md) |
+| Research alignment | Bind request roles and records, distinguish unknown evidence, preserve flexible horizons and ranking methods, and reconcile cash, fees, valuation and causal strategies | [Research alignment](references/research-alignment.md) |
+| Source-bound workflow | Prepare explicit requests without recopying their arguments, run source-bound tasks, retain assumptions, verify results and project exact claims and coverage | [Source-bound workflow](references/source-bound-workflow.md) |
+| Evidence interpretation | Preserve partial event dates, check operand identities and share bases, and distinguish unknown facts from negative or equal facts | [Evidence semantics](references/evidence-semantics.md) |
 | Execution handoff | Preserve the user's order instructions, surface findings as advisory and pass the payload to the host | [Execution handoff](references/execution-handoff.md) |
 
 Stock discovery defaults to **all U.S. exchange-listed stocks including listed
@@ -42,6 +47,14 @@ actual membership, coverage, exclusions and unresolved data; do not call a subse
 a full-market screen. There is no fixed number of picks or maximum holding period.
 Instrument-specific calculations remain limited by their implemented models.
 
+For supplied-data numerical work, start with `scripts/research_workflow.py`.
+Its `prepare` command retains an explicit request and source bytes without changing
+arguments; `run`, `verify` and `summary` produce and check the calculation and its
+reported claims together. Report verification catches altered or incomplete
+projections, including type changes in literal claims. Free-form business
+judgment and source selection still require review. Matching calculations alone
+does not establish matching recommendations or universal model independence.
+
 ## Recommendations and evidence
 
 The shared Value–Quality–Momentum profile produces a reproducible research queue,
@@ -49,6 +62,22 @@ followed by primary-source, horizon and portfolio review. Keep numerical rank,
 valuation evidence and recommendation confidence distinct. A relative factor score
 is not an expected return. Research labels describe the evidence; they do not
 approve, deny or restrict a broker order.
+
+When an ordered candidate set is supplied without weights or supported optimizer
+inputs, the allocation fallback divides the notional budget equally across the
+selected set. It preserves explicit user selections, weights and counts; it does
+not invent a portfolio size or turn scores into expected returns. Alternatives
+that each use the full budget remain separate scenarios. This is a reproducible
+baseline, not a return-maximizing strategy. Fees, all-in debit and suitability
+require their own evidence and calculations.
+
+Cash-budget comparisons calculate quantities, entry costs, total debit and residual
+together for each supplied whole-share or fractional increment. Quoted bid-ask
+spread stays separate from an explicit one-way slippage assumption. Allocation
+context retains the stated denominator, issuer/sector/industry exposure, supplied
+fund holdings and monetary-volume units, including unknown coverage. These are
+planning estimates and source disclosures, not broker permissions or guarantees
+of the amount a market order will spend.
 
 Use SEC filings, issuer releases and appropriate accessible finance providers.
 Yahoo is one acquisition adapter. Record source dates, accounting basis and
@@ -105,13 +134,30 @@ python scripts/quant_workbench.py run <research-folder>/quant.inputs.json --outp
 python scripts/quant_workbench.py verify <research-folder>/quant.bundle.json
 ```
 
-For a combined quant calculation and report, use `scripts/quant_report.py run`
-with the same request and `--private-output-dir` pointing to a new directory.
-Its `verify` command replays the calculation and checks the retained report.
+For a source-bound calculation and report, use:
+
+```text
+python scripts/research_workflow.py prepare REQUEST.json --private-output-dir <research-folder>/prepared --request-role "supplied research request"
+python scripts/research_workflow.py run <research-folder>/prepared/plan.json --private-output-dir <research-folder>/run
+python scripts/research_workflow.py summary <research-folder>/run
+```
+
+The request supplies its own contract, jobs, requested-work checklist and claims.
+External source files need explicit roles; see the [workflow guide](references/source-bound-workflow.md).
+The summary verifies the complete retained run before projecting exact values.
+For an already bound request, `quant_report.py run` and `verify` remain available.
 `analyst_report.py` renders separate analyst cohorts without pooling provider
 consensus, fair value or historical ranges. See [run and report](references/run-and-report.md)
 for the input contracts, private artifacts and limitations. These helpers preserve
 selected inputs; they do not infer which source or strategy the user intended.
+
+For supplied-data analysis, `research_contracts.py` records selected/unused inputs,
+source roles, evidence availability, horizon mode and ranking-method identity.
+The workbench also covers explicit trade costs and affordability, dated cash,
+vesting shares, portfolio denominators, session P&L, cash/valuation bridges,
+corporate actions, dual-SMA/opening-range simulations and forward-study evidence.
+These contracts reduce silent model substitutions. They do not guarantee identical
+interpretation, independent data acquisition, arbitrary prose or future stock picks.
 
 The [prompt catalog](EXAMPLE-PROMPTS.md) covers novice investing through advanced
 quant research, diagnostics, accounting and host handoff. Example values are not

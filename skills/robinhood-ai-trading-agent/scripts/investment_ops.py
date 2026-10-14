@@ -125,7 +125,9 @@ def brinson(groups):
     return {'active_return': excess, 'allocation': float(allocation.sum()),
             'selection': float(selection.sum()), 'interaction': float(interaction.sum()),
             'reconciliation_error': excess-float((allocation+selection+interaction).sum()),
-            'limitation': 'One period, consistent beginning weights; multi-period linking and intraperiod trading need separate accounting.'}
+            'benchmark_appropriateness': 'NOT_ASSESSED',
+            'causal_attribution_assessed': False,
+            'limitation': 'Arithmetic Brinson-Fachler decomposition for one period and consistent beginning weights. Selection is a formula label, not proof of stock-selection skill, investment cause, execution quality or policy compliance. Equal assumed portfolio/benchmark weights force zero allocation and interaction; they do not establish actual policy weights. Benchmark comparability and completeness of costs remain caller evidence. Multi-period linking and intraperiod trading need separate accounting.'}
 
 
 if __name__ == '__main__':

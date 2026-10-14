@@ -1,0 +1,3627 @@
+{
+  "operations": {
+    "analysis.compare_claim": {
+      "arithmetic_comparison_without_metadata": {
+        "basis": "Typed result requires supplied metadata comparability; arithmetic-only comparison does not validate the claim.",
+        "denominator": null,
+        "metric": "arithmetic_comparison_without_metadata",
+        "unit": "boolean"
+      },
+      "inequalities_use_exact_boundary": {
+        "basis": "Typed result requires supplied metadata comparability; arithmetic-only comparison does not validate the claim.",
+        "denominator": null,
+        "metric": "inequalities_use_exact_boundary",
+        "unit": "boolean"
+      },
+      "relative_tolerance": {
+        "basis": "Equality tolerance only; strict inequalities use exact numeric boundary. Absolute tolerance/operand units remain caller-defined and unmapped.",
+        "denominator": "maximum absolute operand magnitude",
+        "metric": "relative_tolerance",
+        "unit": "fraction"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "typed_comparison": {
+        "basis": "Typed result requires supplied metadata comparability; arithmetic-only comparison does not validate the claim.",
+        "denominator": null,
+        "metric": "typed_comparison",
+        "unit": "boolean"
+      }
+    },
+    "analysis.covariance_comparison": {
+      "common_scale": {
+        "basis": "Shared nonnegative scalar only when full matrix comparison passes tolerances; null otherwise.",
+        "denominator": "base covariance matrix entries",
+        "metric": "common_scale",
+        "unit": "ratio"
+      },
+      "pure_nonnegative_scale": {
+        "basis": "Full-matrix scale test; not evidence of a causal risk mechanism.",
+        "denominator": null,
+        "metric": "pure_nonnegative_scale",
+        "unit": "boolean"
+      },
+      "scale_test_absolute_tolerance": {
+        "basis": "Input covariance scale and observation frequency are not inferred or annualized.",
+        "denominator": null,
+        "metric": "scale_test_absolute_tolerance",
+        "unit": "input_covariance_unit"
+      },
+      "scale_test_relative_tolerance": {
+        "basis": "Declared numerical full-matrix relative tolerance; not forecast uncertainty.",
+        "denominator": "magnitude of compared scaled covariance entries",
+        "metric": "scale_test_relative_tolerance",
+        "unit": "fraction"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "variance_ratios/*/alternative_variance_ratio": {
+        "basis": "alternative variance of numerator_asset / variance of denominator_asset.",
+        "denominator": "alternative variance of denominator_asset",
+        "metric": "alternative_variance_ratio",
+        "unit": "ratio"
+      },
+      "variance_ratios/*/base_variance_ratio": {
+        "basis": "base variance of numerator_asset / variance of denominator_asset.",
+        "denominator": "base variance of denominator_asset",
+        "metric": "base_variance_ratio",
+        "unit": "ratio"
+      },
+      "variances/*/alternative_variance": {
+        "basis": "Input covariance scale and observation frequency are not inferred or annualized.",
+        "denominator": null,
+        "metric": "alternative_variance",
+        "unit": "input_covariance_unit"
+      },
+      "variances/*/base_variance": {
+        "basis": "Input covariance scale and observation frequency are not inferred or annualized.",
+        "denominator": null,
+        "metric": "base_variance",
+        "unit": "input_covariance_unit"
+      },
+      "variances/*/variance_multiplier": {
+        "basis": "Alternative diagonal variance / base diagonal variance; null for zero base.",
+        "denominator": "same asset base variance",
+        "metric": "variance_multiplier",
+        "unit": "ratio"
+      }
+    },
+    "analysis.hedge_scenarios": {
+      "equity_notional": {
+        "basis": "Explicit expiry-put payoff or assumed short-linear sensitivity; excludes inferred collateral, borrow, settlement or pre-expiry value.",
+        "denominator": null,
+        "metric": "equity_notional",
+        "unit": "input_currency_amount"
+      },
+      "hedges/*/linear_hedge_offset": {
+        "basis": "Explicit expiry-put payoff or assumed short-linear sensitivity; excludes inferred collateral, borrow, settlement or pre-expiry value.",
+        "denominator": null,
+        "metric": "linear_hedge_offset",
+        "unit": "input_currency_amount"
+      },
+      "hedges/*/linear_residual_equity_sensitivity": {
+        "basis": "Explicit expiry-put payoff or assumed short-linear sensitivity; excludes inferred collateral, borrow, settlement or pre-expiry value.",
+        "denominator": null,
+        "metric": "linear_residual_equity_sensitivity",
+        "unit": "input_currency_amount"
+      },
+      "hedges/*/linear_residual_fraction": {
+        "basis": "Residual linear equity sensitivity / initial equity notional; not maximum loss or estimated beta.",
+        "denominator": "initial equity shares times initial price",
+        "metric": "linear_residual_fraction",
+        "unit": "fraction"
+      },
+      "hedges/*/scenarios/*/combined_net_pnl": {
+        "basis": "Explicit expiry-put payoff or assumed short-linear sensitivity; excludes inferred collateral, borrow, settlement or pre-expiry value.",
+        "denominator": null,
+        "metric": "combined_net_pnl",
+        "unit": "input_currency_amount"
+      },
+      "hedges/*/scenarios/*/combined_pnl_fraction_of_initial_equity": {
+        "basis": "Combined modeled P&L / initial equity notional, excluding additional premium/collateral funding.",
+        "denominator": "initial equity shares times initial price",
+        "metric": "combined_pnl_fraction_of_initial_equity",
+        "unit": "return_fraction"
+      },
+      "hedges/*/scenarios/*/equity_pnl": {
+        "basis": "Explicit expiry-put payoff or assumed short-linear sensitivity; excludes inferred collateral, borrow, settlement or pre-expiry value.",
+        "denominator": null,
+        "metric": "equity_pnl",
+        "unit": "input_currency_amount"
+      },
+      "hedges/*/scenarios/*/equity_terminal_price": {
+        "basis": "Initial equity price times one plus supplied shock.",
+        "denominator": null,
+        "metric": "equity_terminal_price",
+        "unit": "input_price_per_share_unit"
+      },
+      "hedges/*/scenarios/*/hedge_net_pnl": {
+        "basis": "Explicit expiry-put payoff or assumed short-linear sensitivity; excludes inferred collateral, borrow, settlement or pre-expiry value.",
+        "denominator": null,
+        "metric": "hedge_net_pnl",
+        "unit": "input_currency_amount"
+      },
+      "hedges/*/scenarios/*/hedge_payoff_before_cost": {
+        "basis": "Explicit expiry-put payoff or assumed short-linear sensitivity; excludes inferred collateral, borrow, settlement or pre-expiry value.",
+        "denominator": null,
+        "metric": "hedge_payoff_before_cost",
+        "unit": "input_currency_amount"
+      },
+      "hedges/*/scenarios/*/premium": {
+        "basis": "Explicit expiry-put payoff or assumed short-linear sensitivity; excludes inferred collateral, borrow, settlement or pre-expiry value.",
+        "denominator": null,
+        "metric": "premium",
+        "unit": "input_currency_amount"
+      },
+      "hedges/*/scenarios/*/shock_return": {
+        "basis": "Supplied equity price shock, not a calibrated probability.",
+        "denominator": "initial equity price",
+        "metric": "shock_return",
+        "unit": "return_fraction"
+      },
+      "hedges/*/scenarios/*/total_explicit_cost": {
+        "basis": "Explicit expiry-put payoff or assumed short-linear sensitivity; excludes inferred collateral, borrow, settlement or pre-expiry value.",
+        "denominator": null,
+        "metric": "total_explicit_cost",
+        "unit": "input_currency_amount"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      }
+    },
+    "backtest.dual_sma": {
+      "accounting_residual": {
+        "basis": "final_equity - initial_cash - realized_pnl - unrealized_pnl",
+        "denominator": null,
+        "metric": "accounting_residual",
+        "unit": "input_currency_amount"
+      },
+      "as_of": {
+        "basis": "Declared audit cutoff or modeled completed-bar time; never an observed broker fill.",
+        "denominator": null,
+        "metric": "as_of",
+        "unit": "timestamp"
+      },
+      "cash": {
+        "basis": "Modeled ledger cash; not broker buying power or settled cash.",
+        "denominator": null,
+        "metric": "cash",
+        "unit": "input_currency_amount"
+      },
+      "equity_curve/*/cash": {
+        "basis": "Modeled ledger using supplied price/capital scale; no currency or settlement verification.",
+        "denominator": null,
+        "metric": "cash",
+        "unit": "input_currency_amount"
+      },
+      "equity_curve/*/close": {
+        "basis": "Supplied price scale; trailing means or modeled fill/mark, no price adjustment inferred.",
+        "denominator": null,
+        "metric": "close",
+        "unit": "input_price_per_share_unit"
+      },
+      "equity_curve/*/equity": {
+        "basis": "Modeled cash plus fractional position at supplied close after fees; final mark includes declared terminal liquidation fee.",
+        "denominator": null,
+        "metric": "equity",
+        "unit": "input_currency_amount"
+      },
+      "equity_curve/*/fees_cumulative": {
+        "basis": "Modeled ledger using supplied price/capital scale; no currency or settlement verification.",
+        "denominator": null,
+        "metric": "fees_cumulative",
+        "unit": "input_currency_amount"
+      },
+      "equity_curve/*/quantity": {
+        "basis": "Modeled fractional long shares.",
+        "denominator": null,
+        "metric": "quantity",
+        "unit": "shares"
+      },
+      "equity_curve/*/timestamp": {
+        "basis": "Declared audit cutoff or modeled completed-bar time; never an observed broker fill.",
+        "denominator": null,
+        "metric": "timestamp",
+        "unit": "timestamp"
+      },
+      "fills/*/at": {
+        "basis": "Modeled daily session open, or predeclared last close for terminal liquidation; not observed fill time.",
+        "denominator": null,
+        "metric": "at",
+        "unit": "timestamp"
+      },
+      "fills/*/cash_after": {
+        "basis": "Modeled ledger using supplied price/capital scale; no currency or settlement verification.",
+        "denominator": null,
+        "metric": "cash_after",
+        "unit": "input_currency_amount"
+      },
+      "fills/*/fee": {
+        "basis": "Modeled per-side fee on this fill's notional.",
+        "denominator": null,
+        "metric": "fee",
+        "unit": "input_currency_amount"
+      },
+      "fills/*/notional": {
+        "basis": "Modeled ledger using supplied price/capital scale; no currency or settlement verification.",
+        "denominator": null,
+        "metric": "notional",
+        "unit": "input_currency_amount"
+      },
+      "fills/*/price": {
+        "basis": "Supplied price scale; trailing means or modeled fill/mark, no price adjustment inferred.",
+        "denominator": null,
+        "metric": "price",
+        "unit": "input_price_per_share_unit"
+      },
+      "fills/*/quantity": {
+        "basis": "Modeled fractional long shares.",
+        "denominator": null,
+        "metric": "quantity",
+        "unit": "shares"
+      },
+      "fills/*/quantity_after": {
+        "basis": "Modeled fractional long shares.",
+        "denominator": null,
+        "metric": "quantity_after",
+        "unit": "shares"
+      },
+      "final_equity": {
+        "basis": "Final cash plus marked fractional long position; paid entry and exit fees included. Initial cash defaults to 1 synthetic wealth unit.",
+        "denominator": null,
+        "metric": "final_equity",
+        "unit": "input_currency_amount"
+      },
+      "max_drawdown": {
+        "basis": "Every completed daily bar cash plus marked holdings after paid fees, including declared terminal liquidation fee.",
+        "denominator": "running peak modeled marked equity including initial cash",
+        "metric": "max_drawdown",
+        "unit": "loss_fraction"
+      },
+      "open_quantity": {
+        "basis": "Nonnegative fractional long quantity; zero means cash only.",
+        "denominator": null,
+        "metric": "open_quantity",
+        "unit": "shares"
+      },
+      "orders/*/decision_at": {
+        "basis": "Declared audit cutoff or modeled completed-bar time; never an observed broker fill.",
+        "denominator": null,
+        "metric": "decision_at",
+        "unit": "timestamp"
+      },
+      "orders/*/status": {
+        "basis": "Modeled pending/fill state; not broker order status.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "realized_pnl": {
+        "basis": "Net exit proceeds minus entry notional and entry fee for closed positions.",
+        "denominator": null,
+        "metric": "realized_pnl",
+        "unit": "input_currency_amount"
+      },
+      "signal_history_status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "signal_history_status",
+        "unit": "status"
+      },
+      "signals/*/decision_at": {
+        "basis": "Completed daily bar end using trailing closes through this bar only.",
+        "denominator": null,
+        "metric": "decision_at",
+        "unit": "timestamp"
+      },
+      "signals/*/fast_mean": {
+        "basis": "Supplied price scale; trailing means or modeled fill/mark, no price adjustment inferred.",
+        "denominator": null,
+        "metric": "fast_mean",
+        "unit": "input_price_per_share_unit"
+      },
+      "signals/*/slow_mean": {
+        "basis": "Supplied price scale; trailing means or modeled fill/mark, no price adjustment inferred.",
+        "denominator": null,
+        "metric": "slow_mean",
+        "unit": "input_price_per_share_unit"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "total_fees": {
+        "basis": "Sum of modeled notional times cost_per_side_bps / 10000 on both entry and exit.",
+        "denominator": null,
+        "metric": "total_fees",
+        "unit": "input_currency_amount"
+      },
+      "total_return": {
+        "basis": "final_equity / initial_cash - 1; no annualization",
+        "denominator": "initial_cash",
+        "metric": "total_return",
+        "unit": "return_fraction"
+      },
+      "unrealized_pnl": {
+        "basis": "Open quantity times last close minus remaining position cost including entry fee.",
+        "denominator": null,
+        "metric": "unrealized_pnl",
+        "unit": "input_currency_amount"
+      }
+    },
+    "backtest.dual_sma_variants": {
+      "computed_variants": {
+        "basis": "Number of declared variants successfully simulated or supplied; no winner inference.",
+        "denominator": null,
+        "metric": "computed_variants",
+        "unit": "count"
+      },
+      "declared_variants": {
+        "basis": "Number of declared variants successfully simulated or supplied; no winner inference.",
+        "denominator": null,
+        "metric": "declared_variants",
+        "unit": "count"
+      },
+      "runs/*/comparison": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "comparison",
+        "unit": "status"
+      },
+      "runs/*/result/accounting_residual": {
+        "basis": "final_equity - initial_cash - realized_pnl - unrealized_pnl",
+        "denominator": null,
+        "metric": "accounting_residual",
+        "unit": "input_currency_amount"
+      },
+      "runs/*/result/as_of": {
+        "basis": "Declared audit cutoff or modeled completed-bar time; never an observed broker fill.",
+        "denominator": null,
+        "metric": "as_of",
+        "unit": "timestamp"
+      },
+      "runs/*/result/cash": {
+        "basis": "Modeled ledger cash; not broker buying power or settled cash.",
+        "denominator": null,
+        "metric": "cash",
+        "unit": "input_currency_amount"
+      },
+      "runs/*/result/equity_curve/*/cash": {
+        "basis": "Modeled ledger using supplied price/capital scale; no currency or settlement verification.",
+        "denominator": null,
+        "metric": "cash",
+        "unit": "input_currency_amount"
+      },
+      "runs/*/result/equity_curve/*/close": {
+        "basis": "Supplied price scale; trailing means or modeled fill/mark, no price adjustment inferred.",
+        "denominator": null,
+        "metric": "close",
+        "unit": "input_price_per_share_unit"
+      },
+      "runs/*/result/equity_curve/*/equity": {
+        "basis": "Modeled cash plus fractional position at supplied close after fees; final mark includes declared terminal liquidation fee.",
+        "denominator": null,
+        "metric": "equity",
+        "unit": "input_currency_amount"
+      },
+      "runs/*/result/equity_curve/*/fees_cumulative": {
+        "basis": "Modeled ledger using supplied price/capital scale; no currency or settlement verification.",
+        "denominator": null,
+        "metric": "fees_cumulative",
+        "unit": "input_currency_amount"
+      },
+      "runs/*/result/equity_curve/*/quantity": {
+        "basis": "Modeled fractional long shares.",
+        "denominator": null,
+        "metric": "quantity",
+        "unit": "shares"
+      },
+      "runs/*/result/equity_curve/*/timestamp": {
+        "basis": "Declared audit cutoff or modeled completed-bar time; never an observed broker fill.",
+        "denominator": null,
+        "metric": "timestamp",
+        "unit": "timestamp"
+      },
+      "runs/*/result/fills/*/at": {
+        "basis": "Modeled daily session open, or predeclared last close for terminal liquidation; not observed fill time.",
+        "denominator": null,
+        "metric": "at",
+        "unit": "timestamp"
+      },
+      "runs/*/result/fills/*/cash_after": {
+        "basis": "Modeled ledger using supplied price/capital scale; no currency or settlement verification.",
+        "denominator": null,
+        "metric": "cash_after",
+        "unit": "input_currency_amount"
+      },
+      "runs/*/result/fills/*/fee": {
+        "basis": "Modeled per-side fee on this fill's notional.",
+        "denominator": null,
+        "metric": "fee",
+        "unit": "input_currency_amount"
+      },
+      "runs/*/result/fills/*/notional": {
+        "basis": "Modeled ledger using supplied price/capital scale; no currency or settlement verification.",
+        "denominator": null,
+        "metric": "notional",
+        "unit": "input_currency_amount"
+      },
+      "runs/*/result/fills/*/price": {
+        "basis": "Supplied price scale; trailing means or modeled fill/mark, no price adjustment inferred.",
+        "denominator": null,
+        "metric": "price",
+        "unit": "input_price_per_share_unit"
+      },
+      "runs/*/result/fills/*/quantity": {
+        "basis": "Modeled fractional long shares.",
+        "denominator": null,
+        "metric": "quantity",
+        "unit": "shares"
+      },
+      "runs/*/result/fills/*/quantity_after": {
+        "basis": "Modeled fractional long shares.",
+        "denominator": null,
+        "metric": "quantity_after",
+        "unit": "shares"
+      },
+      "runs/*/result/final_equity": {
+        "basis": "Final cash plus marked fractional long position; paid entry and exit fees included. Initial cash defaults to 1 synthetic wealth unit.",
+        "denominator": null,
+        "metric": "final_equity",
+        "unit": "input_currency_amount"
+      },
+      "runs/*/result/max_drawdown": {
+        "basis": "Every completed daily bar cash plus marked holdings after paid fees, including declared terminal liquidation fee.",
+        "denominator": "running peak modeled marked equity including initial cash",
+        "metric": "max_drawdown",
+        "unit": "loss_fraction"
+      },
+      "runs/*/result/open_quantity": {
+        "basis": "Nonnegative fractional long quantity; zero means cash only.",
+        "denominator": null,
+        "metric": "open_quantity",
+        "unit": "shares"
+      },
+      "runs/*/result/orders/*/decision_at": {
+        "basis": "Declared audit cutoff or modeled completed-bar time; never an observed broker fill.",
+        "denominator": null,
+        "metric": "decision_at",
+        "unit": "timestamp"
+      },
+      "runs/*/result/orders/*/status": {
+        "basis": "Modeled pending/fill state; not broker order status.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "runs/*/result/realized_pnl": {
+        "basis": "Net exit proceeds minus entry notional and entry fee for closed positions.",
+        "denominator": null,
+        "metric": "realized_pnl",
+        "unit": "input_currency_amount"
+      },
+      "runs/*/result/signal_history_status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "signal_history_status",
+        "unit": "status"
+      },
+      "runs/*/result/signals/*/decision_at": {
+        "basis": "Completed daily bar end using trailing closes through this bar only.",
+        "denominator": null,
+        "metric": "decision_at",
+        "unit": "timestamp"
+      },
+      "runs/*/result/signals/*/fast_mean": {
+        "basis": "Supplied price scale; trailing means or modeled fill/mark, no price adjustment inferred.",
+        "denominator": null,
+        "metric": "fast_mean",
+        "unit": "input_price_per_share_unit"
+      },
+      "runs/*/result/signals/*/slow_mean": {
+        "basis": "Supplied price scale; trailing means or modeled fill/mark, no price adjustment inferred.",
+        "denominator": null,
+        "metric": "slow_mean",
+        "unit": "input_price_per_share_unit"
+      },
+      "runs/*/result/status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "runs/*/result/total_fees": {
+        "basis": "Sum of modeled notional times cost_per_side_bps / 10000 on both entry and exit.",
+        "denominator": null,
+        "metric": "total_fees",
+        "unit": "input_currency_amount"
+      },
+      "runs/*/result/total_return": {
+        "basis": "final_equity / initial_cash - 1; no annualization",
+        "denominator": "initial_cash",
+        "metric": "total_return",
+        "unit": "return_fraction"
+      },
+      "runs/*/result/unrealized_pnl": {
+        "basis": "Open quantity times last close minus remaining position cost including entry fee.",
+        "denominator": null,
+        "metric": "unrealized_pnl",
+        "unit": "input_currency_amount"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      }
+    },
+    "backtest.opening_range": {
+      "as_of": {
+        "basis": "Declared audit cutoff or modeled bar-end mark.",
+        "denominator": null,
+        "metric": "as_of",
+        "unit": "timestamp"
+      },
+      "result/buy_hold_return": {
+        "basis": "Full-capital entry-friction benchmark marked at terminal close; different exposure and no dividends.",
+        "denominator": "initial_cash",
+        "metric": "buy_hold_return",
+        "unit": "return_fraction"
+      },
+      "result/closed_trades": {
+        "basis": "Closed modeled round trips, not broker executions.",
+        "denominator": null,
+        "metric": "closed_trades",
+        "unit": "count"
+      },
+      "result/equity_curve/*/equity": {
+        "basis": "Existing strategy_lab long replay after modeled trading friction.",
+        "denominator": null,
+        "metric": "equity",
+        "unit": "input_currency_amount"
+      },
+      "result/equity_curve/*/timestamp": {
+        "basis": "Declared audit cutoff or modeled bar-end mark.",
+        "denominator": null,
+        "metric": "timestamp",
+        "unit": "timestamp"
+      },
+      "result/final_equity": {
+        "basis": "Unchanged strategy_lab baseline ledger cash plus marked open position after modeled fees/slippage.",
+        "denominator": null,
+        "metric": "final_equity",
+        "unit": "input_currency_amount"
+      },
+      "result/max_drawdown": {
+        "basis": "Unchanged opening-range replay, per-bar cash plus marked holdings; stop-first ambiguity.",
+        "denominator": "running peak modeled bar-end equity including initial cash",
+        "metric": "max_drawdown",
+        "unit": "loss_fraction"
+      },
+      "result/mean_trade_pnl": {
+        "basis": "Existing strategy_lab long replay after modeled trading friction.",
+        "denominator": null,
+        "metric": "mean_trade_pnl",
+        "unit": "input_currency_amount"
+      },
+      "result/profit_factor": {
+        "basis": "Sum of positive trade P&L / absolute sum of losing P&L; null without losses.",
+        "denominator": "absolute sum of losing closed-trade P&L",
+        "metric": "profit_factor",
+        "unit": "ratio"
+      },
+      "result/return": {
+        "basis": "Existing strategy_lab final_equity / initial_cash - 1.",
+        "denominator": "initial_cash",
+        "metric": "return",
+        "unit": "return_fraction"
+      },
+      "result/trades/*/entry_time": {
+        "basis": "Modeled entry bar open, not observed broker timestamp.",
+        "denominator": null,
+        "metric": "entry_time",
+        "unit": "timestamp"
+      },
+      "result/trades/*/exit_time": {
+        "basis": "Containing bar end labels modeled exit; exact intrabar exit time unknown.",
+        "denominator": null,
+        "metric": "exit_time",
+        "unit": "timestamp"
+      },
+      "result/trades/*/pnl": {
+        "basis": "Existing strategy_lab long replay after modeled trading friction.",
+        "denominator": null,
+        "metric": "pnl",
+        "unit": "input_currency_amount"
+      },
+      "result/win_rate": {
+        "basis": "Positive-P&L closed trades / all closed trades; null if none.",
+        "denominator": "closed modeled round trips",
+        "metric": "win_rate",
+        "unit": "fraction"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      }
+    },
+    "financial.acquisition_cash": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "existing_shares": {
+        "basis": "Caller must use one consistent share scale for existing/new shares; no scale inferred.",
+        "denominator": null,
+        "metric": "existing_shares",
+        "unit": "input_share_unit"
+      },
+      "new_shares": {
+        "basis": "Caller must use one consistent share scale for existing/new shares; no scale inferred.",
+        "denominator": null,
+        "metric": "new_shares",
+        "unit": "input_share_unit"
+      },
+      "new_shares_fraction_of_post_issue": {
+        "basis": "new shares / post-issue shares",
+        "denominator": "existing + new shares",
+        "metric": "new_shares_fraction_of_post_issue",
+        "unit": "fraction"
+      },
+      "post_issue_shares": {
+        "basis": "Caller must use one consistent share scale for existing/new shares; no scale inferred.",
+        "denominator": null,
+        "metric": "post_issue_shares",
+        "unit": "input_share_unit"
+      },
+      "scenarios/*/annual_cash/*/after_tax_synergies": {
+        "basis": "Supplied consistent cash scale; explicit tax cash basis and synergy delay; no total-deal valuation inference.",
+        "denominator": null,
+        "metric": "after_tax_synergies",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/annual_cash/*/incremental_net_cash": {
+        "basis": "Supplied consistent cash scale; explicit tax cash basis and synergy delay; no total-deal valuation inference.",
+        "denominator": null,
+        "metric": "incremental_net_cash",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/annual_cash/*/integration_cash": {
+        "basis": "Supplied consistent cash scale; explicit tax cash basis and synergy delay; no total-deal valuation inference.",
+        "denominator": null,
+        "metric": "integration_cash",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/annual_cash/*/interest_cash": {
+        "basis": "Supplied consistent cash scale; explicit tax cash basis and synergy delay; no total-deal valuation inference.",
+        "denominator": null,
+        "metric": "interest_cash",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/annual_cash/*/pretax_realized_synergies": {
+        "basis": "Supplied consistent cash scale; explicit tax cash basis and synergy delay; no total-deal valuation inference.",
+        "denominator": null,
+        "metric": "pretax_realized_synergies",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/annual_cash/*/year": {
+        "basis": "One-based supplied annual scenario interval; no calendar start date inferred.",
+        "denominator": null,
+        "metric": "year",
+        "unit": "model_year_index"
+      },
+      "scenarios/*/cumulative_incremental_cash": {
+        "basis": "finite-horizon after-tax synergy minus explicitly defined integration and interest cash; not deal NPV",
+        "denominator": null,
+        "metric": "cumulative_incremental_cash",
+        "unit": "input_currency_amount"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      },
+      "total_deal_npv": {
+        "basis": "separately supplied complete deal cashflow contract only",
+        "denominator": null,
+        "metric": "total_deal_npv",
+        "unit": "input_currency_amount"
+      }
+    },
+    "financial.corporate_action_return": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "cash_distributions_per_initial_share": {
+        "basis": "Cash converted using explicit old/new share basis and split ratio; no dividend reinvestment.",
+        "denominator": "one initial old share",
+        "metric": "cash_distributions_per_initial_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "dividends_in_mark_window/*/cash_per_initial_old_share": {
+        "basis": "Cash converted using explicit old/new share basis and split ratio; no dividend reinvestment.",
+        "denominator": "one initial old share",
+        "metric": "cash_per_initial_old_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "dividends_in_mark_window/*/ex_on": {
+        "basis": "Supplied mark or ex-dividend date; outside-window dividends remain excluded from measured return.",
+        "denominator": null,
+        "metric": "ex_on",
+        "unit": "date"
+      },
+      "dividends_outside_mark_window/*/cash_per_initial_old_share": {
+        "basis": "Cash converted using explicit old/new share basis and split ratio; no dividend reinvestment.",
+        "denominator": "one initial old share",
+        "metric": "cash_per_initial_old_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "dividends_outside_mark_window/*/ex_on": {
+        "basis": "Supplied mark or ex-dividend date; outside-window dividends remain excluded from measured return.",
+        "denominator": null,
+        "metric": "ex_on",
+        "unit": "date"
+      },
+      "measurement_period/end": {
+        "basis": "Supplied mark or ex-dividend date; outside-window dividends remain excluded from measured return.",
+        "denominator": null,
+        "metric": "end",
+        "unit": "date"
+      },
+      "measurement_period/start": {
+        "basis": "Supplied mark or ex-dividend date; outside-window dividends remain excluded from measured return.",
+        "denominator": null,
+        "metric": "start",
+        "unit": "date"
+      },
+      "price_return_fraction": {
+        "basis": "ending raw price * explicit split ratio / start raw price - 1",
+        "denominator": "start raw price of one old share",
+        "metric": "price_return_fraction",
+        "unit": "return_fraction"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      },
+      "total_return_through_requested_end_fraction": {
+        "basis": "Split-adjusted end holding plus in-window dividends / initial value - 1; null if requested terminal mark missing.",
+        "denominator": "start raw price of one old share",
+        "metric": "total_return_through_requested_end_fraction",
+        "unit": "return_fraction"
+      },
+      "total_return_to_end_mark_fraction": {
+        "basis": "ending split-adjusted holding value plus in-window distributions / initial value - 1",
+        "denominator": "start raw price of one old share",
+        "metric": "total_return_to_end_mark_fraction",
+        "unit": "return_fraction"
+      }
+    },
+    "financial.owner_cash_bridge": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "after_total_capex_and_acquisitions": {
+        "basis": "CFO minus total capex minus supplied acquisition cash",
+        "denominator": null,
+        "metric": "after_total_capex_and_acquisitions",
+        "unit": "input_amount_unit"
+      },
+      "bridge_conservation_residual": {
+        "basis": "Same caller-declared financial amount_unit as reported CFO; no scaling or currency conversion; earnings and cash adjustments remain separate.",
+        "denominator": null,
+        "metric": "bridge_conservation_residual",
+        "unit": "input_amount_unit"
+      },
+      "capex_split_residual": {
+        "basis": "Same caller-declared financial amount_unit as reported CFO; no scaling or currency conversion; earnings and cash adjustments remain separate.",
+        "denominator": null,
+        "metric": "capex_split_residual",
+        "unit": "input_amount_unit"
+      },
+      "cash_after_supported_adjustments": {
+        "basis": "Same caller-declared financial amount_unit as reported CFO; no scaling or currency conversion; earnings and cash adjustments remain separate.",
+        "denominator": null,
+        "metric": "cash_after_supported_adjustments",
+        "unit": "input_amount_unit"
+      },
+      "declared_cash_adjustments_fully_supported": {
+        "basis": "Coverage of explicitly declared adjustments only; no source authenticity or proof of exhaustive normalization.",
+        "denominator": null,
+        "metric": "declared_cash_adjustments_fully_supported",
+        "unit": "boolean"
+      },
+      "earnings_adjustments/*/after_tax_amount": {
+        "basis": "Same caller-declared financial amount_unit as reported CFO; no scaling or currency conversion; earnings and cash adjustments remain separate.",
+        "denominator": null,
+        "metric": "after_tax_amount",
+        "unit": "input_amount_unit"
+      },
+      "fcf_after_declared_cash_adjustments": {
+        "basis": "Same caller-declared financial amount_unit as reported CFO; no scaling or currency conversion; earnings and cash adjustments remain separate.",
+        "denominator": null,
+        "metric": "fcf_after_declared_cash_adjustments",
+        "unit": "input_amount_unit"
+      },
+      "maintenance_only_cash": {
+        "basis": "CFO minus maintenance capex; growth excluded; SBC retained",
+        "denominator": null,
+        "metric": "maintenance_only_cash",
+        "unit": "input_amount_unit"
+      },
+      "measurement_period/end": {
+        "basis": "Explicit reported period or supported cash-effect date.",
+        "denominator": null,
+        "metric": "end",
+        "unit": "date"
+      },
+      "measurement_period/start": {
+        "basis": "Explicit reported period or supported cash-effect date.",
+        "denominator": null,
+        "metric": "start",
+        "unit": "date"
+      },
+      "normalized_earnings_scenario": {
+        "basis": "Same caller-declared financial amount_unit as reported CFO; no scaling or currency conversion; earnings and cash adjustments remain separate.",
+        "denominator": null,
+        "metric": "normalized_earnings_scenario",
+        "unit": "input_amount_unit"
+      },
+      "pre_working_capital_cfo": {
+        "basis": "Same caller-declared financial amount_unit as reported CFO; no scaling or currency conversion; earnings and cash adjustments remain separate.",
+        "denominator": null,
+        "metric": "pre_working_capital_cfo",
+        "unit": "input_amount_unit"
+      },
+      "reported_cfo": {
+        "basis": "Same caller-declared financial amount_unit as reported CFO; no scaling or currency conversion; earnings and cash adjustments remain separate.",
+        "denominator": null,
+        "metric": "reported_cfo",
+        "unit": "input_amount_unit"
+      },
+      "reported_fcf": {
+        "basis": "reported CFO minus total capex",
+        "denominator": null,
+        "metric": "reported_fcf",
+        "unit": "input_amount_unit"
+      },
+      "sbc_deducted_economic_proxy": {
+        "basis": "reported FCF minus supplied SBC cash-flow addback",
+        "denominator": null,
+        "metric": "sbc_deducted_economic_proxy",
+        "unit": "input_amount_unit"
+      },
+      "sbc_retained_in_reported_fcf": {
+        "basis": "Same caller-declared financial amount_unit as reported CFO; no scaling or currency conversion; earnings and cash adjustments remain separate.",
+        "denominator": null,
+        "metric": "sbc_retained_in_reported_fcf",
+        "unit": "input_amount_unit"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "supported_cash_adjustments/*/amount": {
+        "basis": "Same caller-declared financial amount_unit as reported CFO; no scaling or currency conversion; earnings and cash adjustments remain separate.",
+        "denominator": null,
+        "metric": "amount",
+        "unit": "input_amount_unit"
+      },
+      "supported_cash_adjustments/*/paid_on": {
+        "basis": "Explicit reported period or supported cash-effect date.",
+        "denominator": null,
+        "metric": "paid_on",
+        "unit": "date"
+      },
+      "supported_cash_adjustments/*/reported_cfo_effect": {
+        "basis": "Same caller-declared financial amount_unit as reported CFO; no scaling or currency conversion; earnings and cash adjustments remain separate.",
+        "denominator": null,
+        "metric": "reported_cfo_effect",
+        "unit": "input_amount_unit"
+      },
+      "total_capex": {
+        "basis": "Same caller-declared financial amount_unit as reported CFO; no scaling or currency conversion; earnings and cash adjustments remain separate.",
+        "denominator": null,
+        "metric": "total_capex",
+        "unit": "input_amount_unit"
+      }
+    },
+    "financial.price_scenarios": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "discount_year_fraction": {
+        "basis": "actual elapsed seconds / (365 * 86400)",
+        "denominator": null,
+        "metric": "discount_year_fraction",
+        "unit": "years"
+      },
+      "measurement_period/entry": {
+        "basis": "Exact arbitrary dated horizon preserved, no trading-calendar shift.",
+        "denominator": null,
+        "metric": "entry",
+        "unit": "timestamp"
+      },
+      "measurement_period/exit": {
+        "basis": "Exact arbitrary dated horizon preserved, no trading-calendar shift.",
+        "denominator": null,
+        "metric": "exit",
+        "unit": "timestamp"
+      },
+      "scenarios/*/cumulative_dividends_per_share": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "cumulative_dividends_per_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/discounted_terminal_proceeds_only": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "discounted_terminal_proceeds_only",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/entry_cost_per_share": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "entry_cost_per_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/entry_outlay_per_share": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "entry_outlay_per_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/exit_cost_per_share": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "exit_cost_per_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/net_terminal_proceeds_plus_dividends": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "net_terminal_proceeds_plus_dividends",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/net_total_return_fraction": {
+        "basis": "(Terminal price minus exit cost plus cumulative dividends) / entry outlay - 1; no annualization.",
+        "denominator": "entry price plus entry cost per share",
+        "metric": "net_total_return_fraction",
+        "unit": "return_fraction"
+      },
+      "scenarios/*/present_value_of_modeled_distributions": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "present_value_of_modeled_distributions",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/terminal_share_price": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "terminal_share_price",
+        "unit": "input_price_per_share_unit"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      }
+    },
+    "financial.terminal_scenarios": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "scenarios/*/cumulative_dividends_per_share": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "cumulative_dividends_per_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/discounted_terminal_proceeds_only": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "discounted_terminal_proceeds_only",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/entry_cost_per_share": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "entry_cost_per_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/entry_outlay_per_share": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "entry_outlay_per_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/exit_cost_per_share": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "exit_cost_per_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/interim_free_cash_flow": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "interim_free_cash_flow",
+        "unit": "input_amount_unit"
+      },
+      "scenarios/*/model_years": {
+        "basis": "Declared whole model horizon, not observation frequency.",
+        "denominator": null,
+        "metric": "model_years",
+        "unit": "years"
+      },
+      "scenarios/*/net_terminal_proceeds_plus_dividends": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "net_terminal_proceeds_plus_dividends",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/net_total_return_fraction": {
+        "basis": "(Terminal price minus exit cost plus cumulative dividends) / entry outlay - 1; no annualization.",
+        "denominator": "entry price plus entry cost per share",
+        "metric": "net_total_return_fraction",
+        "unit": "return_fraction"
+      },
+      "scenarios/*/present_value_of_modeled_distributions": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "present_value_of_modeled_distributions",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/reinvestment_financing_reconciled": {
+        "basis": "False: separate reinvestment schedule does not reconcile exit debt or interim free cash flow.",
+        "denominator": null,
+        "metric": "reinvestment_financing_reconciled",
+        "unit": "boolean"
+      },
+      "scenarios/*/reinvestment_schedule/*/growth_capex": {
+        "basis": "Explicit revenue-scaled reinvestment assumptions; unknown working-capital release remains null.",
+        "denominator": null,
+        "metric": "growth_capex",
+        "unit": "input_amount_unit"
+      },
+      "scenarios/*/reinvestment_schedule/*/maintenance_capex": {
+        "basis": "Explicit revenue-scaled reinvestment assumptions; unknown working-capital release remains null.",
+        "denominator": null,
+        "metric": "maintenance_capex",
+        "unit": "input_amount_unit"
+      },
+      "scenarios/*/reinvestment_schedule/*/revenue": {
+        "basis": "Explicit revenue-scaled reinvestment assumptions; unknown working-capital release remains null.",
+        "denominator": null,
+        "metric": "revenue",
+        "unit": "input_amount_unit"
+      },
+      "scenarios/*/reinvestment_schedule/*/revenue_change": {
+        "basis": "Explicit revenue-scaled reinvestment assumptions; unknown working-capital release remains null.",
+        "denominator": null,
+        "metric": "revenue_change",
+        "unit": "input_amount_unit"
+      },
+      "scenarios/*/reinvestment_schedule/*/total_reinvestment_cash": {
+        "basis": "Explicit revenue-scaled reinvestment assumptions; unknown working-capital release remains null.",
+        "denominator": null,
+        "metric": "total_reinvestment_cash",
+        "unit": "input_amount_unit"
+      },
+      "scenarios/*/reinvestment_schedule/*/working_capital_cash_investment": {
+        "basis": "Explicit revenue-scaled reinvestment assumptions; unknown working-capital release remains null.",
+        "denominator": null,
+        "metric": "working_capital_cash_investment",
+        "unit": "input_amount_unit"
+      },
+      "scenarios/*/reinvestment_schedule/*/year": {
+        "basis": "One-based modeled annual interval.",
+        "denominator": null,
+        "metric": "year",
+        "unit": "model_year_index"
+      },
+      "scenarios/*/status": {
+        "basis": "Negative unfloored equity residual remains diagnostic; investable share price, fee and return are unresolved rather than negative-price proceeds.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "scenarios/*/terminal_diluted_shares": {
+        "basis": "Starting share scale compounded by declared dilution; must be consistent with financial amount and per-share price scales.",
+        "denominator": null,
+        "metric": "terminal_diluted_shares",
+        "unit": "input_share_unit"
+      },
+      "scenarios/*/terminal_ebit": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "terminal_ebit",
+        "unit": "input_amount_unit"
+      },
+      "scenarios/*/terminal_enterprise_value": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "terminal_enterprise_value",
+        "unit": "input_amount_unit"
+      },
+      "scenarios/*/terminal_equity_residual_before_floor": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "terminal_equity_residual_before_floor",
+        "unit": "input_amount_unit"
+      },
+      "scenarios/*/terminal_nopat": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "terminal_nopat",
+        "unit": "input_amount_unit"
+      },
+      "scenarios/*/terminal_revenue": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "terminal_revenue",
+        "unit": "input_amount_unit"
+      },
+      "scenarios/*/terminal_share_price": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "terminal_share_price",
+        "unit": "input_price_per_share_unit"
+      },
+      "scenarios/*/total_reinvestment_cash": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "total_reinvestment_cash",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/cumulative_dividends_per_share": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "cumulative_dividends_per_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "sensitivities/*/discounted_terminal_proceeds_only": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "discounted_terminal_proceeds_only",
+        "unit": "input_price_per_share_unit"
+      },
+      "sensitivities/*/entry_cost_per_share": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "entry_cost_per_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "sensitivities/*/entry_outlay_per_share": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "entry_outlay_per_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "sensitivities/*/exit_cost_per_share": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "exit_cost_per_share",
+        "unit": "input_price_per_share_unit"
+      },
+      "sensitivities/*/interim_free_cash_flow": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "interim_free_cash_flow",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/model_years": {
+        "basis": "Declared whole model horizon, not observation frequency.",
+        "denominator": null,
+        "metric": "model_years",
+        "unit": "years"
+      },
+      "sensitivities/*/net_terminal_proceeds_plus_dividends": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "net_terminal_proceeds_plus_dividends",
+        "unit": "input_price_per_share_unit"
+      },
+      "sensitivities/*/net_total_return_fraction": {
+        "basis": "(Terminal price minus exit cost plus cumulative dividends) / entry outlay - 1; no annualization.",
+        "denominator": "entry price plus entry cost per share",
+        "metric": "net_total_return_fraction",
+        "unit": "return_fraction"
+      },
+      "sensitivities/*/present_value_of_modeled_distributions": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "present_value_of_modeled_distributions",
+        "unit": "input_price_per_share_unit"
+      },
+      "sensitivities/*/reinvestment_financing_reconciled": {
+        "basis": "False: separate reinvestment schedule does not reconcile exit debt or interim free cash flow.",
+        "denominator": null,
+        "metric": "reinvestment_financing_reconciled",
+        "unit": "boolean"
+      },
+      "sensitivities/*/reinvestment_schedule/*/growth_capex": {
+        "basis": "Explicit revenue-scaled reinvestment assumptions; unknown working-capital release remains null.",
+        "denominator": null,
+        "metric": "growth_capex",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/reinvestment_schedule/*/maintenance_capex": {
+        "basis": "Explicit revenue-scaled reinvestment assumptions; unknown working-capital release remains null.",
+        "denominator": null,
+        "metric": "maintenance_capex",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/reinvestment_schedule/*/revenue": {
+        "basis": "Explicit revenue-scaled reinvestment assumptions; unknown working-capital release remains null.",
+        "denominator": null,
+        "metric": "revenue",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/reinvestment_schedule/*/revenue_change": {
+        "basis": "Explicit revenue-scaled reinvestment assumptions; unknown working-capital release remains null.",
+        "denominator": null,
+        "metric": "revenue_change",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/reinvestment_schedule/*/total_reinvestment_cash": {
+        "basis": "Explicit revenue-scaled reinvestment assumptions; unknown working-capital release remains null.",
+        "denominator": null,
+        "metric": "total_reinvestment_cash",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/reinvestment_schedule/*/working_capital_cash_investment": {
+        "basis": "Explicit revenue-scaled reinvestment assumptions; unknown working-capital release remains null.",
+        "denominator": null,
+        "metric": "working_capital_cash_investment",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/reinvestment_schedule/*/year": {
+        "basis": "One-based modeled annual interval.",
+        "denominator": null,
+        "metric": "year",
+        "unit": "model_year_index"
+      },
+      "sensitivities/*/status": {
+        "basis": "Negative unfloored equity residual remains diagnostic; investable share price, fee and return are unresolved rather than negative-price proceeds.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "sensitivities/*/terminal_diluted_shares": {
+        "basis": "Starting share scale compounded by declared dilution; must be consistent with financial amount and per-share price scales.",
+        "denominator": null,
+        "metric": "terminal_diluted_shares",
+        "unit": "input_share_unit"
+      },
+      "sensitivities/*/terminal_ebit": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "terminal_ebit",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/terminal_enterprise_value": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "terminal_enterprise_value",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/terminal_equity_residual_before_floor": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "terminal_equity_residual_before_floor",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/terminal_nopat": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "terminal_nopat",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/terminal_revenue": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "terminal_revenue",
+        "unit": "input_amount_unit"
+      },
+      "sensitivities/*/terminal_share_price": {
+        "basis": "Caller price-per-share unit; terminal valuation requires consistent amount/share scales. No automatic millions-to-units conversion; PV requires declared discount and distribution timing.",
+        "denominator": null,
+        "metric": "terminal_share_price",
+        "unit": "input_price_per_share_unit"
+      },
+      "sensitivities/*/total_reinvestment_cash": {
+        "basis": "Caller-declared financial amount_unit; exogenous net debt and separate reinvestment do not establish financing feasibility.",
+        "denominator": null,
+        "metric": "total_reinvestment_cash",
+        "unit": "input_amount_unit"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      },
+      "status": {
+        "basis": "Negative unfloored equity residual remains diagnostic; investable share price, fee and return are unresolved rather than negative-price proceeds.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      }
+    },
+    "planning.allocate": {
+      "budget": {
+        "metric": "budget",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Cent-denominated declared budget or advisory notional; fees, debit and affordability remain separate. Alternative budgets must not be added together."
+      },
+      "rows/*/advisory_cash_amount": {
+        "metric": "advisory_cash_amount",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Cent-denominated declared budget or advisory notional; fees, debit and affordability remain separate. Alternative budgets must not be added together."
+      },
+      "rows/*/reference_notional_before_fees": {
+        "metric": "reference_notional_before_fees",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Cent-denominated declared budget or advisory notional; fees, debit and affordability remain separate. Alternative budgets must not be added together."
+      },
+      "rows/*/all_in_cash_debit": {
+        "metric": "all_in_cash_debit",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Cent-denominated declared budget or advisory notional; fees, debit and affordability remain separate. Alternative budgets must not be added together."
+      },
+      "totals/reference_portfolio_notional": {
+        "metric": "reference_portfolio_notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Cent-denominated declared budget or advisory notional; fees, debit and affordability remain separate. Alternative budgets must not be added together."
+      },
+      "totals/allocated_notional_total": {
+        "metric": "allocated_notional_total",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Cent-denominated declared budget or advisory notional; fees, debit and affordability remain separate. Alternative budgets must not be added together."
+      },
+      "totals/reference_unallocated_notional_budget": {
+        "metric": "reference_unallocated_notional_budget",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Cent-denominated declared budget or advisory notional; fees, debit and affordability remain separate. Alternative budgets must not be added together."
+      },
+      "totals/all_in_cash_debit": {
+        "metric": "all_in_cash_debit",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Cent-denominated declared budget or advisory notional; fees, debit and affordability remain separate. Alternative budgets must not be added together."
+      },
+      "totals/budget_per_alternative": {
+        "metric": "budget_per_alternative",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Cent-denominated declared budget or advisory notional; fees, debit and affordability remain separate. Alternative budgets must not be added together."
+      },
+      "source_count": {
+        "metric": "source_count",
+        "unit": "count",
+        "denominator": null,
+        "basis": "Explicit source order and selected rows; no invented portfolio count or proof of universe coverage."
+      },
+      "selected_count": {
+        "metric": "selected_count",
+        "unit": "count",
+        "denominator": null,
+        "basis": "Explicit source order and selected rows; no invented portfolio count or proof of universe coverage."
+      },
+      "requested_count": {
+        "metric": "requested_count",
+        "unit": "count",
+        "denominator": null,
+        "basis": "Explicit source order and selected rows; no invented portfolio count or proof of universe coverage."
+      },
+      "count_shortfall": {
+        "metric": "count_shortfall",
+        "unit": "count",
+        "denominator": null,
+        "basis": "Explicit source order and selected rows; no invented portfolio count or proof of universe coverage."
+      },
+      "rows/*/source_position": {
+        "metric": "source_position",
+        "unit": "count",
+        "denominator": null,
+        "basis": "Explicit source order and selected rows; no invented portfolio count or proof of universe coverage."
+      },
+      "rows/*/selected_position": {
+        "metric": "selected_position",
+        "unit": "count",
+        "denominator": null,
+        "basis": "Explicit source order and selected rows; no invented portfolio count or proof of universe coverage."
+      },
+      "rows/*/requested_weight": {
+        "metric": "requested_weight",
+        "unit": "fraction",
+        "denominator": "declared notional budget",
+        "basis": "Explicit user weight or exact equal-weight ratio before cent rounding; not expected return."
+      },
+      "rows/*/target_weight": {
+        "metric": "target_weight",
+        "unit": "fraction",
+        "denominator": "declared notional budget",
+        "basis": "Explicit user weight or exact equal-weight ratio before cent rounding; not expected return."
+      },
+      "status": {
+        "metric": "status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Declared arithmetic/research state; no source authentication, recommendation validation or live-action permission."
+      },
+      "sizing_status": {
+        "metric": "sizing_status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Declared arithmetic/research state; no source authentication, recommendation validation or live-action permission."
+      },
+      "selection_basis": {
+        "metric": "selection_basis",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Declared arithmetic/research state; no source authentication, recommendation validation or live-action permission."
+      },
+      "weighting_basis": {
+        "metric": "weighting_basis",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Declared arithmetic/research state; no source authentication, recommendation validation or live-action permission."
+      },
+      "budget_basis": {
+        "metric": "budget_basis",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Declared arithmetic/research state; no source authentication, recommendation validation or live-action permission."
+      },
+      "source_kind": {
+        "metric": "source_kind",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Declared arithmetic/research state; no source authentication, recommendation validation or live-action permission."
+      },
+      "mode": {
+        "metric": "mode",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Declared arithmetic/research state; no source authentication, recommendation validation or live-action permission."
+      },
+      "rows/*/primary_review_status": {
+        "metric": "primary_review_status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Declared arithmetic/research state; no source authentication, recommendation validation or live-action permission."
+      },
+      "requested_count_met": {
+        "metric": "requested_count_met",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit helper declaration. Null stays unknown; arithmetic alone is not investment or broker evidence."
+      },
+      "count_conflict": {
+        "metric": "count_conflict",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit helper declaration. Null stays unknown; arithmetic alone is not investment or broker evidence."
+      },
+      "advisory_only": {
+        "metric": "advisory_only",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit helper declaration. Null stays unknown; arithmetic alone is not investment or broker evidence."
+      },
+      "recommendation_validated": {
+        "metric": "recommendation_validated",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit helper declaration. Null stays unknown; arithmetic alone is not investment or broker evidence."
+      },
+      "source_authenticity_verified": {
+        "metric": "source_authenticity_verified",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit helper declaration. Null stays unknown; arithmetic alone is not investment or broker evidence."
+      },
+      "optimization_performed": {
+        "metric": "optimization_performed",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit helper declaration. Null stays unknown; arithmetic alone is not investment or broker evidence."
+      },
+      "orders_submitted": {
+        "metric": "orders_submitted",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit helper declaration. Null stays unknown; arithmetic alone is not investment or broker evidence."
+      },
+      "execution_permission_evaluated": {
+        "metric": "execution_permission_evaluated",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit helper declaration. Null stays unknown; arithmetic alone is not investment or broker evidence."
+      },
+      "totals/cash_affordable": {
+        "metric": "cash_affordable",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit helper declaration. Null stays unknown; arithmetic alone is not investment or broker evidence."
+      },
+      "totals/alternatives_are_mutually_exclusive": {
+        "metric": "alternatives_are_mutually_exclusive",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit helper declaration. Null stays unknown; arithmetic alone is not investment or broker evidence."
+      },
+      "totals/alternative_notionals_must_not_be_summed": {
+        "metric": "alternative_notionals_must_not_be_summed",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit helper declaration. Null stays unknown; arithmetic alone is not investment or broker evidence."
+      },
+      "upstream_coverage_declared": {
+        "metric": "upstream_coverage_declared",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Upstream coverage declaration is retained separately from allocation verification. Selected subset size need not equal upstream universe size. Allocation arithmetic cannot verify source coverage."
+      },
+      "coverage_verified": {
+        "metric": "coverage_verified",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Upstream coverage declaration is retained separately from allocation verification. Selected subset size need not equal upstream universe size. Allocation arithmetic cannot verify source coverage."
+      }
+    },
+    "planning.cash_plan": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "helper_result/breaches/*/at": {
+        "basis": "Supplied availability time, debit before credit at equal time; not a shifted withdrawal date.",
+        "denominator": null,
+        "metric": "at",
+        "unit": "timestamp"
+      },
+      "helper_result/breaches/*/available": {
+        "basis": "Per currency key/row, after explicit reservations and ordered events; no FX aggregation or spendability claim.",
+        "denominator": null,
+        "metric": "available",
+        "unit": "input_currency_amount"
+      },
+      "helper_result/breaches/*/floor": {
+        "basis": "Per currency key/row, after explicit reservations and ordered events; no FX aggregation or spendability claim.",
+        "denominator": null,
+        "metric": "floor",
+        "unit": "input_currency_amount"
+      },
+      "helper_result/ending_available/*": {
+        "basis": "Per currency key/row, after explicit reservations and ordered events; no FX aggregation or spendability claim.",
+        "denominator": null,
+        "metric": "*",
+        "unit": "input_currency_amount"
+      },
+      "helper_result/remaining_reservations/*": {
+        "basis": "Per currency key/row, after explicit reservations and ordered events; no FX aggregation or spendability claim.",
+        "denominator": null,
+        "metric": "*",
+        "unit": "input_currency_amount"
+      },
+      "helper_result/status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "helper_result/timeline/*/at": {
+        "basis": "Supplied availability time, debit before credit at equal time; not a shifted withdrawal date.",
+        "denominator": null,
+        "metric": "at",
+        "unit": "timestamp"
+      },
+      "helper_result/timeline/*/available": {
+        "basis": "Per currency key/row, after explicit reservations and ordered events; no FX aggregation or spendability claim.",
+        "denominator": null,
+        "metric": "available",
+        "unit": "input_currency_amount"
+      },
+      "helper_result/timeline/*/remaining_reservation": {
+        "basis": "Per currency key/row, after explicit reservations and ordered events; no FX aggregation or spendability claim.",
+        "denominator": null,
+        "metric": "remaining_reservation",
+        "unit": "input_currency_amount"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "troughs/*/first_minimum_at": {
+        "basis": "Supplied availability time, debit before credit at equal time; not a shifted withdrawal date.",
+        "denominator": null,
+        "metric": "first_minimum_at",
+        "unit": "timestamp"
+      },
+      "troughs/*/floor": {
+        "basis": "Per currency key/row, after explicit reservations and ordered events; no FX aggregation or spendability claim.",
+        "denominator": null,
+        "metric": "floor",
+        "unit": "input_currency_amount"
+      },
+      "troughs/*/maximum_floor_gap": {
+        "basis": "max(0, declared floor - minimum available); currency is the map key, never inferred from headline currency",
+        "denominator": null,
+        "metric": "maximum_floor_gap",
+        "unit": "input_currency_amount"
+      },
+      "troughs/*/minimum_available": {
+        "basis": "lowest opening or event cash after reservations; currency is the map key, never inferred from headline currency",
+        "denominator": null,
+        "metric": "minimum_available",
+        "unit": "input_currency_amount"
+      },
+      "cash_bounds/*/minimum_available_range/lower": {
+        "metric": "cash_bounds/*/minimum_available_range/lower",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "cash_bounds/*/minimum_available_range/upper": {
+        "metric": "cash_bounds/*/minimum_available_range/upper",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "cash_bounds/*/maximum_floor_gap_range/lower": {
+        "metric": "cash_bounds/*/maximum_floor_gap_range/lower",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "cash_bounds/*/maximum_floor_gap_range/upper": {
+        "metric": "cash_bounds/*/maximum_floor_gap_range/upper",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "cash_bounds/*/ending_available_range/lower": {
+        "metric": "cash_bounds/*/ending_available_range/lower",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "cash_bounds/*/ending_available_range/upper": {
+        "metric": "cash_bounds/*/ending_available_range/upper",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "cash_bounds/*/floor": {
+        "metric": "cash_bounds/*/floor",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "scenarios/*/ending_available/*": {
+        "metric": "scenarios/*/ending_available/*",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "scenarios/*/remaining_reservations/*": {
+        "metric": "scenarios/*/remaining_reservations/*",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "scenarios/*/net_external_cash_flows/*": {
+        "metric": "scenarios/*/net_external_cash_flows/*",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "scenarios/*/conservation_residual/*": {
+        "metric": "scenarios/*/conservation_residual/*",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "scenarios/*/timeline/*/cash_flow": {
+        "metric": "scenarios/*/timeline/*/cash_flow",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "scenarios/*/timeline/*/reservation_release": {
+        "metric": "scenarios/*/timeline/*/reservation_release",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "scenarios/*/timeline/*/available": {
+        "metric": "scenarios/*/timeline/*/available",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "scenarios/*/timeline/*/remaining_reservation": {
+        "metric": "scenarios/*/timeline/*/remaining_reservation",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "scenarios/*/troughs/*/minimum_available": {
+        "metric": "scenarios/*/troughs/*/minimum_available",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "scenarios/*/troughs/*/floor": {
+        "metric": "scenarios/*/troughs/*/floor",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "scenarios/*/troughs/*/maximum_floor_gap": {
+        "metric": "scenarios/*/troughs/*/maximum_floor_gap",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Complete conditional cash path in the named currency and scenario, retaining signed unfunded demand. Date boundaries are interval limits, not observed settlement; missing timezones/opening inclusion use expressly relaxed conditional bounds, not buying power."
+      },
+      "cash_bounds/*/shortfall_classification": {
+        "metric": "conditional_shortfall_classification",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Classification only within declared or relaxed conditional timing bounds; not verified spending availability."
+      }
+    },
+    "planning.cash_projection": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "conservation_residual": {
+        "basis": "last cash - opening - processed external flows - interest",
+        "denominator": null,
+        "metric": "conservation_residual",
+        "unit": "input_currency_amount"
+      },
+      "ending_cash": {
+        "basis": "timed cash events and explicit annual effective rate",
+        "denominator": null,
+        "metric": "ending_cash",
+        "unit": "input_currency_amount"
+      },
+      "interest_earned": {
+        "basis": "Explicit constant annual-effective-rate ACT/365F scenario with timed cash flows; not forecast or available cash.",
+        "denominator": null,
+        "metric": "interest_earned",
+        "unit": "input_currency_amount"
+      },
+      "last_modeled_cash": {
+        "basis": "Explicit constant annual-effective-rate ACT/365F scenario with timed cash flows; not forecast or available cash.",
+        "denominator": null,
+        "metric": "last_modeled_cash",
+        "unit": "input_currency_amount"
+      },
+      "maximum_floor_gap": {
+        "basis": "max(0,floor-minimum balance)",
+        "denominator": null,
+        "metric": "maximum_floor_gap",
+        "unit": "input_currency_amount"
+      },
+      "measurement_period/end": {
+        "basis": "Supplied observation/event horizon; no settlement shift or observation frequency inference.",
+        "denominator": null,
+        "metric": "end",
+        "unit": "timestamp"
+      },
+      "measurement_period/start": {
+        "basis": "Supplied observation/event horizon; no settlement shift or observation frequency inference.",
+        "denominator": null,
+        "metric": "start",
+        "unit": "timestamp"
+      },
+      "minimum_at": {
+        "basis": "Supplied observation/event horizon; no settlement shift or observation frequency inference.",
+        "denominator": null,
+        "metric": "minimum_at",
+        "unit": "timestamp"
+      },
+      "minimum_balance": {
+        "basis": "minimum modeled opening/before-flow/after-flow value",
+        "denominator": null,
+        "metric": "minimum_balance",
+        "unit": "input_currency_amount"
+      },
+      "net_external_cash_flows_processed": {
+        "basis": "Explicit constant annual-effective-rate ACT/365F scenario with timed cash flows; not forecast or available cash.",
+        "denominator": null,
+        "metric": "net_external_cash_flows_processed",
+        "unit": "input_currency_amount"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "timeline/*/at": {
+        "basis": "Supplied observation/event horizon; no settlement shift or observation frequency inference.",
+        "denominator": null,
+        "metric": "at",
+        "unit": "timestamp"
+      },
+      "timeline/*/balance": {
+        "basis": "Explicit constant annual-effective-rate ACT/365F scenario with timed cash flows; not forecast or available cash.",
+        "denominator": null,
+        "metric": "balance",
+        "unit": "input_currency_amount"
+      },
+      "timeline/*/cash_flow": {
+        "basis": "Explicit constant annual-effective-rate ACT/365F scenario with timed cash flows; not forecast or available cash.",
+        "denominator": null,
+        "metric": "cash_flow",
+        "unit": "input_currency_amount"
+      }
+    },
+    "planning.cash_reconciliation": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "calculated_cash": {
+        "basis": "Signed supplied ledger/aggregate cash reconciliation; not broker buying power or spendability.",
+        "denominator": null,
+        "metric": "calculated_cash",
+        "unit": "input_currency_amount"
+      },
+      "difference": {
+        "basis": "calculated cash minus observed cash; not availability",
+        "denominator": null,
+        "metric": "difference",
+        "unit": "input_currency_amount"
+      },
+      "helper_result/broker_cash": {
+        "basis": "Signed supplied ledger/aggregate cash reconciliation; not broker buying power or spendability.",
+        "denominator": null,
+        "metric": "broker_cash",
+        "unit": "input_currency_amount"
+      },
+      "helper_result/calculated_cash": {
+        "basis": "Signed supplied ledger/aggregate cash reconciliation; not broker buying power or spendability.",
+        "denominator": null,
+        "metric": "calculated_cash",
+        "unit": "input_currency_amount"
+      },
+      "helper_result/difference": {
+        "basis": "Signed supplied ledger/aggregate cash reconciliation; not broker buying power or spendability.",
+        "denominator": null,
+        "metric": "difference",
+        "unit": "input_currency_amount"
+      },
+      "helper_result/reconciled": {
+        "basis": "Declared reconciliation rule; dated helper uses one-cent tolerance, aggregate bridge exact equality.",
+        "denominator": null,
+        "metric": "reconciled",
+        "unit": "boolean"
+      },
+      "helper_result/unsettled_positive_trade_proceeds": {
+        "basis": "Signed supplied ledger/aggregate cash reconciliation; not broker buying power or spendability.",
+        "denominator": null,
+        "metric": "unsettled_positive_trade_proceeds",
+        "unit": "input_currency_amount"
+      },
+      "observed_cash": {
+        "basis": "Signed supplied ledger/aggregate cash reconciliation; not broker buying power or spendability.",
+        "denominator": null,
+        "metric": "observed_cash",
+        "unit": "input_currency_amount"
+      },
+      "reconciled": {
+        "basis": "Declared reconciliation rule; dated helper uses one-cent tolerance, aggregate bridge exact equality.",
+        "denominator": null,
+        "metric": "reconciled",
+        "unit": "boolean"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      }
+    },
+    "planning.portfolio_reconciliation": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "conservation_residual": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "conservation_residual",
+        "unit": "input_currency_amount"
+      },
+      "contribution_only_scenario/conservation_residual": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "conservation_residual",
+        "unit": "input_currency_amount"
+      },
+      "contribution_only_scenario/declared_equity": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "declared_equity",
+        "unit": "input_currency_amount"
+      },
+      "contribution_only_scenario/embedded_fund_cash": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "embedded_fund_cash",
+        "unit": "input_currency_amount"
+      },
+      "contribution_only_scenario/explicit_cash": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "explicit_cash",
+        "unit": "input_currency_amount"
+      },
+      "contribution_only_scenario/identified_assets": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "identified_assets",
+        "unit": "input_currency_amount"
+      },
+      "contribution_only_scenario/identified_position_value": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "identified_position_value",
+        "unit": "input_currency_amount"
+      },
+      "contribution_only_scenario/issuer_exposures/*/fraction_of_declared_equity": {
+        "basis": "legacy lookthrough exposure / declared equity",
+        "denominator": "declared equity",
+        "metric": "fraction_of_declared_equity",
+        "unit": "fraction"
+      },
+      "contribution_only_scenario/issuer_exposures/*/fraction_of_identified_assets": {
+        "basis": "legacy lookthrough exposure / identified assets",
+        "denominator": "positions + explicit top-level cash",
+        "metric": "fraction_of_identified_assets",
+        "unit": "fraction"
+      },
+      "contribution_only_scenario/issuer_exposures/*/value": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "value",
+        "unit": "input_currency_amount"
+      },
+      "contribution_only_scenario/sector_exposures/*/fraction_of_declared_equity": {
+        "basis": "legacy lookthrough sector exposure / declared equity",
+        "denominator": "declared equity",
+        "metric": "fraction_of_declared_equity",
+        "unit": "fraction"
+      },
+      "contribution_only_scenario/sector_exposures/*/fraction_of_identified_assets": {
+        "basis": "legacy lookthrough sector exposure / identified assets",
+        "denominator": "positions + explicit top-level cash",
+        "metric": "fraction_of_identified_assets",
+        "unit": "fraction"
+      },
+      "contribution_only_scenario/sector_exposures/*/value": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "value",
+        "unit": "input_currency_amount"
+      },
+      "contribution_only_scenario/status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "contribution_only_scenario/unexplained_equity_difference": {
+        "basis": "declared equity - original-precision positions - explicit cash",
+        "denominator": null,
+        "metric": "unexplained_equity_difference",
+        "unit": "input_currency_amount"
+      },
+      "contribution_only_scenario/unexplained_fraction_of_declared_equity": {
+        "basis": "(Declared equity - identified positions - explicit cash) / declared equity.",
+        "denominator": "declared_equity",
+        "metric": "unexplained_fraction_of_declared_equity",
+        "unit": "fraction"
+      },
+      "contribution_only_scenario/unknown_fund_value_within_identified_positions": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "unknown_fund_value_within_identified_positions",
+        "unit": "input_currency_amount"
+      },
+      "declared_equity": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "declared_equity",
+        "unit": "input_currency_amount"
+      },
+      "embedded_fund_cash": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "embedded_fund_cash",
+        "unit": "input_currency_amount"
+      },
+      "explicit_cash": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "explicit_cash",
+        "unit": "input_currency_amount"
+      },
+      "identified_assets": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "identified_assets",
+        "unit": "input_currency_amount"
+      },
+      "identified_position_value": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "identified_position_value",
+        "unit": "input_currency_amount"
+      },
+      "issuer_exposures/*/fraction_of_declared_equity": {
+        "basis": "legacy lookthrough exposure / declared equity",
+        "denominator": "declared equity",
+        "metric": "fraction_of_declared_equity",
+        "unit": "fraction"
+      },
+      "issuer_exposures/*/fraction_of_identified_assets": {
+        "basis": "legacy lookthrough exposure / identified assets",
+        "denominator": "positions + explicit top-level cash",
+        "metric": "fraction_of_identified_assets",
+        "unit": "fraction"
+      },
+      "issuer_exposures/*/value": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "value",
+        "unit": "input_currency_amount"
+      },
+      "sector_exposures/*/fraction_of_declared_equity": {
+        "basis": "legacy lookthrough sector exposure / declared equity",
+        "denominator": "declared equity",
+        "metric": "fraction_of_declared_equity",
+        "unit": "fraction"
+      },
+      "sector_exposures/*/fraction_of_identified_assets": {
+        "basis": "legacy lookthrough sector exposure / identified assets",
+        "denominator": "positions + explicit top-level cash",
+        "metric": "fraction_of_identified_assets",
+        "unit": "fraction"
+      },
+      "sector_exposures/*/value": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "value",
+        "unit": "input_currency_amount"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "unexplained_equity_difference": {
+        "basis": "declared equity - original-precision positions - explicit cash",
+        "denominator": null,
+        "metric": "unexplained_equity_difference",
+        "unit": "input_currency_amount"
+      },
+      "unexplained_fraction_of_declared_equity": {
+        "basis": "(Declared equity - identified positions - explicit cash) / declared equity.",
+        "denominator": "declared_equity",
+        "metric": "unexplained_fraction_of_declared_equity",
+        "unit": "fraction"
+      },
+      "unknown_fund_value_within_identified_positions": {
+        "basis": "Snapshot reconciliation; unknown fund holdings remain within identified positions, unexplained equity is separate. Legacy lookthrough uses floats.",
+        "denominator": null,
+        "metric": "unknown_fund_value_within_identified_positions",
+        "unit": "input_currency_amount"
+      }
+    },
+    "planning.session_pnl": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "after_declared_session_close": {
+        "basis": "Declared timing test only; missing session evidence remains null.",
+        "denominator": null,
+        "metric": "after_declared_session_close",
+        "unit": "boolean"
+      },
+      "observed_basis_to_mark_sum": {
+        "basis": "supplied lifetime basis to mark; never assumed daily P&L",
+        "denominator": null,
+        "metric": "observed_basis_to_mark_sum",
+        "unit": "input_currency_amount"
+      },
+      "positions/*/basis_to_mark_unrealized": {
+        "basis": "Per-position supplied basis or complete session marks/trade times, retaining distinct lifetime and session calculations.",
+        "denominator": null,
+        "metric": "basis_to_mark_unrealized",
+        "unit": "input_currency_amount"
+      },
+      "positions/*/session_mark_change_net_costs": {
+        "basis": "Per-position supplied basis or complete session marks/trade times, retaining distinct lifetime and session calculations.",
+        "denominator": null,
+        "metric": "session_mark_change_net_costs",
+        "unit": "input_currency_amount"
+      },
+      "realized_trades/*/included_in_session_pnl": {
+        "basis": "Declared timing test only; missing session evidence remains null.",
+        "denominator": null,
+        "metric": "included_in_session_pnl",
+        "unit": "boolean"
+      },
+      "realized_trades/*/realized_trade_pnl": {
+        "basis": "Per-position supplied basis or complete session marks/trade times, retaining distinct lifetime and session calculations.",
+        "denominator": null,
+        "metric": "realized_trade_pnl",
+        "unit": "input_currency_amount"
+      },
+      "session_pnl": {
+        "basis": "only complete prior-mark/unchanged-holding/intraday-close/cost/distribution evidence",
+        "denominator": null,
+        "metric": "session_pnl",
+        "unit": "input_currency_amount"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      }
+    },
+    "planning.trade_costs": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "affordable_cash_debit": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "affordable_cash_debit",
+        "unit": "input_currency_amount"
+      },
+      "applied_cost_phase": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "applied_cost_phase",
+        "unit": "status"
+      },
+      "budget_remainder": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "budget_remainder",
+        "unit": "input_currency_amount"
+      },
+      "entry_cash_debit": {
+        "basis": "quantity * entry price + explicit entry costs",
+        "denominator": null,
+        "metric": "entry_cash_debit",
+        "unit": "input_currency_amount"
+      },
+      "entry_cost": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "entry_cost",
+        "unit": "input_currency_amount"
+      },
+      "exact_fractional_quantity_for_required_proceeds": {
+        "basis": "required net proceeds plus fixed charge divided by price net of per-share charges",
+        "denominator": null,
+        "metric": "exact_fractional_quantity_for_required_proceeds",
+        "unit": "shares"
+      },
+      "exit_cost": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "exit_cost",
+        "unit": "input_currency_amount"
+      },
+      "exit_net_proceeds": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "exit_net_proceeds",
+        "unit": "input_currency_amount"
+      },
+      "gross_notional": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "gross_notional",
+        "unit": "input_currency_amount"
+      },
+      "gross_pnl": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "gross_pnl",
+        "unit": "input_currency_amount"
+      },
+      "max_affordable_quantity": {
+        "basis": "budget net of explicitly declared variable/fixed transaction charges",
+        "denominator": null,
+        "metric": "max_affordable_quantity",
+        "unit": "shares"
+      },
+      "minimum_quantity_at_increment": {
+        "basis": "Declared or cost-aware quantity at explicit increment.",
+        "denominator": null,
+        "metric": "minimum_quantity_at_increment",
+        "unit": "shares"
+      },
+      "net_pnl": {
+        "basis": "exit proceeds - entry debit, including both cost phases",
+        "denominator": null,
+        "metric": "net_pnl",
+        "unit": "input_currency_amount"
+      },
+      "quantity": {
+        "basis": "Declared or cost-aware quantity at explicit increment.",
+        "denominator": null,
+        "metric": "quantity",
+        "unit": "shares"
+      },
+      "quoted_quantity_meets_proceeds": {
+        "basis": "Arithmetic against supplied budget or proceeds requirement; not broker availability.",
+        "denominator": null,
+        "metric": "quoted_quantity_meets_proceeds",
+        "unit": "boolean"
+      },
+      "quoted_quantity_within_budget": {
+        "basis": "Arithmetic against supplied budget or proceeds requirement; not broker availability.",
+        "denominator": null,
+        "metric": "quoted_quantity_within_budget",
+        "unit": "boolean"
+      },
+      "sale_net_proceeds": {
+        "basis": "quantity * sale price - explicit selected-phase costs",
+        "denominator": null,
+        "metric": "sale_net_proceeds",
+        "unit": "input_currency_amount"
+      },
+      "sized_net_proceeds": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "sized_net_proceeds",
+        "unit": "input_currency_amount"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      },
+      "status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "total_cost": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "total_cost",
+        "unit": "input_currency_amount"
+      },
+      "transaction_cost": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "transaction_cost",
+        "unit": "input_currency_amount"
+      }
+    },
+    "planning.trade_history_costs": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "gross/average_loss": {
+        "basis": "Sum of gross P&L of negative trades / count; negative mean or null if none.",
+        "denominator": "count of gross-negative trades",
+        "metric": "average_loss",
+        "unit": "input_currency_amount"
+      },
+      "gross/average_win": {
+        "basis": "Sum of gross P&L of positive trades / count; null if none.",
+        "denominator": "count of gross-positive trades",
+        "metric": "average_win",
+        "unit": "input_currency_amount"
+      },
+      "gross/flat": {
+        "basis": "Counts by sign of gross trade P&L after its stated cost convention.",
+        "denominator": null,
+        "metric": "flat",
+        "unit": "count"
+      },
+      "gross/losses": {
+        "basis": "Counts by sign of gross trade P&L after its stated cost convention.",
+        "denominator": null,
+        "metric": "losses",
+        "unit": "count"
+      },
+      "gross/total": {
+        "basis": "Trade group determined by sign of gross P&L; means use only that group, not all trades.",
+        "denominator": null,
+        "metric": "total",
+        "unit": "input_currency_amount"
+      },
+      "gross/wins": {
+        "basis": "Counts by sign of gross trade P&L after its stated cost convention.",
+        "denominator": null,
+        "metric": "wins",
+        "unit": "count"
+      },
+      "net/average_loss": {
+        "basis": "Sum of net P&L of negative trades / count; negative mean or null if none.",
+        "denominator": "count of net-negative trades",
+        "metric": "average_loss",
+        "unit": "input_currency_amount"
+      },
+      "net/average_win": {
+        "basis": "Sum of net P&L of positive trades / count; null if none.",
+        "denominator": "count of net-positive trades",
+        "metric": "average_win",
+        "unit": "input_currency_amount"
+      },
+      "net/flat": {
+        "basis": "Counts by sign of net trade P&L after its stated cost convention.",
+        "denominator": null,
+        "metric": "flat",
+        "unit": "count"
+      },
+      "net/losses": {
+        "basis": "Counts by sign of net trade P&L after its stated cost convention.",
+        "denominator": null,
+        "metric": "losses",
+        "unit": "count"
+      },
+      "net/total": {
+        "basis": "Trade group determined by sign of net P&L; means use only that group, not all trades.",
+        "denominator": null,
+        "metric": "total",
+        "unit": "input_currency_amount"
+      },
+      "net/wins": {
+        "basis": "Counts by sign of net trade P&L after its stated cost convention.",
+        "denominator": null,
+        "metric": "wins",
+        "unit": "count"
+      },
+      "rows/*/fees": {
+        "basis": "Explicit gross/net P&L and separately supplied costs; no execution-versus-investment attribution.",
+        "denominator": null,
+        "metric": "fees",
+        "unit": "input_currency_amount"
+      },
+      "rows/*/gross_pnl": {
+        "basis": "Explicit gross/net P&L and separately supplied costs; no execution-versus-investment attribution.",
+        "denominator": null,
+        "metric": "gross_pnl",
+        "unit": "input_currency_amount"
+      },
+      "rows/*/net_pnl": {
+        "basis": "Explicit gross/net P&L and separately supplied costs; no execution-versus-investment attribution.",
+        "denominator": null,
+        "metric": "net_pnl",
+        "unit": "input_currency_amount"
+      },
+      "rows/*/slippage": {
+        "basis": "Explicit gross/net P&L and separately supplied costs; no execution-versus-investment attribution.",
+        "denominator": null,
+        "metric": "slippage",
+        "unit": "input_currency_amount"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      }
+    },
+    "planning.vest_reconciliation": {
+      "advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "grants/*/gross_shares": {
+        "basis": "Declared grant shares, separately identifying withheld and tax-sale shares; future shares are not cash.",
+        "denominator": null,
+        "metric": "gross_shares",
+        "unit": "shares"
+      },
+      "grants/*/net_share_value_at_supplied_vest_assumption": {
+        "basis": "Separate supplied vest-price scenario or confirmed sale proceeds settled by cutoff; no implied sale of unsold shares.",
+        "denominator": null,
+        "metric": "net_share_value_at_supplied_vest_assumption",
+        "unit": "input_currency_amount"
+      },
+      "grants/*/net_shares": {
+        "basis": "Declared grant shares, separately identifying withheld and tax-sale shares; future shares are not cash.",
+        "denominator": null,
+        "metric": "net_shares",
+        "unit": "shares"
+      },
+      "grants/*/settled_sale_cash_observed": {
+        "basis": "Separate supplied vest-price scenario or confirmed sale proceeds settled by cutoff; no implied sale of unsold shares.",
+        "denominator": null,
+        "metric": "settled_sale_cash_observed",
+        "unit": "input_currency_amount"
+      },
+      "grants/*/sold_for_tax_shares": {
+        "basis": "Declared grant shares, separately identifying withheld and tax-sale shares; future shares are not cash.",
+        "denominator": null,
+        "metric": "sold_for_tax_shares",
+        "unit": "shares"
+      },
+      "grants/*/status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "grants/*/tax_share_fraction": {
+        "basis": "Withheld plus tax-sale shares divided by gross shares; null if gross is zero.",
+        "denominator": "gross shares of this grant",
+        "metric": "tax_share_fraction",
+        "unit": "fraction"
+      },
+      "grants/*/tax_shares": {
+        "basis": "Declared grant shares, separately identifying withheld and tax-sale shares; future shares are not cash.",
+        "denominator": null,
+        "metric": "tax_shares",
+        "unit": "shares"
+      },
+      "grants/*/vest_date": {
+        "basis": "Supplied grant vest calendar date, no intraday precision.",
+        "denominator": null,
+        "metric": "vest_date",
+        "unit": "date"
+      },
+      "grants/*/withheld_shares": {
+        "basis": "Declared grant shares, separately identifying withheld and tax-sale shares; future shares are not cash.",
+        "denominator": null,
+        "metric": "withheld_shares",
+        "unit": "shares"
+      },
+      "observed_settled_sale_cash": {
+        "basis": "explicit confirmed net sales settled by supplied cutoff",
+        "denominator": null,
+        "metric": "observed_settled_sale_cash",
+        "unit": "input_currency_amount"
+      },
+      "source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      },
+      "tax_share_fraction": {
+        "basis": "(withheld + sold for tax) / gross; scenario grant shares only",
+        "denominator": "gross grant shares",
+        "metric": "tax_share_fraction",
+        "unit": "fraction"
+      },
+      "total_tax_shares": {
+        "basis": "Declared grant shares, separately identifying withheld and tax-sale shares; future shares are not cash.",
+        "denominator": null,
+        "metric": "total_tax_shares",
+        "unit": "shares"
+      },
+      "totals/gross_shares": {
+        "basis": "Declared grant shares, separately identifying withheld and tax-sale shares; future shares are not cash.",
+        "denominator": null,
+        "metric": "gross_shares",
+        "unit": "shares"
+      },
+      "totals/net_shares": {
+        "basis": "gross - withheld - sold for tax",
+        "denominator": null,
+        "metric": "net_shares",
+        "unit": "shares"
+      },
+      "totals/sold_for_tax_shares": {
+        "basis": "Declared grant shares, separately identifying withheld and tax-sale shares; future shares are not cash.",
+        "denominator": null,
+        "metric": "sold_for_tax_shares",
+        "unit": "shares"
+      },
+      "totals/withheld_shares": {
+        "basis": "Declared grant shares, separately identifying withheld and tax-sale shares; future shares are not cash.",
+        "denominator": null,
+        "metric": "withheld_shares",
+        "unit": "shares"
+      }
+    },
+    "validation.forward_observations": {
+      "additional_admissible_observations_needed": {
+        "basis": "max(0, declared minimum - admissible count); null when minimum missing/invalid.",
+        "denominator": null,
+        "metric": "additional_admissible_observations_needed",
+        "unit": "count"
+      },
+      "admissible_declared_forward_count": {
+        "basis": "Supplied forward-labeled pairs satisfying exact chronology, identity and retained-payload checks; no source or genuine-observation authentication.",
+        "denominator": null,
+        "metric": "admissible_declared_forward_count",
+        "unit": "count"
+      },
+      "change_list_completeness": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "change_list_completeness",
+        "unit": "status"
+      },
+      "fill_agreement": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "fill_agreement",
+        "unit": "status"
+      },
+      "forecast_calibration": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "forecast_calibration",
+        "unit": "status"
+      },
+      "genuine_forward_proven": {
+        "basis": "Always false: static supplied files do not prove genuine forward observation.",
+        "denominator": null,
+        "metric": "genuine_forward_proven",
+        "unit": "boolean"
+      },
+      "implementation_comparison": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "implementation_comparison",
+        "unit": "status"
+      },
+      "implementations/challenger/known_at": {
+        "basis": "Exact supplied clock text may be date-only or missing; never infer intraday precision.",
+        "denominator": null,
+        "metric": "known_at",
+        "unit": "declared_clock"
+      },
+      "implementations/challenger/status": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "implementations/champion/known_at": {
+        "basis": "Exact supplied clock text may be date-only or missing; never infer intraday precision.",
+        "denominator": null,
+        "metric": "known_at",
+        "unit": "declared_clock"
+      },
+      "implementations/champion/status": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "minimum_count_met": {
+        "basis": "Declared count threshold only; no execution or model replacement authorization.",
+        "denominator": null,
+        "metric": "minimum_count_met",
+        "unit": "boolean"
+      },
+      "minimum_observations": {
+        "basis": "Supplied observation count or declared threshold, with no independence or authenticity inference.",
+        "denominator": null,
+        "metric": "minimum_observations",
+        "unit": "count"
+      },
+      "performance_comparison": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "performance_comparison",
+        "unit": "status"
+      },
+      "protocol/end": {
+        "basis": "Exact supplied clock text may be date-only or missing; never infer intraday precision.",
+        "denominator": null,
+        "metric": "end",
+        "unit": "declared_clock"
+      },
+      "protocol/frozen_at": {
+        "basis": "Exact supplied clock text may be date-only or missing; never infer intraday precision.",
+        "denominator": null,
+        "metric": "frozen_at",
+        "unit": "declared_clock"
+      },
+      "protocol/start": {
+        "basis": "Exact supplied clock text may be date-only or missing; never infer intraday precision.",
+        "denominator": null,
+        "metric": "start",
+        "unit": "declared_clock"
+      },
+      "rows/*/status": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "status": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "supplied_observations": {
+        "basis": "Supplied observation count or declared threshold, with no independence or authenticity inference.",
+        "denominator": null,
+        "metric": "supplied_observations",
+        "unit": "count"
+      }
+    },
+    "validation.paper_study_forward": {
+      "additional_admissible_observations_needed": {
+        "basis": "max(0, declared minimum - admissible count); null when minimum missing/invalid.",
+        "denominator": null,
+        "metric": "additional_admissible_observations_needed",
+        "unit": "count"
+      },
+      "admissible_declared_forward_count": {
+        "basis": "Supplied forward-labeled pairs satisfying exact chronology, identity and retained-payload checks; no source or genuine-observation authentication.",
+        "denominator": null,
+        "metric": "admissible_declared_forward_count",
+        "unit": "count"
+      },
+      "change_list_completeness": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "change_list_completeness",
+        "unit": "status"
+      },
+      "fill_agreement": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "fill_agreement",
+        "unit": "status"
+      },
+      "forecast_calibration": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "forecast_calibration",
+        "unit": "status"
+      },
+      "genuine_forward_proven": {
+        "basis": "Always false: static supplied files do not prove genuine forward observation.",
+        "denominator": null,
+        "metric": "genuine_forward_proven",
+        "unit": "boolean"
+      },
+      "implementation_comparison": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "implementation_comparison",
+        "unit": "status"
+      },
+      "implementations/challenger/known_at": {
+        "basis": "Exact supplied clock text may be date-only or missing; never infer intraday precision.",
+        "denominator": null,
+        "metric": "known_at",
+        "unit": "declared_clock"
+      },
+      "implementations/challenger/status": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "implementations/champion/known_at": {
+        "basis": "Exact supplied clock text may be date-only or missing; never infer intraday precision.",
+        "denominator": null,
+        "metric": "known_at",
+        "unit": "declared_clock"
+      },
+      "implementations/champion/status": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "minimum_count_met": {
+        "basis": "Declared count threshold only; no execution or model replacement authorization.",
+        "denominator": null,
+        "metric": "minimum_count_met",
+        "unit": "boolean"
+      },
+      "minimum_observations": {
+        "basis": "Supplied observation count or declared threshold, with no independence or authenticity inference.",
+        "denominator": null,
+        "metric": "minimum_observations",
+        "unit": "count"
+      },
+      "performance_comparison": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "performance_comparison",
+        "unit": "status"
+      },
+      "protocol/end": {
+        "basis": "Exact supplied clock text may be date-only or missing; never infer intraday precision.",
+        "denominator": null,
+        "metric": "end",
+        "unit": "declared_clock"
+      },
+      "protocol/frozen_at": {
+        "basis": "Exact supplied clock text may be date-only or missing; never infer intraday precision.",
+        "denominator": null,
+        "metric": "frozen_at",
+        "unit": "declared_clock"
+      },
+      "protocol/start": {
+        "basis": "Exact supplied clock text may be date-only or missing; never infer intraday precision.",
+        "denominator": null,
+        "metric": "start",
+        "unit": "declared_clock"
+      },
+      "rows/*/status": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "status": {
+        "basis": "Declared evidence assessment only; does not prove genuine forward observation, execution, or performance.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "supplied_observations": {
+        "basis": "Supplied observation count or declared threshold, with no independence or authenticity inference.",
+        "denominator": null,
+        "metric": "supplied_observations",
+        "unit": "count"
+      }
+    },
+    "planning.budget_sizing": {
+      "requested_cash_budget": {
+        "metric": "Requested cash budget",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/rows/*/requested_cash_budget": {
+        "metric": "Requested cash budget",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/rows/*/gross_notional": {
+        "metric": "Gross notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/rows/*/modeled_entry_cost": {
+        "metric": "Modeled entry cost",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/rows/*/modeled_cash_debit": {
+        "metric": "Modeled cash debit",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/rows/*/budget_remainder": {
+        "metric": "Budget remainder",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/portfolio_totals/gross_notional": {
+        "metric": "Gross notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/portfolio_totals/modeled_entry_cost": {
+        "metric": "Modeled entry cost",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/portfolio_totals/modeled_cash_debit": {
+        "metric": "Modeled cash debit",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/portfolio_totals/budget_remainder": {
+        "metric": "Budget remainder",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/portfolio_totals/allocated_row_budgets": {
+        "metric": "Allocated row budgets",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/portfolio_totals/unassigned_cash_budget": {
+        "metric": "Unassigned cash budget",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/rows/*/quantity": {
+        "metric": "Quantity",
+        "unit": "shares",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/rows/*/quantity_step": {
+        "metric": "Quantity step",
+        "unit": "shares",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/quantity_step": {
+        "metric": "Quantity step",
+        "unit": "shares",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/rows/*/price": {
+        "metric": "Reference price",
+        "unit": "input_currency_per_share",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "alternatives_are_mutually_exclusive": {
+        "metric": "alternatives_are_mutually_exclusive",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "alternatives_must_not_be_summed": {
+        "metric": "alternatives_must_not_be_summed",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "advisory_only": {
+        "metric": "advisory_only",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed."
+      },
+      "scenarios/*/rows/*/friction_context/quoted_full_spread/amount": {
+        "metric": "Observed full spread",
+        "unit": null,
+        "denominator": null,
+        "basis": "Full quoted spread is retained separately; only an explicit one-way model with declared compatible reference and cost overlap enters the modeled cost array. Unit and reference basis belong to the retained quote; no bps or per-share unit is inferred."
+      },
+      "scenarios/*/rows/*/friction_context/modeled_slippage/amount": {
+        "metric": "Declared one-way slippage",
+        "unit": null,
+        "denominator": null,
+        "basis": "Full quoted spread is retained separately; only an explicit one-way model with declared compatible reference and cost overlap enters the modeled cost array. Unit and phase belong to the supplied slippage model."
+      },
+      "scenarios/*/rows/*/friction_context/quoted_spread_added_to_costs": {
+        "metric": "Quoted spread added to costs",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Full quoted spread is retained separately; only an explicit one-way model with declared compatible reference and cost overlap enters the modeled cost array."
+      }
+    },
+    "planning.friction_context": {
+      "quoted_spread_added_to_costs": {
+        "metric": "Quoted spread added to costs",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Full quoted spread is retained separately; only an explicit one-way model with declared compatible reference and cost overlap enters the modeled cost array."
+      },
+      "modeled_slippage_status": {
+        "metric": "Modeled slippage interpretation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Full quoted spread is retained separately; only an explicit one-way model with declared compatible reference and cost overlap enters the modeled cost array."
+      },
+      "quoted_full_spread/amount": {
+        "metric": "Observed full spread",
+        "unit": null,
+        "denominator": null,
+        "basis": "Full quoted spread is retained separately; only an explicit one-way model with declared compatible reference and cost overlap enters the modeled cost array. Unit and reference basis belong to the retained quote; no bps or per-share unit is inferred."
+      },
+      "modeled_slippage/amount": {
+        "metric": "Declared one-way slippage",
+        "unit": null,
+        "denominator": null,
+        "basis": "Full quoted spread is retained separately; only an explicit one-way model with declared compatible reference and cost overlap enters the modeled cost array. Unit and phase belong to the supplied slippage model."
+      }
+    },
+    "planning.allocation_context": {
+      "known_gross_notional": {
+        "metric": "Known gross notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "total_gross_notional": {
+        "metric": "Total gross notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "denominator_difference": {
+        "metric": "Denominator difference",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "rows/*/gross_notional": {
+        "metric": "Gross notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "exposures/*/groups/*/notional": {
+        "metric": "Notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "exposures/*/unknown_notional": {
+        "metric": "Unknown notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "exposures/*/classified_notional": {
+        "metric": "Classified notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "exposures/*/non_applicable_cash_notional": {
+        "metric": "Non applicable cash notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "exposures/*/conservation_residual": {
+        "metric": "Conservation residual",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "fund_lookthrough/known_top_level_fund_notional": {
+        "metric": "Known top level fund notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "fund_lookthrough/terminal_nonfund_notional": {
+        "metric": "Terminal nonfund notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "fund_lookthrough/embedded_cash_notional": {
+        "metric": "Embedded cash notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "fund_lookthrough/opaque_or_uncovered_fund_notional": {
+        "metric": "Opaque or uncovered fund notional",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "fund_lookthrough/conservation_residual": {
+        "metric": "Conservation residual",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "rows/*/fraction_of_denominator": {
+        "metric": "Fraction of denominator",
+        "unit": "fraction",
+        "denominator": "explicit original declared denominator; never known-only assets",
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "exposures/*/groups/*/fraction_of_denominator": {
+        "metric": "Fraction of denominator",
+        "unit": "fraction",
+        "denominator": "explicit original declared denominator; never known-only assets",
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "exposures/*/unknown_fraction_of_denominator": {
+        "metric": "Unknown fraction of denominator",
+        "unit": "fraction",
+        "denominator": "explicit original declared denominator; never known-only assets",
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "exposures/*/non_applicable_cash_fraction_of_denominator": {
+        "metric": "Non applicable cash fraction of denominator",
+        "unit": "fraction",
+        "denominator": "explicit original declared denominator; never known-only assets",
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "fund_lookthrough/terminal_coverage_fraction": {
+        "metric": "Terminal supplied fund coverage",
+        "unit": "fraction",
+        "denominator": "known top-level fund notional",
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred. Null when any fund amount or constituent weight is unresolved."
+      },
+      "fund_lookthrough/coverage_status": {
+        "metric": "Fund look-through coverage",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "denominator_difference_is_cash": {
+        "metric": "Denominator difference established as cash",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred."
+      },
+      "rows/*/dollar_volume_context/notional_to_supplied_dollar_volume": {
+        "metric": "Gross notional relative to supplied dollar volume",
+        "unit": null,
+        "denominator": "supplied monetary-volume amount with its own period, units and currency",
+        "basis": "Read the adjacent ratio_unit: days, sessions or fraction of period volume. Missing unit/currency leaves the ratio unresolved. This is not a fill/capacity claim."
+      },
+      "rows/*/dollar_volume_context/period_known": {
+        "metric": "Period known",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Declared source metadata only; no freshness authentication or retrieval performed."
+      },
+      "rows/*/dollar_volume_context/provenance_known": {
+        "metric": "Provenance known",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Declared source metadata only; no freshness authentication or retrieval performed."
+      },
+      "rows/*/dollar_volume_context/source_freshness_verified": {
+        "metric": "Source freshness verified",
+        "unit": "boolean",
+        "denominator": null,
+        "basis": "Declared source metadata only; no freshness authentication or retrieval performed."
+      }
+    },
+    "planning.input_roles": {
+      "actual_portfolio_inferred": {
+        "metric": "actual_portfolio_inferred",
+        "unit": "boolean",
+        "basis": "Caller-declared roles and same metric/unit/scope/basis comparisons; no observed state, quantity, cash debit or trade permission is inferred.",
+        "denominator": null
+      },
+      "records/*/is_observed_state": {
+        "metric": "is_observed_state",
+        "unit": "boolean",
+        "basis": "Caller-declared roles and same metric/unit/scope/basis comparisons; no observed state, quantity, cash debit or trade permission is inferred.",
+        "denominator": null
+      },
+      "checks/*/satisfies_declared_relation": {
+        "metric": "satisfies_declared_relation",
+        "unit": "boolean",
+        "basis": "Caller-declared roles and same metric/unit/scope/basis comparisons; no observed state, quantity, cash debit or trade permission is inferred.",
+        "denominator": null
+      },
+      "checks/*/missing_value": {
+        "metric": "missing_value",
+        "unit": "boolean",
+        "basis": "Caller-declared roles and same metric/unit/scope/basis comparisons; no observed state, quantity, cash debit or trade permission is inferred.",
+        "denominator": null
+      },
+      "checks/*/status": {
+        "metric": "Declared comparison status",
+        "unit": "status",
+        "basis": "Caller-declared roles and same metric/unit/scope/basis comparisons; no observed state, quantity, cash debit or trade permission is inferred.",
+        "denominator": null
+      }
+    },
+    "planning.reference_comparison": {
+      "sleeves/*/observed_holdings_available": {
+        "metric": "observed_holdings_available",
+        "unit": "boolean",
+        "basis": "Explicit reference exposure only; one currency unit is an analytical denominator, not an allocation. Shocks are supplied, before costs, income, flows and taxes; no performance estimate is implied.",
+        "denominator": null
+      },
+      "sleeves/*/supplied_return_observations_present": {
+        "metric": "supplied_return_observations_present",
+        "unit": "boolean",
+        "basis": "Explicit reference exposure only; one currency unit is an analytical denominator, not an allocation. Shocks are supplied, before costs, income, flows and taxes; no performance estimate is implied.",
+        "denominator": null
+      },
+      "sleeves/*/scenario_status": {
+        "metric": "Reference scenario status",
+        "unit": "status",
+        "basis": "Explicit reference exposure only; one currency unit is an analytical denominator, not an allocation. Shocks are supplied, before costs, income, flows and taxes; no performance estimate is implied.",
+        "denominator": null
+      },
+      "sleeves/*/reference_notional": {
+        "metric": "Reference notional",
+        "unit": "input_currency_amount",
+        "basis": "Explicit reference exposure only; one currency unit is an analytical denominator, not an allocation. Shocks are supplied, before costs, income, flows and taxes; no performance estimate is implied.",
+        "denominator": null
+      },
+      "sleeves/*/reference_scenarios/*/return_fraction": {
+        "metric": "Explicit price shock",
+        "unit": "fraction",
+        "basis": "Explicit reference exposure only; one currency unit is an analytical denominator, not an allocation. Shocks are supplied, before costs, income, flows and taxes; no performance estimate is implied.",
+        "denominator": "explicit reference price"
+      },
+      "sleeves/*/reference_scenarios/*/price_pnl_per_currency_unit": {
+        "metric": "Price effect per currency unit",
+        "unit": "fraction",
+        "basis": "Explicit reference exposure only; one currency unit is an analytical denominator, not an allocation. Shocks are supplied, before costs, income, flows and taxes; no performance estimate is implied.",
+        "denominator": "one currency unit of hypothetical exposed notional"
+      }
+    },
+    "planning.dated_projection": {
+      "cash": {
+        "metric": "cash",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "tax_reserve": {
+        "metric": "tax_reserve",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "cash_after_tax_earmark": {
+        "metric": "cash_after_tax_earmark",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "total_position_value": {
+        "metric": "total_position_value",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "identified_assets": {
+        "metric": "identified_assets",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "other_assets_value": {
+        "metric": "other_assets_value",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "total_assets": {
+        "metric": "total_assets",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "total_liabilities": {
+        "metric": "total_liabilities",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "net_equity": {
+        "metric": "net_equity",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "position_values/*/market_value": {
+        "metric": "market_value",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "other_assets_valuations/*/value": {
+        "metric": "value",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "liability_valuations/*/value": {
+        "metric": "value",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "timeline/*/cash": {
+        "metric": "cash",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "timeline/*/tax_reserve": {
+        "metric": "tax_reserve",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "timeline/*/cash_after_tax_earmark": {
+        "metric": "cash_after_tax_earmark",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "timeline/*/applied_flows/*/cash_delta": {
+        "metric": "cash_delta",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "timeline/*/applied_flows/*/tax_reserve_delta": {
+        "metric": "tax_reserve_delta",
+        "unit": "input_currency_amount",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "opening_positions/*": {
+        "metric": "*",
+        "unit": null,
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null. Quantity units are those of each supplied asset; shares are not inferred for arbitrary assets.",
+        "denominator": null
+      },
+      "position_values/*/quantity": {
+        "metric": "quantity",
+        "unit": null,
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null. Quantity units are those of each supplied asset; shares are not inferred for arbitrary assets.",
+        "denominator": null
+      },
+      "timeline/*/positions/*": {
+        "metric": "*",
+        "unit": null,
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null. Quantity units are those of each supplied asset; shares are not inferred for arbitrary assets.",
+        "denominator": null
+      },
+      "timeline/*/applied_flows/*/asset_quantity_delta/quantity": {
+        "metric": "quantity",
+        "unit": null,
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null. Quantity units are those of each supplied asset; shares are not inferred for arbitrary assets.",
+        "denominator": null
+      },
+      "supplied_flows_all_included": {
+        "metric": "supplied_flows_all_included",
+        "unit": "boolean",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "future_returns_inferred": {
+        "metric": "future_returns_inferred",
+        "unit": "boolean",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      },
+      "flow_audit/*/included": {
+        "metric": "included",
+        "unit": "boolean",
+        "basis": "Explicit dated conditional asset ledger, selected flows and target mark policy; tax earmarks remain assets. Dates are end-of-day accounting, not intraday funding proof. Unknown balances remain null.",
+        "denominator": null
+      }
+    },
+    "planning.tax_sensitivity": {
+      "scenarios/*/gross_proceeds": {
+        "metric": "gross_proceeds",
+        "unit": "input_currency_amount",
+        "basis": "Conditional supplied tax rate and selling-cost gain treatment; no legal determination or netting. Positive estimate earmarks cash but does not establish a payment; losses have no automatic cash credit.",
+        "denominator": null
+      },
+      "scenarios/*/selling_costs": {
+        "metric": "selling_costs",
+        "unit": "input_currency_amount",
+        "basis": "Conditional supplied tax rate and selling-cost gain treatment; no legal determination or netting. Positive estimate earmarks cash but does not establish a payment; losses have no automatic cash credit.",
+        "denominator": null
+      },
+      "scenarios/*/net_sale_proceeds": {
+        "metric": "net_sale_proceeds",
+        "unit": "input_currency_amount",
+        "basis": "Conditional supplied tax rate and selling-cost gain treatment; no legal determination or netting. Positive estimate earmarks cash but does not establish a payment; losses have no automatic cash credit.",
+        "denominator": null
+      },
+      "scenarios/*/modeled_taxable_gain": {
+        "metric": "modeled_taxable_gain",
+        "unit": "input_currency_amount",
+        "basis": "Conditional supplied tax rate and selling-cost gain treatment; no legal determination or netting. Positive estimate earmarks cash but does not establish a payment; losses have no automatic cash credit.",
+        "denominator": null
+      },
+      "scenarios/*/positive_tax_estimate": {
+        "metric": "positive_tax_estimate",
+        "unit": "input_currency_amount",
+        "basis": "Conditional supplied tax rate and selling-cost gain treatment; no legal determination or netting. Positive estimate earmarks cash but does not establish a payment; losses have no automatic cash credit.",
+        "denominator": null
+      },
+      "scenarios/*/modeled_tax_earmark": {
+        "metric": "modeled_tax_earmark",
+        "unit": "input_currency_amount",
+        "basis": "Conditional supplied tax rate and selling-cost gain treatment; no legal determination or netting. Positive estimate earmarks cash but does not establish a payment; losses have no automatic cash credit.",
+        "denominator": null
+      },
+      "scenarios/*/net_sale_proceeds_after_tax_earmark": {
+        "metric": "net_sale_proceeds_after_tax_earmark",
+        "unit": "input_currency_amount",
+        "basis": "Conditional supplied tax rate and selling-cost gain treatment; no legal determination or netting. Positive estimate earmarks cash but does not establish a payment; losses have no automatic cash credit.",
+        "denominator": null
+      },
+      "scenarios/*/tax_payment_inferred": {
+        "metric": "tax_payment_inferred",
+        "unit": "boolean",
+        "basis": "Conditional supplied tax rate and selling-cost gain treatment; no legal determination or netting. Positive estimate earmarks cash but does not establish a payment; losses have no automatic cash credit.",
+        "denominator": null
+      },
+      "scenarios/*/cash_loss_credit_inferred": {
+        "metric": "cash_loss_credit_inferred",
+        "unit": "boolean",
+        "basis": "Conditional supplied tax rate and selling-cost gain treatment; no legal determination or netting. Positive estimate earmarks cash but does not establish a payment; losses have no automatic cash credit.",
+        "denominator": null
+      },
+      "scenarios/*/status": {
+        "metric": "Tax scenario status",
+        "unit": "status",
+        "basis": "Conditional supplied tax rate and selling-cost gain treatment; no legal determination or netting. Positive estimate earmarks cash but does not establish a payment; losses have no automatic cash credit.",
+        "denominator": null
+      }
+    },
+    "planning.alternative_comparison": {
+      "alternatives/*/values/*/value": {
+        "metric": "Declared criterion value",
+        "unit": null,
+        "basis": "Pairwise declared metric/direction comparison with no weights or selected winner; unknown or mismatched criteria prevent dominance, and source order is presentation only. Use adjacent metric/unit/basis; do not infer common units across criteria.",
+        "denominator": null
+      },
+      "alternatives/*/values/*/comparable": {
+        "metric": "Criterion comparability",
+        "unit": "boolean",
+        "basis": "Pairwise declared metric/direction comparison with no weights or selected winner; unknown or mismatched criteria prevent dominance, and source order is presentation only.",
+        "denominator": null
+      },
+      "pairwise/*/relation": {
+        "metric": "Pairwise relation",
+        "unit": "status",
+        "basis": "Pairwise declared metric/direction comparison with no weights or selected winner; unknown or mismatched criteria prevent dominance, and source order is presentation only.",
+        "denominator": null
+      },
+      "input_order_is_priority": {
+        "metric": "Input order establishes priority",
+        "unit": "boolean",
+        "basis": "Pairwise declared metric/direction comparison with no weights or selected winner; unknown or mismatched criteria prevent dominance, and source order is presentation only.",
+        "denominator": null
+      }
+    },
+    "planning.settlement_transfer_paths": {
+      "calendar_extended": {
+        "metric": "calendar_extended",
+        "unit": "boolean",
+        "basis": "Date-only transitions on the supplied calendar and lags; settlement, transfer initiation and spendability remain distinct. Conditional paths never establish actual broker or bank availability.",
+        "denominator": null
+      },
+      "actual_calendar_verified": {
+        "metric": "actual_calendar_verified",
+        "unit": "boolean",
+        "basis": "Date-only transitions on the supplied calendar and lags; settlement, transfer initiation and spendability remain distinct. Conditional paths never establish actual broker or bank availability.",
+        "denominator": null
+      },
+      "broker_availability_verified": {
+        "metric": "broker_availability_verified",
+        "unit": "boolean",
+        "basis": "Date-only transitions on the supplied calendar and lags; settlement, transfer initiation and spendability remain distinct. Conditional paths never establish actual broker or bank availability.",
+        "denominator": null
+      },
+      "paths/*/guaranteed_spendable_by_deadline": {
+        "metric": "guaranteed_spendable_by_deadline",
+        "unit": "boolean",
+        "basis": "Date-only transitions on the supplied calendar and lags; settlement, transfer initiation and spendability remain distinct. Conditional paths never establish actual broker or bank availability.",
+        "denominator": null
+      },
+      "paths/*/status": {
+        "metric": "status",
+        "unit": "status",
+        "basis": "Date-only transitions on the supplied calendar and lags; settlement, transfer initiation and spendability remain distinct. Conditional paths never establish actual broker or bank availability.",
+        "denominator": null
+      },
+      "paths/*/date_relation_to_deadline": {
+        "metric": "date_relation_to_deadline",
+        "unit": "status",
+        "basis": "Date-only transitions on the supplied calendar and lags; settlement, transfer initiation and spendability remain distinct. Conditional paths never establish actual broker or bank availability.",
+        "denominator": null
+      },
+      "sale_date": {
+        "metric": "sale_date",
+        "unit": "ISO_calendar_date",
+        "basis": "Date-only transitions on the supplied calendar and lags; settlement, transfer initiation and spendability remain distinct. Conditional paths never establish actual broker or bank availability. Text follows normal private source-text export settings; not an observed timestamp.",
+        "denominator": null
+      },
+      "settlement_date": {
+        "metric": "settlement_date",
+        "unit": "ISO_calendar_date",
+        "basis": "Date-only transitions on the supplied calendar and lags; settlement, transfer initiation and spendability remain distinct. Conditional paths never establish actual broker or bank availability. Text follows normal private source-text export settings; not an observed timestamp.",
+        "denominator": null
+      },
+      "spendable_deadline": {
+        "metric": "spendable_deadline",
+        "unit": "ISO_calendar_date",
+        "basis": "Date-only transitions on the supplied calendar and lags; settlement, transfer initiation and spendability remain distinct. Conditional paths never establish actual broker or bank availability. Text follows normal private source-text export settings; not an observed timestamp.",
+        "denominator": null
+      },
+      "paths/*/settlement_date": {
+        "metric": "settlement_date",
+        "unit": "ISO_calendar_date",
+        "basis": "Date-only transitions on the supplied calendar and lags; settlement, transfer initiation and spendability remain distinct. Conditional paths never establish actual broker or bank availability. Text follows normal private source-text export settings; not an observed timestamp.",
+        "denominator": null
+      },
+      "paths/*/transfer_initiation_date": {
+        "metric": "transfer_initiation_date",
+        "unit": "ISO_calendar_date",
+        "basis": "Date-only transitions on the supplied calendar and lags; settlement, transfer initiation and spendability remain distinct. Conditional paths never establish actual broker or bank availability. Text follows normal private source-text export settings; not an observed timestamp.",
+        "denominator": null
+      },
+      "paths/*/arrival_date": {
+        "metric": "arrival_date",
+        "unit": "ISO_calendar_date",
+        "basis": "Date-only transitions on the supplied calendar and lags; settlement, transfer initiation and spendability remain distinct. Conditional paths never establish actual broker or bank availability. Text follows normal private source-text export settings; not an observed timestamp.",
+        "denominator": null
+      }
+    },
+    "data.normalize_flows": {
+      "status": {
+        "metric": "Mapping and normalization status",
+        "unit": "status",
+        "basis": "Installed financial normalizer over explicitly mapped supplied observations. Field status, period, unit, rounding bounds and source reviews remain part of the result; caller reviews are not independent authentication.",
+        "denominator": null
+      },
+      "normalization/status": {
+        "metric": "Normalization completeness",
+        "unit": "status",
+        "basis": "Installed financial normalizer over explicitly mapped supplied observations. Field status, period, unit, rounding bounds and source reviews remain part of the result; caller reviews are not independent authentication.",
+        "denominator": null
+      },
+      "normalization/issuers/*/status": {
+        "metric": "Issuer completeness",
+        "unit": "status",
+        "basis": "Installed financial normalizer over explicitly mapped supplied observations. Field status, period, unit, rounding bounds and source reviews remain part of the result; caller reviews are not independent authentication.",
+        "denominator": null
+      },
+      "normalization/issuers/*/latest_public_period_checked": {
+        "metric": "Latest public period reviewed",
+        "unit": "boolean",
+        "basis": "Installed financial normalizer over explicitly mapped supplied observations. Field status, period, unit, rounding bounds and source reviews remain part of the result; caller reviews are not independent authentication.",
+        "denominator": null
+      },
+      "normalization/issuers/*/fields/*/value": {
+        "metric": "Normalized financial field",
+        "unit": "USD",
+        "basis": "Installed financial normalizer over explicitly mapped supplied observations. Field status, period, unit, rounding bounds and source reviews remain part of the result; caller reviews are not independent authentication.",
+        "denominator": null
+      },
+      "normalization/issuers/*/fields/*/rounding_error_bound": {
+        "metric": "Reported precision error bound",
+        "unit": "USD",
+        "basis": "Installed financial normalizer over explicitly mapped supplied observations. Field status, period, unit, rounding bounds and source reviews remain part of the result; caller reviews are not independent authentication.",
+        "denominator": null
+      },
+      "normalization/issuers/*/fields/*/status": {
+        "metric": "Financial field evidence status",
+        "unit": "status",
+        "basis": "Installed financial normalizer over explicitly mapped supplied observations. Field status, period, unit, rounding bounds and source reviews remain part of the result; caller reviews are not independent authentication.",
+        "denominator": null
+      },
+      "normalization/source_reviews/*/ready": {
+        "metric": "Caller source-review readiness",
+        "unit": "boolean",
+        "basis": "Installed financial normalizer over explicitly mapped supplied observations. Field status, period, unit, rounding bounds and source reviews remain part of the result; caller reviews are not independent authentication.",
+        "denominator": null
+      }
+    }
+  },
+  "schema_version": 1
+}

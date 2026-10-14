@@ -22,6 +22,19 @@ import quant_portfolio
 import quant_validation
 import portfolio_backtest
 import manager_monitor
+import analysis_checks
+import planning_alignment
+import financial_alignment
+import strategy_research
+import forward_evidence
+import evidence_semantics
+import ranking_alignment
+import allocation_policy
+import portfolio_decision
+import planning_roles
+import portfolio_projection
+import planning_comparison
+import flow_normalization
 from quant_common import digest, require
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -44,18 +57,67 @@ OPERATIONS = {
     'ops.attribution': investment_ops.brinson,
     'data.sec_extract': primary_financial_data.extract,
     'data.coverage': primary_financial_data.coverage_plan,
+    'data.normalize_flows': flow_normalization.normalize_flows,
     'backtest.portfolio': portfolio_backtest.simulate,
     'monitor.assess': manager_monitor.assess,
+    'analysis.covariance_comparison': analysis_checks.covariance_comparison,
+    'analysis.hedge_scenarios': analysis_checks.hedge_scenarios,
+    'analysis.compare_claim': analysis_checks.compare_claim,
+    'planning.trade_costs': planning_alignment.trade_costs,
+    'planning.allocate': allocation_policy.allocate,
+    'planning.budget_sizing': portfolio_decision.budget_sizing,
+    'planning.allocation_context': portfolio_decision.allocation_context,
+    'planning.friction_context': portfolio_decision.friction_context,
+    'planning.input_roles': planning_roles.input_roles,
+    'planning.reference_comparison': planning_roles.reference_comparison,
+    'planning.dated_projection': portfolio_projection.dated_projection,
+    'planning.tax_sensitivity': portfolio_projection.tax_sensitivity,
+    'planning.alternative_comparison': planning_comparison.alternative_comparison,
+    'planning.settlement_transfer_paths': planning_comparison.settlement_transfer_paths,
+    'planning.cash_plan': planning_alignment.cash_plan,
+    'planning.cash_projection': planning_alignment.cash_projection,
+    'planning.vest_reconciliation': planning_alignment.vest_reconciliation,
+    'planning.portfolio_reconciliation': planning_alignment.portfolio_reconciliation,
+    'planning.cash_reconciliation': planning_alignment.cash_reconciliation,
+    'planning.trade_history_costs': planning_alignment.trade_history_costs,
+    'planning.session_pnl': planning_alignment.session_pnl,
+    'financial.owner_cash_bridge': financial_alignment.owner_cash_bridge,
+    'financial.acquisition_cash': financial_alignment.acquisition_cash,
+    'financial.terminal_scenarios': financial_alignment.terminal_scenarios,
+    'financial.price_scenarios': financial_alignment.price_scenarios,
+    'financial.corporate_action_return': financial_alignment.corporate_action_return,
+    'backtest.dual_sma': strategy_research.dual_sma,
+    'backtest.dual_sma_variants': strategy_research.dual_sma_variants,
+    'backtest.opening_range': strategy_research.opening_range,
+    'validation.forward_observations': forward_evidence.assess,
+    'validation.paper_study_forward': forward_evidence.paper_study,
+    'evidence.operand_compatibility': evidence_semantics.operand_compatibility,
+    'evidence.event_window': evidence_semantics.event_window,
+    'evidence.states': evidence_semantics.evidence_states,
+    'ranking.route': ranking_alignment.route_ranking,
+    'ranking.replay': ranking_alignment.replay_ranking,
+    'ranking.compare': ranking_alignment.compare_rankings,
 }
 MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'quant_portfolio.py', 'multi_asset_risk.py', 'investment_ops.py',
            'primary_financial_data.py', 'price_audit.py', 'financial_normalize.py',
-           'filing_extract.py', 'deterministic_rank.py', 'portfolio_backtest.py', 'manager_monitor.py')
+           'filing_extract.py', 'deterministic_rank.py', 'portfolio_backtest.py', 'manager_monitor.py',
+           'analysis_checks.py', 'planning_alignment.py', 'financial_alignment.py',
+           'portfolio_analytics.py', 'accounting_tools.py', 'strategy_research.py',
+           'strategy_lab.py', 'risk_engine.py', 'forward_evidence.py', 'report_facts.py',
+           'research_analytics.py', 'evidence_semantics.py', 'ranking_alignment.py',
+           'vqm_research.py', 'public_research.py', 'research_bundle.py', 'screen_review.py',
+           'horizon_review.py', 'cash_benchmark.py', 'trading_calendar.py', 'allocation_policy.py',
+           'portfolio_decision.py', 'planning_roles.py', 'portfolio_projection.py', 'planning_comparison.py',
+           'flow_normalization.py')
 
 
 def implementation_hash():
     sources = {f: (ROOT/'scripts'/f).read_text(encoding='utf-8') for f in MODULES}
     sources['financial-normalization-v1.json'] = (ROOT/'profiles/financial-normalization-v1.json').read_text(encoding='utf-8')
+    sources['report-facts-v2.json'] = (ROOT/'profiles/report-facts-v2.json').read_text(encoding='utf-8')
+    for name in ('vqm-fundamental-v1.json', 'public-vqm-discovery-v1.json'):
+        sources[name] = (ROOT/'profiles'/name).read_text(encoding='utf-8')
     return digest(sources)
 
 
@@ -121,6 +183,13 @@ def run(document):
                 require(timestamp(inputs['as_of']) <= timestamp(contract['as_of']), 'FUTURE_STATE_SNAPSHOT')
             if job['operation'] == 'backtest.portfolio':
                 require(all(timestamp(r['end']) <= timestamp(contract['as_of']) for r in inputs['document']['periods']), 'FUTURE_BACKTEST_DATA')
+            if job['operation'] in {'backtest.dual_sma', 'backtest.dual_sma_variants',
+                                     'backtest.opening_range', 'validation.paper_study_forward'}:
+                require(timestamp(inputs['as_of']) <= timestamp(contract['as_of']), 'FUTURE_ANALYSIS_CUTOFF')
+            if job['operation'] in {'validation.forward_observations', 'planning.cash_plan',
+                                     'planning.vest_reconciliation', 'planning.session_pnl'}:
+                if inputs['document'].get('as_of') is not None:
+                    require(timestamp(inputs['document']['as_of']) <= timestamp(contract['as_of']), 'FUTURE_STATE_SNAPSHOT')
             result = OPERATIONS[job['operation']](**inputs)
             result['execution_authorized'] = False
             results.append({'id': job['id'], 'operation': job['operation'], 'status': 'COMPUTED', 'result': result,

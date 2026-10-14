@@ -11,12 +11,12 @@ request. Browse [example prompts](../EXAMPLE-PROMPTS.md) to choose a workflow.
 | Resolve a holding period and events | [Holding-period planning](holding-period-planning.md) |
 | Follow news, sentiment and guidance | [News and guidance](news-and-guidance.md) |
 | Discover reports, targets and analyst evidence | [Analyst research](analyst-research.md) |
-| Review and rebalance a portfolio | [Portfolio management](portfolio-management.md) |
+| Review and rebalance a portfolio | [Portfolio management](portfolio-management.md), [sizing and context](portfolio-decision-calculations.md), [input roles](planning-input-roles.md), [dated projections](portfolio-projection.md), [alternative comparisons](planning-comparison.md) |
 | Plan swing or intraday research | [Short-term trading](short-term-trading.md), [strategy playbook](strategy-playbook.md) |
 | Model volatility | [GARCH family](garch-volatility.md) |
 | Run quantitative construction, risk and validation | [Quant workbench](quant-workbench.md), [quant methods](quant-research.md) |
 | Review different instruments | [Multi-asset playbook](multi-asset-playbook.md) |
-| Plan cash and settlement | [Settled-cash planning](settled-cash-planning.md) |
+| Plan cash and settlement | [Settled-cash planning](settled-cash-planning.md), [dated projections](portfolio-projection.md), [settlement and transfer paths](planning-comparison.md) |
 | Assess strategy evidence | [Research and validation](research-methods.md), [shared strategy validation](strategy-evaluation.md) |
 | Prepare a requested broker handoff | [Execution handoff](execution-handoff.md), [broker integration](broker-integration.md) |
 | Save, refresh or compare research | [Research memory](research-memory.md), [model-independent research](model-independent-research.md) |
