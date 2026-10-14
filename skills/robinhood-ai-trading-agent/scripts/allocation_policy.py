@@ -289,6 +289,36 @@ def _result(document, source, by_symbol, selected, selection_basis, budget, weig
         'amount_semantics': 'Cent-denominated advisory notionals before fees; no assumption about broker order increments, fractional eligibility or debit.',
         'limitation': 'An illustrative deterministic allocation, not a return-maximizing strategy. Research labels are retained declarations. Missing review is not cured by equal weighting. Native host and broker tools own any user-requested execution.',
     }
+    # Classifications and monetary volume supplied with the selected source
+    # rows belong beside the final notionals, not only in retained_input.
+    from portfolio_decision import allocation_context
+    contexts = []
+    groups = [[r] for r in results] if mode == 'alternative_single_stock' else [results]
+    for group in groups:
+        context_rows = []
+        for allocated in group:
+            original = by_symbol[allocated['symbol']]
+            context_rows.append({
+                **{k: deepcopy(original[k]) for k in
+                   ('sector', 'industry', 'dollar_volume', 'lookthrough',
+                    'period', 'provenance', 'classification_provenance') if k in original},
+                'id': allocated['symbol'], 'symbol': allocated['symbol'],
+                'issuer_id': allocated['issuer_id'], 'currency': document['currency'],
+                'instrument_type': original.get('instrument_type', 'unknown'),
+                'notional': allocated['reference_notional_before_fees'],
+                'notional_basis': 'gross_notional',
+            })
+        contexts.append({'scenario_id': group[0]['scenario_id'],
+                         'notional_status': result['sizing_status'],
+                         'result': allocation_context({
+                             'currency': document['currency'], 'role': document['role'],
+                             'denominator': {'amount': result['budget'],
+                                             'basis': 'supplied_notional_budget'},
+                             'rows': context_rows})})
+    result['allocation_context'] = contexts
+    result['context_limitation'] = ('Context uses reference gross notionals before fees; '
+        'unresolved final sizing is not cured. Unknown source labels/volume remain unknown. '
+        'Use the source-bound recommendation report to map other retained source fields explicitly.')
     result['result_sha256'] = digest(result)
     return result
 

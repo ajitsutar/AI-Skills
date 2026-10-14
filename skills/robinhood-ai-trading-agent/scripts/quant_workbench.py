@@ -35,6 +35,11 @@ import planning_roles
 import portfolio_projection
 import planning_comparison
 import flow_normalization
+import price_comparison
+import recommendation_report
+import employer_reference
+import equity_cash_comparison
+import source_exposure
 from quant_common import digest, require
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -66,14 +71,22 @@ OPERATIONS = {
     'planning.trade_costs': planning_alignment.trade_costs,
     'planning.allocate': allocation_policy.allocate,
     'planning.budget_sizing': portfolio_decision.budget_sizing,
+    'planning.source_budget_sizing': portfolio_decision.source_budget_sizing,
     'planning.allocation_context': portfolio_decision.allocation_context,
+    'planning.source_allocation_context': source_exposure.source_allocation_context,
     'planning.friction_context': portfolio_decision.friction_context,
     'planning.input_roles': planning_roles.input_roles,
+    'planning.source_roles': planning_roles.source_roles,
     'planning.reference_comparison': planning_roles.reference_comparison,
     'planning.dated_projection': portfolio_projection.dated_projection,
+    'planning.source_projection': portfolio_projection.source_projection,
     'planning.tax_sensitivity': portfolio_projection.tax_sensitivity,
     'planning.alternative_comparison': planning_comparison.alternative_comparison,
+    'planning.source_alternatives': planning_comparison.source_alternatives,
+    'planning.employer_diversification_baseline': employer_reference.employer_diversification_baseline,
+    'financial.equity_cash_comparison': equity_cash_comparison.equity_cash_comparison,
     'planning.settlement_transfer_paths': planning_comparison.settlement_transfer_paths,
+    'planning.settlement_transfer_sweep': planning_comparison.settlement_transfer_sweep,
     'planning.cash_plan': planning_alignment.cash_plan,
     'planning.cash_projection': planning_alignment.cash_projection,
     'planning.vest_reconciliation': planning_alignment.vest_reconciliation,
@@ -94,6 +107,8 @@ OPERATIONS = {
     'evidence.operand_compatibility': evidence_semantics.operand_compatibility,
     'evidence.event_window': evidence_semantics.event_window,
     'evidence.states': evidence_semantics.evidence_states,
+    'evidence.price_comparison': price_comparison.compare_prices,
+    'planning.recommendation_context': recommendation_report.recommendation_context,
     'ranking.route': ranking_alignment.route_ranking,
     'ranking.replay': ranking_alignment.replay_ranking,
     'ranking.compare': ranking_alignment.compare_rankings,
@@ -109,7 +124,8 @@ MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'vqm_research.py', 'public_research.py', 'research_bundle.py', 'screen_review.py',
            'horizon_review.py', 'cash_benchmark.py', 'trading_calendar.py', 'allocation_policy.py',
            'portfolio_decision.py', 'planning_roles.py', 'portfolio_projection.py', 'planning_comparison.py',
-           'flow_normalization.py')
+           'flow_normalization.py', 'price_comparison.py', 'recommendation_report.py', 'employer_reference.py',
+           'equity_cash_comparison.py', 'source_exposure.py')
 
 
 def implementation_hash():

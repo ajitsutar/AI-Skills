@@ -9,10 +9,12 @@ from __future__ import annotations
 import base64
 import copy
 import hashlib
+import json
 
 from deterministic_rank import digest, number
 from filing_extract import numeric
 from financial_normalize import normalize, policy, quantum, require, nonempty
+from report_facts import pointer
 
 
 def normalize_flows(document):
@@ -53,8 +55,43 @@ def normalize_flows(document):
     usable_sources = {s['source_id'] for s in sources}
     issuers = copy.deepcopy(supplied.get('issuers', []))
     issuer_entities = {i['issuer_id']: i['entity_id'] for i in issuers}
+    observations = copy.deepcopy(supplied.get('observations', []))
+    bindings = []
+    # Select values from retained JSON bytes rather than reconstructing a new
+    # observation and guessing precision from an integer's representation.
+    for binding in supplied.get('observation_bindings', []):
+        require(isinstance(binding, dict) and set(binding) == {'source_id', 'record', 'fields'},
+                'EXPLICIT_OBSERVATION_BINDING_REQUIRED')
+        require(isinstance(binding['record'], dict) and isinstance(binding['fields'], dict),
+                'BINDING_RECORD_AND_FIELDS_REQUIRED')
+        require('source_id' not in binding['fields'], 'BINDING_SOURCE_ID_MUST_BE_DECLARATION')
+        require('decimals' not in binding['record'], 'PRECISION_MUST_BIND_SOURCE_FIELD_OR_SEPARATE_SENSITIVITY')
+        require(not set(binding['record']).intersection(binding['fields']), 'BINDING_FIELD_OVERRIDE_FORBIDDEN')
+        row = copy.deepcopy(binding['record'])
+        require('source_id' not in row or row['source_id'] == binding['source_id'], 'BINDING_SOURCE_CONFLICT')
+        row['source_id'] = binding['source_id']
+        receipt = {'record_id': row.get('record_id'), 'source_id': binding['source_id'], 'fields': []}
+        try:
+            source = next(s for s in sources if s['source_id'] == binding['source_id'])
+            raw = (source['source_text'].encode('utf-8') if 'source_text' in source else
+                   base64.b64decode(source['source_bytes_base64'], validate=True))
+            original = json.loads(raw.decode('utf-8'))
+            receipt['source_content_sha256'] = source['content_sha256']
+            for field, path in binding['fields'].items():
+                require(nonempty(field), 'BINDING_FIELD_NAME_REQUIRED')
+                try:
+                    row[field] = copy.deepcopy(pointer(original, path))
+                    receipt['fields'].append({'field': field, 'source_pointer': path, 'status': 'BOUND'})
+                except (KeyError, IndexError):
+                    # In particular, missing decimals cannot be reconstructed
+                    # from value=11 or display_text="11".
+                    receipt['fields'].append({'field': field, 'source_pointer': path, 'status': 'ABSENT'})
+            observations.append(row)
+        except (StopIteration, ValueError, TypeError, UnicodeError) as exc:
+            issues.append({'record_id': row.get('record_id'), 'reason': 'SOURCE_BINDING_FAILED', 'detail': str(exc)})
+        bindings.append(receipt)
     records = []
-    for observation in supplied.get('observations', []):
+    for observation in observations:
         row = copy.deepcopy(observation)
         try:
             require(row.get('source_id') in usable_sources, 'SOURCE_BYTES_UNAVAILABLE')
@@ -105,11 +142,39 @@ def normalize_flows(document):
     # All duration selection, duplicate reconciliation, amendment conflicts,
     # cutoff filtering, accounting bases and evidence readiness are delegated.
     result = normalize(normalization_input)
+    sensitivities = []
+    labels = set()
+    for sensitivity in supplied.get('precision_sensitivities', []):
+        require(isinstance(sensitivity, dict) and set(sensitivity) == {'label', 'decimals', 'record_ids'},
+                'NAMED_PRECISION_SENSITIVITY_REQUIRED')
+        require(nonempty(sensitivity['label']) and sensitivity['label'] not in labels,
+                'UNIQUE_PRECISION_SENSITIVITY_LABEL_REQUIRED')
+        labels.add(sensitivity['label'])
+        quantum(sensitivity['decimals'])
+        selected = sensitivity['record_ids']
+        require(isinstance(selected, list) and selected and all(nonempty(rid) for rid in selected) and
+                len(set(selected)) == len(selected), 'EXPLICIT_PRECISION_SENSITIVITY_RECORD_IDS_REQUIRED')
+        by_id = {row.get('record_id'): row for row in observations}
+        require(all(rid in by_id and 'decimals' not in by_id[rid] for rid in selected),
+                'SENSITIVITY_ONLY_FOR_ABSENT_SOURCE_PRECISION')
+        scenario = copy.deepcopy(supplied)
+        scenario.pop('observation_bindings', None)
+        scenario.pop('precision_sensitivities', None)
+        scenario['observations'] = copy.deepcopy(observations)
+        for row in scenario['observations']:
+            if row.get('record_id') in selected:
+                row['decimals'] = sensitivity['decimals']
+        computed = normalize_flows(scenario)
+        sensitivities.append({'label': sensitivity['label'], 'assumption': copy.deepcopy(sensitivity),
+            'evidence_status': 'EXPLICIT_PRECISION_ASSUMPTION_NOT_SOURCE_REPORTED',
+            'status': computed['status'], 'normalization_input': computed['normalization_input'],
+            'normalization': computed['normalization'], 'mapping_issues': computed['mapping_issues']})
     return {
         'flow_mapping_schema_version': 1,
         'mapping_input': supplied, 'mapping_input_sha256': digest(supplied),
         'normalization_input': normalization_input, 'normalization': result,
         'mapping_issues': issues,
+        'source_bindings': bindings, 'precision_sensitivities': sensitivities,
         'status': 'MAPPING_REQUIRED' if issues else result['status'],
         'execution_authorized': False,
         'limitations': 'Caller source and mapping reviews are retained declarations, not independently authenticated. Missing mappings are mapping work, not proof of missing financial data. Normalization input uses schema 1; the downstream scoring snapshot uses schema 2. Latest public period remains unresolved without an explicit supported review.',

@@ -22,6 +22,35 @@ def percentile(values, fraction):
     return values[lo] + (values[min(lo+1, len(values)-1)]-values[lo])*(index-lo)
 
 
+def population_provenance(rows, population, identity):
+    """Keep declared upstream lineage within the population that supplied it.
+
+    A common publisher lineage is not a statistical independence test or evidence
+    that its constituent research firms share inputs/assumptions themselves.
+    """
+    lineage, by_upstream = [], {}
+    for row in rows:
+        entity = row.get(identity)
+        upstream = row.get('upstream')
+        upstream = upstream if isinstance(upstream, str) and upstream.strip() else None
+        lineage.append({'entity_id': entity, 'record_id': row.get('record_id'),
+                        'declared_upstream': upstream, 'source_path': row.get('source', {}).get('path')})
+        if upstream is not None and entity is not None:
+            members = by_upstream.setdefault(upstream, [])
+            if entity not in members:
+                members.append(entity)
+    return {'source_population': population, 'entity_identity_field': identity,
+            'entity_ids': list(dict.fromkeys(row.get(identity) for row in rows if row.get(identity) is not None)),
+            'lineage': lineage,
+            'declared_shared_upstream_groups': [{'upstream': upstream, 'entity_ids': members}
+                                                for upstream, members in by_upstream.items() if len(members) > 1],
+            'statistical_independence': 'UNESTABLISHED',
+            'shared_research_data_or_assumptions': None,
+            'other_population_provenance_inferred': False,
+            'claim_scope': 'Declared upstream pertains only to these named entities in this source population.',
+            'interpretation': 'Missing firm upstream remains unknown. Shared aggregate lineage never establishes constituent-firm lineage or correlated research assumptions.'}
+
+
 def review(request, source_root):
     cutoff = stamp(request['as_of'])
     dimensions = ('issuer', 'currency', 'price_basis', 'target_horizon')
@@ -68,7 +97,8 @@ def review(request, source_root):
         else:
             rows.append(latest[firm])
     values = [r['target'] for r in rows]
-    consensus = {'status': 'UNAVAILABLE', 'independent_firms': len(rows)}
+    consensus = {'status': 'UNAVAILABLE', 'independent_firms': len(rows),
+                 'firm_count_meaning': 'Distinct firm identities after source filtering/deduplication; statistical independence is unestablished.'}
     if values:
         med = statistics.median(values)
         q1, q3 = percentile(values, .25), percentile(values, .75)
@@ -83,6 +113,9 @@ def review(request, source_root):
             fresh = stamp(quote['source']['published_at']) >= cutoff - timedelta(hours=max_quote_age)
             consensus['quote_status'] = 'WITHIN_DECLARED_RESEARCH_AGE_LIMIT' if fresh else 'STALE'
             consensus['median_implied_price_change_pct'] = (med/price-1)*100 if fresh else None
+            consensus['median_implied_price_change_formula'] = '100 * (median_target - quote) / quote'
+            consensus['median_implied_price_change_denominator'] = price
+            consensus['median_implied_price_change_meaning'] = 'Price change from quote to median forward target; excludes dividends, costs and probability of attainment.'
             consensus['quote_published_at'] = quote['source']['published_at']
     # Provider consensus pools may overlap. Keep them separate; do not average their averages.
     for r in request.get('provider_consensus', []):
@@ -130,6 +163,8 @@ def review(request, source_root):
             'implementation_sha256': digest(Path(__file__).read_bytes()),
             'input_sha256': digest(json.dumps(request, sort_keys=True)), 'consensus': consensus,
             'individual_targets_used': rows, 'excluded': excluded, 'provider_consensus': aggregates,
+            'source_population_provenance': [population_provenance(rows, 'individual_targets_used', 'firm_id'),
+                                           population_provenance(aggregates, 'provider_consensus', 'provider')],
             'analyst_track_records': stats, 'source_discovery': request.get('source_discovery', []),
             'coverage': 'OBSERVED_SOURCES_ONLY', 'strong_buy_available': False,
             'execution_authorized': False, 'numeric_extraction': 'REVIEWER_SUPPLIED_NOT_AUTOMATICALLY_AUTHENTICATED'}

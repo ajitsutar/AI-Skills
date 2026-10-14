@@ -5,6 +5,15 @@ source-bound workflow. These are advisory interpretation helpers. They do not
 establish source truth, broker availability, execution permission or suitability.
 Their input roles are explicit declarations to check against the full request.
 
+For a retained planning source with `capital`, `contribution`, or a `trade` block,
+use `planning.source_roles` first. Its document contains `currency`, `role`, the
+whole `source` object, `source_ref` (file plus `#` prefix), `source_role`, and optional
+`checks`. It binds the original fields to the role operation without an invented
+holdings ledger. `trade.maximum_planned_loss` has metric `planned_loss`; its basis
+is null unless `trade.maximum_planned_loss_basis` is explicitly supplied. Entry,
+exit, slippage, fees or a stop do not resolve that basis. Preserve the null in the
+answer and any comparison; named gross/after-cost sensitivities are separate.
+
 ## Assign a role before calculating
 
 Keep these separate even when two supplied numbers happen to match:

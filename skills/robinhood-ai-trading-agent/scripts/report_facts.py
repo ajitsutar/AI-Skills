@@ -31,7 +31,10 @@ STATUSES = {'COMPUTED', 'REJECTED_INPUT', 'CALCULATION_FAILED', 'RESEARCH_QUEUE_
             'POSSIBLE_INTRADAY_ACCEPTANCE_UNKNOWN', 'CONDITIONAL_DATE_PATH',
             'BEFORE_DEADLINE_DATE', 'ON_DEADLINE_DATE_INTRADAY_UNRESOLVED', 'AFTER_DEADLINE_DATE',
             'INDETERMINATE', 'LEFT_DOMINATES', 'RIGHT_DOMINATES', 'EQUIVALENT_ON_DECLARED_CRITERIA', 'TRADEOFF',
-            'MAPPING_REQUIRED', 'DRAFT_UNVERIFIED', 'PRIMARY_EVIDENCE_REQUIRED', 'READY', 'INCOMPLETE', 'NOT_ASSESSED'}
+            'MAPPING_REQUIRED', 'DRAFT_UNVERIFIED', 'PRIMARY_EVIDENCE_REQUIRED', 'READY', 'INCOMPLETE', 'NOT_ASSESSED',
+            'NO_INCLUDED_FUTURE_VEST_DATE', 'DATED_ALTERNATIVES_COMPARED',
+            'SOURCE_BOUND_SCENARIO_AT_REQUESTED_EXIT', 'SOURCE_BOUND_CONDITIONAL_COMPARISON',
+            'PRIMARY_APPLICABILITY_UNRESOLVED', 'CONDITIONAL_WEIGHTED_ARITHMETIC'}
 # The original workbench numerical modules and existing schemas were inspected
 # byte-for-text-identical before the additive operation extension. This identifies
 # a known historical schema, not a successful replay with the current code.
@@ -50,7 +53,8 @@ QUANT_FILES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
                'vqm_research.py', 'public_research.py', 'research_bundle.py', 'screen_review.py',
                'horizon_review.py', 'cash_benchmark.py', 'trading_calendar.py', 'allocation_policy.py',
                'portfolio_decision.py', 'planning_roles.py', 'portfolio_projection.py', 'planning_comparison.py',
-               'flow_normalization.py')
+               'flow_normalization.py', 'price_comparison.py', 'recommendation_report.py', 'employer_reference.py',
+               'equity_cash_comparison.py', 'source_exposure.py')
 
 
 def digest(value):
@@ -178,7 +182,10 @@ SIMPLE = {
         ('active_return', 'Portfolio minus benchmark return'), ('allocation', 'Allocation effect'),
         ('selection', 'Selection component'), ('interaction', 'Interaction component'), ('reconciliation_error', 'Attribution reconciliation residual')]},
         'benchmark_appropriateness': ('Benchmark appropriateness', 'status', None, 'not assessed by arithmetic decomposition'),
-        'causal_attribution_assessed': ('Causal attribution assessed', 'boolean', None, 'no causal identification from aggregate returns')},
+        'causal_attribution_assessed': ('Causal attribution assessed', 'boolean', None, 'no causal identification from aggregate returns'),
+        'aggregation_basis_assessed': ('Aggregation basis assessed', 'boolean', None, 'group inputs do not verify common currency, period or non-overlap'),
+        'observed_combined_performance': ('Observed combined performance', 'return_fraction', None, 'unknown without separately bound aggregation evidence'),
+        'calculation_role': ('Attribution calculation role', 'status', None, 'conditional weighted arithmetic; not observed combined performance')},
     'ops.shortfall': {k: (name, unit, denominator, 'decision/arrival/terminal price accounting; positive cost on either side') for k, name, unit, denominator in [
         ('total_shortfall', 'Total implementation shortfall', 'input_currency_amount', None),
         ('fees', 'Explicit fees', 'input_currency_amount', None),

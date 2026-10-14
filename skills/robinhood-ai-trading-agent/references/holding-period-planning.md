@@ -189,6 +189,19 @@ filing/thesis checks and periodic portfolio reviews; create automation only if a
 
 ## Output and offline validation
 
+Before delivering a conditional or speculative fixed-exit proposal, carry the
+original monetary-volume observation, gap/halt/forced-sale risks, adverse-thesis
+findings and review/exit plan into the final answer, including when all names are
+Watch. Terminal scenario losses are not a worst-case loss bound; sizing against a
+downside row can lose more. A modeled cash return establishes no principal
+guarantee, insurance or counterparty terms. Unknown terms remain unknown.
+
+Use `recommendation_report.recommendation_context` with original source bytes and
+explicit bindings to retain these facts beside selection/allocation. It exposes
+missing adverse-thesis/exit-plan evidence and provides advisory review topics
+without inventing early-exit authority, monitoring or an automatic sell rule.
+See [portfolio decision calculations](portfolio-decision-calculations.md).
+
 Lead with the assumed entry/exit and how many candidates actually qualify. Separate
 Eligible comparisons from Watch research priorities, Speculative and Reject.
 Show each finalist's decisive thesis, within-window driver, current primary period,
@@ -232,6 +245,13 @@ The optional `execution_handoff.py` preserves that request; it supplies neither
 execution permission nor an execution veto.
 
 ## Benchmark and scenario evidence
+
+For a numerical equity-versus-cash comparison, use
+`financial.equity_cash_comparison` and its [contract](equity-cash-comparison.md).
+Cash starts from the equity's modeled entry outlay including entry costs, not the
+quoted share price, and is a counterfactual scenario rather than an observed
+balance. Missing source-bound terminal timing leaves the primary comparison
+unresolved; conditional prices at a buffered exit remain a separate sensitivity.
 
 For structured terminal scenarios use the `cash_benchmark` contract in
 [model-independent-research.md](model-independent-research.md). The helper computes

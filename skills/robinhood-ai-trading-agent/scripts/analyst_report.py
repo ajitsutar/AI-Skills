@@ -13,16 +13,17 @@ import json
 from pathlib import Path
 
 import analyst_evidence
+from price_comparison import compare_prices
 from news_analysis import evidence
 from news_sources import stamp
 from report_facts import (ROOT, Projector, code_hash, digest, escape, leaves,
-                          local_path, markdown, strict_json)
+                          local_path, markdown, pointer, strict_json)
 
 VERSION = 'analyst-report-1'
 SUPPLEMENTAL = {'fair_value', 'historical_range', 'source_discovery', 'information_coverage'}
 CONSENSUS = {
     'status': ('Observed target cohort status', 'status'),
-    'independent_firms': ('Observed independent firm count', 'count'),
+    'independent_firms': ('Observed distinct firm count; statistical independence unestablished', 'count'),
     'mean': ('Observed forward target mean', 'input_currency_per_share'),
     'median': ('Observed forward target median', 'input_currency_per_share'),
     'minimum': ('Observed forward target minimum', 'input_currency_per_share'),
@@ -32,6 +33,9 @@ CONSENSUS = {
     'iqr_over_median': ('Forward target IQR divided by median', 'ratio'),
     'quote_status': ('Supporting quote age status', 'status'),
     'quote_published_at': ('Supporting quote publication time', 'timestamp'),
+    'median_implied_price_change_formula': ('Median target price change formula', 'formula'),
+    'median_implied_price_change_denominator': ('Median target price change denominator: quote', 'input_currency_per_share'),
+    'median_implied_price_change_meaning': ('Median target price change meaning', 'definition'),
     'median_implied_price_change_pct': ('Median target implied price change; excludes dividends and costs', 'percent')}
 TRACK_FIELDS = ('analyst_id', 'firm_id', 'provider', 'evaluation_start', 'evaluation_end',
                 'holding_rule', 'benchmark', 'return_definition', 'success_definition',
@@ -48,7 +52,7 @@ def _requests(document):
         raise ValueError('JSON_OBJECT_REQUIRED')
     if 'cohorts' not in document:
         return [('default', document, '/input')], []
-    if set(document) - {'cohorts', 'supplemental_evidence'}:
+    if set(document) - {'cohorts', 'supplemental_evidence', 'price_comparisons'}:
         raise ValueError('UNSUPPORTED_ENVELOPE_FIELD')
     cohorts = document['cohorts']
     supplemental = document.get('supplemental_evidence', [])
@@ -96,11 +100,18 @@ def run(raw, source_root):
                 checked.update(status='EVIDENCE_CHECK_FAILED', evidence_check=str(exc))
         artifact['supplemental_evidence'].append(checked)
 
+    if 'price_comparisons' in document:
+        comparisons = document['price_comparisons']
+        if not isinstance(comparisons, list) or any(not isinstance(item, dict) or
+            set(item) - {'quote', 'references', 'conditional_same_basis'} for item in comparisons):
+            raise ValueError('EXPLICIT_PRICE_COMPARISON_ARGUMENT_LIST_REQUIRED')
+        artifact['price_comparisons'] = [compare_prices(**item) for item in comparisons]
+
     projection = Projector(canonical_bytes(artifact), 'analyst', include_source_text=True)
 
     def add(path, label, *, role, context=None, horizon=None, unit=None, mapping='HELPER_RESULT',
-            metadata=None, basis=None):
-        fact = projection.fact(path, label, unit=unit, horizon=horizon, mapping=mapping,
+            metadata=None, basis=None, denominator=None):
+        fact = projection.fact(path, label, unit=unit, horizon=horizon, mapping=mapping, denominator=denominator,
                                metadata_sources=metadata, basis=basis,
                                context={'evidence_role': role, **(context or {})},
                                assumptions=['Supplied extraction and attribution are not authenticated.'])
@@ -115,8 +126,18 @@ def run(raw, source_root):
             if path.rsplit('/', 1)[-1] in ('execution_authorized', 'strong_buy_available'):
                 continue
             seen.add(path)
-            add(path, role + ': ' + path[len(base) + 1:], role=role, context=context,
-                horizon=horizon, mapping=mapping)
+            if role == 'typed_price_comparison' and path.endswith('/value') and any(
+                    '/' + metric + '/value' in path for metric in
+                    ('quote_discount_relative_to_reference_pct', 'price_change_from_quote_to_reference_pct')):
+                parent = path.rsplit('/', 1)[0]
+                add(path, role + ': ' + path[len(base) + 1:], role=role, context=context,
+                    unit='percent', horizon=horizon, mapping=mapping,
+                    denominator=pointer(artifact, parent + '/denominator_operand_id'),
+                    basis=pointer(artifact, parent + '/meaning'),
+                    metadata={'formula': parent + '/formula', 'denominator_value': parent + '/denominator_value'})
+            else:
+                add(path, role + ': ' + path[len(base) + 1:], role=role, context=context,
+                    horizon=horizon, mapping=mapping)
         for key in required:
             path = base + '/' + '/'.join(escape(part) for part in key.split('/'))
             if not any(existing == path or existing.startswith(path + '/') for existing in seen):
@@ -132,6 +153,9 @@ def run(raw, source_root):
         for key in ('as_of', 'target_horizon', 'coverage', 'numeric_extraction'):
             add(base + '/' + key, 'Cohort ' + key, role='observed_forward_targets',
                 context=context, horizon=horizon)
+        add(base + '/consensus/firm_count_meaning', 'Firm identity count meaning',
+            role='population_scoped_source_lineage', context={**context, 'source_population': 'individual_targets_used'},
+            horizon=horizon)
         for key, (label, unit) in CONSENSUS.items():
             fact = add(base + '/consensus/' + key, label, role='observed_forward_targets',
                        context=context, horizon=horizon, unit=unit,
@@ -149,10 +173,13 @@ def run(raw, source_root):
                 ('excluded', 'excluded_target', ('record_id', 'reason')),
                 ('provider_consensus', 'separate_provider_pool',
                  ('provider', 'as_of', 'target_horizon', 'mean', 'median', 'minimum', 'maximum', 'target_count', 'analyst_count')),
+                ('source_population_provenance', 'population_scoped_source_lineage',
+                 ('source_population', 'entity_identity_field', 'statistical_independence', 'shared_research_data_or_assumptions', 'other_population_provenance_inferred')),
                 ('analyst_track_records', 'provider_reported_track_record', TRACK_FIELDS),
                 ('source_discovery', 'supplied_source_discovery', ('access',))):
             for j, row in enumerate(result[name]):
-                fields(f'{base}/{name}/{j}', row, role=role, context={**context, 'row_index': j},
+                fields(f'{base}/{name}/{j}', row, role=role,
+                       context={**context, 'row_index': j, 'source_population': row.get('source_population', name)},
                        horizon=row.get('target_horizon'), required=required,
                        mapping='SUPPLIED_DISCOVERY_RECORD' if name == 'source_discovery' else 'HELPER_RESULT')
         # The helper's exclusions reference IDs; retain every original row, including
@@ -166,8 +193,8 @@ def run(raw, source_root):
     for i, item in enumerate(supplemental):
         context = {'supplemental_index': i, 'evidence_check_pointer': f'/supplemental_evidence/{i}',
                    'included_in_target_calculation': False}
-        required = {'fair_value': ('value', 'currency', 'price_basis', 'as_of', 'methodology'),
-                    'historical_range': ('low', 'high', 'currency', 'price_basis', 'period_start', 'period_end'),
+        required = {'fair_value': ('value', 'currency', 'price_basis', 'share_basis', 'adjustment_basis', 'security_id', 'as_of', 'methodology'),
+                    'historical_range': ('low', 'high', 'currency', 'price_basis', 'share_basis', 'adjustment_basis', 'security_id', 'period_start', 'period_end'),
                     'source_discovery': ('access', 'url', 'published_at', 'observed_at'),
                     'information_coverage': ('topic', 'status', 'source')}[item['kind']]
         fields(f'/input/supplemental_evidence/{i}/record', item['record'], role=item['kind'],
@@ -175,12 +202,16 @@ def run(raw, source_root):
                mapping='SUPPLIED_CONTEXT_NOT_TARGET_CONSENSUS')
         fields(f'/supplemental_evidence/{i}', artifact['supplemental_evidence'][i],
                role='supplemental_evidence_check', context=context)
+    for i, comparison in enumerate(artifact.get('price_comparisons', [])):
+        fields(f'/price_comparisons/{i}', comparison, role='typed_price_comparison',
+               context={'comparison_index': i, 'included_in_target_calculation': False},
+               mapping='TYPED_PRICE_COMPARISON_RESULT')
     return {'schema_version': 1, 'adapter_version': VERSION, 'kind': 'analyst',
             'input_file_sha256': hashlib.sha256(raw).hexdigest(), 'artifact': artifact,
             'source_artifact_sha256': projection.hash, 'source_text_exported': True,
             'adapter_code_sha256': code_hash('analyst_report.py'),
             'semantics_code_sha256': {name: code_hash(name) for name in
-                                     ('analyst_evidence.py', 'news_analysis.py', 'news_sources.py', 'report_facts.py')},
+                                     ('analyst_evidence.py', 'price_comparison.py', 'evidence_semantics.py', 'news_analysis.py', 'news_sources.py', 'report_facts.py')},
             'checks': [{'helper_executed': bool(requests), 'cohorts_computed': len(requests),
                         'source_authenticity_verified': False}], 'facts': projection.facts,
             'limits': ['Helper results were computed from explicit supplied records; no new extraction or research.',

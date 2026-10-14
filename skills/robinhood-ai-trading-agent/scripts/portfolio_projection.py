@@ -7,6 +7,7 @@ from copy import deepcopy
 from datetime import date
 from decimal import Context, Decimal, localcontext
 import re
+import json
 
 from planning_alignment import amount, finish, fraction, trade_costs
 from quant_common import require
@@ -15,6 +16,122 @@ from quant_common import require
 ZERO = Decimal(0)
 ROLES = {'supplied_observation', 'hypothetical_scenario', 'user_assumption', 'unknown'}
 STATES = {'confirmed', 'planned', 'scenario', 'unknown'}
+
+
+def source_projection(document):
+    """Bind the full retained portfolio-context schema to dated_projection.
+
+    Requires source/source_ref/source_role, date_basis=source_calendar_label,
+    target_date, included_states, mark_policy, opening_tax_reserve, and explicit
+    liabilities ledger. other_assets may be explicit or unknown. Optional
+    residual_policy=carry_opening_reconciliation_difference is a sensitivity.
+    marks and scenario_flows use the existing dated-projection source contracts.
+    All confirmed_cash_events, withdrawal and employer.grant_records are audited.
+    """
+    with localcontext(Context(prec=64 + _precision(document))):
+        return _source_projection(document)
+
+
+def _source_projection(document):
+    source = document.get('source')
+    require(isinstance(source, dict), 'SOURCE_OBJECT_REQUIRED')
+    source_currencies = [source[key] for key in ('currency', 'base_currency') if key in source]
+    require(source_currencies and all(value == document['currency'] for value in source_currencies),
+            'SOURCE_CURRENCY_REQUIRED_OR_MISMATCH_NO_FX')
+    ref = _text(document.get('source_ref'), 'source_ref')
+    role = document.get('source_role')
+    require(role in ROLES, 'SOURCE_ROLE_REQUIRED')
+    require(document.get('date_basis') == 'source_calendar_label', 'EXPLICIT_SOURCE_DATE_BASIS_REQUIRED')
+    def day(raw):
+        # Deliberately retain the source's calendar label, never infer timezone
+        # conversion, settlement time or intraday sequencing.
+        require(isinstance(raw, str), 'SOURCE_DATE_REQUIRED')
+        _day(raw[:10])
+        return raw[:10]
+    def metadata(pointer):
+        return {'currency': document['currency'], 'source_ref': ref + pointer, 'source_role': role}
+    baseline = source.get('baseline_rebalance')
+    require(isinstance(baseline, dict), 'BASELINE_REBALANCE_SOURCE_REQUIRED')
+    holdings = baseline.get('holdings')
+    require(isinstance(holdings, dict), 'EXPLICIT_SOURCE_HOLDINGS_REQUIRED')
+    opening_date = day(source.get('as_of'))
+    opening = {**metadata('/baseline_rebalance'), 'as_of': opening_date,
+               'cash': baseline.get('cash'), 'tax_reserve': document.get('opening_tax_reserve'),
+               'positions': [{'id': key, 'quantity': value} for key, value in holdings.items()]}
+    flows = []
+    for index, row in enumerate(source.get('confirmed_cash_events', [])):
+        require(isinstance(row, dict), 'CASH_EVENT_SOURCE_OBJECT_REQUIRED')
+        value = amount(row['amount']) if row.get('amount') is not None else None
+        kind = row.get('kind')
+        require(kind in {'scheduled_external_obligation', 'external_obligation', 'cash_credit', 'cash_debit'},
+                'UNSUPPORTED_SOURCE_CASH_EVENT_KIND')
+        debit = kind != 'cash_credit'
+        require(value is None or (value <= 0 if debit else value >= 0), 'SOURCE_CASH_EVENT_SIGN_MISMATCH')
+        flows.append({**metadata('/confirmed_cash_events/' + str(index)), 'id': 'source-cash-' + str(index),
+                      'date': day(row.get('available_at')), 'state': 'confirmed' if row.get('confirmed') is True else 'unknown',
+                      'kind': 'external_obligation' if kind in {'scheduled_external_obligation', 'external_obligation'} else kind,
+                      'amount': -value if debit and value is not None else value, 'included_in_opening': False})
+    withdrawal = source.get('withdrawal')
+    if withdrawal is not None:
+        require(isinstance(withdrawal, dict), 'WITHDRAWAL_SOURCE_OBJECT_REQUIRED')
+        flows.append({**metadata('/withdrawal'), 'id': 'source-withdrawal',
+                      'date': day(withdrawal.get('spendable_by')), 'state': 'planned', 'kind': 'cash_debit',
+                      'amount': withdrawal.get('amount'), 'included_in_opening': False})
+    employer = source.get('employer', {})
+    for index, row in enumerate(employer.get('grant_records', [])):
+        shares = [amount(row[k], k, 0) if row.get(k) is not None else None
+                  for k in ('gross_shares', 'shares_withheld_for_tax', 'shares_sold_for_tax')]
+        net = shares[0] - shares[1] - shares[2] if all(x is not None for x in shares) else None
+        require(net is None or net >= 0, 'TAX_SHARE_DISPOSITIONS_EXCEED_GRANT')
+        flows.append({**metadata('/employer/grant_records/' + str(index)), 'id': 'source-vest-' + str(index),
+                      'date': day(row.get('vest_date')), 'state': 'planned' if row.get('status') == 'future_scheduled' else 'unknown',
+                      'kind': 'vest', 'asset_id': employer.get('symbol'), 'quantity': net,
+                      'included_in_opening': False, 'source_grant': deepcopy(row)})
+    additional = deepcopy(document.get('scenario_flows', []))
+    _rows(additional, 'scenario_flows')
+    source_refs = {row['source_ref'] for row in flows}
+    require(not any(row.get('source_ref') in source_refs for row in additional), 'SOURCE_FLOW_DUPLICATION')
+    marks = deepcopy(document.get('marks', []))
+    _rows(marks, 'marks')
+    marked = {row.get('asset_id') for row in marks}
+    if document.get('mark_policy') == 'carry_forward_supplied':
+        for asset, price in baseline.get('prices', {}).items():
+            if asset not in marked:
+                marks.append({**metadata('/baseline_rebalance/prices/' + asset), 'id': 'source-mark-' + asset,
+                              'asset_id': asset, 'as_of': opening_date, 'price': price})
+    other = deepcopy(document.get('other_assets'))
+    residual_policy = document.get('residual_policy', 'unknown')
+    require(residual_policy in {'unknown', 'carry_opening_reconciliation_difference'}, 'RESIDUAL_POLICY_REQUIRED')
+    residual = None
+    if residual_policy != 'unknown':
+        require(other is None, 'RESIDUAL_AND_OTHER_ASSETS_DOUBLE_COUNT_RISK')
+        prices = baseline.get('prices', {})
+        known = baseline.get('equity') is not None and baseline.get('cash') is not None and all(
+            q is not None and prices.get(a) is not None for a, q in holdings.items())
+        if known:
+            residual = amount(baseline['equity']) - amount(baseline['cash']) - sum(
+                (amount(q) * amount(prices[a]) for a, q in holdings.items()), ZERO)
+            require(residual >= 0, 'NEGATIVE_RESIDUAL_NOT_AN_ASSET')
+            other = [{**metadata('/baseline_rebalance'), 'id': 'unclassified-opening-residual',
+                      'as_of': opening_date, 'amount': residual,
+                      'source_role': 'user_assumption', 'basis': 'Explicit retained residual sensitivity; no holdings classification.'}]
+    bound = {'currency': document['currency'], 'role': document['role'], 'opening': opening,
+             'target_date': document['target_date'], 'included_states': document['included_states'],
+             'flows': flows + additional, 'marks': marks, 'mark_policy': document['mark_policy'],
+             'other_assets': other, 'liabilities': deepcopy(document.get('liabilities'))}
+    # Adapter-derived monetary fields are exact decimal strings before hashing
+    # and delegating to the existing JSON-input operation.
+    bound = json.loads(json.dumps(bound, default=lambda value: str(value) if isinstance(value, Decimal) else value))
+    projection = dated_projection(bound)
+    return finish(document, 'planning-source-projection', status=projection['status'],
+                  projection=projection, bound_projection_input=bound,
+                  source_flow_count=len(flows), residual_policy=residual_policy, opening_residual=residual,
+                  retained_input=deepcopy(document),
+                  unmodeled_source_sections=[key for key in ('january_trading_plan', 'contributions') if key in source],
+                  limitations=['All supplied obligations, withdrawal and net grants are retained, including excluded states/dates.',
+                               'Proposed trades and recurring contributions are not automatically executed or scheduled.',
+                               'Source calendar labels are end-of-date accounting only; no intraday availability is inferred.',
+                               'Unknown residuals, liability balances and earmarks remain unknown.'])
 
 
 def _text(value, name):

@@ -8,7 +8,7 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITY_FILES = {
     'research_alignment': ['scripts/' + name + '.py' for name in
-        ('research_workflow', 'evidence_semantics', 'ranking_alignment', 'research_contracts', 'planning_alignment', 'allocation_policy', 'financial_alignment', 'strategy_research',
+        ('research_workflow', 'evidence_semantics', 'price_comparison', 'recommendation_report', 'ranking_alignment', 'research_contracts', 'planning_alignment', 'allocation_policy', 'financial_alignment', 'strategy_research',
          'forward_evidence', 'analysis_checks', 'quant_report', 'report_facts', 'portfolio_analytics',
          'accounting_tools', 'research_analytics', 'strategy_lab', 'risk_engine')] +
         ['profiles/report-facts-v2.json', 'references/research-alignment.md', 'references/source-bound-workflow.md',
@@ -25,7 +25,8 @@ CAPABILITY_FILES = {
          'portfolio_backtest', 'manager_monitor', 'price_audit', 'deterministic_rank',
          'financial_normalize', 'filing_extract', 'analysis_checks', 'planning_alignment', 'allocation_policy',
          'financial_alignment', 'strategy_research', 'forward_evidence', 'portfolio_analytics',
-         'accounting_tools', 'research_analytics', 'strategy_lab', 'risk_engine', 'report_facts', 'evidence_semantics')] +
+         'accounting_tools', 'research_analytics', 'strategy_lab', 'risk_engine', 'report_facts', 'evidence_semantics',
+         'employer_reference', 'equity_cash_comparison', 'source_exposure')] +
          ['profiles/financial-normalization-v1.json', 'profiles/report-facts-v2.json'],
     'public_research': ['profiles/public-vqm-discovery-v1.json', 'scripts/public_research.py',
                         'scripts/public_research_fetch.py', 'scripts/listed_universe.py', 'scripts/research_report_checks.py'],

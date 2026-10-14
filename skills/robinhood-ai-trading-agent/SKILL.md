@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible stock research, portfolio 
 
 # Robinhood Quant Research and Portfolio Agent
 
-Package version: **4.12.0 — October 14, 2026**.
+Package version: **4.15.0 — October 14, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -61,6 +61,12 @@ unresolved and show explicitly named sensitivities if useful; do not select a
 favorite interpretation as though the source supplied it. A model-selected fee
 unit, earnings addback or forecast is not a shared default.
 
+Prefer the source-aware operations below when their input schema fits the supplied
+record. Bind the original whole record and its source fields; do not manually
+rebuild a reduced list that drops liabilities, dated flows, unknown precision,
+classification or liquidity. Their computed reports carry those facts into the
+answer. Use the lower-level helpers for other schemas with an explicit mapping.
+
 ## Recommendations and research
 
 Support the user's actual objective and horizon, including a same-session trade,
@@ -90,6 +96,9 @@ For a retained snapshot, use [ranking alignment](references/ranking-alignment.md
 to identify its bound profile and compatible scorer. A mismatch with the public
 route does not make a compatible strict diagnostic unavailable. Keep requested
 and diagnostic outputs distinct; missing comparison dimensions remain unknown.
+When the user has not named a fundamental ranking method, set
+`requested_basis: documented_default` in the ranking adapter. A profile found in
+the supplied snapshot identifies available evidence, not an explicit user choice.
 Do not silently substitute profiles, hand-picked factor weights or numerical
 results. A complete extraction, a high score and a compelling recommendation
 are different claims. Explain the recommendation's business/valuation/catalyst
@@ -118,6 +127,10 @@ analyst evidence using [news-and-guidance.md](references/news-and-guidance.md) a
 headlines, full reports, paywalls and inaccessible sources are different coverage.
 Forward targets are analyst opinions, distinct from past 52-week ranges and
 intrinsic value. Social posts supply research leads, not authoritative facts.
+Use the analyst helper's population-scoped provenance when explaining dependence:
+shared upstream data among consensus publishers establishes no shared lineage or
+assumptions among their constituent research firms. Distinct firm counts do not
+establish statistical independence; leave absent firm lineage unknown.
 
 ## Portfolio and quantitative work
 
@@ -168,12 +181,28 @@ cash-debit sizing remain explicit separate calculations.
 
 For a cash-budget comparison, use `planning.budget_sizing` to compute affordable
 whole/fractional quantities, modeled entry costs, total debit and residual together.
+When an original source supplies `fee_per_trade` and `one_way_slippage_bps`, use
+`planning.source_budget_sizing` with the entire cost source and explicit currency
+binding. It preserves both components for every quote; unknown reference bases
+remain unresolved beside named complete-cost sensitivities. A fee-only result
+must be labeled as a limited sensitivity and cannot replace full-cost affordability.
 Keep quoted spread separate from explicit one-way slippage with
 `planning.friction_context`. After selecting a scenario, use
 `planning.allocation_context` with its gross notionals and the supplied issuer,
 sector, industry, fund holdings and dollar-volume records. Report known adverse
 facts alongside unknowns; unknown classifications keep the original denominator.
 See [portfolio decision calculations](references/portfolio-decision-calculations.md).
+When identity maps, fund holdings or supplemental issuer observations are supplied,
+use `planning.source_allocation_context` with their whole source records for every
+selected comparison alternative. The [source-exposure guide](references/source-exposure.md)
+defines the supported adapters. It merges all available share-class and constituent
+identities before calculating exposure; do not replace this with a hand-built
+partial mapping. Available classifications and monetary observations cannot be
+called missing because a model omitted them. Qualitative business descriptions do
+not establish formal sector/industry labels; retain them separately. Distinguish
+complete supplied fund weights from actual issuer diversification, and discuss
+material concentration even for a fund labeled broad. Bind gross notionals to the
+retained sizing scenario, with cash, costs and the denominator kept separate.
 
 Before a portfolio or sleeve comparison, preserve supplied observations, user
 assumptions, scenarios, targets, ceilings and pending states with
@@ -182,6 +211,21 @@ A loss ceiling is an inequality, not a requested loss or sizing target. Use
 `planning.reference_comparison` for the shared capability and explicit unit-price
 comparison when allocations are absent; do not invent weights or a shock grid.
 See [planning input roles](references/planning-input-roles.md).
+For sleeve performance, keep combined returns and blended benchmarks unknown
+unless common units, matching periods and non-overlapping coverage are bound to
+evidence. Disclosed endpoint fees must not be subtracted twice. Conditional
+aggregation and Brinson arithmetic do not establish observed combined performance
+or causal investment/execution attribution; use the workbench's retained basis
+states and [attribution guidance](references/quant-workbench.md).
+
+For a supplied portfolio context, use `planning.source_roles` for the loss-basis
+and role record, `planning.source_projection` for a complete dated projection,
+and `planning.source_alternatives` for comparable post-flow alternatives. Use
+`planning.settlement_transfer_sweep` to enumerate sale dates from the supplied
+calendar rather than selecting a convenient date before checking the earlier path.
+The linked guides define explicit source schemas and mappings; unsupported fields
+remain visible as mapping gaps. An unknown loss basis stays unknown even when a
+trade-cost example is also supplied.
 
 For future vest, withdrawal or diversification comparisons, use
 `planning.dated_projection`: carry supplied intervening flows, explicit marks,
@@ -191,14 +235,63 @@ Do not use current equity for a post-withdrawal weight. Use
 treatment; unknown treatment stays unknown. Tax earmarks remain assets until paid.
 See [dated portfolio projections](references/portfolio-projection.md).
 
+For employer-stock diversification without user-specified scenario quantities or
+prices, start with `planning.employer_diversification_baseline` and the
+[shared employer reference](references/employer-reference.md). Compare retention,
+selling net new vests, and selling existing direct shares plus net new vests on
+the same comparison date and valuation basis. Its carried opening-price reference is an
+explicit no-price-change assumption, not a forecast. Keep source vest-price
+sensitivities and other user-chosen paths separate. Missing account facts remain
+unknown in the primary result; a common denominator sensitivity never replaces
+them. These reference paths establish no preference or recommended sale date.
+
 When several alternatives trade off taxes, liquidity, concentration and allocation,
 use `planning.alternative_comparison` with explicit comparable criteria. Without
 supplied priorities, present the alternatives and conditional tradeoffs rather than
 an invented uniquely optimal choice. Use `planning.settlement_transfer_paths` for
 explicit date-only scenarios; same-day settlement and transfer acceptance remain
 unknown without a stated assumption. Distinguish transfer initiation from arrival.
+For a withdrawal proposal without supplied priorities, honor the
+`planning.source_alternatives` proposal contract: present the conditional funding
+alternatives and their tradeoffs with no default favorite. Do not silently prefer
+liquidity, taxes or concentration on the user's behalf. Use the sweep's
+`reference_path` as the shared conditional timing example when available; keep
+other timing choices separate. A null reference leaves timing unresolved. This
+reference is neither a recommended sale date nor a guarantee. Preserve any
+explicit user selection or priority instead of replacing it with the reference.
+Use the sweep's `sale_date_summaries` when describing later dates: preserve both
+same-day and next-listed-day path statuses. Unknown intraday acceptance and missing
+calendar coverage are different facts; a mixed date cannot be labeled wholly
+uncovered merely because its later path exceeds the calendar.
 See [planning comparisons](references/planning-comparison.md).
 These helpers preserve analytical assumptions and add no execution conditions.
+
+For a selected-stock allocation or fixed-exit recommendation, run
+`planning.recommendation_context` against the original security rows and retained
+allocation/selection. Carry its exposure, monetary-volume context, source gaps,
+scenario-loss interpretation and exit review topics into the answer. Fixed-date
+liquidation must address gaps, halts and liquidity; a terminal scenario is not a
+loss limit. A modeled cash return does not establish principal-guarantee terms.
+
+For equity scenarios versus cash, use `financial.equity_cash_comparison` and the
+[same-capital comparison](references/equity-cash-comparison.md). It derives the
+counterfactual cash principal from equity entry outlay including modeled costs;
+the stock quote is not a supplied cash balance. Match the exact holding interval
+and declared cash conventions. Missing source-bound terminal timing leaves the
+primary comparison unresolved, beside a separately labeled price sensitivity.
+An unrelated session close cannot establish a terminal price's timestamp. The
+per-share reference is an accounting unit, not a whole-share execution rule.
+
+For raw financial observations, `data.normalize_flows` supports original-document
+pointer bindings. Preserve absent reporting precision; an integer stored in JSON
+does not establish rounding to a whole monetary unit. Explicit precision
+sensitivities belong beside an unresolved primary result.
+
+For numerical fair-value, target or historical-range comparisons, use
+`evidence.price_comparison` and its named formulas. Discount from a reference
+price divides by that reference; upside from the current quote divides by the
+quote. Keep conditional basis assumptions and incompatible or unknown operand
+metadata in the result instead of silently borrowing them from another record.
 
 For day/swing research, use [short-term-trading.md](references/short-term-trading.md)
 and [strategy-playbook.md](references/strategy-playbook.md). Match signals, events,

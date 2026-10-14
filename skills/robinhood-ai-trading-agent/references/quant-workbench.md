@@ -56,14 +56,23 @@ zero. Inputs cannot supply code, imports, shell commands or executable callbacks
 | `monitor.assess` | `as_of,observations_at,returns,periods_per_year,forecast_volatility,coverage,execution_cost_bps,reconciliation_difference,limits` |
 | `planning.trade_costs`, `planning.cash_plan`, `planning.cash_projection` | Explicit cost units/transaction phase, cash event types/currencies/times, and declared interest assumptions in `document` |
 | `planning.budget_sizing`, `planning.friction_context`, `planning.allocation_context` | Explicit sizing, quote/cost roles and portfolio context; [contract](portfolio-decision-calculations.md) |
+| `planning.source_budget_sizing` | Whole retained fee/slippage source, currency and cost-object pointers, price rows and quantity scenarios; all supplied costs retained in primary/conditional results; [contract](portfolio-decision-calculations.md) |
 | `planning.input_roles`, `planning.reference_comparison` | Supplied semantic roles, bounds and reference exposures without inferred preferences; [contract](planning-input-roles.md) |
+| `planning.source_roles` | Whole supplied planning record and explicit source role; preserves unspecified loss basis; [contract](planning-input-roles.md) |
 | `planning.dated_projection`, `planning.tax_sensitivity` | Dated flows, denominators and explicit tax assumptions; [contract](portfolio-projection.md) |
+| `planning.source_projection`, `planning.source_alternatives` | Whole portfolio source, explicit date/mark/residual policies and scenario flows; preserves original intervening events and comparable post-flow weights; [projection](portfolio-projection.md), [alternatives](planning-comparison.md) |
+| `planning.employer_diversification_baseline` | Whole hashed employer/account source; shared retention, net-vest sale and direct-plus-net sale references on one common date and valuation basis; unresolved primary account facts and separate source-price/denominator sensitivities; [contract](employer-reference.md) |
 | `planning.alternative_comparison`, `planning.settlement_transfer_paths` | Supplied comparable criteria and date-level timing assumptions; [contract](planning-comparison.md) |
+| `planning.settlement_transfer_sweep` | Supplied business-date calendar and transfer conventions; evaluates earlier sale paths without choosing a priority; [contract](planning-comparison.md) |
+| `planning.recommendation_context` | Hashed original security rows, retained selection/allocation and explicit field bindings; exposes concentration, dollar-volume scale and fixed-exit risks; [contract](portfolio-decision-calculations.md) |
+| `evidence.price_comparison` | `quote`, typed `references`, optional named `conditional_same_basis`; separate reference discount and quote-based appreciation with unknown metadata preserved; [contract](analyst-research.md) |
 | `planning.allocate` | Explicit allocation policy; [contract](allocation-policy.md) |
 | `planning.vest_reconciliation`, `planning.portfolio_reconciliation` | Grant/share/sale distinctions and declared equity versus identified assets in `document` |
 | `planning.cash_reconciliation`, `planning.trade_history_costs`, `planning.session_pnl` | Explicit ledger/P&L basis and timing in `document`; no buying-power or missing-session inference |
 | `financial.owner_cash_bridge`, `financial.acquisition_cash` | Explicit financial periods, tax/cash assumptions and cash-flow scope in `document` |
 | `financial.price_scenarios`, `financial.terminal_scenarios`, `financial.corporate_action_return` | Dated price scenarios, whole-year operating model, or split/dividend return contract in `document` |
+| `financial.equity_cash_comparison` | Matched exact interval and capital derived after equity entry costs; counterfactual cash role, explicit cash conventions and separately bound terminal timing; [contract](equity-cash-comparison.md) |
+| `planning.source_allocation_context` | Whole identity/fund/issuer source records merged before every selected gross-notional exposure; [source adapters](source-exposure.md); explicit denominator, no inferred selections |
 | `backtest.dual_sma`, `backtest.dual_sma_variants`, `backtest.opening_range` | `bars,as_of` plus exact declared strategy parameters; variants retained, no algorithm substitution |
 | `validation.forward_observations`, `validation.paper_study_forward` | `document`; paper-study adapter also takes `as_of`; declarations and evidence admissibility, not proven live observation |
 | `analysis.covariance_comparison`, `analysis.hedge_scenarios`, `analysis.compare_claim` | Explicit matrices, expiry/linear hedge scenarios or typed comparison in `document` |
@@ -75,6 +84,17 @@ promote portfolio weights into observed benchmark weights. An explicitly request
 equal-weight comparison is a conditional scenario: zero allocation/interaction is
 then true by construction. Preserve unknown period, currency and benchmark identity;
 a blended portfolio result needs compatible sleeve coverage and units.
+Bind common currency or value units, matching start/end periods, disjoint sleeve
+coverage and comparable valuation/flow conventions before aggregating endpoints
+or constructing beginning-value portfolio weights. Missing basis leaves the
+primary combined return and blended benchmark unknown. Do not present an
+unqualified "Combined" result and then try to repair it with a later caveat.
+`ops.attribution` records `aggregation_basis_assessed: false`, an unknown
+`observed_combined_performance`, and conditional weighted arithmetic. If a
+cross-sleeve scenario is explicitly useful, state its assumed common units,
+period and non-overlap immediately beside every aggregate; it never resolves the
+source's primary missing basis. Report per-sleeve fee bridges in supplied units
+and preserve their benchmark differences as conditional arithmetic.
 
 When endpoint values already include fees, add back only the disclosed fees for
 an accounting bridge and do not deduct them again. A loss remaining after that

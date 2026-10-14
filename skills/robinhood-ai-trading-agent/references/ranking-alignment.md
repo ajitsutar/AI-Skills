@@ -125,6 +125,15 @@ authenticity, calibrated forecasts or independent acquisition.
 
 ## Local command line
 
+For a fundamental request that does not explicitly choose a method, pass
+`requested_basis: documented_default`. The adapter resolves the installed public
+profile independently of snapshot compatibility. A caller-supplied identity is
+retained under `declared_requested`; a strict snapshot remains a diagnostic with
+`requested_result=null`. Use `user_explicit` only when the request chooses a route.
+Omission retains legacy `undeclared` behavior, not evidence of a user choice.
+Do not copy the snapshot profile into the request merely to obtain SAME. Include
+the requested identity, basis, relation and result scope in the final answer.
+
 ```text
 python scripts/ranking_alignment.py route request.json
 python scripts/ranking_alignment.py replay request.json

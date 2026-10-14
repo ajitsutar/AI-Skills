@@ -5,6 +5,7 @@ functions have no network, broker, permission, order or source-verification logi
 """
 from copy import deepcopy
 from decimal import Context, Decimal, localcontext
+import hashlib
 
 import planning_alignment
 from quant_common import digest, require
@@ -204,6 +205,100 @@ def budget_sizing(document):
     _header(document)
     with localcontext(Context(prec=_precision(document))):
         return _budget_sizing(document)
+
+
+def source_budget_sizing(document):
+    """Map a complete retained fee/slippage source to every selected price row.
+
+    The source's cost_assumptions has fee_per_trade and one_way_slippage_bps.
+    Explicit RFC6901 bindings select that object and its declared currency from
+    retained UTF-8 JSON bytes. Existing budget_sizing performs all arithmetic.
+    Unknown quote bases stay unresolved; named basis sensitivities are separate.
+    """
+    from report_facts import pointer, strict_json
+    _header(document)
+    require(type(document.get('schema_version')) is int and document['schema_version'] == 1,
+            'SOURCE_BUDGET_SCHEMA_1_REQUIRED')
+    source = document.get('cost_source')
+    require(isinstance(source, dict) and isinstance(source.get('text'), str),
+            'FULL_COST_SOURCE_TEXT_REQUIRED')
+    require(source.get('role') in {'supplied_observation', 'hypothetical_scenario', 'user_assumption'},
+            'COST_SOURCE_ROLE_REQUIRED')
+    require(source.get('provenance') is not None, 'COST_SOURCE_PROVENANCE_REQUIRED')
+    raw = source['text'].encode('utf-8')
+    require(hashlib.sha256(raw).hexdigest() == source.get('sha256'), 'COST_SOURCE_BYTES_HASH_MISMATCH')
+    retained = strict_json(raw)
+    bindings = document.get('cost_bindings')
+    require(isinstance(bindings, dict) and set(bindings) == {'cost_assumptions', 'currency'},
+            'EXPLICIT_COST_AND_CURRENCY_BINDINGS_REQUIRED')
+    assumptions = deepcopy(pointer(retained, bindings['cost_assumptions']))
+    currency = pointer(retained, bindings['currency'])
+    require(isinstance(currency, str) and currency == document['currency'], 'COST_SOURCE_CURRENCY_MISMATCH')
+    require(isinstance(assumptions, dict) and set(assumptions) <=
+            {'fee_per_trade', 'one_way_slippage_bps'}, 'UNSUPPORTED_COST_ASSUMPTION_SCHEMA')
+    # Missing/null amounts remain missing, never implicit zero. Validate known
+    # amounts here even when unknown price basis would otherwise prevent sizing.
+    _number(assumptions.get('fee_per_trade'), 'fee_per_trade')
+    _number(assumptions.get('one_way_slippage_bps'), 'one_way_slippage_bps')
+    rows = _records(document.get('rows'), 'rows')
+    scenarios = _records(document.get('quantity_scenarios'), 'quantity_scenarios')
+    require(rows and scenarios, 'EXPLICIT_ROWS_AND_QUANTITY_SCENARIOS_REQUIRED')
+    for scenario in scenarios:
+        require(scenario.get('quantity_basis') in {'whole_shares', 'fractional_shares'}
+                and scenario.get('quantity_step') is not None, 'EXPLICIT_QUANTITY_SCENARIO_REQUIRED')
+    for row in rows:
+        require(type(row.get('entry_orders')) is int and row['entry_orders'] > 0,
+                'EXPLICIT_ENTRY_ORDER_COUNT_REQUIRED')
+        require(not set(row) & {'costs', 'modeled_slippage'}, 'ROW_COST_OVERRIDE_NOT_SUPPORTED')
+        require(row.get('price_basis') is None or row['price_basis'] in BASES, 'INVALID_PRICE_BASIS')
+    provenance = {'source_bytes_sha256': source['sha256'], 'source_role': source['role'],
+                  'source_provenance': deepcopy(source['provenance']),
+                  'source_field_pointers': [{'field': key, 'pointer': value} for key, value in bindings.items()]}
+    def mapped(sensitivity=None):
+        derived = {key: deepcopy(document.get(key)) for key in
+                   ('currency', 'role', 'mode', 'budget', 'quantity_scenarios')}
+        derived['rows'] = []
+        for original in rows:
+            row = deepcopy(original)
+            if sensitivity is not None and row.get('price_basis') in {None, 'unknown'}:
+                row['price_basis'] = sensitivity['price_basis']
+                row['price_reference_description'] = sensitivity.get('price_reference_description')
+            basis = row.get('price_basis')
+            row['costs'] = [{'id': 'source-fee-per-trade', 'amount': assumptions.get('fee_per_trade'),
+                             'unit': 'per_order', 'phase': 'entry', 'currency': currency,
+                             'provenance': deepcopy(provenance)}]
+            row['modeled_slippage'] = {
+                'id': 'source-one-way-slippage', 'amount': assumptions.get('one_way_slippage_bps'),
+                'unit': 'bps_notional', 'phase': 'entry', 'convention': 'one_way',
+                'reference_price_basis': basis, 'price_reference_description': row.get('price_reference_description'),
+                'overlap': 'independent', 'currency': currency, 'provenance': deepcopy(provenance)}
+            derived['rows'].append(row)
+        return derived
+    primary = budget_sizing(mapped())
+    sensitivities = _records(document.get('sensitivities', []), 'sensitivities')
+    separate = []
+    for sensitivity in sensitivities:
+        basis = sensitivity.get('price_basis')
+        require(basis in BASES - {'unknown'}, 'EXPLICIT_SENSITIVITY_REFERENCE_BASIS_REQUIRED')
+        if basis == 'other':
+            require(isinstance(sensitivity.get('price_reference_description'), str)
+                    and bool(sensitivity['price_reference_description'].strip()),
+                    'SENSITIVITY_REFERENCE_DESCRIPTION_REQUIRED')
+        separate.append({'id': sensitivity['id'], 'basis_assumption': deepcopy(sensitivity),
+                         'scope': 'unknown_source_price_bases_only',
+                         'status_label': 'CONDITIONAL_REFERENCE_BASIS_SENSITIVITY',
+                         'result': budget_sizing(mapped(sensitivity))})
+    return _finish(document, 'source-bound-cash-budget-sizing',
+                   status=primary['status'], primary_result=primary, sensitivities=separate,
+                   cost_source={'retained_document': retained, 'bytes_sha256': source['sha256'],
+                                'canonical_sha256': digest(retained), 'role': source['role'],
+                                'provenance': deepcopy(source['provenance']), 'bindings': deepcopy(bindings),
+                                'cost_assumptions': assumptions, 'currency': currency},
+                   selected_row_ids=[r['id'] for r in rows],
+                   cost_mapping={'fee_per_trade': 'per_order entry fee times explicit entry_orders',
+                                 'one_way_slippage_bps': 'one-way entry bps_notional; independent of per-trade fee',
+                                 'quoted_full_spread': 'observation only; never added as another charge'},
+                   limitation='All rows retain both supplied cost components. Unknown price basis does not become last; named sensitivities do not replace the unresolved primary result. No selection, weights, budget or broker capability is changed.')
 
 
 def _budget_sizing(document):

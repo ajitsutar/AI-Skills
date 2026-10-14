@@ -74,6 +74,24 @@ receipt supporting that result and its search scope. A planned query or one that
 could not be issued because tools or access were unavailable is `NOT_ATTEMPTED`;
 record the reason separately.
 
+Bind each dependence claim to its source population and named entities. Two
+aggregate consensus publishers declaring a common upstream provider supports that
+publisher-lineage observation only. It does not establish that their constituent
+research firms share an upstream provider, data or research assumptions. Missing
+individual-firm lineage stays unknown even when the provider lists those firms in
+its population. A conditional statement that research firms may share inputs is
+different from an observed common-input claim; neither establishes statistical
+independence or a calibrated target-attainment probability.
+
+The existing analyst helper returns `source_population_provenance` separately for
+included individual-target firms and aggregate providers, including their declared
+lineage, any common-upstream groups, and an `UNESTABLISHED` statistical-independence
+status. The analyst report projects these population-specific fields into retained
+facts. Do not move a lineage relation from one population into another in prose.
+The legacy `independent_firms` numerical field counts distinct firm identities
+after deduplication; it is not an independence test. Its meaning is explicitly
+retained in `consensus.firm_count_meaning`.
+
 A readable article quoting a target supports that attributed target, not a claim
 to have read the underlying research report. A headline without an attributable
 analyst and firm cannot enter the independently constructed consensus. Reposts of
@@ -161,6 +179,41 @@ a compatible basis or a separately labeled conditional same-basis assumption.
 An evidence-consistent excerpt does not prove that the DCF was independently
 reproduced or that the historical price series was checked. Keep those coverage
 claims separate from the arithmetic.
+
+Use `evidence.price_comparison` for cross-item percentage arithmetic. Its
+arguments are `quote`, `references` and optional `conditional_same_basis`.
+Each operand has a unique `id`, a positive numeric `value`, and its own flat
+`security_id`, `issuer_id`, `currency`, `share_basis` and `adjustment_basis`
+metadata. Each reference also has `kind`: `fair_value`, `forward_target`,
+`historical_high` or `historical_low`. Preserve missing fields; do not copy
+neighboring metadata. This helper checks all five dimensions and returns an
+unresolved primary calculation when any required basis is missing or conflicting.
+
+It always distinguishes two directions and denominators:
+
+- `quote_discount_relative_to_reference_pct` uses
+  `100 * (reference - quote) / reference`. Relative to a past high this means
+  percent below that high; negative values mean above the reference.
+- `price_change_from_quote_to_reference_pct` uses
+  `100 * (reference - quote) / quote`. This means appreciation needed from the
+  quote to the reference; negative values mean a decline. It cannot be described
+  as the quote's percentage discount to the reference.
+
+Each computed field retains the formula, denominator operand ID, denominator
+value and meaning. Retain those fields when composing the answer. Optional
+`conditional_same_basis` has exactly `label` and `dimensions`, the latter an
+object with explicit assumed values for missing dimensions. The separate
+conditional sensitivity can fill missing metadata but cannot reconcile known
+conflicts or upgrade the original unknown primary basis. Arithmetic does not
+establish expected returns, probabilities, independent DCF reproduction or
+historical-series verification.
+
+The analyst report envelope accepts optional `price_comparisons`, a list of these
+exact helper argument objects alongside `cohorts` and `supplemental_evidence`.
+It executes the typed helper and includes pointer-bound formulas, denominator
+values, metadata gaps and conditional results in its report. Fair-value and
+historical-range supplemental records retain explicit missing share/adjustment
+basis even when no numeric comparison was requested.
 
 ## Analyst success rate and reputation
 

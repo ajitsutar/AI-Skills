@@ -127,7 +127,10 @@ def brinson(groups):
             'reconciliation_error': excess-float((allocation+selection+interaction).sum()),
             'benchmark_appropriateness': 'NOT_ASSESSED',
             'causal_attribution_assessed': False,
-            'limitation': 'Arithmetic Brinson-Fachler decomposition for one period and consistent beginning weights. Selection is a formula label, not proof of stock-selection skill, investment cause, execution quality or policy compliance. Equal assumed portfolio/benchmark weights force zero allocation and interaction; they do not establish actual policy weights. Benchmark comparability and completeness of costs remain caller evidence. Multi-period linking and intraperiod trading need separate accounting.'}
+            'aggregation_basis_assessed': False,
+            'observed_combined_performance': None,
+            'calculation_role': 'CONDITIONAL_WEIGHTED_ARITHMETIC',
+            'limitation': 'Arithmetic Brinson-Fachler decomposition for one period and consistent beginning weights. Supplied group weights and returns do not establish common currency, matching periods, disjoint sleeve coverage or observed combined portfolio performance; that primary result remains unknown without separately bound evidence. Selection is a formula label, not proof of stock-selection skill, investment cause, execution quality or policy compliance. Equal assumed portfolio/benchmark weights force zero allocation and interaction; they do not establish actual policy weights. Benchmark comparability and completeness of costs remain caller evidence. Multi-period linking and intraperiod trading need separate accounting.'}
 
 
 if __name__ == '__main__':

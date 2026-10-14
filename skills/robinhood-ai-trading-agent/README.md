@@ -21,13 +21,13 @@ research universe.
 | Workflow | What the skill provides | Guide |
 |---|---|---|
 | Stock recommendations | Whole-universe discovery, shared factor ranking, primary evidence, valuation, catalysts and downside | [Research campaign](references/research-campaign.md) |
-| Holding-period decisions | Same-session, dated and flexible long-term research with matching event and scenario analysis | [Holding periods](references/holding-period-planning.md) |
+| Holding-period decisions | Arbitrary dated and flexible horizons, matching events and scenarios, and cash comparisons on the same capital after entry costs | [Holding periods](references/holding-period-planning.md), [equity versus cash](references/equity-cash-comparison.md) |
 | Financial diligence | Sector-relative valuation, normalized earnings/FCF, explicit raw-observation mapping, balance-sheet and value-trap analysis | [Investment review](references/screening-and-value-traps.md), [flow normalization](references/flow-normalization.md) |
 | News and guidance | Dynamic source discovery, public feed polling, between-quarter projections and deterministic text triage | [News and guidance](references/news-and-guidance.md) |
-| Analyst evidence | Accessible reports, forward target distributions, revisions and sourced analyst track records | [Analyst research](references/analyst-research.md) |
-| Portfolio decisions | Contributions, fractional allocation, fee-inclusive sizing, ETF look-through, concentration, volume context, rebalance proposals, tax-lot review and explicit comparisons with missing allocations | [Portfolio management](references/portfolio-management.md), [allocation baseline](references/allocation-policy.md), [decision calculations](references/portfolio-decision-calculations.md), [input roles](references/planning-input-roles.md) |
-| Dated portfolio scenarios | Net vests, withdrawals, tax earmarks versus payments, conditional tax treatments and consistent post-flow denominators | [Dated portfolio projections](references/portfolio-projection.md) |
-| Planning tradeoffs | Compare explicit alternatives without invented objective weights; model separate settlement, transfer and arrival dates with unresolved cutoff timing | [Planning comparisons](references/planning-comparison.md) |
+| Analyst evidence | Accessible reports, forward target distributions, revisions, sourced track records and population-specific source lineage | [Analyst research](references/analyst-research.md) |
+| Portfolio decisions | Contributions, fractional allocation, full-source ETF look-through and share-class joins, concentration, volume context, rebalance proposals, tax-lot review and explicit comparisons with missing allocations | [Portfolio management](references/portfolio-management.md), [source exposure](references/source-exposure.md), [allocation baseline](references/allocation-policy.md), [decision calculations](references/portfolio-decision-calculations.md), [input roles](references/planning-input-roles.md) |
+| Dated portfolio scenarios | Net vests, withdrawals, tax earmarks versus payments, conditional tax treatments and consistent post-flow denominators | [Dated portfolio projections](references/portfolio-projection.md), [shared employer reference](references/employer-reference.md) |
+| Planning tradeoffs | Preference-free conditional proposals; separate settlement, transfer and arrival dates, a shared timing reference and unresolved cutoff timing | [Planning comparisons](references/planning-comparison.md) |
 | Tactical research | Completed-bar setups, catalysts, liquidity, cost assumptions, stops/targets and holding-period scenarios | [Short-term research](references/short-term-trading.md) |
 | Volatility analysis | GARCH, GJR-GARCH, supported EGARCH and stock-relative interval-move diagnostics | [Volatility models](references/garch-volatility.md) |
 | Quant construction | Constrained allocation, covariance sensitivity, empirical tail loss and multi-asset scenarios | [Quant workbench](references/quant-workbench.md) |
@@ -54,6 +54,18 @@ reported claims together. Report verification catches altered or incomplete
 projections, including type changes in literal claims. Free-form business
 judgment and source selection still require review. Matching calculations alone
 does not establish matching recommendations or universal model independence.
+
+Source-aware portfolio helpers carry the original obligations, withdrawals,
+vesting events and unknowns into dated projections and comparable alternatives.
+Source-bound budget sizing keeps the entire supplied fee/slippage model together
+and separates unresolved quote bases from named full-cost sensitivities.
+The settlement/transfer sweep evaluates every supplied sale date. Typed price
+comparisons retain both the reference-price discount and the quote-based upside
+with their formulas. Financial pointer bindings preserve absent reporting
+precision. Final recommendation context joins the selected names and amounts to
+their supplied concentration, monetary volume and fixed-exit risks. Use these
+operations when the linked input schema fits; other schemas require an explicit
+mapping with the same source facts preserved.
 
 ## Recommendations and evidence
 

@@ -1,5 +1,15 @@
 # Enforced research contract and final selection
 
+Preserve the requested ranking route independently of a supplied snapshot's
+compatible diagnostic profile. For an unspecified fundamental method, use the
+public default and `ranking_alignment`'s `requested_basis: documented_default`;
+do not call a strict diagnostic SAME merely because it can replay.
+Before the final allocation or fixed-exit recommendation, use the source-bound
+context report in [portfolio decision calculations](portfolio-decision-calculations.md).
+Carry its known concentration and monetary-volume facts, conditional-scenario
+risk, cash comparator terms and missing adverse-thesis/exit-plan evidence into
+the answer. These are advisory reporting requirements, never execution gates.
+
 Use this workflow for new ranked fundamental or dated stock-pick requests. It
 closes the gap between a reproducible discovery score and discretionary final
 tables. Intraday remains a separate registered-signal workflow. Do not reroute an

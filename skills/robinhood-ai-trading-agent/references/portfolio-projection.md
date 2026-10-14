@@ -7,6 +7,46 @@ exclusion. Do not compare a future numerator to a present denominator. A tax
 earmark remains an asset; an actual tax payment reduces assets. Neither helper
 establishes tax law, account truth, execution permission or intraday liquidity.
 
+## Bind the whole supplied portfolio context first
+
+When the source contains `baseline_rebalance`, `confirmed_cash_events`,
+`withdrawal` and/or `employer.grant_records`, use `planning.source_projection`
+instead of hand-selecting its cash flows. Pass `currency`, `role`, the entire
+`source`, `source_ref` (file plus `#` prefix), `source_role`,
+`date_basis: "source_calendar_label"`, `target_date`, `included_states`,
+`mark_policy`, explicit `opening_tax_reserve` (null if unknown), and `liabilities`
+(null if unknown). This declared date policy preserves each supplied timestamp's
+calendar label for end-of-date accounting; it is not a settlement-time conversion.
+The adapter binds opening holdings/cash, every signed confirmed cash event, the
+planned withdrawal, and every grant net of withheld/sold tax shares. Events beyond
+the target and states not selected remain in the audit. Missing grant deductions
+make retained units unknown. Future grants never become cash automatically.
+
+Optional `marks` use the dated helper contract. With explicit
+`carry_forward_supplied`, missing overrides use the opening prices; vest-price
+assumptions are not silently converted into target marks. `scenario_flows` supplies
+separate explicit sale, buy, reserve or tax-payment scenarios using the same source
+row contract; it cannot duplicate an automatically bound source flow. Proposed
+instructions and recurring contributions remain listed as unmodeled source
+sections until their scheduling/fill assumptions are expressly supplied.
+
+`other_assets` is an explicit ledger or null. Alternatively the explicit sensitivity
+`residual_policy: "carry_opening_reconciliation_difference"` carries the nonnegative
+opening equity less identified assets as an unclassified asset under the selected
+mark policy. It does not classify that residual or imply zero liabilities. Without
+that assumption or a supplied ledger, complete account equity remains unknown.
+An explicit empty liabilities ledger is an assumption/declaration, never a default.
+
+Use `planning.source_alternatives` for multiple diversification or withdrawal
+paths on this same common projection document. Supply `alternatives` as
+`[{id, scenario_flows}]`; individual alternatives cannot change the target date,
+marks, residual treatment or liabilities. It calculates each post-flow asset
+weight, supplied target drift, and known employer look-through exposure on its
+own post-flow net equity. The unknown residual can contain employer exposure;
+known exposure is not labeled complete. Identified-assets denominator results are
+separate labeled sensitivities. No preferred lot, issuer objective or weights are
+invented. A tax earmark remains in assets; a tax payment is a separate flow.
+
 Both operations require `currency` and `role` (`supplied_observation`,
 `hypothetical_scenario`, `user_assumption`). Each source row described below needs
 matching `currency`, nonempty `source_ref`, and `source_role` (those three roles or

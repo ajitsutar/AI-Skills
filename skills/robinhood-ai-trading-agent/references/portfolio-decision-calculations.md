@@ -1,5 +1,54 @@
 # Budget sizing, price friction and source-bound allocation context
 
+## Final recommendation context from original sources
+
+`recommendation_report.recommendation_context(document)` (workbench:
+`planning.recommendation_context`) binds final recommendation evidence to original
+UTF-8 JSON bytes and computed output. Its document has:
+
+- `schema_version: 1`, `currency`, `role`, and explicit
+  `deadline_mode: fixed_exit|flexible_review|comparison`.
+- `sources: {id: {text, sha256}}`, where hashes cover exact UTF-8 text; duplicate
+  JSON keys/nonfinite values are rejected and bytes hashes checked.
+- `bindings: {name: {source_id, pointer}}`, with RFC6901 pointers. Bind
+  `security_rows` to original rows, and `allocation` to the complete computed
+  `planning.allocate` output. Without an allocation, bind `selected_symbols` to
+  an explicit retained nonempty selection; quantities/denominator then stay unknown.
+- Optional bindings `ranking`, `hard_exit`, `scenarios`, `cash_benchmark`,
+  `adverse_thesis`, `exit_plan`. Unbound/absent fields remain explicit unknowns.
+- `row_mapping` maps fields to relative JSON pointers in every original row:
+  required `symbol`; optional `issuer_id`, `sector`, `industry`, `instrument_type`,
+  `period`, `lookthrough`, `dollar_volume_amount`, `dollar_volume_currency`,
+  `dollar_volume_period`. Map every supplied material classification/volume field;
+  do not omit a known adverse observation to make the output appear unresolved.
+- Absent instrument type remains `unknown`. Optional
+  `row_assumptions: {instrument_type: {value: equity|fund|cash|other|unknown, basis: ...}}`
+  may fill only an absent type as an explicitly declared assumption; the per-row
+  receipt retains that assumption separately from source fields. It cannot replace
+  a supplied conflicting type. A stock-only premise must be declared rather than
+  inferred silently from the profile or symbols.
+- When monetary volume is mapped, supply `dollar_volume_unit` using the existing
+  context units and `dollar_volume_unit_basis` identifying its source or explicit
+  assumption. Do not convert share volume into monetary volume without a retained
+  supported calculation. A monetary unit alone does not establish average-period
+  semantics; retain those source terms explicitly.
+
+The report calls the existing allocation-context arithmetic with reference gross
+notionals and the original allocation-budget denominator, separately for each
+single-stock alternative. It returns full source hashes, bindings, mapped row
+receipts, source liquidity, issuer/sector/industry exposures and unchanged ranking,
+scenario/cash/exit evidence. No new forecast or concentration limit is chosen.
+Its interpretation makes scenario losses unbounded by the supplied scenario table,
+fixed-sale gap/halt/buyer risk, unknown cash-guarantee terms and missing review/exit
+plans visible. Suggested review topics are advice, not sourced events or automatic
+sell instructions. Supplied review plans remain unauthenticated declarations.
+
+Present the relevant context alongside the final dollar/selection proposal. A
+successful report is not proof of adequate source mapping, an investment approval,
+cash affordability, executable liquidity or broker submission.
+
+Standalone: `python scripts/recommendation_report.py retained-context-input.json`.
+
 These pure local calculations take `inputs={"document":D}` through the workbench.
 They accept supplied observations or clearly labeled assumptions, produce advisory
 research facts, and add no permission checks, broker capabilities or execution
@@ -15,6 +64,56 @@ sources as supplied and an explicit non-authentication statement. A digest does
 not establish the source's accuracy or freshness.
 
 ## Explicit budget sizing
+
+For a supplied `cost_assumptions` object containing `fee_per_trade` and
+`one_way_slippage_bps`, use `planning.source_budget_sizing` /
+`portfolio_decision.source_budget_sizing(document)`. This adapter retains the
+whole original source and applies both components to every selected price row.
+Do not manually build fee-only rows while calling the result full-cost sizing.
+
+The input contains `schema_version: 1`, the common explicit `currency` and `role`,
+and the unchanged `mode`, `budget`, `rows` and `quantity_scenarios` from the budget
+contract below. Each row must have a positive integer `entry_orders`; every
+quantity scenario must explicitly supply its basis and step. Supply:
+
+```text
+cost_source = {text, sha256, role, provenance}
+cost_bindings = {cost_assumptions: RFC6901_pointer, currency: RFC6901_pointer}
+sensitivities = [{id, price_basis, ?price_reference_description}]  # optional
+```
+
+`text` is the complete retained original UTF-8 JSON source, and `sha256` hashes
+those exact bytes. Both bindings select fields inside that document. Bind
+`currency` to the source's explicit currency; it must match the sizing currency.
+The source role is explicit `supplied_observation`, `hypothetical_scenario` or
+`user_assumption`, with retained provenance. Do not replace the original source
+with a hand-written object containing only the preferred fee. The adapter rejects
+unsupported fields in this narrow cost-assumption object; other source schemas
+continue to use the low-level helpers with explicit mappings.
+
+The fee maps to a per-order entry cost using the row's explicit order count.
+One-way slippage maps to an independent entry `bps_notional` model against that
+row's explicit price reference. Missing/null fee or slippage remains unresolved,
+including when the other component is known; only a supplied zero is zero. Rows
+cannot override these components with their own `costs` or `modeled_slippage`.
+A quoted full spread remains an observation and is never added as another charge.
+The adapter calls the existing `budget_sizing` and `trade_costs` implementations;
+it does not create another quantity algorithm, select names or alter budgets.
+
+Map a sourced stock close to `price_basis: last` explicitly and retain the price
+provenance. An unrelated fund quote with unknown basis remains unknown in its
+own row; it cannot erase stock slippage. For unknown bases, the primary result
+retains both cost components and leaves affordability unresolved. Optional named
+sensitivities assume the declared basis only for those unknown rows, with both
+costs still applied. Known row bases remain unchanged. For `other`, explicitly
+describe the sensitivity reference. Present these as conditional reference-basis
+sensitivities, alongside the unresolved primary result, never as observed broker
+affordability. A fee-only calculation belongs to a separate explicitly labeled
+lower-level diagnostic; it cannot replace this full-source result.
+
+Output includes `primary_result`, separate `sensitivities`, the complete original
+`cost_source`, checked byte/canonical hashes, bindings/provenance and `cost_mapping`.
+These findings add no execution prerequisite or permission condition.
 
 `planning.budget_sizing` / `portfolio_decision.budget_sizing(document)` requires:
 

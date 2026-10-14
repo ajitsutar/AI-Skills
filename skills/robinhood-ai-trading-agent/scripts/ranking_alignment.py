@@ -92,6 +92,16 @@ def route_ranking(document):
     require(set(requested) <= {'profile_id', 'profile_sha256'}, 'UNSUPPORTED_REQUESTED_METHOD_FIELD')
     require(type(document.get('allow_diagnostic_replay', False)) is bool, 'DIAGNOSTIC_FLAG_MUST_BE_BOOLEAN')
     routes = installed_routes()
+    basis = document.get('requested_basis', 'undeclared')
+    require(basis in {'user_explicit', 'documented_default', 'undeclared'},
+            'INVALID_REQUESTED_METHOD_BASIS')
+    declared_requested = deepcopy(requested)
+    # Snapshot compatibility is evidence about available code, not user intent.
+    # A fundamental default is resolved from the installed public profile even
+    # when the retained snapshot happens to bind the strict diagnostic route.
+    if basis == 'documented_default':
+        public = next(r for r in routes if r['profile_id'] == 'public-vqm-discovery')
+        requested = {k: public[k] for k in ('profile_id', 'profile_sha256')}
     available = next((r for r in routes if r['profile_sha256'] == source['canonical_sha256']), None)
     findings = []
     if available is None:
@@ -111,6 +121,7 @@ def route_ranking(document):
     elif bound and method == 'DIFFERENT':
         findings.append('REQUESTED_METHOD_DIFFERS_FROM_BOUND_SNAPSHOT')
     result.update(requested=deepcopy(requested), requested_method_relation=method,
+                  requested_basis=basis, declared_requested=declared_requested,
                   available_diagnostic_route=bound, requested_route=bound if method == 'SAME' else None,
                   profile_binding=source, snapshot_sha256=digest(snapshot),
                   snapshot_schema=snapshot.get('schema_version'), installed_routes=routes,

@@ -28,6 +28,35 @@ Each observation supplies `record_id`, `source_id`, `source_pointer` (a stable s
 
 Supply exactly one of `value` or `display_text`. For `display_text`, optional explicit `scale`, `sign`, and `format` go through the existing filing parser. A raw `value` cannot also carry display transforms. `decimals` describes reporting precision in the normalized unit, independently of scale; `-6` means reported to millions of dollars. The helper never supplies `INF`, zero precision, or extra decimal places. Use `INF` only when the evidence explicitly warrants exactness. Missing precision is a mapping issue.
 
+### Bind original JSON observations without inventing precision
+
+For retained JSON sources, use optional `observation_bindings` instead of rewriting
+the source numbers into `observations`. Each binding has exactly `source_id`,
+`record` and `fields`. `source_id` selects retained source bytes; `record` holds
+explicit observation identity, concept and evidence declarations; `fields` maps
+observation field names to RFC6901 pointers inside those original bytes. For
+example, bind `value` to `/observations/0/value`, `period_start` and `period_end`
+to their original fields, and `decimals` to `/observations/0/decimals` when that
+field exists. Bind `unit` to its actual source field where available. Keep
+publication/source declarations faithful to the actual observation's date.
+
+The returned `source_bindings` retains every field pointer, its `BOUND` or
+`ABSENT` status and the exact source-byte hash. An absent precision pointer stays
+absent; JSON integer values and text without a decimal point do not establish
+nearest-dollar accuracy. The binding's constant `record` cannot contain
+`decimals`. Bound and directly supplied observations may be combined, with unique
+record identifiers as required by the normalizer.
+
+If useful, add `precision_sensitivities`, a list of objects with exactly `label`,
+`decimals` and `record_ids`. Each has a unique descriptive label, explicit
+assumed precision and explicit record IDs whose source precision is absent. The
+helper runs the existing normalizer separately for each named assumption and
+retains its normalization input and output under `precision_sensitivities`.
+The source-only primary result remains `MAPPING_REQUIRED`; a conditional TTM or
+rounding bound is never promoted to source-reported precision. Sensitivities may
+not override precision actually supplied by the source. Report primary unresolved
+precision first, then clearly label every conditional number and rounding bound.
+
 ## Small invented example
 
 This single exact trailing observation illustrates the route; it does not demonstrate a complete issuer financial statement or authenticated source.

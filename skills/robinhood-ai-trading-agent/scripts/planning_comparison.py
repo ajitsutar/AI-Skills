@@ -1,6 +1,7 @@
 """Source-bound alternatives and date-only settlement/transfer scenarios."""
 from copy import deepcopy
 from datetime import date
+from decimal import Context, Decimal, localcontext
 from itertools import combinations
 import re
 
@@ -9,6 +10,175 @@ from quant_common import require
 
 
 DIMENSIONS = ('metric', 'unit', 'basis')
+
+
+def source_alternatives(document):
+    """Compare full dated ledgers on one supplied date/denominator convention.
+
+    document has source_projection arguments plus alternatives[{id,scenario_flows}].
+    Alternative-specific dates, marks, residual/liability policies or objectives
+    are not allowed. Targets/identities/fund overlap come from the retained source.
+    No issuer-maximization objective or preferred sale is constructed.
+    """
+    from portfolio_projection import source_projection, _precision
+    with localcontext(Context(prec=64 + _precision(document))):
+        alternatives = _rows(document.get('alternatives'), 'alternatives')
+        source = document.get('source')
+        require(isinstance(source, dict), 'SOURCE_OBJECT_REQUIRED')
+        identities = {**source.get('identities', {}), **source.get('other_identity', {})}
+        funds = {row['symbol']: row for row in source.get('funds', [])}
+        targets = source.get('baseline_rebalance', {}).get('targets', {})
+        employer_symbol = source.get('employer', {}).get('symbol')
+        employer_id = identities.get(employer_symbol, {}).get('issuer_id')
+        rows = []
+        for alternative in alternatives:
+            require(set(alternative) <= {'id', 'scenario_flows'}, 'ALTERNATIVE_MUST_SHARE_PROJECTION_BASIS')
+            bound = {k: deepcopy(v) for k, v in document.items() if k != 'alternatives'}
+            bound['scenario_flows'] = deepcopy(alternative.get('scenario_flows', []))
+            receipt = source_projection(bound)
+            projection = receipt['projection']
+            values = {row['asset_id']: amount(row['market_value']) if row['market_value'] is not None else None
+                      for row in projection['position_values']}
+            equity = amount(projection['net_equity']) if projection['net_equity'] is not None else None
+            identified = amount(projection['identified_assets']) if projection['identified_assets'] is not None else None
+            def weight(value, denominator):
+                return value / denominator if value is not None and denominator is not None and denominator > 0 else None
+            allocations = []
+            for asset in dict.fromkeys(list(values) + list(targets)):
+                value = values.get(asset, Decimal(0))
+                actual = weight(value, equity)
+                target = amount(targets[asset]) if targets.get(asset) is not None else None
+                sensitivity = weight(value, identified)
+                allocations.append({'asset_id': asset, 'market_value': value, 'target_weight': target,
+                                    'post_flow_weight': actual,
+                                    'target_drift': actual - target if actual is not None and target is not None else None,
+                                    'identified_assets_weight_sensitivity': sensitivity,
+                                    'identified_assets_target_drift_sensitivity': sensitivity - target
+                                    if sensitivity is not None and target is not None else None})
+            exposure, unknown_overlap = Decimal(0), []
+            if employer_id is None:
+                unknown_overlap.append('employer_identity')
+            for asset, value in values.items():
+                if value == 0:
+                    continue
+                if value is None:
+                    unknown_overlap.append(asset)
+                    continue
+                if asset in funds:
+                    fund = funds[asset]
+                    coverage = fund.get('holdings_coverage')
+                    if coverage is None or amount(coverage) < 1:
+                        unknown_overlap.append(asset)
+                    for component in fund.get('holdings', []):
+                        identity = identities.get(component.get('symbol'), {})
+                        if identity.get('issuer_id') == employer_id and employer_id is not None:
+                            exposure += value * amount(component['weight'])
+                        elif not identity.get('issuer_id') and identity.get('kind') != 'cash':
+                            unknown_overlap.append(component.get('symbol'))
+                elif identities.get(asset, {}).get('issuer_id') == employer_id and employer_id is not None:
+                    exposure += value
+                elif not identities.get(asset, {}).get('issuer_id'):
+                    unknown_overlap.append(asset)
+            # The unclassified residual could contain employer exposure. Never
+            # silently promote the known numerator to complete account exposure.
+            if projection['other_assets_value'] is None or amount(projection['other_assets_value']) != 0:
+                unknown_overlap.append('unclassified_other_assets')
+            rows.append({'id': alternative['id'], 'target_date': projection['target_date'],
+                         'denominator': equity, 'denominator_basis': 'same-target-date post-flow net equity',
+                         'identified_assets_sensitivity_denominator': identified,
+                         'allocations': allocations, 'cash': projection['cash'],
+                         'tax_reserve': projection['tax_reserve'],
+                         'known_employer_exposure': exposure,
+                         'known_employer_fraction': weight(exposure, equity),
+                         'identified_assets_employer_fraction_sensitivity': weight(exposure, identified),
+                         'complete_employer_exposure': exposure if not unknown_overlap else None,
+                         'unresolved_employer_overlap': list(dict.fromkeys(unknown_overlap)),
+                         'projection_receipt': receipt})
+        return finish(document, 'planning-source-alternatives', status='DATED_ALTERNATIVES_COMPARED',
+                      alternatives=rows, selected_alternative=None, objective_weights=None,
+                      proposal_contract={
+                          'mode': 'PREFERENCE_FREE_CONDITIONAL_PROPOSAL',
+                          'comparison_alternative_ids': [row['id'] for row in rows],
+                          'default_preferred_funder': None,
+                          'selected_alternative': None,
+                          'input_order_is_priority': False,
+                          'inferred_liquidity_tax_concentration_priority': False,
+                          'self_chosen_objective_weights_allowed_as_default': False,
+                          'conditional_proposal_without_favorite_is_valid': True,
+                          'absent_explicit_user_priorities':
+                              'Compare all viable funding alternatives and conditional priority branches; nominate no default favorite.',
+                          'conditional_priority_branch_rule':
+                              'Describe which supplied alternative facts matter if the user prioritizes a criterion, without assigning that priority to the user.',
+                          'viability_rule':
+                              'Use explicit separately computed funding, timing, lot and liquidity evidence; unknown viability is retained, not assumed or excluded.',
+                          'supplied_preference_rule':
+                              'Preserve explicit user criteria/priorities separately; this operation implements no preference optimizer or automatic selection.',
+                          'execution_effect': 'Advisory proposal contract only; no order or execution prerequisite.'},
+                      input_order_is_priority=False, retained_input=deepcopy(document),
+                      limitations=['Target drift and employer fractions use each alternative post-flow equity on the shared target date.',
+                                   'Identified-assets weights are labeled sensitivities, not complete-account weights.',
+                                   'Known issuer exposure can be a lower bound; unclassified residuals remain unknown.',
+                                   'No criterion direction, preference, tax law or uniquely optimal sale is inferred.'])
+
+
+def settlement_transfer_sweep(document):
+    """Enumerate every supplied sale date through the deadline, including earlier paths.
+
+    Uses settlement_transfer_paths for each date; never chooses a priority/date.
+    When source is supplied, business_dates are bound to its cash_conventions
+    test_business_dates and cannot be narrowed by the caller.
+    """
+    bound = deepcopy(document)
+    if document.get('source') is not None:
+        source = document['source']
+        require(isinstance(source, dict), 'SOURCE_OBJECT_REQUIRED')
+        dates = source.get('cash_conventions', {}).get('test_business_dates')
+        if 'business_dates' in document:
+            require(document['business_dates'] == dates, 'SOURCE_CALENDAR_MUST_NOT_BE_NARROWED')
+        bound['business_dates'] = deepcopy(dates)
+    dates = bound.get('business_dates')
+    require(isinstance(dates, list) and bool(dates), 'LISTED_BUSINESS_DATES_REQUIRED')
+    parsed = [_day(value, 'business_dates') for value in dates]
+    require(all(a < b for a, b in zip(parsed, parsed[1:])), 'STRICTLY_INCREASING_UNIQUE_BUSINESS_DATES')
+    deadline = _day(document.get('spendable_deadline'), 'spendable_deadline')
+    results = []
+    for sale in dates:
+        if _day(sale, 'business_dates') <= deadline:
+            result = settlement_transfer_paths({**bound, 'sale_date': sale})
+            results.append({'sale_date': sale, 'settlement_date': result['settlement_date'], 'paths': result['paths']})
+    reference = None
+    for result in results:
+        path = next((path for path in result['paths'] if path['id'] == 'next_listed_day_initiation'
+                     and path['date_relation_to_deadline'] == 'BEFORE_DEADLINE_DATE'
+                     and path['status'] != 'EXCLUDED_BY_EXPLICIT_ASSUMPTION'), None)
+        if path is not None:
+            reference = {'sale_date': result['sale_date'], 'path': deepcopy(path),
+                         'reference_only': True, 'selected': False,
+                         'basis': 'Earliest supplied sale date with next-listed-day initiation and modeled arrival strictly before deadline.',
+                         'same_day_acceptance_assumed': False,
+                         'description': 'Conditional date-accounting example; no recommended trade date, available-cash claim or arrival guarantee.'}
+            break
+    summaries = []
+    for result in results:
+        uncovered = [bool(path['missing_calendar_dates_for']) for path in result['paths']]
+        summaries.append({'sale_date': result['sale_date'],
+                          'calendar_uncovered_for_all_paths': all(uncovered),
+                          'calendar_coverage_mixed': any(uncovered) and not all(uncovered),
+                          'has_modeled_arrival_on_deadline': any(path['date_relation_to_deadline'] ==
+                              'ON_DEADLINE_DATE_INTRADAY_UNRESOLVED' for path in result['paths']),
+                          'status_for_entire_date': None,
+                          'path_statuses': [{key: deepcopy(path[key]) for key in
+                              ('id', 'status', 'settlement_date', 'transfer_initiation_date', 'arrival_date',
+                               'date_relation_to_deadline', 'missing_calendar_dates_for', 'conditions')}
+                              for path in result['paths']]})
+    return finish(document, 'planning-settlement-transfer-sweep', status='DATE_PATHS_MODELED',
+                  sale_dates=results, sale_date_summaries=summaries, reference_path=reference,
+                  selected_sale_date=None, calendar_extended=False,
+                  guaranteed_spendable_by_deadline=False, retained_input=deepcopy(document),
+                  limitations=['Every supplied sale date on/before the deadline is evaluated; earlier paths are retained.',
+                               'Earlier conditional arrival is not a guarantee or an inferred user priority.',
+                               'Same-day acceptance and deadline-time spendability remain explicitly conditional.',
+                               'Coverage and acceptance are path-specific; mixed timing paths cannot be collapsed into a whole-sale-date status.'])
 
 
 def _text(value, name):

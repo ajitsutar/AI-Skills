@@ -2,6 +2,47 @@
 
 These offline helpers inherit `planning_alignment.finish`: explicit top-level currency and input role, input digest, advisory-only output, no source authentication claim, and no cross-currency conversion. Neither helper creates an order, approval condition, calendar lookup, broker availability claim, or external action.
 
+For a withdrawal or employer-stock comparison from a retained portfolio context,
+run `planning.source_alternatives` with the common full-source projection contract
+in [portfolio-projection.md](portfolio-projection.md). Compare the returned dated
+weights and target drift before describing long-term effects. Present conditional
+tax, liquidity and concentration tradeoffs. Preserving or maximizing a particular
+issuer is not a user objective merely because the source supplies that holding.
+Do not declare one sale uniquely optimal without explicit priorities.
+
+The returned `proposal_contract` makes a conditional proposal valid without
+nominating a favorite. When user priorities are absent, compare every funding
+alternative with supported viability evidence and show conditional branches for
+different priorities. Do not infer that observed liquidity, a lower tax estimate,
+concentration reduction or preservation of an issuer is the user's highest
+priority. Source order is presentation order; self-chosen objective weights are
+not a default decision policy. Preserve unknown viability and missing metrics.
+The contract selects no funder and creates no execution prerequisite. Explicit
+user criteria can be evaluated separately with the existing comparison contract;
+the source projection operation implements no preference optimizer.
+
+For timing, run `planning.settlement_transfer_sweep`, not only a selected late sale.
+It takes `currency`, `role`, `business_dates`, explicit `settlement_lag`,
+`transfer_lag`, `spendable_deadline` and optional `same_day_transfer_assumption`
+from the single-path contract below. Alternatively pass the whole `source`:
+its `cash_conventions.test_business_dates` supplies the full date sequence, and a
+caller-provided different/narrower calendar is rejected. Every listed sale date
+on or before the deadline receives both same-day and next-listed-day initiation
+paths. Keep earlier next-day-initiation paths in the proposal; compare their
+conditions with later same-day-initiation paths. The sweep returns no preferred
+date and never converts a conditional arrival into guaranteed broker availability.
+
+The sweep additionally returns a deterministic `reference_path`: the earliest
+supplied sale date whose `next_listed_day_initiation` path has modeled arrival
+strictly before the deadline and is not explicitly excluded. It retains the full
+conditional path and its cutoff/spendability conditions. This is a common date
+accounting example that needs no same-settlement-day acceptance assumption, not a
+selected sale date, recommended trade, available-cash claim or guaranteed arrival.
+All other paths remain in `sale_dates`, and `selected_sale_date` stays null. If no
+path meets that exact reference rule, `reference_path` is null. A null reference
+does not create a trading restriction, extend the supplied calendar or select a
+later same-day path automatically.
+
 ## Alternative comparison
 
 `planning.alternative_comparison` / `alternative_comparison(document)` accepts:
@@ -29,3 +70,11 @@ The helper separates sale, settlement, transfer initiation and arrival. It enume
 An arrival before, on or after the deadline date is labeled separately. An arrival on the deadline date explicitly retains unknown intraday ordering. Even an earlier modeled arrival is conditional; `guaranteed_spendable_by_deadline` is always false. Missing calendar coverage leaves the affected dates and deadline relation null; it never extends the supplied list, looks up holidays, substitutes calendar days, or fabricates a latest guaranteed sale. Dates calculated for an explicitly excluded path are counterfactual arithmetic and must not be presented as a feasible path.
 
 Use the supplied source scenarios first. Extra example policies do not create approvals or execution conditions for an analytical proposal. Correct projected allocation denominators and explicit tax/cost conventions must be computed upstream and preserved in each metric basis before comparing alternatives.
+
+The sweep's `sale_date_summaries` retains each timing mode's exact status and
+dates. `calendar_uncovered_for_all_paths` and `calendar_coverage_mixed` distinguish
+an uncovered whole date from mixed paths. One mode can have a known arrival on
+the deadline with unknown intraday acceptance while another lacks calendar
+coverage. Report both statuses; do not call that whole sale date uncovered.
+`status_for_entire_date` stays null because the modes have separate assumptions.
+Neither known calendar coverage nor an arrival date proves funds are spendable.

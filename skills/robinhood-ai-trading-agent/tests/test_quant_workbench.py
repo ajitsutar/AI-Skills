@@ -341,11 +341,20 @@ class PrimaryDataTests(unittest.TestCase):
 
 
 class ReplayTests(unittest.TestCase):
-    def test_full_campaign_survives_json_roundtrip_and_all_operations(self):
+    def test_retained_campaign_survives_json_roundtrip_and_baseline_operations(self):
         doc = json.loads((ROOT/'examples/fictional-quant-campaign.json').read_text())
         bundle = json.loads(json.dumps(workbench.freeze(doc), allow_nan=False))
         self.assertEqual(workbench.verify(bundle)['jobs_verified'], len(doc['jobs']))
-        self.assertEqual({j['operation'] for j in doc['jobs']}, set(workbench.OPERATIONS))
+        # This retained campaign predates the source-aware adapters. Keep its
+        # numerical inputs unchanged and its baseline coverage assertion exact.
+        source_operations = {'planning.source_roles', 'planning.source_projection',
+                             'planning.source_alternatives', 'planning.settlement_transfer_sweep',
+                             'planning.recommendation_context', 'evidence.price_comparison',
+                             'planning.source_budget_sizing', 'planning.employer_diversification_baseline',
+                             'financial.equity_cash_comparison', 'planning.source_allocation_context'}
+        self.assertTrue(source_operations <= set(workbench.OPERATIONS))
+        self.assertEqual({j['operation'] for j in doc['jobs']},
+                         set(workbench.OPERATIONS) - source_operations)
 
     def fixture(self):
         return {'schema_version': 1, 'contract': {'prompt': 'Fictional risk review', 'purpose': 'compatibility',

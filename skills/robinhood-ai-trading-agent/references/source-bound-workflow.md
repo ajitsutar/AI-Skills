@@ -5,6 +5,15 @@ It calls the installed calculations, request/evidence receipts and report-facts
 adapter, producing the result and its report together. Reimplementing an available
 operation in an ad hoc script loses those bindings and checks.
 
+When the original record fits a documented source-aware operation, bind that
+whole record instead of transcribing selected fields into lower-level arguments.
+Portfolio source roles, dated projections/alternatives and settlement sweeps
+preserve supplied flows and unknown bases. Recommendation context joins original
+security rows to computed allocations. Financial observation pointer bindings
+retain missing precision; typed price comparisons retain exact denominator
+meaning. Their contracts are listed in [the workbench catalog](quant-workbench.md).
+Use explicit mappings for other schemas and inspect every material omitted field.
+
 ```text
 python scripts/research_workflow.py schema
 python scripts/research_workflow.py run PLAN.json --private-output-dir NEW_DIRECTORY
@@ -194,3 +203,10 @@ workflow in a future answer.
 Use [evidence semantics](evidence-semantics.md), [research alignment](research-alignment.md)
 and operation-specific guides. Do not infer causality, settlement, day-close
 holdings or a covenant definition from a convenient proxy.
+
+Only hash completed artifacts. A command that is still writing a response has
+unfinished stdout, stderr and command receipt; those are not valid fixed artifact
+references inside that same response. Compose the response after substantive
+commands finish. Its authoring command may be recorded separately afterward;
+never claim a placeholder stream hash proves the completed stream. Preserve an
+incorrect original reference as a disclosed evidence failure, not a silent repair.

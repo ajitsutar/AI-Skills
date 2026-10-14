@@ -14,6 +14,47 @@ PENDING_STATES = {'unknown', 'reserved', 'open_position', 'proposed', 'cancelled
 DIMENSIONS = ('metric', 'unit', 'scope', 'basis')
 
 
+def source_roles(document):
+    """Interpret the retained planning source without filling ambiguous bases.
+
+    document={currency,role,source,source_ref,source_role,checks?}. Supported
+    source fields are capital/contribution and trade.cash/maximum_planned_loss/
+    pending_exposure. A loss basis exists only when explicitly declared in
+    trade.maximum_planned_loss_basis; separate costs do not declare that basis.
+    """
+    source = document.get('source')
+    require(isinstance(source, dict), 'SOURCE_OBJECT_REQUIRED')
+    source_currencies = [source[key] for key in ('currency', 'base_currency') if key in source]
+    require(source_currencies and all(value == document['currency'] for value in source_currencies),
+            'SOURCE_CURRENCY_REQUIRED_OR_MISMATCH_NO_FX')
+    ref = _text(document.get('source_ref'), 'source_ref')
+    role = document.get('source_role')
+    require(role in SOURCE_ROLES, 'SOURCE_ROLE_REQUIRED')
+    trade = source.get('trade', {})
+    require(isinstance(trade, dict), 'TRADE_SOURCE_OBJECT_REQUIRED')
+    records = []
+    for owner, key, pointer, semantic, metric, basis in (
+        (source, 'capital', '/capital', 'observation', 'capital', None),
+        (source, 'contribution', '/contribution', 'scenario', 'contribution', None),
+        (trade, 'cash', '/trade/cash', 'observation', 'cash', None),
+        (trade, 'maximum_planned_loss', '/trade/maximum_planned_loss', 'maximum',
+         'planned_loss', trade.get('maximum_planned_loss_basis')),
+        (trade, 'pending_exposure', '/trade/pending_exposure', 'pending', 'exposure', None)):
+        if key not in owner:
+            continue
+        records.append({'id': key, 'value': deepcopy(owner[key]), 'source_ref': ref + pointer,
+                        'source_role': role, 'semantic_role': semantic, 'metric': metric,
+                        'unit': document['currency'], 'scope': 'trade' if owner is trade else 'planning',
+                        'basis': basis})
+    bound = {**document, 'records': records}
+    result = input_roles(bound)
+    return finish(document, 'planning-source-roles', status='INTERPRETED',
+                  records=result['records'], checks=result['checks'], retained_input=deepcopy(document),
+                  actual_portfolio_inferred=False, selected_quantity=None, selected_allocation=None,
+                  loss_basis_inferred_from_costs=False,
+                  limitations=result['limitations'] + ['Separate cost fields never resolve an unspecified loss-ceiling basis.'])
+
+
 def _text(value, name):
     require(isinstance(value, str) and bool(value.strip()), 'TEXT_REQUIRED:' + name)
     return value

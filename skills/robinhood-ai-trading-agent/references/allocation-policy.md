@@ -207,6 +207,18 @@ strategy works over that horizon.
 
 ## Output and replay
 
+Output now includes `allocation_context` beside the final rows, using selected
+source rows' supplied `sector`, `industry`, `instrument_type`, `dollar_volume`,
+fund `lookthrough` and provenance with the existing context helper. Unresolved
+sizing retains reference notionals before fees; alternatives have separate
+contexts. Missing classifications retain the original denominator.
+
+For differently shaped source fields, bind the original rows and computed
+allocation with `recommendation_report.recommendation_context`, described in
+[portfolio decision calculations](portfolio-decision-calculations.md). Report
+known sector/industry totals and each notional-to-volume ratio beside the dollar
+recommendation. Generic evidence gaps cannot replace available adverse facts.
+
 Output includes schema version, policy ID/version/content/hash, normalized-source
 implementation hash, input hash, candidate-row hash and a full `retained_input`.
 It lists selection/weighting provenance, documented defaults actually used, counts,
