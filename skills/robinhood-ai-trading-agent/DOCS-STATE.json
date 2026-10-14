@@ -1,7 +1,7 @@
 {
   "schema_version": 1,
-  "skill_version": "4.7.1",
-  "input_fingerprint_sha256": "a1f7e9d5b8f14385aff32d15f137eb2bcf2543d9d52c8d7484cc8c558e44d629",
+  "skill_version": "4.7.2",
+  "input_fingerprint_sha256": "1dc1c70b7fe5cdd9206262a3dc10db5360ad06ff72e1571b340b46dc4d65f3df",
   "input_file_count": 144,
   "catalog_sha256": "8501ca709e5466047085a9d768d2be2c1c4aba3f7681fdc39fc04b20ac309f0b",
   "readme_sha256": "765b7938c163bc99b2846911fccbd371014793dcfb58c4537b65d93614234231",

@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible stock research, portfolio 
 
 # Robinhood Quant Research and Portfolio Agent
 
-Package version: **4.7.1 — October 13, 2026**.
+Package version: **4.7.2 — October 13, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -86,6 +86,9 @@ units, frequency, horizon, costs, constraints and provenance. Distinguish user
 assumptions from observed facts; expose conflicts and apply helper defaults only
 to unresolved optional fields. Check the explanation against these inputs and
 actual outputs. This research workflow adds no host execution prerequisite.
+
+For custom calculations and simulations, follow the [accounting reconciliation
+guidance](references/quant-research.md#costs-capacity-and-performance) when reporting results.
 
 Use [portfolio-management.md](references/portfolio-management.md) for allocation,
 contributions, concentration, ETF overlap, scenarios, taxes and performance.

@@ -1,6 +1,6 @@
 {
   "package": "robinhood-ai-trading-agent",
-  "version": "4.7.1",
+  "version": "4.7.2",
   "distribution": "AI-Skills repository release",
   "hash_algorithm": "SHA-256",
   "files": {
@@ -9,7 +9,7 @@
     "agents/plugin/robinhood-trading-agent.md": "756d02b1d9c074e6855a5352963b78b377ce947c6d9f5f00522028d8b41e4d7a",
     "agents/robinhood-trading-agent.md": "6885eadfbb02f0892914f1b81d7b1344bd5deec6b994597fa226f20308977466",
     "ARCH-LICENSE.txt": "c6e622bd89db4e13315f4e91605ff96fcbb9012d78ee74e429855870b203eed6",
-    "DOCS-STATE.json": "03c57351c987a53e4f70c9d18d4eb733a82206402d07f467daa0cf8d0810dcc5",
+    "DOCS-STATE.json": "b765941a28eed59014ec157771fb1ebddd5d06c9f60aaa13f5cb04457da06cae",
     "EXAMPLE-PROMPTS.md": "519bb4403d52015b736eeafe7ce4fb068798cd1fe3107fb6d011ba9cb8e237f6",
     "examples/fictional-benchmark-portfolio.json": "ae972e604880adc689be85df0420168593df933a2eb56bd10c8a753eec157fa4",
     "examples/fictional-daily.audit.json": "e38f5a4f3084ce4dc795ea38b9401e73176e6b6c39d13e2ba2c6297431c13215",
@@ -60,7 +60,7 @@
     "references/news-and-guidance.md": "9bf9bf000358ac5b724f8f82bb615723db6c1dafdc79ff88d43612152bad273d",
     "references/personal-setup.md": "3bd4af7a79856239cfe5179bc128181cc4acb520416bd0c02078b0ef9e63e06a",
     "references/portfolio-management.md": "56d824ebf947e479c32b921c72935acf928a6c809786091f7d88b110d7168597",
-    "references/quant-research.md": "e0ab3a54b0f0648753a64baafaa02354e95fa46a1117f3ea61ef3f59044d8671",
+    "references/quant-research.md": "e3dcc63b28f7dddda5e427f6eb20f99600d76b18151237b9d80d88025cf0644c",
     "references/quant-workbench.md": "27c29959a9e09e6826763d482b8beb9c8698ceb61808a7be5adf0f87dc3d458e",
     "references/README.md": "5f7ff2290a2a9c32dff6e1525be82cb72758d420a971246b02cd08baa8eb50da",
     "references/report-facts.md": "2c081a5e61be8dd34349f844bf2ef669d0eb457976166d36514112e16e5a7392",
@@ -135,7 +135,7 @@
     "scripts/trading_calendar.py": "7b5f9b5636e98d924fb258e2fb4bb6c93651de8821402798906b42778277a774",
     "scripts/user_directed_execution.py": "c31d2cd8a8380fee3ae85c046e8f2cffd284a37f3b845c6f299ce8ab86293781",
     "scripts/vqm_research.py": "8f61ac4244eb9e6ad2d48aa0ccd402ef2352d45e5fd068eafd8b596506eaef45",
-    "SKILL.md": "a050cc9ae5df7dc6a164b6a4e464894684fec7d5ccd75ceab55e6d32d82c54a9",
+    "SKILL.md": "e439577f08420aa099f0e9b4e43b0daf0a23b9b5bd95367f7706fc72fd7c1e73",
     "SOURCES.md": "430ca68234c205429e22dfae833604ac75075e9998d866be44fb4bad93ee1dd8",
     "templates/autonomous-mandate.md": "fd20a7d8250a50cf752b22936105df22825865ed845c9791a7576a774f2b8d47",
     "templates/broker-capabilities.template.json": "89798ea5bb21e0d15ab9ea0b385a01e7b3c665e9e1850a56f01725941096aa57",
@@ -182,6 +182,6 @@
     "tests/test_settled_cash_reserve.py": "97b8a493e278e84abc06551db6b466ffca1f390521f766beae851e4f6b9263ea",
     "tests/test_shared_strategy.py": "f741779c2fbcc17b996253d5eb3c4261b33360070c54fe7552b575a12d220c3f",
     "THIRD-PARTY-NOTICES.md": "6bb048a3a253f58a2f57feb87ffe59fb676035ea9dd6b8f21fd3b9f821e5258e",
-    "VERSION": "1b356a2ec960f9b3d3f217dbe57724fd03280bd05e1ab84b38cacdaeb3a45638"
+    "VERSION": "964bf9b089d1e1c9474f4baab1c909ee2affc1fea9464eceaf5d3b8d2ce555f4"
   }
 }

@@ -98,6 +98,19 @@ apply to this personal account or that this helper is a regulatory capital engin
 
 ## Costs, capacity and performance
 
+For custom calculations or simulations outside supported helper contracts, retain
+the code and reconcile reported results with saved artifacts. Declare whether
+terminal holdings stay marked or are hypothetically liquidated; do not add a
+liquidation assumption silently. Reconcile final NAV to cash plus marked holdings,
+less modeled liabilities, with each cost recorded once. If liquidation is modeled,
+include its costs in both the saved final equity observation and headline net
+return on the same valuation and cash-flow basis, without inventing an extra
+elapsed period. Label any retained pre-liquidation observation and its bridge to
+the final value. Without external flows, net return is final NAV / initial NAV - 1;
+otherwise retain the stated flow-aware calculation. Disclose unresolved differences.
+This research-accounting guidance adds no execution gate or approval requirement;
+helper verification and report-facts do not validate arbitrary custom code or prose.
+
 Measure quoted spreads, commissions, impact, delay, unfilled opportunity cost,
 borrow, financing, exchange/clearing fees, taxes and FX separately. Coefficients
 must come from the intended instrument, order size and venue; do not transplant
