@@ -15,6 +15,13 @@ Research findings are advisory; native host and broker tools own execution.
 | Portfolio accounting | Cash ladders, TWR, XIRR, attribution, tax-lot suggestions and potential wash-sale flags | Audited NAV, comprehensive taxes, complete multi-account records and fund administration |
 | Order handoff | Preserve requested market, dollar or fractional intent; explain observed outcomes | Native authentication, supported order schemas, actual execution and order-state handling |
 
+The [offline run/report helpers](run-and-report.md) connect explicit quant inputs,
+separate analyst cohorts and advisory handoff comparisons to retained artifacts.
+They reduce manual copying, but do not infer the correct source/operation from an
+arbitrary prompt or verify every claim in a model's answer. Source acquisition,
+extraction, custom-strategy identity and economic interpretation remain distinct
+work that cannot be declared complete from matching helper output alone.
+
 ## Historical data and strategy evidence
 
 For a historical study, define security identifiers, membership intervals, delistings,

@@ -29,6 +29,11 @@ redacts private account/authentication fields. It requires no policy file,
 ledger, grant, ticket, model output or data threshold. Use real host tool schemas
 when mapping an action; do not invent unavailable parameters or tool names.
 
+For an optional private receipt binding a specific source file/hash/pointer to
+this exact payload, or comparing a proposed payload with it, see
+[handoff preservation](run-and-report.md#handoff-preservation). Differences are
+reported without changing the original handoff or imposing an execution condition.
+
 Research helpers can validate their own inputs, report missing evidence or decline
 to calculate an unsupported statistic. Those are mathematical/data limitations,
 not execution gates. Likewise, a score or an Eligible/Watch research label is not

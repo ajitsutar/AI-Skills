@@ -1,5 +1,9 @@
 # Quant workbench input and replay contract
 
+For a combined prepare, compute and report workflow with retained source bindings,
+use [run and report](run-and-report.md). The lower-level interfaces below remain
+available; the combined workflow uses the same numerical helpers and defaults.
+
 New helpers are offline except the explicit SEC fetch subcommand. Use the pinned
 requirements-tested.txt environment for comparison. They return calculations and
 proposals, never orders. `examples/fictional-quant-campaign.json` exercises the

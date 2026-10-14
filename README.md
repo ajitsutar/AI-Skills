@@ -24,6 +24,9 @@ an explicit preset. Its saved contracts and numerical helpers support reproducib
 calculations while retaining source quality, coverage and unvalidated-performance
 limits. It can also project retained numerical results into private, traceable
 JSON facts and readable Markdown, preserving source pointers and explicit unknowns.
+Offline run/report helpers connect explicit quant jobs and separate analyst cohorts
+to those reports, while advisory payload receipts expose order-instruction changes.
+Source selection and surrounding narrative still require review.
 
 Read its [current capabilities and setup](skills/robinhood-ai-trading-agent/README.md)
 or explore the [prompt catalog for investors, traders and quants](skills/robinhood-ai-trading-agent/EXAMPLE-PROMPTS.md).

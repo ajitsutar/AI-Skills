@@ -5,6 +5,10 @@ targets, estimate revisions or the record of a research author. It supplements
 primary financial and business review. Analyst opinions are neither verified
 company facts nor a calibrated forecast of the investment's return.
 
+For explicit structured records, [run and report](run-and-report.md#analyst-evidence)
+executes the existing evidence helper and renders separate cohorts, exclusions and
+source pointers. It does not acquire missing reports or pool provider estimates.
+
 ## Discover sources for the actual issuer
 
 Build a dated source map for each issuer advanced to this review. Identify the

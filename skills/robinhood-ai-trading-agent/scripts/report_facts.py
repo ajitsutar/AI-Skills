@@ -112,7 +112,17 @@ SIMPLE = {
         'mean': ('Mean input-period return', 'return_fraction', None, 'arithmetic mean of supplied returns'),
         'standard_error_hac': ('HAC standard error of mean', 'return_fraction', None, 'Bartlett/Newey-West; supplied lag count'),
         'two_sided_p': ('Two-sided HAC p-value', 'probability', None, 'normal asymptotic test'),
+        'z': ('HAC mean test statistic', 'dimensionless_statistic', 'HAC standard error of mean', 'mean supplied return / HAC standard error'),
+        'ci95/0': ('HAC mean 95% interval lower endpoint', 'return_fraction', None, 'mean - normal 97.5% quantile * HAC standard error; not a future-return bound'),
+        'ci95/1': ('HAC mean 95% interval upper endpoint', 'return_fraction', None, 'mean + normal 97.5% quantile * HAC standard error; not a future-return bound'),
         'lags': ('HAC lag count', 'count', None, 'input observation lags')},
+    'validation.bootstrap': {
+        'mean': ('Mean input-period return', 'return_fraction', None, 'arithmetic mean of supplied returns'),
+        'mean_percentile_ci95/0': ('Block-bootstrap mean 95% interval lower endpoint', 'return_fraction', None, '2.5% quantile of seeded circular moving-block sample means; approximate stationarity, not future profit probability'),
+        'mean_percentile_ci95/1': ('Block-bootstrap mean 95% interval upper endpoint', 'return_fraction', None, '97.5% quantile of seeded circular moving-block sample means; approximate stationarity, not future profit probability'),
+        'block_length': ('Bootstrap block length', 'count', None, 'input observations per circular moving block'),
+        'replications': ('Bootstrap replications', 'count', None, 'number of resampled series'),
+        'seed': ('Bootstrap random seed', 'integer_seed', None, 'NumPy default_rng seed; recorded runtime and algorithm')},
     'ops.xirr': {'annual_xirr': ('Annualized XIRR', 'annual_return_fraction', 'dated investor cash flows', 'ACT/365 conventional cash-flow root')},
     'ops.attribution': {k: (name, 'return_fraction', 'consistent beginning group weights', 'single-period Brinson-Fachler') for k, name in [
         ('active_return', 'Portfolio minus benchmark return'), ('allocation', 'Allocation effect'),

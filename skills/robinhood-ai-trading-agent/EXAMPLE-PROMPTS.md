@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-179 examples across 25 workflows, from first-time investing to quantitative research.
+186 examples across 26 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the robinhood-ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -44,6 +44,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Cross-model reproducibility and audits](#cross-model-reproducibility-and-audits) | Advanced to quant | 7 |
 | [Institutional research workflows and capability development](#institutional-research-workflows-and-capability-development) | Expert to quant | 7 |
 | [Traceable report facts](#traceable-report-facts) | Investors, research authors and quantitative reviewers | 3 |
+| [Bound inputs and computed reports](#bound-inputs-and-computed-reports) | Research authors, traders and quantitative reviewers | 7 |
 
 ## Getting started and learning
 
@@ -884,6 +885,39 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 ### 179. Add declared labels to selected source fields
 
 > Use [CUSTOM BINDINGS] to add selected exact source pointers from [BUNDLE] to a private report-facts artifact. Keep custom metric names, units, basis and horizon explicitly declared and unverified, preserve the built-in facts, and expose missing pointers. Render a readable report without treating custom labels as semantic proof or evaluating expressions.
+
+
+## Bound inputs and computed reports
+
+**Audience:** Research authors, traders and quantitative reviewers. Guides: [run and report](references/run-and-report.md).
+
+### 180. Run and report explicit quant jobs
+
+> Use [WORKBENCH REQUEST] to compute supported jobs and produce a private quant_report bundle, facts and Markdown report. Retain the original request, actual defaults and computation outcomes, then verify numerical replay and canonical report regeneration. Preserve nested infeasibility or ambiguous-cashflow outcomes without calling them successful investment conclusions.
+
+### 181. Bind calculations to supplied source objects
+
+> For the explicitly selected operations and fields in [REQUEST], bind each complete inputs object to its local file SHA-256 and JSON pointer, then run quant_report. Preserve explicit parameters and report source-selection conflicts. Do not treat a matching hash as proof that a model chose the right object.
+
+### 182. Explain a partially computable campaign
+
+> Run [QUANT REQUEST] with its missing required fields left missing. Report each computed and noncomputed job, resolved optional defaults and retained facts. Distinguish partial calculation coverage from missing source evidence; do not invent observations or silently switch algorithms.
+
+### 183. Report separate analyst cohorts
+
+> Use analyst_report on [STRUCTURED ANALYST RECORDS] and [LOCAL SOURCE ROOT]. Preserve distinct issuer, currency, price-basis and target-horizon cohorts, included and excluded records, provider pools and provider-reported track records. Render pointer-bound facts and state unresolved provider discrepancies without averaging incompatible pools.
+
+### 184. Separate targets from fair value and price history
+
+> Report [ANALYST REQUEST] with supplied fair-value estimates, historical price ranges and source-access records as typed supplemental evidence. Keep them outside forward-target calculations and retain missing fields and evidence limitations. Do not turn reported success rates into an unsupported analyst reputation weight.
+
+### 185. Inspect exact handoff preservation
+
+> Create a private advisory handoff_report from [SOURCE FILE], [SHA256] and [REQUEST POINTER]. Compare [PROPOSED PAYLOAD BINDING] and explain any differences in dollar versus share amounts, order type, time in force or routing. Preserve the selected original payload, omit private details from shared output, and add no execution gate or broker action.
+
+### 186. Distinguish reproducibility from model adherence
+
+> Compare [MODEL OUTPUTS] against their retained quant or analyst reports. Report helper invocation, artifact completeness, numerical replay, source-selection fidelity and narrative agreement separately. Preserve old results and explicitly list missing acquisitions and unsupported custom algorithms instead of declaring them fixed by a successful helper test.
 
 ## Keeping this catalog current
 

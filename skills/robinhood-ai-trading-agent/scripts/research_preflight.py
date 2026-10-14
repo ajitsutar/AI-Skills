@@ -7,6 +7,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITY_FILES = {
+    'offline_run_and_report': ['scripts/quant_report.py', 'scripts/analyst_report.py',
+                              'scripts/handoff_report.py', 'scripts/report_facts.py',
+                              'references/run-and-report.md'],
     'news_and_analyst_research': ['scripts/news_sources.py', 'scripts/news_analysis.py', 'scripts/analyst_evidence.py',
                                 'profiles/news-sources-v1.json', 'references/news-and-guidance.md', 'references/analyst-research.md'],
     'research_handoff': ['scripts/research_handoff.py', 'scripts/research_source_overlay.py', 'references/research-handoff.md', 'PACKAGE-MANIFEST.json'],

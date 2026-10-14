@@ -33,6 +33,7 @@ research universe.
 | Performance accounting | Execution shortfall, cash ladders, TWR/XIRR, attribution and portfolio simulation | [Manager workflow](references/institutional-manager.md) |
 | Reproducibility | Frozen contracts/data, explicit calculation defaults, runtime receipts, numerical replay and separate acquisition comparisons | [Model-independent research](references/model-independent-research.md) |
 | Report facts | Private JSON facts and readable Markdown from retained quant/public-VQM results, with source pointers, supported units and denominators, explicit unknowns and separately declared custom labels | [Report facts](references/report-facts.md) |
+| Run and report | Execute explicit quant jobs or analyst cohorts and retain their inputs, results and reports; inspect exact handoff payload differences without execution gates | [Run and report](references/run-and-report.md) |
 | Execution handoff | Preserve the user's order instructions, surface findings as advisory and pass the payload to the host | [Execution handoff](references/execution-handoff.md) |
 
 Stock discovery defaults to **all U.S. exchange-listed stocks including listed
@@ -103,6 +104,14 @@ python scripts/quant_workbench.py prepare examples/fictional-quant-campaign.json
 python scripts/quant_workbench.py run <research-folder>/quant.inputs.json --output <research-folder>/quant.bundle.json
 python scripts/quant_workbench.py verify <research-folder>/quant.bundle.json
 ```
+
+For a combined quant calculation and report, use `scripts/quant_report.py run`
+with the same request and `--private-output-dir` pointing to a new directory.
+Its `verify` command replays the calculation and checks the retained report.
+`analyst_report.py` renders separate analyst cohorts without pooling provider
+consensus, fair value or historical ranges. See [run and report](references/run-and-report.md)
+for the input contracts, private artifacts and limitations. These helpers preserve
+selected inputs; they do not infer which source or strategy the user intended.
 
 The [prompt catalog](EXAMPLE-PROMPTS.md) covers novice investing through advanced
 quant research, diagnostics, accounting and host handoff. Example values are not
