@@ -8,11 +8,13 @@ from __future__ import annotations
 
 import argparse
 import copy
+from decimal import Decimal
 import hashlib
 import json
 from pathlib import Path
 import tempfile
 
+import handoff_report as exact_json
 import quant_report
 import quant_workbench
 import report_facts
@@ -30,7 +32,50 @@ CONTRACT_OPERATIONS = {
 
 
 def encode(value):
-    return quant_report.encoded(value)
+    # Preserve source Decimal scale: contract value hashes include that spelling.
+    # Give generated floats the same scientific notation on export and reload.
+    def numbers(item):
+        if isinstance(item, dict):
+            return {key: numbers(child) for key, child in item.items()}
+        if isinstance(item, list):
+            return [numbers(child) for child in item]
+        if type(item) is float:
+            return Decimal(str(item))
+        return item
+    return (exact_json.encode(numbers(value)) + '\n').encode('utf-8')
+
+
+def assertion_matches(actual, expected):
+    """Compare JSON values, preserving types but ignoring decimal display scale."""
+    fractional = (float, Decimal)
+    if isinstance(actual, fractional) and isinstance(expected, fractional):
+        return Decimal(str(actual)) == Decimal(str(expected))
+    if type(actual) is not type(expected):
+        return False
+    if isinstance(actual, dict):
+        return actual.keys() == expected.keys() and all(
+            assertion_matches(actual[key], expected[key]) for key in actual)
+    if isinstance(actual, list):
+        return len(actual) == len(expected) and all(
+            assertion_matches(a, b) for a, b in zip(actual, expected))
+    return actual == expected
+
+
+def read_result(raw):
+    """Reload exact contract evidence without changing quant numeric semantics."""
+    result = report_facts.strict_json(raw)
+    exact = exact_json.strict_json(raw)
+    contract_ids = set()
+    for job, retained in zip(result.get('jobs', []), exact.get('jobs', [])):
+        if job.get('operation') in CONTRACT_OPERATIONS:
+            contract_ids.add(job['id'])
+            for key in ('result', 'nested_states'):
+                if key in retained:
+                    job[key] = retained[key]
+    for claim, retained in zip(result.get('claims', []), exact.get('claims', [])):
+        if claim.get('job_id') in contract_ids and 'actual_value' in retained:
+            claim['actual_value'] = retained['actual_value']
+    return result
 
 
 def sha(raw):
@@ -273,8 +318,8 @@ def claims(rows, jobs):
             job = jobs[item['job_id']]
             value = research_contracts.pointer(job, item['pointer'])
             row['actual_value'] = value
-            row['job_result_sha256'] = quant_workbench.digest(job)
-            row['status'] = ('MATCH' if encode(value) == encode(item['assertion'])
+            row['job_result_sha256'] = sha(encode(job))
+            row['status'] = ('MATCH' if assertion_matches(value, item['assertion'])
                              else 'CONTRADICTED') if 'assertion' in item else 'PROJECTED'
         except (KeyError, IndexError, TypeError, ValueError):
             row['status'] = 'UNRESOLVED_POINTER'
@@ -422,7 +467,7 @@ def run(plan, output):
         path.parent.mkdir(parents=True, exist_ok=True)
         with path.open('xb') as handle:
             handle.write(raw)
-    return report_facts.strict_json(artifacts['result.json'])
+    return read_result(artifacts['result.json'])
 
 
 def verify(directory):
@@ -440,8 +485,8 @@ def verify(directory):
     require(set(expected) == set(rebuilt) - {'receipt.json'}, 'ARTIFACT_SET_MISMATCH')
     # Runtime metadata is observational. Replay compares numerical outputs with
     # workbench tolerances; verify retained quant artifacts with their own runner.
-    original_result = report_facts.strict_json((directory / 'result.json').read_bytes())
-    new_result = report_facts.strict_json(rebuilt['result.json'])
+    original_result = read_result((directory / 'result.json').read_bytes())
+    new_result = read_result(rebuilt['result.json'])
     def exact_metadata(result):
         view = copy.deepcopy(result)
         view['claims'] = None  # Separately regenerated from retained job values.
@@ -495,7 +540,7 @@ def summarize(directory):
     directory = report_facts.local_path(directory)
     verification = verify(directory)
     raw = (directory / 'result.json').read_bytes()
-    result = report_facts.strict_json(raw)
+    result = read_result(raw)
     jobs = []
     for index, job in enumerate(result['jobs']):
         value = job.get('result')

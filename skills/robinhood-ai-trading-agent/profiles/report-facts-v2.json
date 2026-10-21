@@ -1873,6 +1873,90 @@
       }
     },
     "planning.allocation_context": {
+      "conclusion_facts/comparative_diversification_established": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: comparative diversification established",
+        "unit": "boolean"
+      },
+      "conclusion_facts/correlation_established": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: correlation established",
+        "unit": "boolean"
+      },
+      "conclusion_facts/entry_cost": {
+        "basis": "Not established by allocation context; denominator difference is not cash.",
+        "denominator": null,
+        "metric": "Conclusion fact: entry cost",
+        "unit": "input_currency_amount"
+      },
+      "conclusion_facts/facts/count_status/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: count status",
+        "unit": "status"
+      },
+      "conclusion_facts/facts/distinct_known_issuer_count/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: distinct known issuer count",
+        "unit": "count"
+      },
+      "conclusion_facts/facts/known_gross_notional/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: known gross notional",
+        "unit": "input_currency_amount"
+      },
+      "conclusion_facts/facts/known_issuer_notional/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: known issuer notional",
+        "unit": "input_currency_amount"
+      },
+      "conclusion_facts/facts/non_applicable_cash_notional/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: non applicable cash notional",
+        "unit": "input_currency_amount"
+      },
+      "conclusion_facts/facts/total_distinct_issuer_count/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: total distinct issuer count",
+        "unit": "count"
+      },
+      "conclusion_facts/facts/total_gross_notional/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: total gross notional",
+        "unit": "input_currency_amount"
+      },
+      "conclusion_facts/facts/unknown_issuer_notional/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: unknown issuer notional",
+        "unit": "input_currency_amount"
+      },
+      "conclusion_facts/investment_dominance_established": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: investment dominance established",
+        "unit": "boolean"
+      },
+      "conclusion_facts/outside_cash": {
+        "basis": "Not established by allocation context; denominator difference is not cash.",
+        "denominator": null,
+        "metric": "Conclusion fact: outside cash",
+        "unit": "input_currency_amount"
+      },
+      "conclusion_facts/relative_risk_established": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: relative risk established",
+        "unit": "boolean"
+      },
       "denominator_difference": {
         "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.",
         "denominator": null,
@@ -2087,6 +2171,54 @@
         "metric": "Budget remainder",
         "unit": "input_currency_amount"
       },
+      "scenarios/*/portfolio_totals/conclusion_facts/budget_reconciliation_residual": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: budget reconciliation residual",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/portfolio_totals/conclusion_facts/facts/budget_remainder/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: budget remainder",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/portfolio_totals/conclusion_facts/facts/gross_notional/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: gross notional",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/portfolio_totals/conclusion_facts/facts/modeled_cash_debit/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: modeled cash debit",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/portfolio_totals/conclusion_facts/facts/modeled_entry_cost/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: modeled entry cost",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/portfolio_totals/conclusion_facts/facts/requested_cash_budget/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: requested cash budget",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/portfolio_totals/conclusion_facts/investment_dominance_established": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: investment dominance established",
+        "unit": "boolean"
+      },
+      "scenarios/*/portfolio_totals/conclusion_facts/reconciliation_status": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: reconciliation status",
+        "unit": "status"
+      },
       "scenarios/*/portfolio_totals/gross_notional": {
         "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed.",
         "denominator": null,
@@ -2122,6 +2254,54 @@
         "denominator": null,
         "metric": "Budget remainder",
         "unit": "input_currency_amount"
+      },
+      "scenarios/*/rows/*/conclusion_facts/budget_reconciliation_residual": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: budget reconciliation residual",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/rows/*/conclusion_facts/facts/budget_remainder/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: budget remainder",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/rows/*/conclusion_facts/facts/gross_notional/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: gross notional",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/rows/*/conclusion_facts/facts/modeled_cash_debit/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: modeled cash debit",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/rows/*/conclusion_facts/facts/modeled_entry_cost/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: modeled entry cost",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/rows/*/conclusion_facts/facts/requested_cash_budget/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: requested cash budget",
+        "unit": "input_currency_amount"
+      },
+      "scenarios/*/rows/*/conclusion_facts/investment_dominance_established": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: investment dominance established",
+        "unit": "boolean"
+      },
+      "scenarios/*/rows/*/conclusion_facts/reconciliation_status": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: reconciliation status",
+        "unit": "status"
       },
       "scenarios/*/rows/*/friction_context/modeled_slippage/amount": {
         "basis": "Full quoted spread is retained separately; only an explicit one-way model with declared compatible reference and cost overlap enters the modeled cost array. Unit and phase belong to the supplied slippage model.",
@@ -3607,41 +3787,373 @@
       }
     },
     "planning.settlement_transfer_sweep": {
+      "sale_date_summaries/*/calendar_coverage_mixed": {
+        "basis": "All retained timing paths for this sale date; coverage is separate from acceptance and spendability",
+        "denominator": null,
+        "metric": "calendar_coverage_mixed",
+        "unit": "boolean"
+      },
+      "sale_date_summaries/*/calendar_uncovered_for_all_paths": {
+        "basis": "All retained timing paths for this sale date; coverage is separate from acceptance and spendability",
+        "denominator": null,
+        "metric": "calendar_uncovered_for_all_paths",
+        "unit": "boolean"
+      },
+      "sale_date_summaries/*/has_modeled_arrival_on_deadline": {
+        "basis": "All retained timing paths for this sale date; coverage is separate from acceptance and spendability",
+        "denominator": null,
+        "metric": "has_modeled_arrival_on_deadline",
+        "unit": "boolean"
+      },
+      "sale_date_summaries/*/path_statuses/*/date_relation_to_deadline": {
+        "basis": "Exact path-specific state; never collapsed into whole-date status",
+        "denominator": null,
+        "metric": "date_relation_to_deadline",
+        "unit": "status"
+      },
+      "sale_date_summaries/*/path_statuses/*/status": {
+        "basis": "Exact path-specific state; never collapsed into whole-date status",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
       "status": {
         "basis": "Source-bound advisory calculation; supplied mappings and assumptions remain declared.",
         "denominator": null,
         "metric": "status",
         "unit": "status"
-      },
-      "sale_date_summaries/*/calendar_uncovered_for_all_paths": {
-        "metric": "calendar_uncovered_for_all_paths",
-        "unit": "boolean",
+      }
+    },
+    "planning.source_allocation_context": {
+      "allocation_result/conclusion_facts/comparative_diversification_established": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
         "denominator": null,
-        "basis": "All retained timing paths for this sale date; coverage is separate from acceptance and spendability"
+        "metric": "Conclusion fact: comparative diversification established",
+        "unit": "boolean"
       },
-      "sale_date_summaries/*/calendar_coverage_mixed": {
-        "metric": "calendar_coverage_mixed",
-        "unit": "boolean",
+      "allocation_result/conclusion_facts/correlation_established": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
         "denominator": null,
-        "basis": "All retained timing paths for this sale date; coverage is separate from acceptance and spendability"
+        "metric": "Conclusion fact: correlation established",
+        "unit": "boolean"
       },
-      "sale_date_summaries/*/has_modeled_arrival_on_deadline": {
-        "metric": "has_modeled_arrival_on_deadline",
-        "unit": "boolean",
+      "allocation_result/conclusion_facts/entry_cost": {
+        "basis": "Not established by allocation context; denominator difference is not cash.",
         "denominator": null,
-        "basis": "All retained timing paths for this sale date; coverage is separate from acceptance and spendability"
+        "metric": "Conclusion fact: entry cost",
+        "unit": "input_currency_amount"
       },
-      "sale_date_summaries/*/path_statuses/*/status": {
+      "allocation_result/conclusion_facts/facts/count_status/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: count status",
+        "unit": "status"
+      },
+      "allocation_result/conclusion_facts/facts/distinct_known_issuer_count/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: distinct known issuer count",
+        "unit": "count"
+      },
+      "allocation_result/conclusion_facts/facts/known_gross_notional/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: known gross notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/conclusion_facts/facts/known_issuer_notional/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: known issuer notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/conclusion_facts/facts/non_applicable_cash_notional/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: non applicable cash notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/conclusion_facts/facts/total_distinct_issuer_count/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: total distinct issuer count",
+        "unit": "count"
+      },
+      "allocation_result/conclusion_facts/facts/total_gross_notional/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: total gross notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/conclusion_facts/facts/unknown_issuer_notional/value": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: unknown issuer notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/conclusion_facts/investment_dominance_established": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: investment dominance established",
+        "unit": "boolean"
+      },
+      "allocation_result/conclusion_facts/outside_cash": {
+        "basis": "Not established by allocation context; denominator difference is not cash.",
+        "denominator": null,
+        "metric": "Conclusion fact: outside cash",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/conclusion_facts/relative_risk_established": {
+        "basis": "Scoped supplied allocation facts; known issuer count is a lower bound when total is unknown. No comparative diversification, risk, correlation or investment dominance is established.",
+        "denominator": null,
+        "metric": "Conclusion fact: relative risk established",
+        "unit": "boolean"
+      },
+      "allocation_result/denominator_difference": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Denominator difference",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/denominator_difference_is_cash": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Denominator difference established as cash",
+        "unit": "boolean"
+      },
+      "allocation_result/exposures/*/classified_notional": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Classified notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/exposures/*/conservation_residual": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Conservation residual",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/exposures/*/groups/*/fraction_of_denominator": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": "explicit original declared denominator; never known-only assets",
+        "metric": "Fraction of denominator",
+        "unit": "fraction"
+      },
+      "allocation_result/exposures/*/groups/*/notional": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/exposures/*/non_applicable_cash_fraction_of_denominator": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": "explicit original declared denominator; never known-only assets",
+        "metric": "Non applicable cash fraction of denominator",
+        "unit": "fraction"
+      },
+      "allocation_result/exposures/*/non_applicable_cash_notional": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Non applicable cash notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/exposures/*/unknown_fraction_of_denominator": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": "explicit original declared denominator; never known-only assets",
+        "metric": "Unknown fraction of denominator",
+        "unit": "fraction"
+      },
+      "allocation_result/exposures/*/unknown_notional": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Unknown notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/fund_lookthrough/conservation_residual": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Conservation residual",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/fund_lookthrough/coverage_status": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Fund look-through coverage",
+        "unit": "status"
+      },
+      "allocation_result/fund_lookthrough/embedded_cash_notional": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Embedded cash notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/fund_lookthrough/known_top_level_fund_notional": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Known top level fund notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/fund_lookthrough/opaque_or_uncovered_fund_notional": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Opaque or uncovered fund notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/fund_lookthrough/terminal_coverage_fraction": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred. Null when any fund amount or constituent weight is unresolved.; classifications/holdings merged from complete declared source collections",
+        "denominator": "known top-level fund notional",
+        "metric": "Terminal supplied fund coverage",
+        "unit": "fraction"
+      },
+      "allocation_result/fund_lookthrough/terminal_nonfund_notional": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Terminal nonfund notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/known_gross_notional": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Known gross notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/rows/*/dollar_volume_context/notional_to_supplied_dollar_volume": {
+        "basis": "Read the adjacent ratio_unit: days, sessions or fraction of period volume. Missing unit/currency leaves the ratio unresolved. This is not a fill/capacity claim.; classifications/holdings merged from complete declared source collections",
+        "denominator": "supplied monetary-volume amount with its own period, units and currency",
+        "metric": "Gross notional relative to supplied dollar volume",
+        "unit": null
+      },
+      "allocation_result/rows/*/dollar_volume_context/period_known": {
+        "basis": "Declared source metadata only; no freshness authentication or retrieval performed.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Period known",
+        "unit": "boolean"
+      },
+      "allocation_result/rows/*/dollar_volume_context/provenance_known": {
+        "basis": "Declared source metadata only; no freshness authentication or retrieval performed.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Provenance known",
+        "unit": "boolean"
+      },
+      "allocation_result/rows/*/dollar_volume_context/source_freshness_verified": {
+        "basis": "Declared source metadata only; no freshness authentication or retrieval performed.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Source freshness verified",
+        "unit": "boolean"
+      },
+      "allocation_result/rows/*/fraction_of_denominator": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": "explicit original declared denominator; never known-only assets",
+        "metric": "Fraction of denominator",
+        "unit": "fraction"
+      },
+      "allocation_result/rows/*/gross_notional": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Gross notional",
+        "unit": "input_currency_amount"
+      },
+      "allocation_result/total_gross_notional": {
+        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
+        "denominator": null,
+        "metric": "Total gross notional",
+        "unit": "input_currency_amount"
+      },
+      "complete_context_receipt/all_declared_collections_consumed": {
+        "basis": "All collections recognized by declared adapters; not complete external data",
+        "denominator": null,
+        "metric": "complete_context_receipt/all_declared_collections_consumed",
+        "unit": "boolean"
+      },
+      "complete_context_receipt/fund_count": {
+        "basis": "Count retained from full declared source collections",
+        "denominator": null,
+        "metric": "complete_context_receipt/fund_count",
+        "unit": "count"
+      },
+      "complete_context_receipt/identity_symbol_count": {
+        "basis": "Count retained from full declared source collections",
+        "denominator": null,
+        "metric": "complete_context_receipt/identity_symbol_count",
+        "unit": "count"
+      },
+      "complete_context_receipt/retained_source_count": {
+        "basis": "Count retained from full declared source collections",
+        "denominator": null,
+        "metric": "complete_context_receipt/retained_source_count",
+        "unit": "count"
+      },
+      "complete_context_receipt/status": {
+        "basis": "Source binding state, not source authenticity or investment eligibility",
+        "denominator": null,
+        "metric": "complete_context_receipt/status",
+        "unit": "status"
+      },
+      "identity_context/*/values/business_description": {
+        "basis": "Declared source field; absent metadata remains unknown; no inferred labels",
+        "denominator": null,
+        "metric": "identity_context/*/values/business_description",
+        "unit": "text"
+      },
+      "identity_context/*/values/dollar_volume/amount": {
+        "basis": "Retained monetary observation; source currency and temporal units remain separate",
+        "denominator": null,
+        "metric": "identity_context/*/values/dollar_volume/amount",
+        "unit": "source_currency_amount"
+      },
+      "identity_context/*/values/dollar_volume/raw_observation/value": {
+        "basis": "Literal source monetary observation; no daily unit inferred",
+        "denominator": null,
+        "metric": "identity_context/*/values/dollar_volume/raw_observation/value",
+        "unit": "source_currency_amount"
+      },
+      "identity_context/*/values/industry": {
+        "basis": "Declared source field; absent metadata remains unknown; no inferred labels",
+        "denominator": null,
+        "metric": "identity_context/*/values/industry",
+        "unit": "text"
+      },
+      "identity_context/*/values/instrument_type": {
+        "basis": "Declared source field; absent metadata remains unknown; no inferred labels",
+        "denominator": null,
+        "metric": "identity_context/*/values/instrument_type",
+        "unit": "text"
+      },
+      "identity_context/*/values/issuer_id": {
+        "basis": "Declared source field; absent metadata remains unknown; no inferred labels",
+        "denominator": null,
+        "metric": "identity_context/*/values/issuer_id",
+        "unit": "text"
+      },
+      "identity_context/*/values/kind": {
+        "basis": "Declared source field; absent metadata remains unknown; no inferred labels",
+        "denominator": null,
+        "metric": "identity_context/*/values/kind",
+        "unit": "text"
+      },
+      "identity_context/*/values/sector": {
+        "basis": "Declared source field; absent metadata remains unknown; no inferred labels",
+        "denominator": null,
+        "metric": "identity_context/*/values/sector",
+        "unit": "text"
+      },
+      "identity_context/*/values/share_class": {
+        "basis": "Declared source field; absent metadata remains unknown; no inferred labels",
+        "denominator": null,
+        "metric": "identity_context/*/values/share_class",
+        "unit": "text"
+      },
+      "mapping_status": {
+        "basis": "Source binding state, not source authenticity or investment eligibility",
+        "denominator": null,
+        "metric": "mapping_status",
+        "unit": "status"
+      },
+      "status": {
+        "basis": "Source binding state, not source authenticity or investment eligibility",
+        "denominator": null,
         "metric": "status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Exact path-specific state; never collapsed into whole-date status"
-      },
-      "sale_date_summaries/*/path_statuses/*/date_relation_to_deadline": {
-        "metric": "date_relation_to_deadline",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Exact path-specific state; never collapsed into whole-date status"
+        "unit": "status"
       }
     },
     "planning.source_alternatives": {
@@ -3707,6 +4219,54 @@
         "metric": "Budget remainder",
         "unit": "input_currency_amount"
       },
+      "primary_result/scenarios/*/portfolio_totals/conclusion_facts/budget_reconciliation_residual": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: budget reconciliation residual",
+        "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/portfolio_totals/conclusion_facts/facts/budget_remainder/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: budget remainder",
+        "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/portfolio_totals/conclusion_facts/facts/gross_notional/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: gross notional",
+        "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/portfolio_totals/conclusion_facts/facts/modeled_cash_debit/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: modeled cash debit",
+        "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/portfolio_totals/conclusion_facts/facts/modeled_entry_cost/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: modeled entry cost",
+        "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/portfolio_totals/conclusion_facts/facts/requested_cash_budget/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: requested cash budget",
+        "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/portfolio_totals/conclusion_facts/investment_dominance_established": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: investment dominance established",
+        "unit": "boolean"
+      },
+      "primary_result/scenarios/*/portfolio_totals/conclusion_facts/reconciliation_status": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: reconciliation status",
+        "unit": "status"
+      },
       "primary_result/scenarios/*/portfolio_totals/gross_notional": {
         "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed.",
         "denominator": null,
@@ -3742,6 +4302,54 @@
         "denominator": null,
         "metric": "Budget remainder",
         "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/rows/*/conclusion_facts/budget_reconciliation_residual": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: budget reconciliation residual",
+        "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/rows/*/conclusion_facts/facts/budget_remainder/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: budget remainder",
+        "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/rows/*/conclusion_facts/facts/gross_notional/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: gross notional",
+        "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/rows/*/conclusion_facts/facts/modeled_cash_debit/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: modeled cash debit",
+        "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/rows/*/conclusion_facts/facts/modeled_entry_cost/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: modeled entry cost",
+        "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/rows/*/conclusion_facts/facts/requested_cash_budget/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: requested cash budget",
+        "unit": "input_currency_amount"
+      },
+      "primary_result/scenarios/*/rows/*/conclusion_facts/investment_dominance_established": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: investment dominance established",
+        "unit": "boolean"
+      },
+      "primary_result/scenarios/*/rows/*/conclusion_facts/reconciliation_status": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: reconciliation status",
+        "unit": "status"
       },
       "primary_result/scenarios/*/rows/*/friction_context/modeled_slippage/amount": {
         "basis": "Full quoted spread is retained separately; only an explicit one-way model with declared compatible reference and cost overlap enters the modeled cost array. Unit and phase belong to the supplied slippage model.",
@@ -3839,6 +4447,54 @@
         "metric": "Budget remainder",
         "unit": "input_currency_amount"
       },
+      "sensitivities/*/result/scenarios/*/portfolio_totals/conclusion_facts/budget_reconciliation_residual": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: budget reconciliation residual",
+        "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/portfolio_totals/conclusion_facts/facts/budget_remainder/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: budget remainder",
+        "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/portfolio_totals/conclusion_facts/facts/gross_notional/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: gross notional",
+        "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/portfolio_totals/conclusion_facts/facts/modeled_cash_debit/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: modeled cash debit",
+        "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/portfolio_totals/conclusion_facts/facts/modeled_entry_cost/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: modeled entry cost",
+        "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/portfolio_totals/conclusion_facts/facts/requested_cash_budget/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: requested cash budget",
+        "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/portfolio_totals/conclusion_facts/investment_dominance_established": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: investment dominance established",
+        "unit": "boolean"
+      },
+      "sensitivities/*/result/scenarios/*/portfolio_totals/conclusion_facts/reconciliation_status": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: reconciliation status",
+        "unit": "status"
+      },
       "sensitivities/*/result/scenarios/*/portfolio_totals/gross_notional": {
         "basis": "Explicit supplied cash budget and modeled entry costs; no realized market debit or broker capability. Mutually exclusive alternatives and quantity scenarios must not be summed.",
         "denominator": null,
@@ -3874,6 +4530,54 @@
         "denominator": null,
         "metric": "Budget remainder",
         "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/rows/*/conclusion_facts/budget_reconciliation_residual": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: budget reconciliation residual",
+        "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/rows/*/conclusion_facts/facts/budget_remainder/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: budget remainder",
+        "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/rows/*/conclusion_facts/facts/gross_notional/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: gross notional",
+        "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/rows/*/conclusion_facts/facts/modeled_cash_debit/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: modeled cash debit",
+        "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/rows/*/conclusion_facts/facts/modeled_entry_cost/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: modeled entry cost",
+        "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/rows/*/conclusion_facts/facts/requested_cash_budget/value": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: requested cash budget",
+        "unit": "input_currency_amount"
+      },
+      "sensitivities/*/result/scenarios/*/rows/*/conclusion_facts/investment_dominance_established": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: investment dominance established",
+        "unit": "boolean"
+      },
+      "sensitivities/*/result/scenarios/*/rows/*/conclusion_facts/reconciliation_status": {
+        "basis": "Own scenario and cash-envelope scope only; budget equals gross exposure plus modeled entry costs plus unspent cash. Mutually exclusive alternatives are never aggregated.",
+        "denominator": null,
+        "metric": "Conclusion fact: reconciliation status",
+        "unit": "status"
       },
       "sensitivities/*/result/scenarios/*/rows/*/friction_context/modeled_slippage/amount": {
         "basis": "Full quoted spread is retained separately; only an explicit one-way model with declared compatible reference and cost overlap enters the modeled cost array. Unit and phase belong to the supplied slippage model.",
@@ -4266,6 +4970,24 @@
         "denominator": null,
         "metric": "quantity",
         "unit": "shares"
+      },
+      "quantity_step": {
+        "basis": "Declared analytical share increment for budget or required-proceeds sizing; not a currency amount or verified broker increment.",
+        "denominator": null,
+        "metric": "quantity_step",
+        "unit": "shares"
+      },
+      "quantity_step_unit": {
+        "basis": "Unit of the analytical quantity increment; monetary results retain input currency units.",
+        "denominator": null,
+        "metric": "quantity_step_unit",
+        "unit": "unit_label"
+      },
+      "quantity_unit": {
+        "basis": "Declared quantity domain of this share-based trade-cost helper.",
+        "denominator": null,
+        "metric": "quantity_unit",
+        "unit": "unit_label"
       },
       "quoted_quantity_meets_proceeds": {
         "basis": "Arithmetic against supplied budget or proceeds requirement; not broker availability.",
@@ -4784,254 +5506,6 @@
         "denominator": null,
         "metric": "supplied_observations",
         "unit": "count"
-      }
-    },
-    "planning.source_allocation_context": {
-      "allocation_result/denominator_difference": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Denominator difference",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/denominator_difference_is_cash": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Denominator difference established as cash",
-        "unit": "boolean"
-      },
-      "allocation_result/exposures/*/classified_notional": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Classified notional",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/exposures/*/conservation_residual": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Conservation residual",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/exposures/*/groups/*/fraction_of_denominator": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": "explicit original declared denominator; never known-only assets",
-        "metric": "Fraction of denominator",
-        "unit": "fraction"
-      },
-      "allocation_result/exposures/*/groups/*/notional": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Notional",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/exposures/*/non_applicable_cash_fraction_of_denominator": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": "explicit original declared denominator; never known-only assets",
-        "metric": "Non applicable cash fraction of denominator",
-        "unit": "fraction"
-      },
-      "allocation_result/exposures/*/non_applicable_cash_notional": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Non applicable cash notional",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/exposures/*/unknown_fraction_of_denominator": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": "explicit original declared denominator; never known-only assets",
-        "metric": "Unknown fraction of denominator",
-        "unit": "fraction"
-      },
-      "allocation_result/exposures/*/unknown_notional": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Unknown notional",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/fund_lookthrough/conservation_residual": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Conservation residual",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/fund_lookthrough/coverage_status": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Fund look-through coverage",
-        "unit": "status"
-      },
-      "allocation_result/fund_lookthrough/embedded_cash_notional": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Embedded cash notional",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/fund_lookthrough/known_top_level_fund_notional": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Known top level fund notional",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/fund_lookthrough/opaque_or_uncovered_fund_notional": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Opaque or uncovered fund notional",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/fund_lookthrough/terminal_coverage_fraction": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred. Null when any fund amount or constituent weight is unresolved.; classifications/holdings merged from complete declared source collections",
-        "denominator": "known top-level fund notional",
-        "metric": "Terminal supplied fund coverage",
-        "unit": "fraction"
-      },
-      "allocation_result/fund_lookthrough/terminal_nonfund_notional": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Terminal nonfund notional",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/known_gross_notional": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Known gross notional",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/rows/*/dollar_volume_context/notional_to_supplied_dollar_volume": {
-        "basis": "Read the adjacent ratio_unit: days, sessions or fraction of period volume. Missing unit/currency leaves the ratio unresolved. This is not a fill/capacity claim.; classifications/holdings merged from complete declared source collections",
-        "denominator": "supplied monetary-volume amount with its own period, units and currency",
-        "metric": "Gross notional relative to supplied dollar volume",
-        "unit": null
-      },
-      "allocation_result/rows/*/dollar_volume_context/period_known": {
-        "basis": "Declared source metadata only; no freshness authentication or retrieval performed.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Period known",
-        "unit": "boolean"
-      },
-      "allocation_result/rows/*/dollar_volume_context/provenance_known": {
-        "basis": "Declared source metadata only; no freshness authentication or retrieval performed.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Provenance known",
-        "unit": "boolean"
-      },
-      "allocation_result/rows/*/dollar_volume_context/source_freshness_verified": {
-        "basis": "Declared source metadata only; no freshness authentication or retrieval performed.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Source freshness verified",
-        "unit": "boolean"
-      },
-      "allocation_result/rows/*/fraction_of_denominator": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": "explicit original declared denominator; never known-only assets",
-        "metric": "Fraction of denominator",
-        "unit": "fraction"
-      },
-      "allocation_result/rows/*/gross_notional": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Gross notional",
-        "unit": "input_currency_amount"
-      },
-      "allocation_result/total_gross_notional": {
-        "basis": "Long gross notional from the supplied rows and fund weights; original explicit denominator is unchanged, unknown classifications stay unknown, and source timing/authenticity is not inferred.; classifications/holdings merged from complete declared source collections",
-        "denominator": null,
-        "metric": "Total gross notional",
-        "unit": "input_currency_amount"
-      },
-      "status": {
-        "metric": "status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Source binding state, not source authenticity or investment eligibility"
-      },
-      "mapping_status": {
-        "metric": "mapping_status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Source binding state, not source authenticity or investment eligibility"
-      },
-      "complete_context_receipt/status": {
-        "metric": "complete_context_receipt/status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Source binding state, not source authenticity or investment eligibility"
-      },
-      "complete_context_receipt/all_declared_collections_consumed": {
-        "metric": "complete_context_receipt/all_declared_collections_consumed",
-        "unit": "boolean",
-        "denominator": null,
-        "basis": "All collections recognized by declared adapters; not complete external data"
-      },
-      "complete_context_receipt/retained_source_count": {
-        "metric": "complete_context_receipt/retained_source_count",
-        "unit": "count",
-        "denominator": null,
-        "basis": "Count retained from full declared source collections"
-      },
-      "complete_context_receipt/identity_symbol_count": {
-        "metric": "complete_context_receipt/identity_symbol_count",
-        "unit": "count",
-        "denominator": null,
-        "basis": "Count retained from full declared source collections"
-      },
-      "complete_context_receipt/fund_count": {
-        "metric": "complete_context_receipt/fund_count",
-        "unit": "count",
-        "denominator": null,
-        "basis": "Count retained from full declared source collections"
-      },
-      "identity_context/*/values/issuer_id": {
-        "metric": "identity_context/*/values/issuer_id",
-        "unit": "text",
-        "denominator": null,
-        "basis": "Declared source field; absent metadata remains unknown; no inferred labels"
-      },
-      "identity_context/*/values/sector": {
-        "metric": "identity_context/*/values/sector",
-        "unit": "text",
-        "denominator": null,
-        "basis": "Declared source field; absent metadata remains unknown; no inferred labels"
-      },
-      "identity_context/*/values/industry": {
-        "metric": "identity_context/*/values/industry",
-        "unit": "text",
-        "denominator": null,
-        "basis": "Declared source field; absent metadata remains unknown; no inferred labels"
-      },
-      "identity_context/*/values/kind": {
-        "metric": "identity_context/*/values/kind",
-        "unit": "text",
-        "denominator": null,
-        "basis": "Declared source field; absent metadata remains unknown; no inferred labels"
-      },
-      "identity_context/*/values/share_class": {
-        "metric": "identity_context/*/values/share_class",
-        "unit": "text",
-        "denominator": null,
-        "basis": "Declared source field; absent metadata remains unknown; no inferred labels"
-      },
-      "identity_context/*/values/instrument_type": {
-        "metric": "identity_context/*/values/instrument_type",
-        "unit": "text",
-        "denominator": null,
-        "basis": "Declared source field; absent metadata remains unknown; no inferred labels"
-      },
-      "identity_context/*/values/business_description": {
-        "metric": "identity_context/*/values/business_description",
-        "unit": "text",
-        "denominator": null,
-        "basis": "Declared source field; absent metadata remains unknown; no inferred labels"
-      },
-      "identity_context/*/values/dollar_volume/amount": {
-        "metric": "identity_context/*/values/dollar_volume/amount",
-        "unit": "source_currency_amount",
-        "denominator": null,
-        "basis": "Retained monetary observation; source currency and temporal units remain separate"
-      },
-      "identity_context/*/values/dollar_volume/raw_observation/value": {
-        "metric": "identity_context/*/values/dollar_volume/raw_observation/value",
-        "unit": "source_currency_amount",
-        "denominator": null,
-        "basis": "Literal source monetary observation; no daily unit inferred"
       }
     }
   },

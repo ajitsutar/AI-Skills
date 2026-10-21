@@ -21,6 +21,35 @@ The contract selects no funder and creates no execution prerequisite. Explicit
 user criteria can be evaluated separately with the existing comparison contract;
 the source projection operation implements no preference optimizer.
 
+The additive `allocation_direction_comparisons` records target-distance changes
+between explicitly named alternatives on the shared projection convention. Use
+absolute drift, not the sign of a trade or a rank among candidates, to describe
+movement toward a target. No pair is automatically the starting baseline and no
+per-asset direction establishes overall portfolio improvement. Unknown primary
+denominators remain unresolved; identified-assets sensitivities stay separate.
+See the final conditional-branch audit in [evidence-semantics.md](evidence-semantics.md).
+
+`alternative_coverage_audit` inventories which held assets and sale quantities
+appear in the supplied alternatives. Asymmetric sampling is not exclusive funding
+capacity: compare common funding requirements across assets or preserve missing
+information. Multi-trade combinations and isolated sale scenarios are distinct.
+This audit does not invent an order, prove eligibility or choose a funder.
+
+`source_context_evidence_inventory` retains analytical price/cost inputs and
+optional source opening conventions with pointers and explicit roles. It does not
+verify current quotes, broker fees or optional-scenario applicability. Use exact
+roles when describing remaining unknowns; supplied assumptions are not absent
+because actual execution is unknown.
+
+Its `baseline_source_fields` retains supplied baseline fields with literal state,
+value and source pointers. `owning_scope_pointer` identifies the baseline record;
+`task_applicability: NOT_ESTABLISHED_BY_SOURCE_RECORD`,
+`user_authorization_inferred: false` and `broker_requirement_inferred: false`
+mean this inventory makes no authority or applicability inference.
+`baseline_source_description` retains the source description literally; it does
+not classify that description as proof of current policy. Determine the relevance
+of each field from the user request and source scope before applying it.
+
 For timing, run `planning.settlement_transfer_sweep`, not only a selected late sale.
 It takes `currency`, `role`, `business_dates`, explicit `settlement_lag`,
 `transfer_lag`, `spendable_deadline` and optional `same_day_transfer_assumption`

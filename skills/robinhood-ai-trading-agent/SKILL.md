@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible stock research, portfolio 
 
 # Robinhood Quant Research and Portfolio Agent
 
-Package version: **4.15.0 — October 14, 2026**.
+Package version: **4.15.12 — October 21, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -30,11 +30,123 @@ limit the calculations you can truthfully claim, not permission to execute.
 
 ## Start with the request and its evidence
 
+Before authoring the final answer, retain a compact factual-claim check alongside
+the calculation artifacts: each amount, date, evidence-absence statement and
+exclusive conclusion needs its source/result pointer, meaning and scenario scope.
+Include incidental context as well as the main recommendation. Distinguish supplied
+analytical marks and cost assumptions from unavailable executable prices and
+actual broker fees. Use `source_context_evidence_inventory` for their exact
+source roles; an unavailable live observation does not make an analytical input
+absent. Avoid speculative optional commentary that adds unsupported absence or
+exclusivity claims to an otherwise completed proposal. Follow the
+[source-to-conclusion review](references/evidence-semantics.md#source-to-conclusion-review)
+to distinguish observed totals from derived totals, absent from insufficient
+evidence, and alternative scenario baselines. This check is a review record,
+not a claim that arbitrary prose has been automatically validated. Audit the
+actual final conditional branches after drafting: every directional or eligibility
+claim must agree with the computed comparison and preserve its assumptions.
+Use the branch audit described in the linked review before finalizing the answer.
+
+For cash-raising comparisons, apply a common funding need to every eligible held
+asset before describing priority branches. A failed quantity is a near-miss
+example, not a completed funding proposal. Use the alternative coverage audit;
+examining a larger sale for one asset does not establish that it alone can fund
+the need. Do not turn a sampling choice into a recommended asset.
+
+If an optional source scenario specifies its own clock or opening account,
+display its source opening convention, included events and amount interpretation
+before any results for that scenario. Keep it separate unless a source-backed
+reconciliation permits combination. When it is not needed for the user's request,
+omit its calculation and state the omission rather than constructing a hybrid.
+Retain source configuration flags in their owning scenario. Their presence alone
+does not establish applicability to the current user request or broker rules.
+Do not invent an override approval for independently authorized work; preserve
+actual task constraints and authority separately from example configuration.
+A local calculation does not create a new permission prerequisite.
+Before computing a source-bound projection with added scenario flows, bind its
+opening convention and source-event scope through `projection_scope`. Use the
+returned scope receipt when describing the result; prose written after computation
+cannot change which opening balances or events the helper used. See
+[dated projection scope](references/portfolio-projection.md#bind-the-whole-supplied-portfolio-context-first).
+
 For supplied-data research, read the full current request and inventory its allowed
 files before selecting a calculation. Preserve its universe, horizon, objective,
 source scope and requested comparisons. An example configuration is not the user's
 mandate. When acquisition is excluded, work from the retained bytes and report
 what is missing; do not invoke a download command to fill that gap.
+
+Carry supplied decision context through to the answer: the purpose of the money,
+recurring contributions, liquidity needs, constraints and any loss scenario the
+user asks to discuss. State how each material field affects the comparison, or
+why it remains unresolved or outside a clearly stated calculation scope. An
+initial-budget calculation does not answer recurring-contribution affordability.
+Do not invent contribution timing, returns or loss probabilities to fill a gap.
+Review this narrative coverage separately from numerical replay; helpers cannot
+certify that the answer addressed every supplied preference.
+
+Before finalizing a portfolio comparison, check the answer against the original
+decision context, not just the computed jobs. Explain the consequence of a
+supplied loss for the spending goal (including delay or reduced spending where
+applicable), and whether a cash alternative is relevant if the goal cannot absorb
+that loss. A per-unit shock calculation alone does not answer this question.
+For each sized alternative used in the conclusion, reconcile its implemented
+gross exposures, costs and remaining cash on a stated denominator. A separately
+labeled pre-cost target is useful but does not replace this comparison. Support
+comparative diversification claims with the actual distinct underlying issuers,
+weights and known overlap; a fund wrapper, index label, complete holdings file or
+additional sector labels alone cannot establish broader diversification or lower
+risk. Keep unknown dimensions unknown. If any of these checks cannot be completed,
+state the exact remaining limitation in the conclusion rather than asserting it.
+When mapping nested source records, retain applicable document-level currency,
+units and dates with their scope. An adapter that drops supplied metadata has a
+mapping gap, not evidence that the original source omitted it. Reconcile conflicting
+statuses across retained artifacts before describing a source field as unavailable.
+
+For diversification comparisons, take distinct known issuer counts from the
+allocation context's `issuer_identity_summary`, not the number of fund holdings,
+share classes, cash rows or labels. Report a partial known count separately from
+an unknown total. Before using a numeric count to justify a conclusion, verify
+the claimed count against that retained result with `analysis.compare_claim`
+or an equivalent exact comparison and retain the check. Re-read the final prose
+against the checked number; a correct table does not excuse a contradictory
+conclusion. Economic similarity can motivate a common-risk concern, but it is
+not measured correlation. Without aligned return evidence and a retained
+correlation calculation, describe correlation and relative portfolio risk as
+unestablished. Do not turn sector descriptions into a factual correlation claim.
+
+For each numeric comparison operand, retain its own source/result pointer and
+metadata. A literal hypothesis is not a source-derived observation. Never copy
+the other operand's date, scope or basis to manufacture compatibility; a successful
+`analysis.compare_claim` checks caller declarations, not their provenance. If an
+identity mapping is missing, retain the helper's known count and unknown total;
+qualitative single-company exposure is a separate interpretation, not a replacement
+verified count. Compare basket costs only after sizing that basket as a combined
+scenario, including its own order count; single-position debits cannot stand in.
+
+For reproducible affordability research with no supplied fractional increment,
+retain broker precision as unknown and use a separately labeled analytical
+sensitivity with quantity_step `0.000001` share. Use whole-share step `1` alongside
+it. These are shared calculation conventions, not broker capabilities. Explicit
+user/source increments override this fallback; do not choose another unrequested
+increment or mix sensitivity quantities across exposure and final prose.
+
+Affordability mapping must preserve source field semantics: a dated `close_price`
+is a last observed trade-price reference for this analytical sizing convention,
+not an unknown bid/ask basis merely because no separate `price_basis` key exists.
+Retain the original field pointer and observation date; this mapping does not
+make it a current executable quote. A generic `price` with no such semantics
+remains basis-unknown. Document any conflicting price metadata instead of
+overriding it.
+
+When a recurring contribution amount is supplied, compute its per-contribution
+affordability using the same explicit fixed-price/cost sensitivity as the initial
+budget. Missing future dates or returns prevent a future-value forecast, not this
+bounded comparison. For every portfolio discussed as sized, derive its exposure
+from that portfolio's final sizing result after all sizing revisions, including
+baskets. Label earlier target allocations separately; do not compare their gross
+targets with another portfolio's cost-sized exposure. Final conclusions must
+preserve the differences among initial budget, gross invested amount, fees and
+outside cash instead of calling a partially invested position the full budget.
 
 Use the [source-bound workflow](references/source-bound-workflow.md) for supported
 numerical work. Start with its `prepare` command when the inputs already form an
@@ -46,6 +158,12 @@ requested subtask before choosing operations. A hash or a successful job cannot
 substitute for a skipped subtask. Do not replace an available operation with a
 custom calculation. Use the linked guide for the requested workflow before mapping
 its source data into the operation's actual argument contract.
+
+For budget and allocation conclusions, use the helper's `conclusion_facts`
+with its result pointers and limits. Carry these facts into the final paragraph,
+then state any preference separately as a conditional judgment. Known-label
+coverage is not comparative diversification; budget is not gross exposure.
+The helper does not validate arbitrary prose or establish investment dominance.
 
 Build the numerical answer from result pointers in the generated report. A new
 percentage, range, sensitivity or comparison in the explanation is another

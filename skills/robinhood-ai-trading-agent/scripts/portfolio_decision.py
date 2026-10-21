@@ -378,11 +378,46 @@ def _budget_sizing(document):
         result_scenarios.append({'id': scenario['id'], 'quantity_basis': basis, 'quantity_step': step,
                                  'status': 'COMPUTED' if computed else 'INPUTS_UNRESOLVED',
                                  'rows': results, 'portfolio_totals': totals})
+    for index, scenario in enumerate(result_scenarios):
+        path = f'/scenarios/{index}'
+        for position, row in enumerate(scenario['rows']):
+            row_path = path + f'/rows/{position}'
+            row['conclusion_facts'] = _sizing_conclusion_facts(
+                row, row['requested_cash_budget'], row_path, row_path + '/requested_cash_budget',
+                document['currency'], scenario['id'],
+                'mutually_exclusive_alternative' if mode == 'alternatives' else 'portfolio_row_cash_envelope')
+        if scenario['portfolio_totals'] is not None:
+            totals = scenario['portfolio_totals']
+            totals['conclusion_facts'] = _sizing_conclusion_facts(
+                totals, budget, path + '/portfolio_totals', '/requested_cash_budget',
+                document['currency'], scenario['id'], 'combined_portfolio')
     return _finish(document, 'explicit-budget-sizing', mode=mode, requested_cash_budget=budget,
                    status='COMPUTED' if all(s['status'] == 'COMPUTED' for s in result_scenarios) else 'INPUTS_UNRESOLVED',
                    scenarios=result_scenarios, alternatives_are_mutually_exclusive=mode == 'alternatives',
                    alternatives_must_not_be_summed=mode == 'alternatives',
                    limitation='Supplied long-buy cash budgets and modeled costs only; quantity increments are assumptions, not broker capabilities.')
+
+
+def _sizing_conclusion_facts(values, budget, path, budget_pointer, currency, scenario_id, scope):
+    """Project completed sizing values; do not infer cash from exposure context."""
+    facts = {'requested_cash_budget': {'value': budget, 'unit': 'currency_amount',
+                                      'result_pointer': budget_pointer}}
+    for key in ('gross_notional', 'modeled_entry_cost', 'modeled_cash_debit', 'budget_remainder'):
+        facts[key] = {'value': values[key], 'unit': 'currency_amount', 'result_pointer': path + '/' + key}
+    complete = all(fact['value'] is not None for fact in facts.values())
+    residual = None
+    if complete:
+        numbers = {key: Decimal(str(fact['value'])) for key, fact in facts.items()}
+        residual = numbers['requested_cash_budget'] - numbers['gross_notional'] - numbers['modeled_entry_cost'] - numbers['budget_remainder']
+    return {'scope': scope, 'scenario_id': scenario_id, 'currency': currency,
+            'pointer_scope': 'Pointers are relative to this helper result, not its wrapper or another scenario.',
+            'facts': facts, 'budget_reconciliation_residual': residual,
+            'reconciliation_status': 'INPUTS_UNRESOLVED' if not complete else 'RECONCILED' if residual == ZERO else 'MISMATCH',
+            'identity': 'requested_cash_budget = gross_notional + modeled_entry_cost + budget_remainder',
+            'interpretation': 'Gross notional is the modeled position exposure. Entry costs are not invested exposure. Budget remainder is unspent cash within this cash envelope; it is not embedded fund cash or a statement about the whole account.',
+            'comparison_scope': 'Alternative rows and quantity scenarios are mutually exclusive. A portfolio row is only its own cash envelope; combined totals include unassigned budget cash.',
+            'investment_dominance_established': False,
+            'limitation': 'These are fixed-input modeled amounts, not executed fills, broker capabilities, a future-value forecast or evidence that one investment is superior.'}
 
 
 def _label(value):
@@ -565,11 +600,58 @@ def _allocation_context(document):
                          and r['id'] in {u['id'] for u in unquantified}]
     unknown_weight_paths = [r['path'] for r in coverage if r.get('unknown_weight_constituent_ids')]
     fund_coverage_resolved = not unquantified_funds and not unknown_weight_paths
+    issuer_exposure = exposures['issuer_id']
+    known_issuer_ids = sorted(label for label, group in issuer_exposure['groups'].items()
+                              if group['notional'] > ZERO)
+    unresolved_issuer_weights = [r['path'] for r in coverage
+                                 if r.get('unknown_weight_constituent_ids') and r['fund_notional'] > ZERO]
+    issuer_count_complete = not (issuer_exposure['unknown_notional'] or unquantified or
+                                unresolved_issuer_weights)
+    issuer_summary = {
+        'distinct_known_issuer_ids': known_issuer_ids,
+        'distinct_known_issuer_count': len(known_issuer_ids),
+        'total_distinct_issuer_count': len(known_issuer_ids) if issuer_count_complete else None,
+        'count_status': 'COMPLETE_WITHIN_SUPPLIED_ROWS' if issuer_count_complete else 'KNOWN_LOWER_BOUND_ONLY',
+        'known_issuer_notional': issuer_exposure['classified_notional'],
+        'unknown_issuer_notional': issuer_exposure['unknown_notional'],
+        'non_applicable_cash_notional': issuer_exposure['non_applicable_cash_notional'],
+        'unquantified_row_ids': [row['id'] for row in unquantified],
+        'unknown_weight_fund_paths': unresolved_issuer_weights,
+        'count_scope': 'Distinct supplied terminal issuer labels with positive gross notional; repeated share classes merge. Cash, fund wrappers and zero exposure do not add issuers. Unknown exposure can overlap known issuers or contain additional issuers.',
+        'correlation_established': False,
+        'risk_or_diversification_ranking_established': False,
+        'limitation': 'Counts describe supplied identities and exposure coverage only. They do not establish return correlation, independence, risk reduction, diversification quality, source truth or coverage beyond supplied rows.'}
+    conclusion_facts = {
+        'scope': 'supplied_allocation_rows_and_original_denominator',
+        'currency': document['currency'],
+        'pointer_scope': 'Pointers are relative to this helper result, not its source adapter wrapper.',
+        'facts': {key: {'value': issuer_summary[key], 'unit': unit,
+                        'result_pointer': '/issuer_identity_summary/' + key}
+                  for key, unit in (
+                      ('distinct_known_issuer_count', 'count'), ('total_distinct_issuer_count', 'count'),
+                      ('count_status', 'status'), ('known_issuer_notional', 'currency_amount'),
+                      ('unknown_issuer_notional', 'currency_amount'),
+                      ('non_applicable_cash_notional', 'currency_amount'))},
+        'denominator': {'observation': deepcopy(document.get('denominator')),
+                        'result_pointer': '/denominator/observation', 'unresolved': denominator_unknowns},
+        'outside_cash': None, 'entry_cost': None,
+        'cash_limitation': 'Allocation context does not establish entry costs or outside cash. The denominator difference is not cash. Embedded and explicit cash in supplied rows are separate from unspent sizing budget.',
+        'count_interpretation': 'Known count describes only mapped positive terminal issuer labels. An unknown total cannot be replaced with the known lower bound. More known labels or fuller disclosure do not establish broader actual diversification than another portfolio.',
+        'comparative_diversification_established': False, 'relative_risk_established': False,
+        'correlation_established': False, 'investment_dominance_established': False,
+        'limitation': 'No comparative investment conclusion follows from these identity and coverage facts alone.'}
+    conclusion_facts['facts']['known_gross_notional'] = {
+        'value': known_total, 'unit': 'currency_amount', 'result_pointer': '/known_gross_notional'}
+    conclusion_facts['facts']['total_gross_notional'] = {
+        'value': None if unquantified else known_total, 'unit': 'currency_amount',
+        'result_pointer': '/total_gross_notional'}
     return _finish(document, 'source-bound-allocation-context',
                    status='PARTIAL_CONTEXT' if denominator_unknowns or unquantified or not fund_coverage_resolved or any(
                        e['unknown_notional'] for e in exposures.values()) else 'COMPUTED_CONTEXT',
                    denominator={'observation': deepcopy(document.get('denominator')), 'unresolved': denominator_unknowns},
-                   rows=output_rows, exposures=exposures, known_gross_notional=known_total,
+                   rows=output_rows, exposures=exposures, issuer_identity_summary=issuer_summary,
+                   conclusion_facts=conclusion_facts,
+                   known_gross_notional=known_total,
                    total_gross_notional=None if unquantified else known_total,
                    unquantified_rows=unquantified,
                    denominator_difference=declared - known_total if divisor is not None and not unquantified else None,

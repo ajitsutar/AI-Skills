@@ -1,5 +1,119 @@
 # Evidence semantics
 
+## Source-to-conclusion review
+
+Retain a compact factual-claim check before writing the answer, including
+incidental context: claim, source/result pointer, exact field meaning, unit,
+date, account/scenario scope and whether it is observed, derived or conditional.
+For a derived total retain its formula and evidence that its components are
+disjoint. Account equity, NAV, securities value and cash are not interchangeable
+or presumed additive. Copy source totals with their labels; report an unresolved
+reconciliation instead of constructing a new account value from field names.
+
+A source-bound comparison's `source_context_evidence_inventory` retains supplied
+baseline marks, cost assumptions and optional opening conventions. A missing
+current execution quote is not a missing analytical mark; an unspecified actual
+fee is not absence of a supplied fee assumption. Copy the exact unknown: for
+example applicability to the optional scenario or future execution remains
+unverified. Never replace that limitation with a blanket assertion that the input
+was not supplied. Null, absent, zero and a supplied assumption are distinct.
+
+Source configuration belongs to its named record or scenario. Retain a literal
+false, null or missing field accurately without treating it as a current user
+instruction, broker policy or execution prohibition. Establish applicability from
+the request and relevant evidence; a source record alone cannot grant or withdraw
+user authority. An independently authorized task needs no invented override of
+an unrelated example configuration. Preserve real task constraints separately.
+
+For evidence coverage, distinguish absent, present but unreviewed, present but
+insufficient, conflicting and evaluated. Inspect relevant supplied records before
+asserting absence. Partial disclosures may support review without establishing
+an authenticated or sufficient basis for a recommendation; missing helper mapping
+does not mean the underlying evidence is absent.
+
+For each scenario retain its opening state/date, included events, proposed versus
+confirmed status, costs, tax and denominator assumptions. Compare on a common
+baseline or expose differences explicitly. A separately specified opening state
+must not silently inherit events from another scenario. Reconcile a conflicting
+opening convention before combining scenarios; otherwise keep them separate.
+
+Review the conclusion against the complete result, not just its reference path
+or preferred row. An exclusive claim such as only, none or impossible requires
+checking every applicable alternative. For settlement sweeps use `timing_summary`
+and its result pointers; conditional arrival on the deadline remains a possible
+modeled path with unresolved intraday acceptance, not a guarantee or impossibility.
+Calendar-coverage gaps do not establish that an arrival cannot occur.
+
+For funding quantities use `proceeds_sizing_precision` from trade-cost results.
+Label displayed decimals as approximate unless exactness is established. Preserve
+the increment-ceiled quantity sensitivity and recompute proceeds if reporting
+a newly rounded quantity as sufficient. A decimal display of a mathematical
+threshold must not be called an exact sufficient order quantity by inspection.
+Remove unsupported factual embellishments; retain a preference as an explicitly
+conditional judgment with its evidence limits. The check does not authenticate
+sources or validate arbitrary prose automatically.
+
+### Funding coverage and source scenario boundaries
+
+For a funding proposal, first distinguish the held-asset universe, the sampled
+quantity set and the set of alternatives that have actually met the common need
+under stated costs, floors and reserves. `alternative_coverage_audit` inventories
+sample coverage; it is not proof of feasibility or infeasibility. For every
+potential funding asset, compute a quantity meeting the common objective,
+document why no available quantity meets it under the stated assumptions, or
+retain a concrete missing-data reason. Multi-asset combinations are separate
+scenarios and need their own complete costs and constraints. Do not promote an underfunded quantity
+as a successful tax/liquidity branch. An exclusive feasibility claim requires
+coverage of the relevant universe, not just the rows an analyst chose to run.
+
+An optional scenario with its own opening account/date is a separate experiment.
+Bind that distinction before a source projection runs through `projection_scope`
+and its source-event dispositions; use the returned receipt for the opening and
+event audit. See the [projection contract](portfolio-projection.md#bind-the-whole-supplied-portfolio-context-first).
+Before its result table, show the literal opening convention and a compact event
+inclusion ledger. A source snapshot carried from an earlier clock may contain
+intervening events that a later opening convention excludes. Adding those events
+silently changes the scenario even if the arithmetic replays. State each cash
+instruction's gross-notional versus all-in interpretation and its status. If these
+cannot be reconciled, keep the optional scenario uncomputed; do not label the
+hybrid as the source plan or use it in the final decision branches.
+
+### Final conditional-branch audit
+
+Retain a second short audit of the actual drafted conclusion, after calculations
+and factual tables are complete. For each conditional branch record its criterion,
+explicit comparator, source/result pointer, computed direction, applicable dates,
+and all assumptions necessary for that branch. Correct the draft before final
+publication if a branch contradicts its own table. Check the final branches
+against one another as well: an alternative may satisfy several conditional
+criteria. A primary reason for considering it does not imply it serves no other
+priority. State positive supported tradeoffs without inventing exclusive claims. A factual table alone does not
+validate a later recommendation sentence.
+
+For target allocation, signed drift is actual weight minus target; movement toward
+target means a reduction in absolute drift relative to the named comparator.
+Being closest among alternatives does not imply improvement from the starting
+state. Crossing the target requires comparing absolute distances, not just signs.
+Use `allocation_direction_comparisons` from source-alternatives results; unknown
+full-account denominators leave full-account direction unresolved even when a
+separately labeled identified-assets sensitivity is available. Do not turn
+arithmetic direction into an assigned user preference or automatic choice.
+
+For deadline eligibility, distinguish guaranteed arrival, conditional arrival,
+and earlier arrival with more modeled time margin. A preference for more margin
+must be labeled as a preference, not necessity. Final branches must retain every
+conditionally eligible date in `timing_summary`, including deadline-day paths;
+an earlier reference path cannot silently replace that set.
+
+For scenario comparisons, carry the exact opening-state convention, liabilities,
+unclassified assets, tax reserve and event inclusion into the displayed table
+caption and final branches. An empty liability list means a declared zero-liability
+scenario, not verified absence. Separate an optional instruction example with its
+own opening convention from a forward projection. If cash amount does not specify
+all-in budget versus gross notional, label the interpretation and resulting costs;
+do not call the derivative the source instruction as written. Skip an optional
+unreconciled scenario rather than claiming its quantities are prescribed.
+
 `scripts/evidence_semantics.py` provides three pure research diagnostics. Inputs
 are explicit caller declarations. These helpers do not read sources, resolve
 identities, interpret prose, fetch data, or establish source authenticity.

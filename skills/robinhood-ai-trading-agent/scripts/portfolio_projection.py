@@ -18,6 +18,83 @@ ROLES = {'supplied_observation', 'hypothetical_scenario', 'user_assumption', 'un
 STATES = {'confirmed', 'planned', 'scenario', 'unknown'}
 
 
+def _bind_projection_scope(document, source, opening, flows, additional, day):
+    """Select an explicit opening/event universe before ledger arithmetic."""
+    from report_facts import pointer
+    scope = document.get('projection_scope')
+    require(not additional or scope is not None, 'EXPLICIT_PROJECTION_SCOPE_REQUIRED_FOR_SCENARIO_FLOWS')
+    explicit = scope is not None
+    if scope is None:
+        scope = {'mode': 'baseline_continuation'}
+    require(isinstance(scope, dict), 'PROJECTION_SCOPE_OBJECT_REQUIRED')
+    mode = scope.get('mode')
+    require(mode in {'baseline_continuation', 'independent_scenario'}, 'PROJECTION_SCOPE_MODE_REQUIRED')
+    audit, selected = [], []
+    opening_binding = {'balances_pointer': '/baseline_rebalance', 'as_of_pointer': '/as_of',
+                       'raw_as_of': deepcopy(source.get('as_of')), 'calendar_date': opening['as_of'],
+                       'basis': 'Continue the supplied baseline with source events under declared state/date filters.'}
+    dispositions = {}
+    if mode == 'baseline_continuation':
+        require(set(scope) == {'mode'}, 'BASELINE_SCOPE_HAS_NO_EVENT_OR_OPENING_OVERRIDES')
+    else:
+        require(set(scope) == {'mode', 'opening', 'source_event_dispositions'}, 'INDEPENDENT_SCOPE_FIELDS_REQUIRED')
+        binding = scope['opening']
+        require(isinstance(binding, dict) and set(binding) ==
+                {'balances_pointer', 'as_of_pointer', 'convention_pointer', 'reuse_basis'},
+                'EXPLICIT_INDEPENDENT_OPENING_BINDINGS_REQUIRED')
+        require(binding['balances_pointer'] == '/baseline_rebalance', 'SOURCE_ADAPTER_BASELINE_BINDING_REQUIRED')
+        for name in ('as_of_pointer', 'convention_pointer'):
+            require(isinstance(binding[name], str) and binding[name].startswith('/'), 'SOURCE_POINTER_REQUIRED:' + name)
+        _text(binding['reuse_basis'], 'opening.reuse_basis')
+        raw_date = deepcopy(pointer(source, binding['as_of_pointer']))
+        convention = deepcopy(pointer(source, binding['convention_pointer']))
+        require(convention is not None and convention != '', 'BOUND_OPENING_CONVENTION_REQUIRED')
+        scoped_date = day(raw_date)
+        opening = {**deepcopy(opening), 'as_of': scoped_date, 'source_role': 'user_assumption'}
+        opening_binding = {**deepcopy(binding), 'raw_as_of': raw_date, 'calendar_date': scoped_date,
+                           'literal_convention': convention, 'convention_interpreted': False,
+                           'balance_reuse_is_assumption': True}
+        raw_dispositions = scope['source_event_dispositions']
+        require(isinstance(raw_dispositions, list), 'SOURCE_EVENT_DISPOSITIONS_ARRAY_REQUIRED')
+        expected = {flow['source_ref'][len(document['source_ref']):] for flow in flows}
+        for item in raw_dispositions:
+            require(isinstance(item, dict) and set(item) == {'source_pointer', 'disposition', 'reason'},
+                    'SOURCE_EVENT_DISPOSITION_FIELDS_REQUIRED')
+            path = item['source_pointer']
+            require(isinstance(path, str) and path in expected, 'UNKNOWN_SOURCE_EVENT_DISPOSITION_POINTER')
+            require(path not in dispositions, 'DUPLICATE_SOURCE_EVENT_DISPOSITION')
+            require(item['disposition'] in {'include', 'exclude_from_scenario', 'already_in_opening'},
+                    'SOURCE_EVENT_DISPOSITION_REQUIRED')
+            _text(item['reason'], 'source_event_disposition.reason')
+            dispositions[path] = item
+        require(set(dispositions) == expected, 'COMPLETE_SOURCE_EVENT_DISPOSITIONS_REQUIRED')
+    for flow in flows:
+        path = flow['source_ref'][len(document['source_ref']):]
+        item = dispositions.get(path, {'disposition': 'include', 'reason': 'Baseline continuation; apply existing date/state filters.'})
+        disposition = item['disposition']
+        if mode == 'independent_scenario':
+            if disposition == 'include':
+                require(_day(flow['date']) > _day(opening['as_of']), 'SCOPED_INCLUDED_EVENT_NOT_AFTER_OPENING')
+            elif disposition == 'already_in_opening':
+                require(_day(flow['date']) <= _day(opening['as_of']), 'FUTURE_EVENT_CANNOT_BE_ALREADY_IN_OPENING')
+        if disposition == 'include':
+            selected.append(flow)
+        audit.append({'source_pointer': path, 'source_ref': flow['source_ref'], 'flow_id': flow['id'],
+                      'disposition': disposition, 'reason': item['reason'],
+                      'passed_to_projection': disposition == 'include',
+                      'normalized_source_event': deepcopy(flow)})
+    return opening, selected, {
+        'schema_version': 1, 'mode': mode, 'explicit': explicit, 'opening_binding': opening_binding,
+        'source_event_audit': audit,
+        'scenario_flow_pointers': ['/retained_input/scenario_flows/' + str(i) for i in range(len(additional))],
+        'scope_is_execution_gate': False,
+        'limitations': ['Event disposition declares scenario scope, not observed event cancellation or broker execution.',
+                       'Passed events still undergo included-state and target-date filters in projection.flow_audit.',
+                       'Independent opening reuses source baseline balances as an assumption; source marks keep original dates.',
+                       'Literal opening conventions are retained, not parsed or independently reconciled with the chosen scope.',
+                       'Unknown balances stay unknown; no events, cash, holdings or prices are fabricated.']}
+
+
 def source_projection(document):
     """Bind the full retained portfolio-context schema to dated_projection.
 
@@ -91,6 +168,8 @@ def _source_projection(document):
     _rows(additional, 'scenario_flows')
     source_refs = {row['source_ref'] for row in flows}
     require(not any(row.get('source_ref') in source_refs for row in additional), 'SOURCE_FLOW_DUPLICATION')
+    source_flow_count = len(flows)
+    opening, flows, scope_receipt = _bind_projection_scope(document, source, opening, flows, additional, day)
     marks = deepcopy(document.get('marks', []))
     _rows(marks, 'marks')
     marked = {row.get('asset_id') for row in marks}
@@ -125,7 +204,9 @@ def _source_projection(document):
     projection = dated_projection(bound)
     return finish(document, 'planning-source-projection', status=projection['status'],
                   projection=projection, bound_projection_input=bound,
-                  source_flow_count=len(flows), residual_policy=residual_policy, opening_residual=residual,
+                  source_flow_count=source_flow_count, scoped_source_flow_count=len(flows),
+                  projection_scope_receipt=scope_receipt,
+                  residual_policy=residual_policy, opening_residual=residual,
                   retained_input=deepcopy(document),
                   unmodeled_source_sections=[key for key in ('january_trading_plan', 'contributions') if key in source],
                   limitations=['All supplied obligations, withdrawal and net grants are retained, including excluded states/dates.',

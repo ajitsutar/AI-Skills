@@ -27,6 +27,14 @@ as an additional constraint on the host.
 
 ## Analytical sizing
 
+Use supplied quantity increments when available. When an affordability comparison
+has no supplied fractional increment, the shared analytical sensitivity uses
+`quantity_step: 0.000001` share, alongside a whole-share step of `1`. Label this
+as an analytical assumption and retain actual broker precision/eligibility as
+unknown. It is not an inferred broker rule or permission. Use the same convention
+for initial and recurring calculations and bind exposure to the resulting gross
+notionals. A different explicit user/source increment overrides this fallback.
+
 `fractional_shares.size_dollar_buy` estimates a fractional quantity from a budget,
 price, quantity increment, minimum notional/quantity and fee estimates. Decimal
 arithmetic rounds down and reports estimated cost and unused budget. Its maximum

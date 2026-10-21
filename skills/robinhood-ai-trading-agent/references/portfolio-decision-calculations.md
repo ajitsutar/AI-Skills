@@ -1,5 +1,19 @@
 # Budget sizing, price friction and source-bound allocation context
 
+## Scoped conclusion facts
+
+`budget_sizing` adds `conclusion_facts` to each scenario row and, in portfolio
+mode, its `portfolio_totals`. `allocation_context` includes a top-level
+`conclusion_facts`. Facts carry values, units and result-relative pointers.
+Use these with their scenario and scope when writing the final conclusion.
+Requested budget, gross exposure, entry costs and outside cash are separate
+amounts; unresolved accounting stays unresolved. Alternative rows are not additive.
+Known issuer counts describe supplied coverage, with a nullable total when
+coverage is incomplete. They do not establish comparative breadth, correlation,
+risk ranking or investment dominance. Allocation denominator differences are
+not inferred cash. These summaries preserve helper limitations; they do not
+validate arbitrary prose or determine a preferred investment.
+
 ## Final recommendation context from original sources
 
 `recommendation_report.recommendation_context(document)` (workbench:

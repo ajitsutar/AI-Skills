@@ -56,6 +56,11 @@ positive integer count. Optional `exit_price` and `exit_orders` model a long
 round trip. Optional `budget` with positive `quantity_step` sizes a buy downward;
 `required_net_proceeds` with `quantity_step` sizes a sale upward. Fees are charged
 at explicit phases, zero quantity incurs no charge, and taxes are not inferred.
+The result labels `quantity_unit` as `shares`. Both sizing paths retain
+`quantity_step` and `quantity_step_unit: "shares"`; this increment is a share
+quantity, not currency or monetary rounding precision. Report it alongside sized
+quantities using the returned unit. An analytical increment does not establish
+broker fractional eligibility or supported execution precision.
 
 `planning.cash_plan`: the three cash maps have identical currency keys; top-level
 `currency` must be one of them. Events are

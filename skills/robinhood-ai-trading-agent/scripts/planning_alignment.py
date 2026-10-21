@@ -6,6 +6,7 @@ are supplied observations/scenarios, never broker availability or execution gate
 from copy import deepcopy
 from datetime import date, datetime, time, timedelta, timezone
 from decimal import Context, Decimal, ROUND_CEILING, ROUND_FLOOR, localcontext
+from fractions import Fraction
 import math
 import re
 from zoneinfo import ZoneInfo, ZoneInfoNotFoundError
@@ -103,7 +104,7 @@ Per-order charges require order counts; per-round-trip charges require charged_a
     fixed, variable, detail = _cost_coefficients(document['costs'], phase, price, document['entry_orders'])
     cost = fixed + variable * qty if qty else Decimal(0)
     gross = qty * price
-    result = {'status': 'COMPUTED', 'quantity': qty, 'gross_notional': gross,
+    result = {'status': 'COMPUTED', 'quantity': qty, 'quantity_unit': 'shares', 'gross_notional': gross,
               'entry_cost': cost if phase=='entry' else None, 'transaction_cost':cost,'applied_cost_phase':phase,
               'entry_cash_debit': gross + cost if side == 'buy' else None,
               'sale_net_proceeds': gross - cost if side == 'sell' else None,
@@ -112,6 +113,7 @@ Per-order charges require order counts; per-round-trip charges require charged_a
         require(side == 'buy', 'BUDGET_REQUIRES_BUY')
         budget = amount(document['budget'], 'budget', 0)
         step = amount(document['quantity_step'], 'quantity_step', '0.000000000001')
+        result.update(quantity_step=step, quantity_step_unit='shares')
         raw = max(Decimal(0), (budget - fixed) / (price + variable))
         affordable = (raw / step).to_integral_value(rounding=ROUND_FLOOR) * step
         debit = affordable * (price + variable) + (fixed if affordable else 0)
@@ -121,8 +123,26 @@ Per-order charges require order counts; per-round-trip charges require charged_a
         require(side == 'sell' and price > variable, 'POSITIVE_NET_PRICE_SALE_REQUIRED')
         needed = amount(document['required_net_proceeds'], 'required_net_proceeds', 0)
         step = amount(document['quantity_step'], 'quantity_step', '0.000000000001')
+        result.update(quantity_step=step, quantity_step_unit='shares')
         raw = (needed + fixed) / (price - variable) if needed else Decimal(0)
         sized = (raw / step).to_integral_value(rounding=ROUND_CEILING) * step
+        # The legacy decimal field is finite-precision, even when the exact
+        # algebraic threshold is recurring. Retain a lossless rational witness.
+        threshold = ((Fraction(needed) + Fraction(fixed)) /
+                     (Fraction(price) - Fraction(variable))) if needed else Fraction(0)
+        result['proceeds_sizing_precision'] = {
+            'threshold_quantity_numerator': str(threshold.numerator),
+            'threshold_quantity_denominator': str(threshold.denominator),
+            'threshold_quantity_unit': 'shares',
+            'decimal_quantity_pointer': '/exact_fractional_quantity_for_required_proceeds',
+            'decimal_quantity_is_exact': Fraction(raw) == threshold,
+            'increment_quantity_pointer': '/minimum_quantity_at_increment',
+            'increment_net_proceeds_pointer': '/sized_net_proceeds',
+            'required_net_proceeds': needed,
+            'quantity_step': step,
+            'rounding_direction_for_required_proceeds': 'ceiling_to_declared_quantity_step',
+            'display_rule': 'A shortened decimal is approximate; do not label it exact or sufficient without recomputing net proceeds.',
+            'broker_increment_verified': False}
         result.update(exact_fractional_quantity_for_required_proceeds=raw,
                       minimum_quantity_at_increment=sized,
                       sized_net_proceeds=sized * (price - variable) - (fixed if sized else 0),

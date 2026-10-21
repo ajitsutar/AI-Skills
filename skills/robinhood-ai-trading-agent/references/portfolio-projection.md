@@ -26,9 +26,41 @@ Optional `marks` use the dated helper contract. With explicit
 `carry_forward_supplied`, missing overrides use the opening prices; vest-price
 assumptions are not silently converted into target marks. `scenario_flows` supplies
 separate explicit sale, buy, reserve or tax-payment scenarios using the same source
-row contract; it cannot duplicate an automatically bound source flow. Proposed
+row contract; it cannot duplicate any normalized original source flow, including
+one excluded from the scenario or already included in opening balances. Proposed
 instructions and recurring contributions remain listed as unmodeled source
 sections until their scheduling/fill assumptions are expressly supplied.
+
+When `scenario_flows` is nonempty, declare `projection_scope` before computation.
+Use `{mode: "baseline_continuation"}` to continue the supplied baseline with its
+source events; this mode does not accept event overrides. A separately specified
+opening convention needs `mode: "independent_scenario"` with:
+
+- `opening.balances_pointer`: `/baseline_rebalance`, identifying the adapter's
+  supported balance schema. This is explicit reuse of those balances at a scenario
+  opening, not support for arbitrary alternate account schemas.
+- `opening.as_of_pointer` and `opening.convention_pointer`: pointers within the
+  complete source to the scenario clock and literal opening convention.
+- `opening.reuse_basis`: a nonempty explanation of the analytical assumption
+  supporting balance reuse. This declaration does not verify the account.
+- `source_event_dispositions`: one row for every normalized source cash event,
+  withdrawal and grant, each with `source_pointer`, `disposition` and a nonempty
+  `reason`. Disposition is `include`, `exclude_from_scenario` or
+  `already_in_opening`. Cover the full source-event inventory, not only events
+  expected to affect the result; ordinary target-date/state filtering still applies.
+
+Retain `projection_scope_receipt` with its `opening_binding`,
+`source_event_audit` and `scenario_flow_pointers` when reporting results. Included
+source events must be strictly after opening; `already_in_opening` events must
+be on or before opening. `source_flow_count` retains the complete inventory, while
+`scoped_source_flow_count` counts events passed to the projection. An independent opening does not silently replay
+prior source events or redetermine their inclusion from a final prose caption.
+The date basis still uses source calendar labels, not intraday availability;
+original mark dates remain original dates. Unknown opening balances remain unknown.
+The receipt retains the literal convention without interpreting it; review whether
+the declared dispositions agree with that convention. A valid scope declaration
+does not independently reconcile source prose or authenticate the opening account.
+These declarations define the calculation, not broker authority or a permission gate.
 
 `other_assets` is an explicit ledger or null. Alternatively the explicit sensitivity
 `residual_policy: "carry_opening_reconciliation_difference"` carries the nonnegative

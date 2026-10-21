@@ -34,7 +34,8 @@ STATUSES = {'COMPUTED', 'REJECTED_INPUT', 'CALCULATION_FAILED', 'RESEARCH_QUEUE_
             'MAPPING_REQUIRED', 'DRAFT_UNVERIFIED', 'PRIMARY_EVIDENCE_REQUIRED', 'READY', 'INCOMPLETE', 'NOT_ASSESSED',
             'NO_INCLUDED_FUTURE_VEST_DATE', 'DATED_ALTERNATIVES_COMPARED',
             'SOURCE_BOUND_SCENARIO_AT_REQUESTED_EXIT', 'SOURCE_BOUND_CONDITIONAL_COMPARISON',
-            'PRIMARY_APPLICABILITY_UNRESOLVED', 'CONDITIONAL_WEIGHTED_ARITHMETIC'}
+            'PRIMARY_APPLICABILITY_UNRESOLVED', 'CONDITIONAL_WEIGHTED_ARITHMETIC',
+            'COMPLETE_WITHIN_SUPPLIED_ROWS', 'KNOWN_LOWER_BOUND_ONLY'}
 # The original workbench numerical modules and existing schemas were inspected
 # byte-for-text-identical before the additive operation extension. This identifies
 # a known historical schema, not a successful replay with the current code.
@@ -293,6 +294,13 @@ class Projector:
                     spec = SIMPLE.get(op, {}).get(rel)
                     if spec is None and current_code:
                         spec = extended_spec(op, rel)
+                        issuer_root = {'planning.allocation_context': 'issuer_identity_summary/',
+                                       'planning.source_allocation_context': 'allocation_result/issuer_identity_summary/'}.get(op)
+                        if issuer_root and rel in (issuer_root + 'distinct_known_issuer_count',
+                                                   issuer_root + 'total_distinct_issuer_count'):
+                            spec = ('Distinct known issuer count' if rel.endswith('distinct_known_issuer_count') else
+                                    'Total distinct issuer count within supplied rows', 'count', None,
+                                    'Positive terminal issuer identities; cash and repeated share classes excluded; total unknown when identity coverage is unresolved')
                     if op == 'validation.tail':
                         spec = TAIL.get(rel)
                     elif op == 'backtest.portfolio':

@@ -16,6 +16,28 @@ Start with [example prompts](EXAMPLE-PROMPTS.md), [installation](INSTALL.md), or
 Yahoo. The Robinhood name identifies the broker integration context, not the
 research universe.
 
+Source-bound workflows retain decimal-valued evidence as JSON numbers through
+export and replay. Portfolio comparisons require a separate final review of
+goal/loss implications, applicable source metadata and actual cost-sized
+exposures; successful numerical replay alone does not establish recommendation
+coverage or comparative diversification.
+
+Allocation results explicitly count distinct known issuers, merge share classes,
+and separate cash from unresolved issuer exposure. A total count remains unknown
+when identity coverage is incomplete. These counts do not establish correlation
+or a diversification ranking; conclusions must retain that distinction.
+Unspecified fractional increments use a labeled shared analytical sensitivity,
+while actual broker precision stays unknown. Comparison checks retain each
+operand's provenance rather than turning matching declarations into source facts.
+Affordability retains dated close-price semantics, computes per-contribution
+sensitivities separately from forecasts, and refreshes exposure after final sizing.
+Budget and allocation outputs include scoped, evidence-linked conclusion facts:
+gross exposure, fees and cash remain distinct, and unknown comparative evidence
+stays unknown when assembling a recommendation.
+Settlement summaries preserve every conditional arrival path, and funding sizing
+distinguishes exact rational thresholds from displayed decimal approximations.
+Final reporting retains source and scenario checks for factual claims.
+
 ## Capabilities
 
 | Workflow | What the skill provides | Guide |
@@ -54,6 +76,12 @@ reported claims together. Report verification catches altered or incomplete
 projections, including type changes in literal claims. Free-form business
 judgment and source selection still require review. Matching calculations alone
 does not establish matching recommendations or universal model independence.
+
+Small-account comparisons address the supplied goal, loss scenarios and recurring
+contributions alongside initial affordability. They distinguish pre-cost targets
+from cost-sized exposures and identify omitted assumptions. Narrative coverage
+requires review even when the numerical artifacts replay successfully; see
+[small-account research](references/small-account-research.md).
 
 Source-aware portfolio helpers carry the original obligations, withdrawals,
 vesting events and unknowns into dated projections and comparable alternatives.
@@ -221,3 +249,13 @@ Execution-time price changes, quote age and research-to-market price drift do no
 trigger a skill threshold, pause or repeat approval. Preserve the user's accepted
 market-price uncertainty; state the research as-of time without making it a
 condition for the host handoff.
+
+Conditional proposal summaries retain an explicit comparator for target-distance
+direction and reconcile each final branch with the complete timing paths and
+scenario assumptions. Numerical replay alone does not validate recommendation prose.
+
+Funding comparison coverage distinguishes the held-asset universe from sampled
+quantities, and optional scenarios retain separate source opening conventions.
+
+Source-context evidence distinguishes supplied analytical marks and cost
+assumptions from unverified actual execution terms.
