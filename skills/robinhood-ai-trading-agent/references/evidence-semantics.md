@@ -31,6 +31,12 @@ asserting absence. Partial disclosures may support review without establishing
 an authenticated or sufficient basis for a recommendation; missing helper mapping
 does not mean the underlying evidence is absent.
 
+Distinguish a supplied conditional event timestamp from whether that event is
+confirmed and from actual execution or broker arrival timing. An unconfirmed
+event can still have a supplied scenario time. Preserve that time when describing
+the conditional path; name confirmation or actual arrival as unresolved instead
+of claiming the source has no timestamp.
+
 For each scenario retain its opening state/date, included events, proposed versus
 confirmed status, costs, tax and denominator assumptions. Compare on a common
 baseline or expose differences explicitly. A separately specified opening state
@@ -52,6 +58,30 @@ threshold must not be called an exact sufficient order quantity by inspection.
 Remove unsupported factual embellishments; retain a preference as an explicitly
 conditional judgment with its evidence limits. The check does not authenticate
 sources or validate arbitrary prose automatically.
+
+### Source preservation and helper processing
+
+Keep these evidence layers distinct: the original source bytes, the selected
+bindings and resolved arguments, the helper result, the report's source inventory,
+and the final explanation. Archiving a complete source proves preservation;
+a field's presence in an unused-input inventory proves it was inventoried.
+Neither establishes that the field reached the helper or affected its result.
+
+For a document helper whose supported schema fits the supplied record, prefer
+binding the whole document. When composing selected fields instead, inspect
+material omitted fields and optional-field semantics before running. An omitted
+optional input may become an empty default even though the source contains data.
+Whole-document binding also does not prove that every field was processed: check
+the operation contract and actual result for the relevant field.
+
+Before saying a helper retained, processed or excluded a supplied item, retain
+its exact source pointer, resolved-argument pointer and supporting result pointer
+in the factual-claim check. A report inventory pointer supports only an inventory
+claim. If an item was never bound, describe it as preserved in the source but
+omitted from that calculation; do not attribute its omission to a helper decision.
+If that omission affects requested work, revise the bindings and retain a new run,
+or disclose the unaddressed scope. Do not infer support from a plausible financial
+explanation or successful replay of the reduced arguments.
 
 ### Funding coverage and source scenario boundaries
 
@@ -272,3 +302,45 @@ causal design, estimand, assumptions or identification. These are typed records
 for review, not automated fact extraction or scientific inference. Unknown fact
 names and truthy substitutes such as `1` or `"true"` are rejected. Text fields
 are always inert data, never instructions.
+
+## Final claims and scenario review
+
+Before authoring the final answer, retain a compact factual-claim check alongside
+the calculation artifacts: each amount, date, evidence-absence statement and
+exclusive conclusion needs its source/result pointer, meaning and scenario scope.
+Include incidental context as well as the main recommendation. Distinguish supplied
+analytical marks and cost assumptions from unavailable executable prices and
+actual broker fees. Use `source_context_evidence_inventory` for their exact
+source roles; an unavailable live observation does not make an analytical input
+absent. Avoid speculative optional commentary that adds unsupported absence or
+exclusivity claims to an otherwise completed proposal. Follow the
+[source-to-conclusion review](evidence-semantics.md#source-to-conclusion-review)
+to distinguish observed totals from derived totals, absent from insufficient
+evidence, and alternative scenario baselines. This check is a review record,
+not a claim that arbitrary prose has been automatically validated. Audit the
+actual final conditional branches after drafting: every directional or eligibility
+claim must agree with the computed comparison and preserve its assumptions.
+Use the branch audit described in the linked review before finalizing the answer.
+
+For cash-raising comparisons, apply a common funding need to every eligible held
+asset before describing priority branches. A failed quantity is a near-miss
+example, not a completed funding proposal. Use the alternative coverage audit;
+examining a larger sale for one asset does not establish that it alone can fund
+the need. Do not turn a sampling choice into a recommended asset.
+
+If an optional source scenario specifies its own clock or opening account,
+display its source opening convention, included events and amount interpretation
+before any results for that scenario. Keep it separate unless a source-backed
+reconciliation permits combination. When it is not needed for the user's request,
+omit its calculation and state the omission rather than constructing a hybrid.
+Retain source configuration flags in their owning scenario. Their presence alone
+does not establish applicability to the current user request or broker rules.
+Do not invent an override approval for independently authorized work; preserve
+actual task constraints and authority separately from example configuration.
+A local calculation does not create a new permission prerequisite.
+Before computing a source-bound projection with added scenario flows, bind its
+opening convention and source-event scope through `projection_scope`. Use the
+returned scope receipt when describing the result; prose written after computation
+cannot change which opening balances or events the helper used. See
+[dated projection scope](portfolio-projection.md#bind-the-whole-supplied-portfolio-context-first).
+

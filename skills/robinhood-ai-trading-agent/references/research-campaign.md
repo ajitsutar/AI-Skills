@@ -54,6 +54,13 @@ invented selection target. `research_handoff.evaluate` applies that bound itself
 and distinguishes exhaustive review from meeting a user-specified count. With no
 earnings instruction, the lock documents `allow_with_disclosure`; unknown risk and
 early-exit preferences remain `unspecified`, not inferred constraints.
+Follow [the mandatory universe rule](../SKILL.md#mandatory-default-stock-universe).
+An unspecified stock universe requires the full `us-listed` membership; an
+analyst-news shortlist, output count or time pressure cannot replace it. Preserve
+applicable user-scoped overrides and record their source instruction. Announce
+the default without asking; require explicit user agreement before narrowing it.
+Incomplete acquisition remains incomplete rather than a smaller completed screen.
+
 New runs default to `--universe-preset us-listed`:
 all U.S. exchange-listed stocks including listed ADRs. For an explicitly requested
 S&P 500 screen add `--universe-preset sp500`. These presets are mutually exclusive
@@ -172,3 +179,42 @@ Report numerical candidate overlap, agreement on evidence/eligibility decisions,
 and investment-performance validation separately. None of these implies the others.
 A passing run proves its measured result for that date and contract, not future
 80% agreement, predictive accuracy, or ten Strong Buy recommendations.
+
+## Mandatory default stock universe
+
+For an open-ended stock-discovery or stock-pick request, if the user has not
+specified a universe in the current request or applicable conversation instructions,
+you MUST use **all U.S. exchange-listed stocks, including U.S.-listed foreign
+ordinary shares and ADRs**, with `--universe-preset us-listed`. Apply this default
+without asking the user to choose a universe. State it briefly before acquisition.
+The existing collector already uses this preset by default; pass it explicitly
+for a new run so the invocation and retained universe evidence are unambiguous.
+
+Terms such as "hottest", "best", "today", "analyst picks", "undervalued" and
+"positive sentiment" describe selection criteria or timing; they do NOT authorize
+a smaller universe. A requested output count (one pick, top five, etc.) is NOT an
+input-universe limit. Do not substitute S&P 500, recent analyst actions, news-search
+results, familiar names or a fixed finalist list for the default discovery universe.
+Analyst/news searches enrich candidate review; they do not define membership.
+
+A user-specified universe takes precedence: for example S&P 500, a sector, a
+portfolio or a supplied list. A request to analyze named stocks is scoped to those
+stocks and does not trigger a full-market scan. Preserve an applicable earlier
+explicit scope until the user changes it. Document the instruction supplying any
+nondefault scope; do not attribute an assistant-selected shortcut to the user.
+
+Runtime cost, missing dependencies, failed feeds, rate limits or incomplete data
+do NOT authorize narrowing the universe. Repair or resume feasible acquisition
+and report the actual limitation. If narrowing would help, obtain the user's
+explicit agreement before using it as the discovery scope. A labeled convenience
+shortlist is still not a substitute for the requested screen. Preserve checkpoints;
+an incomplete run must not claim a market-wide winner or a completed comparison.
+
+Retain the universe preset/identity, dated membership evidence and attempted,
+scored and unscored coverage. Report multiple share classes, unique issuers,
+exclusions and missing data. Universe membership is not the same as scoring
+coverage; sector-input gaps do not remove members or imply an investment rejection.
+This default is exchange-listed equities, not every security traded in the U.S.:
+OTC, funds, preferreds and other instrument types require an explicitly appropriate
+scope and workflow. There is no fixed top-N or mandatory finalist list length.
+

@@ -235,6 +235,10 @@
         {
           "title": "Test news data quality",
           "prompt": "Audit [NEWS ARCHIVE] for late arrivals, future timestamps, revised stories with old datelines, syndication, ambiguous company names and source outages. Replay the same inputs and verify the triage output matches."
+        },
+        {
+          "title": "Complete an evidence-backed sentiment review",
+          "prompt": "Review sentiment for [COMPANY] over [WINDOW] at [CUTOFF]. Preserve deterministic triage labels, record qualitative interpretations with sources using sentiment_review, disclose news, analyst, price/volume, positioning and social coverage, and show contrary evidence without treating unscored language as neutral or a buy signal."
         }
       ]
     },

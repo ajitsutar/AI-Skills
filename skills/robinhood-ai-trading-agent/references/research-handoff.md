@@ -19,6 +19,15 @@ beta, analyst-count, price-momentum or earnings-blackout filters.
 
 ## Lock the actual mandate
 
+Resolve universe before selecting names using
+[the mandatory default rule](../SKILL.md#mandatory-default-stock-universe).
+If no applicable user instruction supplies a different scope, lock the entire
+U.S. exchange-listed stock universe and retain its membership evidence. Do not
+encode an assistant-generated analyst/news finalist list as a user mandate.
+An output count limits requested selections, not discovery membership. Record
+the actual user instruction for any scope override; later runtime failures do
+not silently amend the locked universe.
+
 Before selecting names, save a JSON object with `prompt`, `universe`, `hold`,
 `information_cutoff`, `price_date`, `entry_at`, `comparison_at` (or the legacy
 `exit_at` comparison-clock name), `standing_preferences`, `selection_mode`,

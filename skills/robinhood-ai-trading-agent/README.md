@@ -1,5 +1,17 @@
 # Robinhood quant research and portfolio agent
 
+For unspecified stock-discovery requests, use the full U.S. exchange-listed
+stock universe. An applicable explicit user scope overrides this default;
+analyst-news shortlists and incomplete acquisition do not. See
+[the universe rule](SKILL.md#mandatory-default-stock-universe).
+
+The skill includes a retained qualitative sentiment review alongside
+the existing deterministic news triage. It distinguishes unscored language from
+missing research, preserves contrary and stale evidence, and records coverage
+across news, analysts, price/volume, positioning and social sources. It does not
+add a trained sentiment model or change the discovery score. See
+[sentiment review](references/news-and-guidance.md#complete-the-sentiment-review).
+
 A self-contained skill for investment recommendations, reproducible stock research,
 portfolio analysis and quantitative work across arbitrary holding periods. It
 combines public evidence with replayable calculations and hands requested trades
@@ -76,6 +88,10 @@ reported claims together. Report verification catches altered or incomplete
 projections, including type changes in literal claims. Free-form business
 judgment and source selection still require review. Matching calculations alone
 does not establish matching recommendations or universal model independence.
+Source preservation and report inventories are distinct from helper processing.
+Claims that a helper retained or excluded an item require the actual input and
+result pointers; omitted bindings remain calculation omissions. See
+[evidence semantics](references/evidence-semantics.md#source-preservation-and-helper-processing).
 
 Small-account comparisons address the supplied goal, loss scenarios and recurring
 contributions alongside initial affordability. They distinguish pre-cost targets

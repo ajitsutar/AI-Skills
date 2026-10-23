@@ -67,7 +67,16 @@ def _rows(value, name):
     return value
 
 
-def _record(record):
+# Explicit known numeric dimensions only; unfamiliar custom units remain declarations.
+BOOLEAN_INCOMPATIBLE_UNITS = {
+    'usd', 'eur', 'gbp', 'jpy', 'cad', 'aud', 'chf', 'cny', 'inr',
+    'currency', 'money', 'dollars', 'shares', 'share', 'count', 'percent',
+    'percentage', '%', 'bps', 'basis_points', 'fraction', 'ratio',
+    'days', 'hours', 'seconds', 'years', 'number', 'integer', 'decimal',
+}
+
+
+def _record(record, currency=None):
     require(isinstance(record, dict), 'RECORD_OBJECT_REQUIRED')
     _text(record.get('id'), 'record.id')
     source = record.get('source_role', 'unknown')
@@ -81,6 +90,12 @@ def _record(record):
     require(role == 'pending' or 'pending_state' not in record, 'PENDING_STATE_REQUIRES_PENDING_ROLE')
     present = 'value' in record
     known = present and record['value'] is not None
+    # bool subclasses int in Python; validate its declared unit before numeric logic.
+    if known and isinstance(record['value'], bool):
+        unit = (record.get('unit') or '').strip().casefold()
+        declared_currency = currency.strip().casefold() if isinstance(currency, str) else None
+        require(not unit or (unit not in BOOLEAN_INCOMPATIBLE_UNITS and unit != declared_currency),
+                'BOOLEAN_VALUE_UNIT_MISMATCH:' + record['id'])
     if known and role in {'maximum', 'minimum', 'target'}:
         amount(record['value'], 'constraint')
     return {**deepcopy(record), 'source_role': source, 'semantic_role': role,
@@ -99,7 +114,7 @@ def input_roles(document):
     compare a candidate to a declared maximum/minimum/target with exact boundaries.
     Missing/mismatched dimensions stay unresolved. No candidate or size is inferred.
     """
-    records = [_record(row) for row in _rows(document.get('records'), 'records')]
+    records = [_record(row, document.get('currency')) for row in _rows(document.get('records'), 'records')]
     by_id = {row['id']: row for row in records}
     checks = []
     for check in _rows(document.get('checks', []), 'checks'):
@@ -151,7 +166,7 @@ def reference_comparison(document):
     for sleeve in sleeves:
         model = sleeve.get('exposure_model', 'unknown')
         require(model in {'long_linear_price', 'not_applicable', 'unknown'}, 'INVALID_REFERENCE_EXPOSURE_MODEL')
-        records = {key: _record(sleeve[key]) if sleeve.get(key) is not None else None
+        records = {key: _record(sleeve[key], document.get('currency')) if sleeve.get(key) is not None else None
                    for key in ('allocation_record', 'holdings_record', 'return_observations_record')}
         for key in ('holdings_record', 'return_observations_record'):
             record = records[key]

@@ -149,6 +149,53 @@ with prior guidance, consensus, what the price already discounts and the holding
 window. Save original text hashes and fixed configuration for model-independent
 replay. Outputs cannot alter the public VQM weights or grant buy eligibility.
 
+## Complete the sentiment review
+
+A requested sentiment analysis has two layers: reproducible language triage and
+an evidence-backed qualitative assessment. `UNSCORED` means the small vocabulary
+found no directional words. It is not neutral, negative, no-news, or a completed
+assessment. Read material items that triage flags for primary review, including
+unscored headlines. Do not expand the vocabulary merely to obtain a bullish label.
+
+Declare the issuer, publication/event window, actual observation cutoff and
+requested dimensions. Review news catalysts and counterevidence; analyst rating
+and estimate revisions; and price/volume or positioning/social evidence when
+relevant to the request. State unavailable dimensions and source access limits.
+An issuer press release alone is not representative market sentiment. Old
+fundamental disclosures can inform risk but do not become fresh news because
+they were downloaded today. A republished analyst action retains its event date.
+
+When a configured feed fails, continue through accessible exact publisher/issuer
+pages or permitted exports and import the observations into the existing triage
+schema. Preserve failures and actual acquisition route. Never synthesize missing
+publication times or backdate local observation to fit a frozen screen cutoff.
+Disclose a new later review cutoff separately from the original screen.
+
+Keep automated labels unchanged. Record qualitative interpretation separately,
+with source URLs, access level, dates and the relevant evidence. Group paraphrased
+syndications by underlying event in addition to exact-headline deduplication.
+Several reports repeating one target change do not create independent bullish
+votes. Show counterevidence and distinguish analyst sentiment from retail opinion.
+
+Use `scripts/sentiment_review.py TRIAGE.json REVIEW.json OUTPUT.json` to retain
+the supplied interpretations, requested-dimension coverage and evidence references.
+The helper checks consistency; it does not validate source truth, infer sentiment,
+change ranking weights or approve a trade. Its input schema is documented in the
+script docstring. A partial result is a coverage disclosure, not a reason to stop
+available independent research or an execution gate.
+
+Price moves and volume are observations, while explanations about investor intent
+are interpretations. Lower pullback volume does not prove absence of distribution;
+call volume can be hedging or selling; low lagged short interest does not prove
+little bearish conviction. Bind numerical claims to their actual measurement dates,
+denominators and existing calculation helpers. Do not substitute a single social
+post or a search snippet for representative, timestamped sentiment evidence.
+
+Finish with a qualitative conclusion and its strongest contrary evidence. Clearly
+label it analyst interpretation, not the keyword model's output or a calibrated
+return prediction. Do not claim a best-in-universe pick from a small news shortlist;
+follow the requested ranking route separately and disclose its unresolved review.
+
 ## Guidance comparison
 
 Review new/raised/lowered/reaffirmed/withdrawn guidance, preliminary results and

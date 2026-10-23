@@ -14,6 +14,13 @@ is null unless `trade.maximum_planned_loss_basis` is explicitly supplied. Entry,
 exit, slippage, fees or a stop do not resolve that basis. Preserve the null in the
 answer and any comparison; named gross/after-cost sensitivities are separate.
 
+Boolean record values use Boolean or unitless declarations, not currency or
+numeric measurement units. `planning.input_roles` rejects Boolean records with
+known monetary/numeric units (including the document currency) using
+`BOOLEAN_VALUE_UNIT_MISMATCH`; it never converts false/true to zero/one or silently
+rewrites a unit. Missing and unfamiliar custom units remain declarations whose
+meaning needs review; acceptance does not establish dimensional validity.
+
 ## Assign a role before calculating
 
 Keep these separate even when two supplied numbers happen to match:

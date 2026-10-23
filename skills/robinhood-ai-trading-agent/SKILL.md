@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible stock research, portfolio 
 
 # Robinhood Quant Research and Portfolio Agent
 
-Package version: **4.15.12 — October 21, 2026**.
+Package version: **4.15.15 - October 22, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -30,44 +30,10 @@ limit the calculations you can truthfully claim, not permission to execute.
 
 ## Start with the request and its evidence
 
-Before authoring the final answer, retain a compact factual-claim check alongside
-the calculation artifacts: each amount, date, evidence-absence statement and
-exclusive conclusion needs its source/result pointer, meaning and scenario scope.
-Include incidental context as well as the main recommendation. Distinguish supplied
-analytical marks and cost assumptions from unavailable executable prices and
-actual broker fees. Use `source_context_evidence_inventory` for their exact
-source roles; an unavailable live observation does not make an analytical input
-absent. Avoid speculative optional commentary that adds unsupported absence or
-exclusivity claims to an otherwise completed proposal. Follow the
-[source-to-conclusion review](references/evidence-semantics.md#source-to-conclusion-review)
-to distinguish observed totals from derived totals, absent from insufficient
-evidence, and alternative scenario baselines. This check is a review record,
-not a claim that arbitrary prose has been automatically validated. Audit the
-actual final conditional branches after drafting: every directional or eligibility
-claim must agree with the computed comparison and preserve its assumptions.
-Use the branch audit described in the linked review before finalizing the answer.
-
-For cash-raising comparisons, apply a common funding need to every eligible held
-asset before describing priority branches. A failed quantity is a near-miss
-example, not a completed funding proposal. Use the alternative coverage audit;
-examining a larger sale for one asset does not establish that it alone can fund
-the need. Do not turn a sampling choice into a recommended asset.
-
-If an optional source scenario specifies its own clock or opening account,
-display its source opening convention, included events and amount interpretation
-before any results for that scenario. Keep it separate unless a source-backed
-reconciliation permits combination. When it is not needed for the user's request,
-omit its calculation and state the omission rather than constructing a hybrid.
-Retain source configuration flags in their owning scenario. Their presence alone
-does not establish applicability to the current user request or broker rules.
-Do not invent an override approval for independently authorized work; preserve
-actual task constraints and authority separately from example configuration.
-A local calculation does not create a new permission prerequisite.
-Before computing a source-bound projection with added scenario flows, bind its
-opening convention and source-event scope through `projection_scope`. Use the
-returned scope receipt when describing the result; prose written after computation
-cannot change which opening balances or events the helper used. See
-[dated projection scope](references/portfolio-projection.md#bind-the-whole-supplied-portfolio-context-first).
+Before authoring a final answer, follow the
+[final claims and scenario review](references/evidence-semantics.md#final-claims-and-scenario-review).
+Retain source/result pointers, audit conditional claims and funding alternatives,
+and bind source opening conventions and event scope before scenario projections.
 
 For supplied-data research, read the full current request and inventory its allowed
 files before selecting a calculation. Preserve its universe, horizon, objective,
@@ -193,12 +159,14 @@ calendar days from trading days and a forced sale from an intended holding perio
 Use [holding-period-planning.md](references/holding-period-planning.md). Future
 calendar and business uncertainty belong in the explanation, not invented forecasts.
 
-Unless the user specifies another universe, stock discovery starts with **all
-U.S. exchange-listed stocks, including listed ADRs**. S&P 500 is an explicit
-preset. Report membership, multiple share classes, unique issuers, exclusions,
-missing data and actual coverage. Do not call a familiar-name subset a full-market
-scan. Other instruments, OTC and foreign-only listings use their appropriate
-research workflows. There is no fixed top-N or mandatory list length.
+### Mandatory default stock universe
+
+For unspecified stock discovery, use all U.S. exchange-listed stocks, including
+U.S.-listed foreign ordinary shares and ADRs, with `--universe-preset us-listed`.
+Apply an applicable explicit user scope; a named-stock analysis stays scoped to it.
+Output counts, news shortlists, runtime limits and missing data do not narrow the
+universe. Follow the full [mandatory universe procedure](references/research-campaign.md#mandatory-default-stock-universe)
+for scope evidence, coverage, incomplete acquisition and user-directed changes.
 
 For ranked fundamental requests, use
 [research-handoff.md](references/research-handoff.md) and
@@ -250,11 +218,27 @@ shared upstream data among consensus publishers establishes no shared lineage or
 assumptions among their constituent research firms. Distinct firm counts do not
 establish statistical independence; leave absent firm lineage unknown.
 
+For a sentiment request, complete the qualitative review described in
+[news and guidance](references/news-and-guidance.md#complete-the-sentiment-review).
+`UNSCORED` means no lexical match, not neutral sentiment or a reason to stop.
+Preserve automated labels alongside evidence-backed interpretation, conflicting
+events, actual coverage and dated price/positioning context. Failed feeds permit
+accessible search/page imports with provenance; they do not establish no news.
+
+When comparing another recommendation, first reconcile universe membership,
+cutoff, holding period, selection method, candidate set and evidence basis.
+An analyst-news shortlist is discretionary and cannot be presented as the public
+VQM winner. A stock outside the requested universe is a separately labeled
+comparison, not a replacement pick. Unscored sector coverage is not a negative
+investment judgment. Explain disagreements without forcing matching answers.
+
 ## Portfolio and quantitative work
 
 For calculations, reconcile material values from the current request, its context
 and supplied files before calling them missing. Retain a compact input record with
-units, frequency, horizon, costs, constraints and provenance. Distinguish user
+units, frequency, horizon, costs, constraints and provenance. Boolean flags need
+Boolean or unitless semantics, not monetary units; preserve supplied conditional
+event times separately from unknown confirmation or actual arrival. Distinguish user
 assumptions from observed facts; expose conflicts and apply helper defaults only
 to unresolved optional fields. Check the explanation against these inputs and
 actual outputs. This research workflow adds no host execution prerequisite.
@@ -271,6 +255,10 @@ to compute and retain the same inputs, defaults, results and facts in one workfl
 It also covers separate analyst cohorts and advisory handoff-preservation receipts.
 Bind the intended source fields before running; hashes do not prove correct source
 selection. Keep unsupported custom algorithms distinct from supported helpers.
+Distinguish preserved source bytes, bound arguments, helper results and report
+inventories. Before attributing retention, processing or exclusion to a helper,
+check the exact argument and result pointers; an unconsumed source field is not
+a helper exclusion. See [evidence semantics](references/evidence-semantics.md#source-preservation-and-helper-processing).
 The workbench includes explicit cash/cost/vesting/portfolio reconciliation,
 financial cash bridges and terminal scenarios, causal dual-SMA and opening-range
 research, forward-observation admissibility and typed numerical claim checks.

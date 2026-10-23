@@ -5,6 +5,15 @@ targets, estimate revisions or the record of a research author. It supplements
 primary financial and business review. Analyst opinions are neither verified
 company facts nor a calibrated forecast of the investment's return.
 
+For comparisons across recommendations, bind each displayed forward P/E to the
+actual EPS fiscal period, adjusted or statutory basis, currency, estimate vintage
+and quote timestamp. Next fiscal year is not automatically next twelve months.
+PEG needs its earnings-growth definition and horizon; a low vendor PEG alone does
+not establish intrinsic undervaluation. Keep currency-neutral growth distinct from
+reported-currency growth, and do not use a single historical quarter as forecast
+EPS CAGR. Banks require credit, capital and funding review rather than an industrial
+CFO/EV formula. A provider's missing specialized bank inputs is a coverage gap.
+
 For explicit structured records, [run and report](run-and-report.md#analyst-evidence)
 executes the existing evidence helper and renders separate cohorts, exclusions and
 source pointers. It does not acquire missing reports or pool provider estimates.
