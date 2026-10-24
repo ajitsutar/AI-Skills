@@ -1,0 +1,31 @@
+{
+  "schema_version": 1,
+  "action": "research",
+  "operation": "bond_cashflows",
+  "currency": "USD",
+  "inputs": {
+    "par": 1000,
+    "settlement_date": "2025-01-01",
+    "cashflows": [
+      {
+        "date": "2026-01-01",
+        "amount": 50
+      },
+      {
+        "date": "2027-01-01",
+        "amount": 1050
+      }
+    ],
+    "cashflows_complete": true,
+    "noncallable_fixed": true,
+    "yield_rate": 0.05,
+    "compounding_per_year": 1,
+    "discount_day_count": "ACT365F",
+    "accrual": {
+      "method": "supplied_amount",
+      "amount": 0
+    }
+  },
+  "information_cutoff": "2026-10-23T23:00:00Z",
+  "inputs_available_at": "2026-10-23T22:00:00Z"
+}

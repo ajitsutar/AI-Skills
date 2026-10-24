@@ -1,0 +1,24 @@
+{
+  "schema_version": 1,
+  "operation": "gbm",
+  "inputs": {
+    "symbol": "FICTIONAL",
+    "price_unit": "USD/share",
+    "price_basis": "unadjusted_scenario",
+    "initial_price": 100,
+    "parameters_available_at": "2026-01-01T00:00:00Z",
+    "start_at": "2026-01-01T00:00:00Z",
+    "mu": 0.0,
+    "sigma": 0.0,
+    "horizon_years": 1,
+    "steps": 2,
+    "paths": 3,
+    "seed": 17,
+    "year_basis": "ACT_365_FIXED_SECONDS",
+    "distribution": "independent_standard_normal_log_increments",
+    "measure": "real_world_scenario",
+    "risk_free_rate": null,
+    "dividend_yield": null,
+    "as_of": "2026-01-01T00:00:00Z"
+  }
+}

@@ -17,6 +17,10 @@ Set SEC_USER_AGENT to your application's contact identity in the environment; do
 not invent it or put it in shared reports. The source URL, retrieval time and hash
 are retained. See [SEC APIs](https://www.sec.gov/search-filings/edgar-application-programming-interfaces).
 point_in_time_fact requires an exact period/unit and filings available by as_of.
+Date-only filing metadata becomes eligible at the next America/New_York midnight;
+a date-only as_of means the start of that New York day. A timezone-aware as_of is
+compared as an exact instant. This conservative convention prevents same-day
+intraday access from being inferred from a filing date without an acceptance time.
 Filing dates alone cannot resolve same-day intraday availability: use an observed
 filing publication time or an earlier cutoff. Do not sum quarterly and YTD facts.
 

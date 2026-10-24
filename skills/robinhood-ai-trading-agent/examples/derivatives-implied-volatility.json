@@ -1,0 +1,27 @@
+{
+  "schema_version": 1,
+  "action": "research",
+  "operation": "implied_volatility",
+  "currency": "USD",
+  "inputs": {
+    "option": {
+      "spot": 100,
+      "strike": 100,
+      "time_years": 1,
+      "risk_free_rate": 0,
+      "dividend_yield": 0,
+      "steps": 1,
+      "right": "call",
+      "exercise": "european",
+      "dividend_model": "continuous_yield",
+      "rate_compounding": "continuous"
+    },
+    "market_price": 33.333333333333336,
+    "volatility_lower": 0.1,
+    "volatility_upper": 1.2,
+    "price_tolerance": 1e-08,
+    "max_iterations": 80
+  },
+  "information_cutoff": "2026-10-23T23:00:00Z",
+  "inputs_available_at": "2026-10-23T22:00:00Z"
+}

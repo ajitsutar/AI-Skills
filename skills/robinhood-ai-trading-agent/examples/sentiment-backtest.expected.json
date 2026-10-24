@@ -1,0 +1,60 @@
+{
+  "input_sha256": "79f790a64c0919dfab323355c6a00ad580a7b40fb03f370e7595a1a4b7ef633b",
+  "periods": [
+    {
+      "decision_at": "2026-01-01T11:00:00Z",
+      "start": "2026-01-01T11:01:00Z",
+      "end": "2026-01-01T12:00:00Z",
+      "polarity": null,
+      "exposure": 0,
+      "turnover": 0,
+      "entry_rebalance_cost_fraction": 0.0,
+      "final_exit_cost_fraction": 0,
+      "gross_return": 0.0,
+      "net_return": 0.0,
+      "wealth": 1.0,
+      "buy_hold_wealth": 1.4985,
+      "evidence_snapshot_sha256": "9b3f9eb289a11fc73b0520705f2474a49c9c3ca2541a44f98a00c5745759a6f3"
+    },
+    {
+      "decision_at": "2026-01-01T12:00:00Z",
+      "start": "2026-01-01T12:01:00Z",
+      "end": "2026-01-01T13:00:00Z",
+      "polarity": 1.0,
+      "exposure": 1,
+      "turnover": 1,
+      "entry_rebalance_cost_fraction": 0.001,
+      "final_exit_cost_fraction": 0,
+      "gross_return": 0.1,
+      "net_return": 0.09889999999999999,
+      "wealth": 1.0989,
+      "buy_hold_wealth": 1.64835,
+      "evidence_snapshot_sha256": "bad273f9e28fca0292ddc3e9fdd54799d402dcb6cfdbdfa3f8a220dbb1072476"
+    },
+    {
+      "decision_at": "2026-01-01T13:00:00Z",
+      "start": "2026-01-01T13:01:00Z",
+      "end": "2026-01-01T14:00:00Z",
+      "polarity": -0.3333333333333333,
+      "exposure": 0,
+      "turnover": 1,
+      "entry_rebalance_cost_fraction": 0.001,
+      "final_exit_cost_fraction": 0.0,
+      "gross_return": 0.0,
+      "net_return": -0.0010000000000000009,
+      "wealth": 1.0978011,
+      "buy_hold_wealth": 1.5643665674999998,
+      "evidence_snapshot_sha256": "999005b61dd92a71768e433989e337801942cbec22e254abe51bbb61ebea9519"
+    }
+  ],
+  "net_total_return": 0.09780110000000009,
+  "buy_hold_net_total_return": 0.5643665674999998,
+  "excess_return": -0.4665654674999997,
+  "missing_signal_periods": 1,
+  "status": "EXPLORATORY_FIXED_POLICY_REPLAY",
+  "limitations": [
+    "Supplied returns and historical availability require independent validation.",
+    "Threshold, source weights and model must be fixed before held-out evaluation.",
+    "No intraperiod execution, market impact, shorting, tax or out-of-sample guarantee."
+  ]
+}

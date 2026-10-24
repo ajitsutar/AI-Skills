@@ -13,9 +13,10 @@ import math
 import os
 import re
 import time
-from datetime import datetime, timezone
+from datetime import date, datetime, timedelta, timezone
 from pathlib import Path
 from urllib.parse import urlsplit, parse_qsl, urlunsplit
+from zoneinfo import ZoneInfo
 
 from risk_engine import canonical_hash, timestamp
 from trading_calendar import audit_timestamps, sessions
@@ -90,13 +91,39 @@ def point_in_time_fact(companyfacts, namespace, concept, unit, as_of, start=None
 
     No guessing tag synonyms, period aggregation or quarters from YTD totals.
     Ambiguous dimensions remain the caller's filing-review responsibility.
+
+    SEC companyfacts ``filed`` is a date, not a publication timestamp. A date-only
+    filing becomes conservatively eligible at the NEXT America/New_York midnight
+    (including the applicable daylight-saving offset). An aware ``as_of`` timestamp
+    with seconds and a valid Z or HH:MM offset is compared exactly. A date-only
+    ``as_of`` means START of that New York date,
+    never end of day; same-day filings are therefore excluded. Missing filing dates
+    cannot establish eligibility. Naive timestamps and malformed filing dates fail.
+    The original selected row and this public function signature are preserved.
     """
-    records = companyfacts["facts"][namespace][concept]["units"][unit]
-    eligible = [row for row in records if row.get("filed", "9999") <= str(as_of)[:10]
-                and (start is None or row.get("start") == start)
-                and (end is None or row.get("end") == end)]
     if start is None and end is None:
         raise ValueError("Specify an exact period endpoint; no arbitrary latest fact")
+    ny = ZoneInfo('America/New_York')
+    raw_cutoff = str(as_of)
+    if re.fullmatch(r'\d{4}-\d{2}-\d{2}', raw_cutoff):
+        cutoff = datetime.combine(date.fromisoformat(raw_cutoff), datetime.min.time(), ny)
+    else:
+        if not re.fullmatch(r'\d{4}-\d{2}-\d{2}[T ]\d{2}:\d{2}:\d{2}(?:\.\d+)?(?:Z|[+-](?:[01]\d|2[0-3]):[0-5]\d)', raw_cutoff):
+            raise ValueError('SEC as_of requires a date or an aware ISO timestamp with seconds')
+        cutoff = timestamp(raw_cutoff)
+    records = companyfacts["facts"][namespace][concept]["units"][unit]
+    eligible = []
+    for row in records:
+        if (start is not None and row.get('start') != start) or (end is not None and row.get('end') != end):
+            continue
+        filed = row.get('filed')
+        if filed is None:
+            continue
+        if not isinstance(filed, str) or not re.fullmatch(r'\d{4}-\d{2}-\d{2}', filed):
+            raise ValueError('SEC filing date must be YYYY-MM-DD')
+        available_by = datetime.combine(date.fromisoformat(filed)+timedelta(days=1), datetime.min.time(), ny)
+        if available_by <= cutoff:
+            eligible.append(row)
     if not eligible:
         return None
     # Same date with contradictory values must not be silently selected.

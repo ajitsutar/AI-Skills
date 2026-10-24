@@ -170,3 +170,21 @@ Before delivering, compare the explanation with the bound inputs and actual resu
 Label analyst proposals and interpretations separately. State which requested work
 is incomplete and why. Neither a clean receipt nor two matching model answers proves
 universal model independence, source truth or investment performance.
+
+## Review retained model runs against the original request
+
+Establish the authoritative original requested input or mandate from the supplied
+request and its declared source pointer (for example, `requested_inputs`),
+separately from each run's own request.
+Compare each run's complete resolved parameters and source selections against that
+authority. Report unauthorized changes as request-fidelity failures even when the
+run's own bindings, helper invocation and arithmetic are internally consistent.
+If authority is missing or ambiguous, retain that uncertainty rather than choosing
+a run's request as the baseline.
+
+Assess request fidelity, helper execution, artifact completeness, numerical replay
+and final explanation separately. A shared contract hash covers only that contract,
+not necessarily all inputs; inspect the scope of the hash before claiming identity.
+Replaying a run's own inputs can verify its calculation but cannot establish that
+it answered the original request. Preserve original runs and retain new replays
+separately; do not repair historical evidence in place.

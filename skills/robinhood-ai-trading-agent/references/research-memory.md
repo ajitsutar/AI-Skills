@@ -24,8 +24,9 @@ python scripts/research_memory.py verify --root /research/run --input /research/
 python scripts/research_memory.py plan --root /research/run --input /research/run/manifest.json --as-of 2026-10-20T20:30:00Z --hold P1M --universe US_EXCHANGE_LISTED_STOCKS --output /research/refresh-plan.json
 ```
 
-On the next research request, verify the saved inventory, resolve the new mandate
-and create a new run linked to its parent manifest. Recheck SEC/issuer indexes for
+On the next research request, resolve the new mandate and default to full data
+collection. If the user requests partial fetch or reuse, verify the explicitly
+supplied inventory and create a new run linked to its parent manifest. Recheck SEC/issuer indexes for
 new periods, amendments, restatements and material announcements. Reuse unchanged
 primary facts and their calculation bridges after that check; retain original
 retrieval/publication times and record the new check separately. Missing evidence
@@ -40,13 +41,15 @@ risk and eligibility; old conclusions are prior research, not standing buy order
 
 An interrupted **same-contract** collection can use `public_research_fetch.py
 --resume` to retry only failures. It is not a new-date refresh. The shipped public
-collector still downloads fresh provider components for a new run: the memory
-workflow avoids repeating unchanged primary-source diligence but does not promise
-an automatic cross-run vendor-cache shortcut or a particular speedup. A future
-adapter that merges cached data must disclose mixed acquisition, bind every reused
-component to its source hash/time and invalidate it on source revisions. It must
-not claim independent fresh acquisition or cross-model validation from a shared
-cache. User requests for a completely fresh run take precedence over reuse.
+collector downloads all provider components for a new run by default. Its explicit
+`--partial-fetch` mode can reuse unchanged quarterly statements from a supplied
+verified bundle only after current source-index checks. Follow
+[partial-fetch.md](partial-fetch.md) for its receipt schema, baseline preparation
+and fallbacks. Original times, source bytes, component hashes and parent hashes
+remain attached to reused facts. Prices/actions still refresh in full because
+safe adjusted-history tail reconciliation is not implemented. Shared reuse cannot
+establish independent acquisition or a guaranteed speedup. A completely fresh
+request takes precedence; model-native memory is not a portable cache.
 
 Keep every old run immutable, show what changed and what could not be refreshed,
 and retain a small local index pointing to the latest run. Never commit personal

@@ -21,3 +21,19 @@ When adding externally sourced code or substantial text, record the exact source
 revision, modifications and applicable license, and retain required notices. Keep
 source-comparison reports and development history in the local archive. Preserve
 current licensing and dependency notices in standalone copies.
+
+## 5.0 analysis expansion
+
+The technical, fundamental, sentiment and factor toolkit code and fictional fixtures were newly
+authored as original implementations of the attributed mathematical methods. No external
+implementation source, model weights, vendor reports or datasets were copied into this expansion.
+The existing package MIT license applies to its original additions. Attribution is not permission
+to copy third-party code or redistribute weights. Unclear or incompatible materials stay excluded.
+
+## 5.0 multi-asset extension
+
+Derivatives calculations, paper-event accounting, platform evidence assessment and their fictional
+fixtures are original project code. No broker, vendor or publication implementation was copied.
+Method attribution and explicit limits are in [derivatives](references/derivatives-toolkit.md),
+[paper ledger](references/paper-exchange.md) and [platform scope](references/multiasset-platform.md).
+No new third-party dependencies, model weights or market data are bundled.

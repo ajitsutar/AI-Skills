@@ -40,6 +40,10 @@ zero. Inputs cannot supply code, imports, shell commands or executable callbacks
 | `validation.sharpe` | Net excess `returns,trial_sharpes,effective_trials,iid_assumption_justified`; same unannualized frequency |
 | `validation.bootstrap` | `returns,block_length,replications,seed`; seeded circular block interval |
 | `validation.factors` | `observations:[{timestamp,excess_return,factors:{name:value}}],factor_names,lags` |
+| `derivatives.calculate` | `document`; exact [derivatives contract](derivatives-toolkit.md), declared input availability and information cutoff; projected cashflow dates are not observed settlements |
+| `paper.replay` | `document`; [paper event ledger](paper-exchange.md), supplied hypothetical fills and explicit currency/cutoff |
+| `platform.assess` | `document`; [host evidence catalog](platform-readiness.md), evidence completeness only, never production certification |
+| `timeseries.run` | `document`; [GBM, causal derivatives or fixed-pair OLS](time-series-toolkit.md), nested inputs.as_of must not exceed contract.as_of |
 | `validation.promotion` | `evidence,criteria`; complete aligned net-excess trial returns and frozen/test chronology |
 | `portfolio.construct` | `document` with allocation contract below |
 | `risk.option` | `spot,strike,years,volatility,rate,dividend_yield,right,exercise_style`; European only |

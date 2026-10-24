@@ -12,6 +12,14 @@ across news, analysts, price/volume, positioning and social sources. It does not
 add a trained sentiment model or change the discovery score. See
 [sentiment review](references/news-and-guidance.md#complete-the-sentiment-review).
 
+Full fetch remains the default. [Optional partial fetch](references/partial-fetch.md)
+can reuse unchanged quarterly statements from an explicitly supplied, sealed
+portable bundle after current source-index and revision checks. It refreshes
+membership, quotes and full price/action history; estimates, news and events still
+need current review. Codex, Muse and Claude use the same opt-in interface and
+fall back to fresh acquisition when the bundle or required checks are unavailable.
+Hidden model caches are neither assumed nor inspected; no speedup is guaranteed.
+
 A self-contained skill for investment recommendations, reproducible stock research,
 portfolio analysis and quantitative work across arbitrary holding periods. It
 combines public evidence with replayable calculations and hands requested trades
@@ -68,6 +76,7 @@ Final reporting retains source and scenario checks for factual claims.
 | Strategy evaluation | Causal splits, purging, HAC, block bootstrap, multiple-testing review and retained evidence | [Quant research](references/quant-research.md) |
 | Performance accounting | Execution shortfall, cash ladders, TWR/XIRR, attribution and portfolio simulation | [Manager workflow](references/institutional-manager.md) |
 | Reproducibility | Frozen contracts/data, explicit calculation defaults, runtime receipts, numerical replay and separate acquisition comparisons | [Model-independent research](references/model-independent-research.md) |
+| Optional partial collection | Explicit sealed research bundle, source-checked unchanged statements, original times and parent hashes; full fetch by default | [Partial fetch](references/partial-fetch.md) |
 | Report facts | Private JSON facts and readable Markdown from retained quant/public-VQM results, with source pointers, supported units and denominators, explicit unknowns and separately declared custom labels | [Report facts](references/report-facts.md) |
 | Run and report | Execute explicit quant jobs or analyst cohorts and retain their inputs, results and reports; inspect exact handoff payload differences without execution gates | [Run and report](references/run-and-report.md) |
 | Research alignment | Bind request roles and records, distinguish unknown evidence, preserve flexible horizons and ranking methods, and reconcile cash, fees, valuation and causal strategies | [Research alignment](references/research-alignment.md) |
@@ -275,3 +284,39 @@ quantities, and optional scenarios retain separate source opening conventions.
 
 Source-context evidence distinguishes supplied analytical marks and cost
 assumptions from unverified actual execution terms.
+
+## Expanded analysis toolkit (5.0)
+
+The [analysis contracts](references/analysis-contracts.md) route reproducible offline calculations:
+
+- [Technical](references/technical-toolkit.md): explicit OHLCV indicators, sessions, chart geometry,
+  SVG charts and costed next-bar replay. Supplied market-depth snapshots are not a live feed.
+- [Fundamental](references/fundamental-toolkit.md): ratios and accounting screens, reconciled
+  simplified forecasts, FCFF/FCFE DCF, reverse DCF, DDM, residual income, SOTP and seeded scenarios.
+- [Sentiment](references/sentiment-toolkit.md): entity/aspect evidence, weighted time decay,
+  duplicate review, polarity trends, calibration and causal costed replay. An optional pinned
+  local transformer adapter requires separately permitted model weights and dependencies.
+- [Factors](references/factor-toolkit.md): sector winsorization/z-scores, FF3/FF5 attribution,
+  generic exposure risk and neutralization, training-only PCA and seeded clustering.
+
+All four expose versioned calculations through `quant_workbench.py`. Formula conventions,
+missing-data treatment and full input packets are retained for cross-model replay. Independent
+language-model agreement and profitable trading are not established by software tests.
+Quantum sentiment, proprietary Barra replication and unvalidated RL/recurrent forecasting are
+not bundled. Earlier news/sentiment review and all prior workflows remain available.
+
+## Multi-asset research and paper platform (5.0)
+
+Read [platform scope](references/multiasset-platform.md) for the supported instrument conventions,
+[derivatives](references/derivatives-toolkit.md) for explicit valuation models,
+[paper ledger](references/paper-exchange.md) for hypothetical event accounting and
+[platform evidence](references/platform-readiness.md) for scoped host qualification evidence.
+The package supports bounded research across equities/ETFs, options, futures, FX, bonds and
+spot crypto; live capability and production readiness must be established on the actual host.
+It does not bundle a live order service or claim that every modeled asset is tradable there.
+
+The [time-series research tools](references/time-series-toolkit.md) add seeded
+GBM scenarios, timestamp-aware backward trend derivatives and fixed-pair train-only
+OLS spread normalization. Their [examples](EXAMPLE-PROMPTS.md) require explicit
+units, model assumptions and cutoffs. They do not establish ARMA support,
+cointegration, calibrated forecasts or an executable arbitrage strategy.

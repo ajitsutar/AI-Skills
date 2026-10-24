@@ -70,3 +70,20 @@ Official API and methodology references are linked from references/news-and-guid
 and references/analyst-research.md. Public availability is not permission to
 redistribute full news articles, reports or provider data; retain only permitted
 local evidence and exclude personal source archives from releases.
+
+## Optional sentiment model runtime (5.0)
+
+No transformer code, model weights or tokenizer data are redistributed with this package.
+The original optional adapter can call separately installed Hugging Face Transformers
+(Apache-2.0), PyTorch (BSD-style license) and safetensors (Apache-2.0). Their installed versions
+and distribution notices must be retained separately. The adapter performs no installation or
+download. Model weights and training datasets have independent terms; software license terms
+do not grant rights to them. For example, the current ProsusAI/finbert model card specifies
+CC-BY-NC-SA-4.0 for its weights. It is not bundled or assumed unrestricted. The caller supplies
+license identification, source, intended use and permission attestation, plus pinned file hashes.
+License metadata is a recorded assertion, not automatic legal verification.
+
+Primary license sources: [Transformers](https://github.com/huggingface/transformers/blob/main/LICENSE),
+[PyTorch](https://github.com/pytorch/pytorch/blob/main/LICENSE),
+[safetensors](https://github.com/huggingface/safetensors/blob/main/LICENSE),
+[FinBERT model card](https://huggingface.co/ProsusAI/finbert).

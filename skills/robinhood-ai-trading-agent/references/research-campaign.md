@@ -80,6 +80,11 @@ Use `--universe-only` to inspect membership without requesting financial data; t
 does **not** constitute a completed stock screen. `--resume` retains the frozen
 universe and completed per-security checkpoints, including after an interrupted
 collection. An explicit changed universe on resume is rejected; start a new run.
+New-date runs collect all components by default. Explicit user opt-in can use
+[partial-fetch](partial-fetch.md) with a supplied verified parent bundle and
+current retained source-index checks. It never silently discovers a host's cache
+or reduces the current universe to previous winners. Resume and partial fetch
+cannot be combined: resume preserves the original contract and source times.
 
 The S&P preset retains fresh constituents and its official SPY fund-proxy check.
 For every stock in the chosen universe the adapter obtains Yahoo quarterly

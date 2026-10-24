@@ -1,0 +1,11 @@
+{
+  "operation": "factor.normalize",
+  "inputs": {
+    "rows": [
+      {"id":"A","sector":"fictional","available_at":"2026-01-01T00:00:00Z","values":{"yield":1,"constant":3}},
+      {"id":"B","sector":"fictional","available_at":"2026-01-01T00:00:00Z","values":{"yield":2,"constant":3}},
+      {"id":"C","sector":"fictional","available_at":"2026-01-01T00:00:00Z","values":{"yield":3,"constant":3}}
+    ],
+    "fields":["yield","constant"],"as_of":"2026-01-02T00:00:00Z","lower":0,"upper":1,"min_group":3
+  }
+}

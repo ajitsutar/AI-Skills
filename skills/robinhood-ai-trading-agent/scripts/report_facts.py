@@ -55,7 +55,9 @@ QUANT_FILES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
                'horizon_review.py', 'cash_benchmark.py', 'trading_calendar.py', 'allocation_policy.py',
                'portfolio_decision.py', 'planning_roles.py', 'portfolio_projection.py', 'planning_comparison.py',
                'flow_normalization.py', 'price_comparison.py', 'recommendation_report.py', 'employer_reference.py',
-               'equity_cash_comparison.py', 'source_exposure.py')
+               'equity_cash_comparison.py', 'source_exposure.py', 'technical_toolkit.py',
+               'fundamental_toolkit.py', 'sentiment_toolkit.py', 'factor_research.py',
+               'derivatives_toolkit.py', 'paper_exchange.py', 'platform_readiness.py', 'time_series_toolkit.py')
 
 
 def digest(value):

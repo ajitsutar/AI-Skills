@@ -1,0 +1,15 @@
+{
+  "currency": "USD",
+  "amount_unit": "USD millions",
+  "example_context": "Fictional offline assumptions; not observed issuer data.",
+  "operation": "altman",
+  "company_type": "public_manufacturing",
+  "annual_periods_comparable": true,
+  "assets": 100,
+  "working_capital": 20,
+  "retained_earnings": 10,
+  "ebit": 10,
+  "market_equity": 60,
+  "total_liabilities": 40,
+  "sales": 100
+}

@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "action": "research",
+  "operation": "futures_pnl",
+  "currency": "USD",
+  "inputs": {
+    "signed_contracts": 2,
+    "multiplier": 1000,
+    "price_unit": "USD/barrel",
+    "entry_price": 10,
+    "settlements": [
+      {
+        "price": -5,
+        "at": "2026-10-20T21:00:00Z"
+      },
+      {
+        "price": -10,
+        "at": "2026-10-21T21:00:00Z"
+      }
+    ],
+    "fees": 12,
+    "settlement_method": "variation_margin",
+    "rounding": "per_contract_half_up",
+    "currency_decimals": 2,
+    "terminal_state": "physical_delivery_pending",
+    "entry_at": "2026-10-20T16:00:00Z"
+  },
+  "information_cutoff": "2026-10-23T23:00:00Z",
+  "inputs_available_at": "2026-10-23T22:00:00Z"
+}

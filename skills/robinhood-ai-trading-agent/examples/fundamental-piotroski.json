@@ -1,0 +1,32 @@
+{
+  "currency": "USD",
+  "amount_unit": "USD millions",
+  "example_context": "Fictional offline assumptions; not observed issuer data.",
+  "operation": "piotroski",
+  "company_type": "nonfinancial",
+  "annual_periods_comparable": true,
+  "prior": {
+    "beginning_assets": 100,
+    "assets": 100,
+    "income_before_extraordinary": 5,
+    "cfo": 4,
+    "long_term_debt": 30,
+    "current_assets": 30,
+    "current_liabilities": 20,
+    "sales": 100,
+    "cogs": 70
+  },
+  "current": {
+    "beginning_assets": 100,
+    "assets": 100,
+    "income_before_extraordinary": 10,
+    "cfo": 12,
+    "long_term_debt": 20,
+    "current_assets": 40,
+    "current_liabilities": 20,
+    "sales": 120,
+    "cogs": 72,
+    "equity_issued": false
+  },
+  "turnover_basis": "beginning_assets"
+}

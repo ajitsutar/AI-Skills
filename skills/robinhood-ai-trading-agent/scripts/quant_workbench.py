@@ -40,9 +40,37 @@ import recommendation_report
 import employer_reference
 import equity_cash_comparison
 import source_exposure
+import technical_toolkit
+import fundamental_toolkit
+import sentiment_toolkit
+import factor_research
+import derivatives_toolkit
+import paper_exchange
+import platform_readiness
+import time_series_toolkit
 from quant_common import digest, require
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def technical_analysis(request, data_available_at):
+    """Bind completed-bar availability explicitly, including open-labelled/date-only bars."""
+    from price_audit import timestamp
+    available = timestamp(data_available_at)
+    for bar in technical_toolkit.validate_bars(request['bars']):
+        stamp = bar['timestamp']
+        if len(stamp) == 10:
+            require(stamp <= available.date().isoformat(), 'BAR_DATE_AFTER_DATA_AVAILABILITY')
+        else:
+            require(timestamp(stamp) <= available, 'BAR_AFTER_DATA_AVAILABILITY')
+    if 'depth_snapshot' in request:
+        require(timestamp(request['depth_snapshot']['as_of']) <= available, 'DEPTH_AFTER_DATA_AVAILABILITY')
+    result = technical_toolkit.analyze(request)
+    result['data_available_at'] = data_available_at
+    result['availability_basis'] = 'Caller-declared completed-bar availability, not inferred from open timestamps or independently verified.'
+    return result
+
+
 OPERATIONS = {
     'validation.folds': quant_validation.purged_walk_forward,
     'validation.tail': quant_validation.tail_risk,
@@ -113,6 +141,24 @@ OPERATIONS = {
     'ranking.replay': ranking_alignment.replay_ranking,
     'ranking.compare': ranking_alignment.compare_rankings,
 }
+ANALYSIS_OPERATIONS = {
+    'technical.analyze': technical_analysis,
+    'fundamental.calculate': fundamental_toolkit.run,
+    'sentiment.analyze': sentiment_toolkit.analyze,
+    'sentiment.trend': sentiment_toolkit.trend,
+    'sentiment.fuse': sentiment_toolkit.fuse,
+    'sentiment.calibrate': sentiment_toolkit.calibrate,
+    'sentiment.backtest': sentiment_toolkit.backtest,
+    **factor_research.OPERATIONS,
+}
+OPERATIONS.update(ANALYSIS_OPERATIONS)
+MULTIASSET_OPERATIONS = {
+    'derivatives.calculate': derivatives_toolkit.run,
+    'paper.replay': paper_exchange.replay,
+    'platform.assess': platform_readiness.assess,
+    'timeseries.run': time_series_toolkit.run,
+}
+OPERATIONS.update(MULTIASSET_OPERATIONS)
 MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'quant_portfolio.py', 'multi_asset_risk.py', 'investment_ops.py',
            'primary_financial_data.py', 'price_audit.py', 'financial_normalize.py',
@@ -125,7 +171,9 @@ MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'horizon_review.py', 'cash_benchmark.py', 'trading_calendar.py', 'allocation_policy.py',
            'portfolio_decision.py', 'planning_roles.py', 'portfolio_projection.py', 'planning_comparison.py',
            'flow_normalization.py', 'price_comparison.py', 'recommendation_report.py', 'employer_reference.py',
-           'equity_cash_comparison.py', 'source_exposure.py')
+           'equity_cash_comparison.py', 'source_exposure.py', 'technical_toolkit.py',
+           'fundamental_toolkit.py', 'sentiment_toolkit.py', 'factor_research.py',
+           'derivatives_toolkit.py', 'paper_exchange.py', 'platform_readiness.py', 'time_series_toolkit.py')
 
 
 def implementation_hash():
@@ -154,7 +202,12 @@ def resolved_inputs(operation, inputs):
     require(isinstance(inputs, dict), 'JOB_INPUT_OBJECT_REQUIRED')
     bound = inspect.signature(OPERATIONS[operation]).bind(**inputs)
     bound.apply_defaults()
-    return copy.deepcopy(dict(bound.arguments))
+    resolved = copy.deepcopy(dict(bound.arguments))
+    if operation == 'technical.analyze':
+        resolved['request'] = technical_toolkit.resolve_request(resolved['request'])
+    if operation.startswith('sentiment.'):
+        resolved['document'] = sentiment_toolkit.resolve_document(operation.split('.')[1], resolved['document'])
+    return resolved
 
 
 def prepare(document):
@@ -185,6 +238,35 @@ def run(document):
         require(isinstance(job['inputs'], dict), 'JOB_INPUT_OBJECT_REQUIRED')
         try:
             inputs = resolved_inputs(job['operation'], job['inputs'])
+            if job['operation'] in MULTIASSET_OPERATIONS:
+                payload = inputs['document']
+                if job['operation'] in ('paper.replay', 'platform.assess'):
+                    require(timestamp(payload['as_of']) <= timestamp(contract['as_of']), 'FUTURE_MULTI_ASSET_CUTOFF')
+                if job['operation'] == 'paper.replay':
+                    require(payload['base_currency'] == contract['base_currency'], 'PAPER_CURRENCY_MISMATCH')
+                if job['operation'] == 'derivatives.calculate':
+                    require(payload['currency'] == contract['base_currency'], 'DERIVATIVES_CURRENCY_MISMATCH')
+                    require(timestamp(payload['information_cutoff']) <= timestamp(contract['as_of']), 'FUTURE_DERIVATIVES_CUTOFF')
+                if job['operation'] == 'timeseries.run':
+                    require(timestamp(payload['inputs']['as_of']) <= timestamp(contract['as_of']), 'FUTURE_TIME_SERIES_CUTOFF')
+            if job['operation'] in ANALYSIS_OPERATIONS:
+                cutoff = timestamp(contract['as_of'])
+                if job['operation'] == 'technical.analyze':
+                    require(timestamp(inputs['data_available_at']) <= cutoff, 'FUTURE_TECHNICAL_DATA')
+                if job['operation'] == 'fundamental.calculate':
+                    require(inputs['d']['currency'] == contract['base_currency'], 'FUNDAMENTAL_CURRENCY_MISMATCH')
+                if job['operation'] in ('factor.normalize', 'sentiment.analyze', 'sentiment.fuse'):
+                    payload = inputs.get('document',inputs)
+                    require(timestamp(payload['as_of']) <= cutoff, 'FUTURE_ANALYSIS_CUTOFF')
+                if job['operation'] == 'factor.fama_french':
+                    require(all(timestamp(r['timestamp']) <= cutoff for r in inputs['rows']), 'FUTURE_FACTOR_OBSERVATION')
+                if job['operation'] == 'sentiment.trend':
+                    require(all(timestamp(t) <= cutoff for t in inputs['document']['cutoffs']), 'FUTURE_TREND_CUTOFF')
+                if job['operation'] == 'sentiment.backtest':
+                    require(all(timestamp(r['end']) <= cutoff for r in inputs['document']['periods']), 'FUTURE_BACKTEST_DATA')
+                if job['operation'] == 'sentiment.calibrate':
+                    require(all(timestamp(r['predicted_at']) <= cutoff and timestamp(r['label_available_at']) <= cutoff
+                                for r in inputs['document']['rows']), 'FUTURE_CALIBRATION_DATA')
             if job['operation'] == 'portfolio.construct':
                 require(inputs['document']['horizon_id'] == contract['horizon_id'] and
                         inputs['document']['currency'] == contract['base_currency'], 'WORKBENCH_PORTFOLIO_CONTRACT')

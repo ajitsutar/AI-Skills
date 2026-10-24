@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "action": "research",
+  "operation": "option_crr",
+  "currency": "USD",
+  "inputs": {
+    "spot": 100,
+    "strike": 100,
+    "time_years": 1,
+    "risk_free_rate": 0.05,
+    "dividend_yield": 0.02,
+    "volatility": 0.2,
+    "steps": 200,
+    "right": "put",
+    "exercise": "american",
+    "dividend_model": "continuous_yield",
+    "rate_compounding": "continuous"
+  },
+  "information_cutoff": "2026-10-23T23:00:00Z",
+  "inputs_available_at": "2026-10-23T22:00:00Z"
+}

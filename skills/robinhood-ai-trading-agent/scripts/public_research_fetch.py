@@ -25,6 +25,7 @@ from zoneinfo import ZoneInfo
 from public_research import digest, profile, incomplete_components
 from listed_universe import DIRECTORIES, build_universe
 from trading_calendar import sessions
+from incremental_research import PartialFetch
 
 _request_lock = threading.Lock()
 _next_request = 0.0
@@ -177,7 +178,7 @@ def acquire_universe(folder, supplied=None, preset=None, price_date=None):
     return data
 
 
-def fetch_row(identity, grid, folder, prior=None):
+def fetch_row(identity, grid, folder, prior=None, reusable=None, source_checks=None):
     import yfinance as yf
     symbol = identity['symbol']
     provider_symbol = identity.get('provider_symbol', symbol.replace('.', '-'))
@@ -200,6 +201,16 @@ def fetch_row(identity, grid, folder, prior=None):
             end=(datetime.fromisoformat(grid[-1]['date']) + timedelta(days=1)).date().isoformat(),
             auto_adjust=False, repair=False, actions=True, raise_errors=True, timeout=20), price=True)),
     ):
+        if (reusable and key in reusable
+                and (not result.get('info', {}).get('financialCurrency')
+                     or result['info']['financialCurrency'] ==
+                     reusable[key]['source_check']['metadata']['currency'])):
+            retained = reusable[key]
+            result[key] = retained['value']
+            result.setdefault('component_retrieved_at', {})[key] = retained['retrieved_at']
+            result.setdefault('component_source_checks', {})[key] = retained['source_check']
+            result.setdefault('component_acquisition', {})[key] = retained['provenance']
+            continue
         if needed is not None and key not in needed:
             continue
         try:
@@ -219,10 +230,13 @@ def fetch_row(identity, grid, folder, prior=None):
                     result['security_type_basis'] = 'Yahoo EQUITY confirmation; common/ADR subtype and issuer identity still need primary review'
             result[key] = value
             result.setdefault('component_retrieved_at', {})[key] = now()
+            result.setdefault('component_acquisition', {})[key] = {'acquisition': 'fresh_network_pull'}
         except Exception as exc:
             result['errors'].append({'component': key, 'error': type(exc).__name__ + ':' + str(exc)})
             result[key] = {} if key == 'info' else {'index': [], 'columns': [], 'data': []}
     result['completed_at'] = now()
+    if source_checks:
+        source_checks.attach_current_checks(result, result['completed_at'])
     save(folder / 'raw' / ('security-' + provider_symbol + '.json'), result)
     return result
 
@@ -257,12 +271,20 @@ def argument_parser():
         help='Default for a new run: us-listed. An omitted selection on resume retains the frozen universe.')
     parser.add_argument('--universe-only', action='store_true', help='Freeze and audit membership; do not fetch prices/financials or claim a completed stock screen')
     parser.add_argument('--resume', action='store_true', help='Retry failed components of this run, preserving old snapshots')
+    parser.add_argument('--partial-fetch', action='store_true', help='Opt in to source-checked statement reuse from an explicit sealed bundle; full fetch remains default')
+    parser.add_argument('--reuse-from', type=Path, help='Explicit portable parent research-library root; no hidden cache discovery')
+    parser.add_argument('--reuse-manifest', type=Path, help='Sealed research_memory manifest covering exactly one parent snapshot and its source-index evidence')
+    parser.add_argument('--freshness-receipt', type=Path, help='Current source-index observations; can also bind source checks during a full fetch')
     parser.add_argument('--workers', type=int, default=4, choices=range(1, 5))
     return parser
 
 
 def main():
     args = argument_parser().parse_args()
+    if args.resume and (args.partial_fetch or args.reuse_from or args.reuse_manifest or args.freshness_receipt):
+        raise ValueError('RESUME_AND_NEW_RUN_SOURCE_CHECKS_ARE_DISTINCT')
+    if not args.partial_fetch and (args.reuse_from or args.reuse_manifest):
+        raise ValueError('PARENT_REUSE_REQUIRES_EXPLICIT_PARTIAL_FETCH')
     decision = datetime.fromisoformat(args.decision_at.replace('Z', '+00:00'))
     if decision.tzinfo is None:
         raise ValueError('decision-at needs timezone')
@@ -279,7 +301,7 @@ def main():
     prompt = args.prompt_file.read_text(encoding='utf-8-sig').strip()
     contract = {'profile': profile(), 'profile_sha256': digest(profile()), 'defined_at': now(),
         'acquisition_code_sha256': {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
-            for name in ('public_research_fetch.py', 'listed_universe.py')},
+            for name in ('public_research_fetch.py', 'listed_universe.py', 'incremental_research.py')},
         'decision_at': args.decision_at, 'price_date': grid[-1]['date'], 'prompt': prompt,
         'prompt_sha256': digest(prompt), 'hold': args.hold, 'acquisition': 'independent_fresh_network_pull',
         'universe_selection': universe_spec(args.universe_preset, args.universe),
@@ -309,6 +331,8 @@ def main():
             'corrupt_checkpoints_retained': corrupt,
             'contract_sha256': digest(contract), 'scope': 'Only failed acquisition components; no ranking-based retries'})
     else:
+        if args.partial_fetch:
+            contract['acquisition'] = 'explicit_optional_partial_fetch'
         save(folder / 'contract-before-fetch.json', contract)
         universe = acquire_universe(folder, args.universe, args.universe_preset, grid[-1]['date'])
     print('Universe', len(universe['rows']), 'securities; close', grid[-1]['date'], flush=True)
@@ -316,6 +340,11 @@ def main():
         print('MEMBERSHIP_ONLY: no financial/price screen performed', flush=True)
         return
     rows = []
+    checks = None
+    if args.partial_fetch or args.freshness_receipt:
+        checks = PartialFetch(args.reuse_from, args.reuse_manifest, args.freshness_receipt,
+                              output_folder, args.decision_at,
+                              baseline_only=not args.partial_fetch)
     with ThreadPoolExecutor(max_workers=args.workers) as pool:
         futures = []
         for identity in universe['rows']:
@@ -323,7 +352,9 @@ def main():
             if old is not None and not incomplete_components(old):
                 rows.append(old)
             else:
-                futures.append(pool.submit(fetch_row, identity, grid, output_folder, old))
+                reusable = checks.choose(identity, contract['profile_sha256'], now()) if args.partial_fetch else None
+                futures.append(pool.submit(fetch_row, identity, grid, output_folder, old,
+                                           reusable, checks))
         for future in as_completed(futures):
             rows.append(future.result())
             if len(rows) % 25 == 0 or len(rows) == len(universe['rows']):
@@ -336,6 +367,10 @@ def main():
         'universe_symbols': sorted(r['symbol'] for r in rows), 'rows': sorted(rows, key=lambda r: r['symbol']),
         'completed_at': now(), 'dependencies': {n: importlib.metadata.version(n)
             for n in ('yfinance', 'pandas', 'exchange_calendars')}}
+    if checks:
+        acquisition_receipt = checks.receipt(rows)
+        save(output_folder / 'partial-fetch-receipt.json', acquisition_receipt)
+        snapshot['partial_fetch'] = acquisition_receipt
     snapshot['essential_acquisition_errors'] = sum(any(e['component'] in
         {'info', 'income', 'balance', 'cashflow', 'history'} for e in r['errors']) for r in rows)
     save(output_folder / 'snapshot.json', snapshot)

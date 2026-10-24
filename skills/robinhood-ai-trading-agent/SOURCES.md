@@ -49,3 +49,23 @@ research ideas; they are separate from reuse permission for source code or artic
 For implementation origins, audit limits and the replacement of inherited
 material, read [PROVENANCE.md](PROVENANCE.md). For the external numerical backend
 and other dependencies, read [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md).
+
+## 5.0 calculation methods
+
+Detailed method sources and exact conventions are recorded in [technical](references/technical-toolkit.md),
+[fundamental](references/fundamental-toolkit.md), [sentiment](references/sentiment-toolkit.md) and
+[factor](references/factor-toolkit.md) references. These are formula/API citations, not imported code.
+The supplied Google AI Mode summaries were discovery inputs, not implementation authorities.
+Quantum sentiment and unsupported promises of trading advantage were not adopted.
+
+## 5.0 multi-asset extension
+
+Derivatives calculations, paper-event accounting, platform evidence assessment and their fictional
+fixtures are original project code. No broker, vendor or publication implementation was copied.
+Method attribution and explicit limits are in [derivatives](references/derivatives-toolkit.md),
+[paper ledger](references/paper-exchange.md) and [platform scope](references/multiasset-platform.md).
+No new third-party dependencies, model weights or market data are bundled.
+
+Original GBM simulation, backward trend derivatives and fixed-pair OLS follow the
+explicit methods and primary attributions in [time-series research](references/time-series-toolkit.md).
+These formula references do not imply copied implementation code or validated alpha.

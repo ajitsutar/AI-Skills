@@ -354,7 +354,7 @@ class ReplayTests(unittest.TestCase):
                              'financial.equity_cash_comparison', 'planning.source_allocation_context'}
         self.assertTrue(source_operations <= set(workbench.OPERATIONS))
         self.assertEqual({j['operation'] for j in doc['jobs']},
-                         set(workbench.OPERATIONS) - source_operations)
+                         set(workbench.OPERATIONS) - source_operations - set(workbench.ANALYSIS_OPERATIONS) - set(workbench.MULTIASSET_OPERATIONS))
 
     def fixture(self):
         return {'schema_version': 1, 'contract': {'prompt': 'Fictional risk review', 'purpose': 'compatibility',

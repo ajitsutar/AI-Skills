@@ -1,11 +1,11 @@
 ---
 name: robinhood-ai-trading-agent
-description: Investment recommendations, reproducible stock research, portfolio analysis, quantitative strategy evaluation and broker handoff across arbitrary holding periods. Use for stock selection, investment decisions, risk and performance analysis, and carrying the user's trading instructions to available host tools.
+description: Investment recommendations, reproducible equity and multi-asset research, portfolio risk, derivatives calculations, paper-event replay and native broker handoff across holding periods. Use for investment decisions, quantitative strategy evaluation, research and paper testing, and assessing evidence for actual host capabilities.
 ---
 
-# Robinhood Quant Research and Portfolio Agent
+# Robinhood Multi-Asset Quant Research and Portfolio Agent
 
-Package version: **4.15.15 - October 22, 2026**.
+Package version: **5.0.0 - October 23, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -177,6 +177,14 @@ then review primary evidence and the requested horizon in its order. Use
 `scripts/research_handoff.py` for the final computed research ordering. A clean-slate
 request omits previous preferences and picks; it does not erase broker history.
 
+Full data collection is the default. Use [optional partial-fetch](references/partial-fetch.md)
+only when the user explicitly requests partial collection or reuse of a supplied
+portable research bundle. Codex, Muse, Claude and other hosts follow the same
+opt-in route; never assume their hidden caches persist or contain current data.
+Missing or incompatible reuse evidence falls back to fresh acquisition. Preserve
+original retrieval times and current source checks, refresh changing evidence and
+rerank the whole requested universe. A shared cache is not independent acquisition.
+
 The strict filing-based `vqm-fundamental` route remains available separately.
 For a retained snapshot, use [ranking alignment](references/ranking-alignment.md)
 to identify its bound profile and compatible scorer. A mismatch with the public
@@ -249,6 +257,9 @@ supported operation, then compare the explanation with retained facts. Use
 `research_contracts.py` for source/role, horizon and ranking-method receipts;
 do not substitute sample constraints, unrelated record dates or a different strategy.
 Receipts disclose uncertainty and do not infer the user's intent or authenticate sources.
+For retained model-run reviews, follow [original-request fidelity](references/research-alignment.md#review-retained-model-runs-against-the-original-request):
+compare every run with the authoritative requested input separately from its own
+internal consistency and numerical replay.
 
 For supported explicit quant requests, use [run and report](references/run-and-report.md)
 to compute and retain the same inputs, defaults, results and facts in one workflow.
@@ -425,6 +436,25 @@ implications. Missing `arch`, a failed fit or insufficient history is a disclose
 research limitation, never an execution gate. Optional stock-relative interval
 movement diagnostics likewise describe evidence and uncertainty; they neither
 approve nor veto an order. Never claim an unrun model was computed.
+
+## Technical, fundamental and sentiment toolkits
+
+For cross-asset research, paper scenarios or production-readiness questions, read
+[multi-asset platform scope](references/multiasset-platform.md). Distinguish
+implemented calculations, hypothetical paper accounting, and actual native-host
+capabilities. A package version, complete evidence catalog or successful replay
+does not by itself establish a production deployment.
+
+For the expanded calculation modules, read [analysis contracts](references/analysis-contracts.md)
+and only the domain reference needed: [technical](references/technical-toolkit.md),
+[fundamental](references/fundamental-toolkit.md), [sentiment](references/sentiment-toolkit.md),
+[factor research](references/factor-toolkit.md), or [time-series scenarios and diagnostics](references/time-series-toolkit.md). Use the implemented helper, explicit units,
+formula variant and frozen parameters rather than independently reconstructing its arithmetic.
+Do not substitute missing source facts or silently change a method to obtain a result.
+Use `quant_workbench.py prepare`, `run` and `verify` for portable frozen calculations.
+The sentiment transformer adapter is optional and local-only; its model weights and runtime
+are not bundled. Report unavailable dependencies and distinguish supplied interpretations,
+rule-based scores, model outputs and validated predictions. No calculation alone proves alpha.
 
 ## Handoff and reporting
 

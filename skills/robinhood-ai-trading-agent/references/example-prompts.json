@@ -896,7 +896,11 @@
         },
         {
           "title": "Refresh without repeating everything",
-          "prompt": "Refresh [SAVED CAMPAIGN] for [NEW CUTOFF]. Verify its manifest, reuse unchanged primary evidence after revalidation, refresh changing prices/news/events and rerank the full eligible universe."
+          "prompt": "Use optional partial fetch for [SUPPLIED PORTABLE CAMPAIGN BUNDLE] at [NEW CUTOFF]. Verify its manifest and current source-index evidence before reusing unchanged statements. Refresh membership, quotes, full history/actions, estimates, news and events; rerank the whole eligible universe. Fall back to fresh acquisition for missing or incompatible evidence and retain original retrieval times and parent hashes."
+        },
+        {
+          "title": "Use the same optional partial fetch across models",
+          "prompt": "Have Codex, Muse or Claude use optional partial fetch with [EXPLICIT PORTABLE BUNDLE] and [CURRENT SOURCE CHECKS]. Use the same skill interface rather than relying on hidden model caches. Keep fresh acquisition as the default without opt-in, disclose fallbacks and label shared reuse as shared acquisition, not an independent research replication."
         },
         {
           "title": "Resume an incomplete full-market scan",
@@ -1199,6 +1203,215 @@
         {
           "title": "Respect an offline research scope",
           "prompt": "Analyze only the attached frozen data, with no network acquisition. Run all supported calculations, retain missing source limitations, and separate that offline result from any proposed future data collection."
+        }
+      ]
+    },
+    {
+      "id": "technical-toolkit",
+      "title": "Reproducible technical indicators and charts",
+      "audience": "Intermediate to quant",
+      "guides": [
+        "references/technical-toolkit.md",
+        "references/analysis-contracts.md"
+      ],
+      "prompts": [
+        {
+          "title": "Compute a declared indicator set",
+          "prompt": "Analyze [TICKER] for a [HOLDING PERIOD] using my dated OHLCV file. Compute EMA, RSI, MACD, Bollinger bands, ATR, ADX, stochastic, OBV and Ichimoku with explicit periods, seed conventions, warmup nulls and price-adjustment basis. Retain the frozen calculation and distinguish observations from trade hypotheses."
+        },
+        {
+          "title": "Compare session and anchored VWAP",
+          "prompt": "Using these intraday bars and explicit exchange-session labels, compare session VWAP with VWAP anchored at [TIMESTAMP]. Explain the volume/price basis and do not reconstruct intraday VWAP from daily bars."
+        },
+        {
+          "title": "Plot declared levels and candle patterns",
+          "prompt": "Render an SVG chart from my retained OHLCV bars with moving averages and Bollinger bands. Show the supplied Fibonacci swing and causal support/resistance, report candlestick rule definitions, and label bar-based volume profile as an approximation."
+        },
+        {
+          "title": "Replay an indicator hypothesis after costs",
+          "prompt": "Freeze this indicator hypothesis and parameters before evaluation. Replay close-time signals at subsequent bar opens using supplied costs, preserve missing/warmup periods, and compare with buy-and-hold. Do not choose parameters using the evaluation period."
+        },
+        {
+          "title": "Inspect supplied market depth",
+          "prompt": "Calculate spread and size imbalance from this timestamped depth snapshot. Keep the result separate from historical OHLCV indicators and explain why the snapshot cannot establish executable liquidity or a durable signal."
+        }
+      ]
+    },
+    {
+      "id": "fundamental-toolkit",
+      "title": "Accounting quality and explicit valuation models",
+      "audience": "Intermediate to expert",
+      "guides": [
+        "references/fundamental-toolkit.md",
+        "references/analysis-contracts.md"
+      ],
+      "prompts": [
+        {
+          "title": "Compare accounting screen variants",
+          "prompt": "Using attached comparable annual financials, calculate Piotroski, Altman and Beneish where applicable. Freeze the exact model variants and asset denominators, cite each source fact, and retain missing values and invalid domains instead of filling them."
+        },
+        {
+          "title": "Reconcile operating forecasts and DCF",
+          "prompt": "Build a five-year annual forecast from my explicit operating and financing assumptions. Reconcile income, cash and balance sheets; calculate FCFF and FCFE valuations with the appropriate discount basis and an explicit equity bridge. Report omitted accounting items."
+        },
+        {
+          "title": "Solve price-implied cash growth",
+          "prompt": "Use reverse DCF to solve the constant cash-flow growth implied by [PRICE] under my supplied assumptions. Preserve the growth bracket, terminal cash convention, discount rate and share basis; report failure if the target is outside the bracket."
+        },
+        {
+          "title": "Compare three valuation approaches",
+          "prompt": "Apply dividend discount, residual income and sum-of-parts to these supplied inputs. Keep enterprise value, total equity and per-share value distinct, and show where the business model or evidence makes a method inapplicable."
+        },
+        {
+          "title": "Evaluate accounting ratios consistently",
+          "prompt": "Compute ROIC, PEG, liquidity, interest coverage, margins and DuPont ROE from these statements. State growth units, average-versus-ending balance choices and reasons for any unavailable result."
+        },
+        {
+          "title": "Simulate declared valuation assumptions",
+          "prompt": "Run a seeded Monte Carlo valuation using my explicit triangular discount-rate, terminal-growth and cash-flow-multiplier assumptions. Retain the distributions and seed; label the output as scenario quantiles rather than estimated probabilities."
+        }
+      ]
+    },
+    {
+      "id": "sentiment-toolkit",
+      "title": "Evidence-bound sentiment scores and validation",
+      "audience": "Intermediate to quant",
+      "guides": [
+        "references/sentiment-toolkit.md",
+        "references/analysis-contracts.md"
+      ],
+      "prompts": [
+        {
+          "title": "Separate sentiment by company and aspect",
+          "prompt": "Analyze these retained articles by company and by revenue, earnings, balance sheet, guidance and governance. Bind each score to its exact text span and timestamp; keep ambiguous targets, missing aspects and contradictory evidence visible."
+        },
+        {
+          "title": "Measure dated sentiment changes",
+          "prompt": "Build a sentiment series at these declared cutoffs with explicit source weights, half-life and event deduplication. Use prior observations only for normalization, and keep unknown sentiment separate from neutral or balanced evidence."
+        },
+        {
+          "title": "Use an optional local financial classifier",
+          "prompt": "Check whether my locally supplied, version-pinned sentiment model and runtime are available and permitted for my stated use. Verify model-file hashes and label mapping, infer on bound spans without downloads, and report unavailable components without substituting another model."
+        },
+        {
+          "title": "Evaluate sentiment calibration and performance",
+          "prompt": "Evaluate supplied prediction probabilities against held-out labels, then replay a frozen long/cash sentiment rule over these subsequent return intervals with costs. Report calibration and incremental performance separately; do not infer profitability from classification accuracy."
+        },
+        {
+          "title": "Combine declared research signals",
+          "prompt": "Combine my normalized sentiment, technical and positioning observations using explicit fixed weights and information cutoffs. Report coverage and unavailable features; do not describe the composite as a trained or validated trading policy."
+        }
+      ]
+    },
+    {
+      "id": "factor-toolkit",
+      "title": "Fundamental factors and statistical structure",
+      "audience": "Quant",
+      "guides": [
+        "references/factor-toolkit.md",
+        "references/analysis-contracts.md"
+      ],
+      "prompts": [
+        {
+          "title": "Normalize a dated sector cross-section",
+          "prompt": "Winsorize these point-in-time fundamental metrics within sectors at explicit quantiles and compute population z-scores. Preserve membership dates, missing data, small groups and constant features."
+        },
+        {
+          "title": "Attribute returns to Fama French factors",
+          "prompt": "Fit FF3 and FF5 to my aligned decimal returns and factor observations. Preserve geography and frequency, report per-period alpha, exposures and residual variation, and avoid claiming in-sample attribution is predictive alpha."
+        },
+        {
+          "title": "Measure generic style exposure risk",
+          "prompt": "Using supplied exposures, factor covariance and specific variances, decompose this portfolio variance and residualize scores against declared styles. Distinguish this generic implementation from proprietary Barra data and models."
+        },
+        {
+          "title": "Explore fundamental structure without leakage",
+          "prompt": "Fit PCA and seeded k-means on this training-only fundamental matrix and apply the saved transformation to held-out rows. Report scaling, convergence and stability limitations before treating clusters as economic peers."
+        }
+      ]
+    },
+    {
+      "id": "derivatives-toolkit",
+      "title": "Explicit multi-asset valuation and settlement research",
+      "audience": "Quant",
+      "guides": [
+        "references/derivatives-toolkit.md",
+        "references/multiasset-platform.md"
+      ],
+      "prompts": [
+        {
+          "title": "Value a vanilla American option",
+          "prompt": "Price this supplied vanilla option with explicit exercise style, continuous dividend yield, risk-free rate and CRR steps. Compare increasingly fine grids, retain residual differences, and state unsupported discrete dividends or deliverables."
+        },
+        {
+          "title": "Recover model-implied volatility",
+          "prompt": "Given this observed option premium per underlying unit, solve implied volatility under the supplied model, bracket and price tolerance. Preserve nonconvergence or nonidentifiability; do not substitute a price model or infer realized volatility."
+        },
+        {
+          "title": "Separate FX forward from forecast",
+          "prompt": "Compute the covered-interest forward from these explicitly oriented currency rates and compounding assumptions. Show domestic-per-foreign units, forward points and omitted basis/costs; do not label it a spot forecast."
+        },
+        {
+          "title": "Reconcile bond value and accrued interest",
+          "prompt": "Value my supplied complete fixed noncallable bond cashflows using the explicit yield and ACT365F discount clock. Show dirty value, accrued interest and clean price; state when my actual market convention is unsupported."
+        },
+        {
+          "title": "Reconcile futures variation and costs",
+          "prompt": "Reconcile this linear futures settlement series using the exact multiplier, tick, contract count and currency rounding. Include negative prices and fees, and distinguish variation P&L from funded notional, margin and physical delivery."
+        }
+      ]
+    },
+    {
+      "id": "multiasset-paper",
+      "title": "Multi-asset paper accounting and platform evidence",
+      "audience": "Quant",
+      "guides": [
+        "references/paper-exchange.md",
+        "references/platform-readiness.md",
+        "references/multiasset-platform.md"
+      ],
+      "prompts": [
+        {
+          "title": "Replay hypothetical multi-asset events",
+          "prompt": "Replay this paper-only event packet containing equities, bonds, spot crypto, futures and funded FX. Reconcile cash, receivables, positions, fees and currency translation. Do not infer fills from price touches or present the scenario as a broker execution."
+        },
+        {
+          "title": "Test cancellation and restart scenarios",
+          "prompt": "Use these fictional order/fill/cancellation events to test partial fills, cancellation races, duplicate delivery and deterministic full-journal restart. Preserve failures and explain which native-host recovery behaviors remain untested."
+        },
+        {
+          "title": "Model explicit option exercise",
+          "prompt": "Replay my long vanilla option exercise/expiry scenario with exact strike, multiplier, exercise style and deliverable. Reconcile strike cash and underlying shares; do not infer automatic exercise or short assignment."
+        },
+        {
+          "title": "Audit production scope by asset class",
+          "prompt": "Assess the supplied evidence catalog for stocks/ETFs, options, futures, FX, bonds and crypto on my existing native host. Separate research, paper and live coverage. Retain missing and conflicting evidence and never equate mathematical support with broker support."
+        },
+        {
+          "title": "Check actual native host support",
+          "prompt": "Inspect only available read-only native-host capabilities for my requested asset/order/session. Distinguish observed schemas from dated product documentation. Report unsupported or unverified scope without inventing another broker or placing trades."
+        }
+      ]
+    },
+    {
+      "id": "time-series-research",
+      "title": "Explicit time-series scenarios and diagnostics",
+      "audience": "Quant",
+      "guides": [
+        "references/time-series-toolkit.md"
+      ],
+      "prompts": [
+        {
+          "title": "Simulate a declared GBM scenario",
+          "prompt": "Simulate these supplied GBM assumptions with explicit price basis, measure, drift, volatility, horizon, grid and seed. Distinguish real-world assumptions from risk-neutral pricing, preserve model units and show analytic versus sampled moments. Do not infer a calibrated forecast."
+        },
+        {
+          "title": "Measure causal trend derivatives",
+          "prompt": "Calculate backward price velocity and acceleration on these irregular timestamps with explicit time and value units. Preserve warmup, availability and price-adjustment conventions; do not use future observations or describe finite differences as exact instantaneous derivatives."
+        },
+        {
+          "title": "Normalize a fixed pair without leakage",
+          "prompt": "Fit the supplied fixed-pair OLS relationship using only the frozen training window, then normalize the holdout spread using training residual dispersion. Retain conditioning failures and distinguish spread z-scores from cointegration, arbitrage or executable short trades."
         }
       ]
     }

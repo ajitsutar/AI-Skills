@@ -142,7 +142,10 @@ trained neural model. Sarcasm, clauses, quoted denials and non-English content n
 review. Headlines, corporate promotion and macro language can be misleading. A
 FinBERT/other model integration would need pinned weights, tokenizer, license,
 dataset, version and held-out entity/event calibration before comparison or use.
-It is not bundled merely because it is mentioned here.
+The [sentiment toolkit](sentiment-toolkit.md) now provides a local-only optional
+classifier adapter and numerical evidence/validation workflows. Weights and the
+optional transformer runtime are not bundled; it returns unavailable when required
+components are absent. The existing news baseline remains distinct from that adapter.
 
 Positive prose and a guidance raise do not imply positive stock returns: compare
 with prior guidance, consensus, what the price already discounts and the holding

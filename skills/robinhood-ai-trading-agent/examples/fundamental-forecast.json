@@ -1,0 +1,36 @@
+{
+  "currency": "USD",
+  "amount_unit": "USD millions",
+  "example_context": "Fictional offline assumptions; not observed issuer data.",
+  "operation": "forecast",
+  "company_type": "nonfinancial",
+  "tax_loss_policy": "no_benefit",
+  "opening_revenue": 100,
+  "opening": {
+    "cash": 20,
+    "receivables": 10,
+    "inventory": 10,
+    "net_ppe": 60,
+    "payables": 10,
+    "debt": 30,
+    "equity": 60
+  },
+  "years": [
+    {
+      "revenue_growth": 0.1,
+      "cogs_fraction": 0.5,
+      "opex_fraction": 0.2,
+      "depreciation": 6,
+      "capex": 10,
+      "interest_rate": 0.1,
+      "tax_rate": 0.25,
+      "receivables_fraction": 0.1,
+      "inventory_fraction": 0.2,
+      "payables_fraction": 0.2,
+      "new_debt": 0,
+      "debt_repayment": 5,
+      "equity_issuance": 0,
+      "dividends": 4
+    }
+  ]
+}

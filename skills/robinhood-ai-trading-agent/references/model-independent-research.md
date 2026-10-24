@@ -52,8 +52,13 @@ helper's declared tolerance and categorical decisions exactly; wording may diffe
 Two empty selections do not count as perfect stock-pick overlap. A passing frozen
 test does not establish model-independent live research or future investment gains.
 
-For recurring research, reuse downloaded data only with its original source and
-observation dates. Follow [research-memory.md](research-memory.md), refresh material
+For recurring research, full fetch is the default. Codex, Muse, Claude and other
+hosts use [the same optional partial-fetch workflow](partial-fetch.md) only after
+explicit opt-in with a supplied portable bundle. Do not assume access to another
+model's internal cache or silently substitute remembered observations. If the
+bundle, tools or compatible source checks are unavailable, fetch fresh and disclose
+the fallback; do not claim an unperformed partial run. Reuse downloaded data only
+with its original source and observation dates. Follow [research-memory.md](research-memory.md), refresh material
 stale/missing facts, and rerank the declared universe rather than prior winners.
 Shared-cache work must be labeled shared/incremental acquisition. A download date
 cannot replace a completed price session, filing period or analyst action date.

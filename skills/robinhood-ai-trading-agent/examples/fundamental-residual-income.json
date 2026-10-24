@@ -1,0 +1,15 @@
+{
+  "currency": "USD",
+  "amount_unit": "USD millions",
+  "example_context": "Fictional offline assumptions; not observed issuer data.",
+  "operation": "residual_income",
+  "opening_book_equity": 100,
+  "cost_equity": 0.1,
+  "years": [
+    {
+      "net_income": 15,
+      "dividends": 5
+    }
+  ],
+  "terminal_residual_income_value": 0
+}
