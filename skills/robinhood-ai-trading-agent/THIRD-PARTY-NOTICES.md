@@ -87,3 +87,12 @@ Primary license sources: [Transformers](https://github.com/huggingface/transform
 [PyTorch](https://github.com/pytorch/pytorch/blob/main/LICENSE),
 [safetensors](https://github.com/huggingface/safetensors/blob/main/LICENSE),
 [FinBERT model card](https://huggingface.co/ProsusAI/finbert).
+
+## Optional portable calculations (5.1)
+
+The original local wrappers call separately installed statsmodels (BSD), QuantLib
+(modified BSD), and VADER (MIT) APIs. Their implementations and VADER lexicon are
+not bundled in the skill; installed distributions retain their own notices.
+See [portable methods: sources and licenses](references/portable-quant.md#sources-and-licenses)
+for the upstream projects and license links. These optional libraries run inside
+the host Python environment and require no backend service.

@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-250 examples across 35 workflows, from first-time investing to quantitative research.
+260 examples across 36 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the robinhood-ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -54,6 +54,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Explicit multi-asset valuation and settlement research](#explicit-multi-asset-valuation-and-settlement-research) | Quant | 5 |
 | [Multi-asset paper accounting and platform evidence](#multi-asset-paper-accounting-and-platform-evidence) | Quant | 5 |
 | [Explicit time-series scenarios and diagnostics](#explicit-time-series-scenarios-and-diagnostics) | Quant | 3 |
+| [Portable quant methods without a backend](#portable-quant-methods-without-a-backend) | Quantitative researcher | 10 |
 
 ## Getting started and learning
 
@@ -1228,6 +1229,51 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 ### 250. Normalize a fixed pair without leakage
 
 > Fit the supplied fixed-pair OLS relationship using only the frozen training window, then normalize the holdout spread using training residual dispersion. Retain conditioning failures and distinguish spread z-scores from cointegration, arbitrage or executable short trades.
+
+
+## Portable quant methods without a backend
+
+**Audience:** Quantitative researcher. Guides: [portable quant](references/portable-quant.md), [costed bar replay](references/costed-bar-replay.md).
+
+### 251. Inspect local capability
+
+> Check this host with scripts/research_preflight.py and the existing workbench operation catalog. Distinguish bundled point-in-time selection and costed bar replay from optional statsmodels, QuantLib and VADER calculations. Report package integrity, actual installed versions and unavailable operations. Importability alone is not a completed calculation; use the local skill without a backend or service.
+
+### 252. Select historical revisions
+
+> Use examples/point-in-time-data.json as the format for my supplied observations and run data.asof_snapshot at [AS_OF]. Retain instrument IDs, event and availability timestamps, revision IDs, units, currency and source declarations. Show selected revisions, exclusion counts and hashes; explain that recorded availability and licensing are supplied claims, not independently verified facts.
+
+### 253. Fit a forecast explicitly
+
+> Use my frozen observations in the format of examples/portable-quant-arima.json and run portable.arima. Keep the declared as-of time, currency, units, frequency, [p,d,q], trend, forecast steps, maxiter, diagnostic_lags and alpha explicit, with input_basis set to caller_declared_frozen_inputs. Report convergence, residual diagnostics, model-conditional intervals and runtime versions. Preserve failure instead of emitting an unconverged forecast; distinguish fitting from held-out accuracy or profitability.
+
+### 254. Test cointegration
+
+> Run portable.cointegration on my frozen aligned series using examples/portable-quant-cointegration.json as the format. Preserve y0 as dependent and y1 as regressor, their units, frequency, as-of time and currency, and the explicit trend, maxlag, autolag and significance settings. Set input_basis to caller_declared_frozen_inputs. Explain the no-cointegration null, unverified I(1) assumption, directional normalization and multiple-pair testing limits; significance alone does not establish a profitable pairs strategy.
+
+### 255. Price a vanilla option
+
+> Run portable.european using examples/portable-quant-european.json as the template for my supplied European call or put. Preserve spot, strike, volatility, flat continuous interest and dividend yields, currency and exact dates; evaluation_date must match the UTC as-of date and day_count must be Actual365Fixed. Report the QuantLib version, value per underlying unit and Greek units, including vega and rho per 1.0 absolute change and theta per year. State the limits for American exercise and discrete dividends.
+
+### 256. Compare named sentiment baseline
+
+> Run portable.vader on my supplied English texts using the format in examples/portable-quant-vader.json, with explicit as-of time and currency. Preserve input order and the original neg, neu, pos and compound scores, and record the actual local package version. Explain that lexical tone does not establish entity-specific sentiment, publication timing or a calibrated financial prediction. If VADER is unavailable, retain that failure.
+
+### 257. Paper-test with costs
+
+> Run backtest.costed_bars on my frozen document using examples/costed-bar-replay.json as the template. Preserve as_of, currency, asset class, initial cash, quantity step, all bar and signal availability times, spread/slippage/fee basis points, fixed fee, participation and carry-or-cancel policy. Fill only at opens strictly after both the source close and signal availability, using prior available volume as a liquidity proxy. Reconcile partial fills, fees, cash, held position and final pending quantity; do not invent final liquidation or observed liquidity.
+
+### 258. Replay all six portable examples
+
+> Run the unchanged fictional examples/portable-workbench.json through scripts/quant_workbench.py prepare, run and verify. Preserve each job document and the shared contract; save prepared inputs and the first result bundle in new files outside the installed skill folder. Show the outcome of all six operations, hashes and runtime versions, retaining errors and unavailable dependencies. A replayed rejection is not a successful calculation. Explain the examples as method checks, not market history or investment-performance evidence.
+
+### 259. Compare models on the same frozen packet
+
+> Prepare examples/portable-workbench.json once and compare Codex, Muse and Claude on that exact input-only packet and identical prompt, using the same skill candidate in fresh participant contexts. Withhold other participants' answers, accepted answers and correctness feedback. Preserve every first response, error, input hash and runtime version; verify calculations locally after collection. Report correct agreement separately from shared mistakes, interpretation differences and execution limits. Label comparisons exploratory when memory, blinding or environments differ; do not replace a failed attempt.
+
+### 260. Continue when an optional library is missing
+
+> Check the requirements of my requested portable operations in this host. When an optional library is missing, preserve the explicit DEPENDENCY_UNAVAILABLE outcome and identify the affected operations. Continue unrelated bundled calculations that can actually run, retaining their inputs and outputs separately. Do not install packages, switch models, substitute another method or contact a backend. Tell me which work remains uncomputed and the local dependency it requires.
 
 ## Keeping this catalog current
 

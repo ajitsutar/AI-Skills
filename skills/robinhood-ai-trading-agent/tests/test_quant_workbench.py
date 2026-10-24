@@ -353,8 +353,16 @@ class ReplayTests(unittest.TestCase):
                              'planning.source_budget_sizing', 'planning.employer_diversification_baseline',
                              'financial.equity_cash_comparison', 'planning.source_allocation_context'}
         self.assertTrue(source_operations <= set(workbench.OPERATIONS))
+        # Portable extensions have their own frozen fixture and integration tests.
+        # Enumerate them explicitly so moving a legacy operation into this group
+        # cannot silently weaken the retained campaign's coverage assertion.
+        portable_operations = {'portable.arima', 'portable.cointegration',
+                               'portable.european', 'portable.vader',
+                               'data.asof_snapshot', 'backtest.costed_bars'}
+        self.assertEqual(set(workbench.PORTABLE_OPERATIONS), portable_operations)
         self.assertEqual({j['operation'] for j in doc['jobs']},
-                         set(workbench.OPERATIONS) - source_operations - set(workbench.ANALYSIS_OPERATIONS) - set(workbench.MULTIASSET_OPERATIONS))
+                         set(workbench.OPERATIONS) - source_operations - set(workbench.ANALYSIS_OPERATIONS)
+                         - set(workbench.MULTIASSET_OPERATIONS) - portable_operations)
 
     def fixture(self):
         return {'schema_version': 1, 'contract': {'prompt': 'Fictional risk review', 'purpose': 'compatibility',

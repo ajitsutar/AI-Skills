@@ -48,6 +48,9 @@ import derivatives_toolkit
 import paper_exchange
 import platform_readiness
 import time_series_toolkit
+import portable_quant
+import point_in_time_data
+import costed_bar_replay
 from quant_common import digest, require
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -159,6 +162,15 @@ MULTIASSET_OPERATIONS = {
     'timeseries.run': time_series_toolkit.run,
 }
 OPERATIONS.update(MULTIASSET_OPERATIONS)
+PORTABLE_OPERATIONS = {
+    'portable.arima': portable_quant.arima,
+    'portable.cointegration': portable_quant.cointegration,
+    'portable.european': portable_quant.european,
+    'portable.vader': portable_quant.vader,
+    'data.asof_snapshot': point_in_time_data.snapshot,
+    'backtest.costed_bars': costed_bar_replay.simulate,
+}
+OPERATIONS.update(PORTABLE_OPERATIONS)
 MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'quant_portfolio.py', 'multi_asset_risk.py', 'investment_ops.py',
            'primary_financial_data.py', 'price_audit.py', 'financial_normalize.py',
@@ -173,7 +185,8 @@ MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'flow_normalization.py', 'price_comparison.py', 'recommendation_report.py', 'employer_reference.py',
            'equity_cash_comparison.py', 'source_exposure.py', 'technical_toolkit.py',
            'fundamental_toolkit.py', 'sentiment_toolkit.py', 'factor_research.py',
-           'derivatives_toolkit.py', 'paper_exchange.py', 'platform_readiness.py', 'time_series_toolkit.py')
+           'derivatives_toolkit.py', 'paper_exchange.py', 'platform_readiness.py', 'time_series_toolkit.py',
+               'portable_quant.py', 'point_in_time_data.py', 'costed_bar_replay.py')
 
 
 def implementation_hash():
@@ -238,6 +251,11 @@ def run(document):
         require(isinstance(job['inputs'], dict), 'JOB_INPUT_OBJECT_REQUIRED')
         try:
             inputs = resolved_inputs(job['operation'], job['inputs'])
+            if job['operation'] in PORTABLE_OPERATIONS:
+                payload = inputs['document']
+                require(timestamp(payload['as_of']) <= timestamp(contract['as_of']), 'FUTURE_PORTABLE_CUTOFF')
+                if job['operation'] != 'data.asof_snapshot':
+                    require(payload['currency'] == contract['base_currency'], 'PORTABLE_CURRENCY_MISMATCH')
             if job['operation'] in MULTIASSET_OPERATIONS:
                 payload = inputs['document']
                 if job['operation'] in ('paper.replay', 'platform.assess'):
@@ -325,7 +343,7 @@ def differences(left, right, path='$', absolute=1e-8, relative=1e-7):
 def freeze(document):
     result = run(document)
     versions = {}
-    for name in ('numpy', 'scipy', 'pandas', 'arch', 'exchange_calendars', 'tzdata'):
+    for name in ('numpy', 'scipy', 'pandas', 'arch', 'exchange_calendars', 'tzdata', 'statsmodels', 'QuantLib', 'vaderSentiment'):
         try:
             versions[name] = importlib.metadata.version(name)
         except importlib.metadata.PackageNotFoundError:

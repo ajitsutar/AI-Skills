@@ -5507,6 +5507,148 @@
         "metric": "supplied_observations",
         "unit": "count"
       }
+    },
+    "portable.european": {
+      "npv": {
+        "metric": "European option value per underlying unit",
+        "unit": "input_currency_amount_per_underlying_unit",
+        "denominator": null,
+        "basis": "Flat continuous rates/dividend yield; constant volatility; no contract multiplier."
+      },
+      "delta": {
+        "metric": "Option delta",
+        "unit": "dimensionless",
+        "denominator": null,
+        "basis": "Derivative of option value per underlying unit with respect to spot."
+      },
+      "gamma": {
+        "metric": "Option gamma",
+        "unit": "inverse_input_currency",
+        "denominator": null,
+        "basis": "Second spot derivative of option value per underlying unit."
+      },
+      "vega": {
+        "metric": "Option vega",
+        "unit": "input_currency_amount_per_absolute_volatility",
+        "denominator": null,
+        "basis": "Per 1.0 volatility change, not per percentage point."
+      },
+      "rho": {
+        "metric": "Option rate sensitivity",
+        "unit": "input_currency_amount_per_absolute_rate",
+        "denominator": null,
+        "basis": "Per 1.0 continuous rate change."
+      },
+      "theta_per_year": {
+        "metric": "Option time decay",
+        "unit": "input_currency_amount_per_year",
+        "denominator": null,
+        "basis": "Analytic theta per year, no daily conversion."
+      },
+      "year_fraction": {
+        "metric": "Time to expiry",
+        "unit": "years",
+        "denominator": null,
+        "basis": "Actual365Fixed date-level convention."
+      }
+    },
+    "portable.arima": {
+      "forecast/*": {
+        "metric": "Conditional ARIMA forecast",
+        "unit": "declared_value_unit",
+        "denominator": null,
+        "basis": "Same unit as document.value_unit; one step uses declared observation_frequency."
+      },
+      "prediction_intervals/*/*": {
+        "metric": "Conditional ARIMA prediction bound",
+        "unit": "declared_value_unit",
+        "denominator": null,
+        "basis": "Conditional fitted-model interval at declared alpha; no all-model uncertainty guarantee."
+      },
+      "observations": {
+        "metric": "Training observations",
+        "unit": "count",
+        "denominator": null,
+        "basis": "Supplied equally spaced array; caller-declared availability."
+      },
+      "residual_diagnostics/ljung_box_pvalue": {
+        "metric": "Ljung-Box p-value",
+        "unit": "probability",
+        "denominator": null,
+        "basis": "Residual diagnostic at explicit lag and model degrees of freedom."
+      }
+    },
+    "portable.cointegration": {
+      "pvalue": {
+        "metric": "Engle-Granger p-value",
+        "unit": "probability",
+        "denominator": null,
+        "basis": "Directional test; null no cointegration; I(1) assumed, not verified."
+      },
+      "statistic": {
+        "metric": "Engle-Granger statistic",
+        "unit": "test_statistic",
+        "denominator": null,
+        "basis": "Explicit trend, maxlag and autolag."
+      },
+      "observations": {
+        "metric": "Aligned supplied observations",
+        "unit": "count",
+        "denominator": null,
+        "basis": "One prespecified pair; no pair-search correction."
+      }
+    },
+    "data.asof_snapshot": {
+      "exclusion_counts/*": {
+        "metric": "Snapshot excluded records",
+        "unit": "count",
+        "denominator": null,
+        "basis": "Partitioned future event, future availability or superseded revision; caller-declared data."
+      }
+    },
+    "backtest.costed_bars": {
+      "initial_cash": {
+        "metric": "Modeled initial cash",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Single-instrument cash-funded bar model; explicit costs; no observed fills."
+      },
+      "cash": {
+        "metric": "Modeled cash",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Single-instrument cash-funded bar model; explicit costs; no observed fills."
+      },
+      "equity": {
+        "metric": "Modeled equity",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Single-instrument cash-funded bar model; explicit costs; no observed fills."
+      },
+      "total_fees": {
+        "metric": "Modeled total fees",
+        "unit": "input_currency_amount",
+        "denominator": null,
+        "basis": "Single-instrument cash-funded bar model; explicit costs; no observed fills."
+      },
+      "position": {
+        "metric": "Modeled quantity",
+        "unit": "instrument_units",
+        "denominator": null,
+        "basis": "Input instrument quantity step; hypothetical paper replay."
+      },
+      "pending_order/remaining": {
+        "metric": "Modeled quantity",
+        "unit": "instrument_units",
+        "denominator": null,
+        "basis": "Input instrument quantity step; hypothetical paper replay."
+      },
+      "fills/*/quantity": {
+        "metric": "Modeled quantity",
+        "unit": "instrument_units",
+        "denominator": null,
+        "basis": "Input instrument quantity step; hypothetical paper replay."
+      }
     }
   },
   "schema_version": 1

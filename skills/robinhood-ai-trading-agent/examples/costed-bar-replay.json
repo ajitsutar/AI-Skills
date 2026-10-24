@@ -1,0 +1,19 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-01-03T17:00:00Z",
+  "currency": "USD",
+  "asset_class": "equity",
+  "initial_cash": "1000",
+  "quantity_step": "1",
+  "max_participation": "0.1",
+  "time_in_force": "carry",
+  "costs": {"spread_bps": "10", "slippage_bps": "5", "fee_bps": "1", "fixed_fee": "0.05"},
+  "bars": [
+    {"open_at": "2026-01-01T09:30:00Z", "close_at": "2026-01-01T16:00:00Z", "available_at": "2026-01-01T16:00:00Z", "open": "10", "close": "10.5", "volume": "100"},
+    {"open_at": "2026-01-02T09:30:00Z", "close_at": "2026-01-02T16:00:00Z", "available_at": "2026-01-02T16:00:00Z", "open": "11", "close": "11.5", "volume": "50"},
+    {"open_at": "2026-01-03T09:30:00Z", "close_at": "2026-01-03T16:00:00Z", "available_at": "2026-01-03T16:00:00Z", "open": "12", "close": "12.5", "volume": "5000"}
+  ],
+  "signals": [
+    {"timestamp": "2026-01-01T16:00:00Z", "available_at": "2026-01-01T16:00:00Z", "side": "buy", "quantity": "20"}
+  ]
+}

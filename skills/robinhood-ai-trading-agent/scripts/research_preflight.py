@@ -26,7 +26,8 @@ CAPABILITY_FILES = {
          'financial_normalize', 'filing_extract', 'analysis_checks', 'planning_alignment', 'allocation_policy',
          'financial_alignment', 'strategy_research', 'forward_evidence', 'portfolio_analytics',
          'accounting_tools', 'research_analytics', 'strategy_lab', 'risk_engine', 'report_facts', 'evidence_semantics',
-         'employer_reference', 'equity_cash_comparison', 'source_exposure')] +
+         'employer_reference', 'equity_cash_comparison', 'source_exposure',
+         'portable_quant', 'point_in_time_data', 'costed_bar_replay')] +
          ['profiles/financial-normalization-v1.json', 'profiles/report-facts-v2.json'],
     'public_research': ['profiles/public-vqm-discovery-v1.json', 'scripts/public_research.py',
                         'scripts/public_research_fetch.py', 'scripts/listed_universe.py', 'scripts/research_report_checks.py'],
@@ -59,7 +60,7 @@ def package_integrity():
 
 def check():
     dependencies = {}
-    for name in ('exchange_calendars', 'numpy', 'pandas', 'tzdata', 'scipy', 'arch', 'yfinance', 'requests', 'lxml'):
+    for name in ('exchange_calendars', 'numpy', 'pandas', 'tzdata', 'scipy', 'arch', 'yfinance', 'requests', 'lxml', 'statsmodels', 'QuantLib', 'vaderSentiment'):
         try:
             importlib.import_module(name)
             dependencies[name] = {'status': 'IMPORTABLE', 'version': importlib.metadata.version(name)}
@@ -78,6 +79,10 @@ def check():
             'shared_default': 'AVAILABLE' if not missing_by_capability['shared_default'] and available(['exchange_calendars', 'numpy', 'pandas', 'tzdata']) else 'UNAVAILABLE',
             'volatility': 'AVAILABLE' if not missing_by_capability['volatility'] and available(['arch', 'numpy', 'pandas', 'scipy']) else 'SKIPPED_MISSING_COMPONENTS',
             'allocation': 'AVAILABLE_REQUIRES_CALIBRATION' if not missing_by_capability['allocation'] and available(['numpy', 'scipy']) else 'UNAVAILABLE',
+            'portable_optional_calculations': {
+                'arima_and_cointegration': 'IMPORTABLE_NOT_QUALIFIED' if available(['statsmodels']) else 'UNAVAILABLE',
+                'quantlib_european': 'IMPORTABLE_NOT_QUALIFIED' if available(['QuantLib']) else 'UNAVAILABLE',
+                'vader': 'IMPORTABLE_NOT_QUALIFIED' if available(['vaderSentiment']) else 'UNAVAILABLE'},
             'execution_authorized': False,
             'news_and_analyst_research': 'AVAILABLE_RESEARCH_ONLY_ACCESS_NOT_VERIFIED' if integrity['status'] == 'VERIFIED' and not missing_by_capability['news_and_analyst_research'] and available(['requests', 'tzdata']) else 'UNAVAILABLE',
             'quant_workbench': 'AVAILABLE_RESEARCH_ONLY' if not missing_by_capability['quant_workbench'] and available(['numpy', 'scipy', 'lxml', 'tzdata']) else 'UNAVAILABLE',

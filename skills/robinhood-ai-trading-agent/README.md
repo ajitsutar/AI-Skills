@@ -320,3 +320,15 @@ GBM scenarios, timestamp-aware backward trend derivatives and fixed-pair train-o
 OLS spread normalization. Their [examples](EXAMPLE-PROMPTS.md) require explicit
 units, model assumptions and cutoffs. They do not establish ARMA support,
 cointegration, calibrated forecasts or an executable arbitrage strategy.
+
+## Portable research extensions
+
+The skill is self-contained: no dedicated backend, server, service or separate
+client is required. New bundled scripts provide revision-aware as-of snapshots
+and a costed next-open bar simulation using the Python standard library.
+Optional local libraries provide ARIMA/cointegration, QuantLib European pricing
+and a named VADER baseline. See [portable methods](references/portable-quant.md)
+and [bar replay](references/costed-bar-replay.md). The optional dependency file is
+`requirements-optional-quant.txt`; installing it is not necessary for the original
+workflows. Report missing host capabilities explicitly. No package upload alone
+proves those calculations work in Muse or Claude.

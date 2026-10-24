@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # Robinhood Multi-Asset Quant Research and Portfolio Agent
 
-Package version: **5.0.0 - October 23, 2026**.
+Package version: **5.1.1 - October 23, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -436,6 +436,18 @@ implications. Missing `arch`, a failed fit or insufficient history is a disclose
 research limitation, never an execution gate. Optional stock-relative interval
 movement diagnostics likewise describe evidence and uncertainty; they neither
 approve nor veto an order. Never claim an unrun model was computed.
+
+## Portable quantitative extensions
+
+This is a self-contained skill (Option A), with no separate backend, client,
+server or service. Run bundled scripts in the current host's own Python runtime.
+For point-in-time revision selection, costed bar replay and optional ARIMA,
+cointegration, QuantLib European pricing or VADER, read
+[portable quant methods](references/portable-quant.md) and
+[costed bar replay](references/costed-bar-replay.md). These use the existing
+`quant_workbench.py` frozen-input workflow. Missing optional dependencies limit
+only their specific operations; do not fabricate results or silently substitute
+a different model. An upload alone does not establish Muse/Claude runtime support.
 
 ## Technical, fundamental and sentiment toolkits
 

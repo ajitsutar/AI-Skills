@@ -1,0 +1,4 @@
+# Optional local calculation libraries; no server or backend.
+statsmodels==0.15.0
+QuantLib==1.43
+vaderSentiment==3.3.2
