@@ -3,10 +3,14 @@ import importlib
 import importlib.metadata
 import hashlib
 import json
+import re
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITY_FILES = {
+    'alignment_hardening': ['scripts/research_workflow.py', 'scripts/answer_facts.py',
+                            'scripts/concentration_bounds.py', 'scripts/evidence_provenance.py',
+                            'references/model-alignment-hardening.md'],
     'research_alignment': ['scripts/' + name + '.py' for name in
         ('research_workflow', 'evidence_semantics', 'price_comparison', 'recommendation_report', 'ranking_alignment', 'research_contracts', 'planning_alignment', 'allocation_policy', 'financial_alignment', 'strategy_research',
          'forward_evidence', 'analysis_checks', 'quant_report', 'report_facts', 'portfolio_analytics',
@@ -40,12 +44,46 @@ CAPABILITY_FILES = {
 }
 
 
+def active_package_versions(text):
+    """Read active display labels, excluding fenced examples and quoted history."""
+    labels = []
+    fence = None
+    for line in text.splitlines():
+        stripped = line.strip()
+        marker = re.match(r'^(`{3,}|~{3,})', stripped)
+        if marker:
+            token = marker.group(1)
+            if fence is None:
+                fence = token
+            elif token[0] == fence[0] and len(token) >= len(fence):
+                fence = None
+            continue
+        if fence is not None:
+            continue
+        label = re.match(r'^Package version\s*:\s*(.*)$', stripped, re.I)
+        if label:
+            value = label.group(1).strip().lstrip('*` ')
+            version = re.match(r'(0|[1-9]\d*)\.(0|[1-9]\d*)\.(0|[1-9]\d*)(?:-[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?(?:\+[0-9A-Za-z]+(?:\.[0-9A-Za-z]+)*)?(?=$|[\s*`])', value)
+            labels.append(version.group(0) if version else None)
+    return labels
+
+
 def package_integrity():
     try:
         manifest = json.loads((ROOT / 'PACKAGE-MANIFEST.json').read_text(encoding='utf-8'))
         errors = []
-        if manifest['version'] != (ROOT / 'VERSION').read_text(encoding='utf-8').strip():
+        version = (ROOT / 'VERSION').read_text(encoding='utf-8').strip()
+        if manifest['version'] != version:
             errors.append('VERSION_MISMATCH')
+        labels = active_package_versions((ROOT / 'SKILL.md').read_text(encoding='utf-8-sig'))
+        if not labels:
+            errors.append('SKILL_PACKAGE_VERSION_MISSING')
+        if len(labels) > 1:
+            errors.append('SKILL_PACKAGE_VERSION_MULTIPLE')
+        if None in labels:
+            errors.append('SKILL_PACKAGE_VERSION_INVALID')
+        if any(label is not None and label != version for label in labels):
+            errors.append('SKILL_PACKAGE_VERSION_MISMATCH')
         for name, expected in manifest['files'].items():
             path = (ROOT / name).resolve()
             if ROOT.resolve() not in path.parents or not path.is_file():
@@ -73,6 +111,7 @@ def check():
     integrity = package_integrity()
     return {'skill_version': (ROOT / 'VERSION').read_text(encoding='utf-8').strip(),
             'package_integrity': integrity,
+            'alignment_hardening': 'AVAILABLE_REQUIRES_SUPPLIED_REQUEST' if integrity['status'] == 'VERIFIED' and not missing_by_capability['alignment_hardening'] and available(['numpy', 'scipy', 'lxml', 'tzdata']) else 'UNAVAILABLE',
             'research_handoff': 'AVAILABLE' if integrity['status'] == 'VERIFIED' and not missing_by_capability['research_handoff'] else 'UNAVAILABLE',
             'missing_files': missing, 'missing_by_capability': missing_by_capability, 'dependencies': dependencies,
             'public_research': 'AVAILABLE' if not missing_by_capability['public_research'] and available(['yfinance', 'requests', 'lxml', 'pandas', 'exchange_calendars']) else 'UNAVAILABLE',

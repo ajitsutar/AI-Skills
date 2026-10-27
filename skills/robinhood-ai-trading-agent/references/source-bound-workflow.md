@@ -21,6 +21,9 @@ python scripts/research_workflow.py verify NEW_DIRECTORY
 python scripts/research_workflow.py summary NEW_DIRECTORY
 ```
 
+For a complete explicit request, `execute REQUEST.json --request-role "Original supplied request" --private-output-dir NEW_DIRECTORY` runs preparation, execution, verification and answer-fact projection together. Preserve its completion and export records, including failures. See [checked answers across hosts](model-alignment-hardening.md).
+
+
 The runner is offline. Obtain authorized current data separately and save its
 actual bytes and acquisition times before binding files. For an offline request,
 missing source bytes remain missing; do not run acquisition commands. The runner

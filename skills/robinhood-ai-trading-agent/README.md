@@ -332,3 +332,11 @@ and [bar replay](references/costed-bar-replay.md). The optional dependency file 
 `requirements-optional-quant.txt`; installing it is not necessary for the original
 workflows. Report missing host capabilities explicitly. No package upload alone
 proves those calculations work in Muse or Claude.
+
+## Checked numerical answers
+
+Use the [single-command offline workflow](references/model-alignment-hardening.md)
+for explicit requests. It retains execution and verification evidence and renders
+supported numeric fields with fixed metric and scenario labels. Concentration
+bounds and hash comparisons retain their scope and assumptions. Export availability
+is reported separately from calculations; no backend or additional service is needed.

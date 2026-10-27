@@ -3188,6 +3188,342 @@
         "denominator": null,
         "metric": "status",
         "unit": "status"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/ratio": {
+        "metric": "employer_concentration_evidence_ratio",
+        "unit": "fraction",
+        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/bound_status": {
+        "metric": "employer_concentration_evidence_bound_status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/value_role": {
+        "metric": "employer_concentration_evidence_value_role",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/numerator/completeness": {
+        "metric": "employer_concentration_evidence_numerator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/denominator/completeness": {
+        "metric": "employer_concentration_evidence_denominator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/numerator/relation": {
+        "metric": "employer_concentration_evidence_numerator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/denominator/relation": {
+        "metric": "employer_concentration_evidence_denominator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
+        "metric": "identified_assets_employer_concentration_evidence_ratio",
+        "unit": "fraction",
+        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
+        "metric": "identified_assets_employer_concentration_evidence_bound_status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
+        "metric": "identified_assets_employer_concentration_evidence_value_role",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
+        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
+        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
+        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
+        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/ratio": {
+        "metric": "employer_concentration_evidence_ratio",
+        "unit": "fraction",
+        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/bound_status": {
+        "metric": "employer_concentration_evidence_bound_status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/value_role": {
+        "metric": "employer_concentration_evidence_value_role",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/numerator/completeness": {
+        "metric": "employer_concentration_evidence_numerator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/denominator/completeness": {
+        "metric": "employer_concentration_evidence_denominator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/numerator/relation": {
+        "metric": "employer_concentration_evidence_numerator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/denominator/relation": {
+        "metric": "employer_concentration_evidence_denominator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
+        "metric": "identified_assets_employer_concentration_evidence_ratio",
+        "unit": "fraction",
+        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
+        "metric": "identified_assets_employer_concentration_evidence_bound_status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
+        "metric": "identified_assets_employer_concentration_evidence_value_role",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
+        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
+        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
+        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
+        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/ratio": {
+        "metric": "employer_concentration_evidence_ratio",
+        "unit": "fraction",
+        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/bound_status": {
+        "metric": "employer_concentration_evidence_bound_status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/value_role": {
+        "metric": "employer_concentration_evidence_value_role",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/numerator/completeness": {
+        "metric": "employer_concentration_evidence_numerator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/denominator/completeness": {
+        "metric": "employer_concentration_evidence_denominator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/numerator/relation": {
+        "metric": "employer_concentration_evidence_numerator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/denominator/relation": {
+        "metric": "employer_concentration_evidence_denominator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
+        "metric": "identified_assets_employer_concentration_evidence_ratio",
+        "unit": "fraction",
+        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
+        "metric": "identified_assets_employer_concentration_evidence_bound_status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
+        "metric": "identified_assets_employer_concentration_evidence_value_role",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
+        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
+        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
+        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
+        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/ratio": {
+        "metric": "employer_concentration_evidence_ratio",
+        "unit": "fraction",
+        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/bound_status": {
+        "metric": "employer_concentration_evidence_bound_status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/value_role": {
+        "metric": "employer_concentration_evidence_value_role",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/numerator/completeness": {
+        "metric": "employer_concentration_evidence_numerator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/denominator/completeness": {
+        "metric": "employer_concentration_evidence_denominator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/numerator/relation": {
+        "metric": "employer_concentration_evidence_numerator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/denominator/relation": {
+        "metric": "employer_concentration_evidence_denominator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
+        "metric": "identified_assets_employer_concentration_evidence_ratio",
+        "unit": "fraction",
+        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
+        "metric": "identified_assets_employer_concentration_evidence_bound_status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
+        "metric": "identified_assets_employer_concentration_evidence_value_role",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
+        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
+        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
+        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
+        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
       }
     },
     "planning.friction_context": {
@@ -4180,6 +4516,90 @@
         "denominator": null,
         "metric": "status",
         "unit": "status"
+      },
+      "alternatives/*/employer_concentration_evidence/ratio": {
+        "metric": "employer_concentration_evidence_ratio",
+        "unit": "fraction",
+        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/employer_concentration_evidence/bound_status": {
+        "metric": "employer_concentration_evidence_bound_status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/employer_concentration_evidence/value_role": {
+        "metric": "employer_concentration_evidence_value_role",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/employer_concentration_evidence/numerator/completeness": {
+        "metric": "employer_concentration_evidence_numerator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/employer_concentration_evidence/denominator/completeness": {
+        "metric": "employer_concentration_evidence_denominator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/employer_concentration_evidence/numerator/relation": {
+        "metric": "employer_concentration_evidence_numerator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/employer_concentration_evidence/denominator/relation": {
+        "metric": "employer_concentration_evidence_denominator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
+        "metric": "identified_assets_employer_concentration_evidence_ratio",
+        "unit": "fraction",
+        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
+        "metric": "identified_assets_employer_concentration_evidence_bound_status",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
+        "metric": "identified_assets_employer_concentration_evidence_value_role",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
+        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
+        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
+        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
+        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
+        "unit": "status",
+        "denominator": null,
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
       }
     },
     "planning.source_budget_sizing": {

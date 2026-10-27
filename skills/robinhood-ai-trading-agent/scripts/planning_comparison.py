@@ -7,6 +7,7 @@ import re
 
 from planning_alignment import amount, finish
 from quant_common import require
+from concentration_bounds import ratio_evidence
 
 
 DIMENSIONS = ('metric', 'unit', 'basis')
@@ -269,6 +270,9 @@ def source_alternatives(document):
         targets = source.get('baseline_rebalance', {}).get('targets', {})
         employer_symbol = source.get('employer', {}).get('symbol')
         employer_id = identities.get(employer_symbol, {}).get('issuer_id')
+        def is_fund_identity(identity):
+            kind = identity.get('kind')
+            return isinstance(kind, str) and kind.casefold() in {'fund', 'etf', 'mutual_fund', 'mutual fund'}
         rows = []
         for alternative in alternatives:
             require(set(alternative) <= {'id', 'scenario_flows'}, 'ALTERNATIVE_MUST_SHARE_PROJECTION_BASIS')
@@ -303,17 +307,33 @@ def source_alternatives(document):
                 if value is None:
                     unknown_overlap.append(asset)
                     continue
+                require(value >= 0, 'EMPLOYER_EXPOSURE_REQUIRES_NONNEGATIVE_POSITION_VALUES')
                 if asset in funds:
                     fund = funds[asset]
                     coverage = fund.get('holdings_coverage')
-                    if coverage is None or amount(coverage) < 1:
+                    coverage = amount(coverage, 'holdings_coverage', 0) if coverage is not None else None
+                    require(coverage is None or coverage <= 1, 'HOLDINGS_COVERAGE_FRACTION_REQUIRED')
+                    component_weights = [amount(component['weight'], 'fund_weight', 0)
+                                         for component in fund.get('holdings', [])]
+                    require(sum(component_weights, Decimal(0)) <= 1, 'LONG_ONLY_FUND_WEIGHTS_EXCEED_ONE')
+                    if coverage != 1 or sum(component_weights, Decimal(0)) != 1:
                         unknown_overlap.append(asset)
-                    for component in fund.get('holdings', []):
+                    for component, component_weight in zip(fund.get('holdings', []), component_weights):
                         identity = identities.get(component.get('symbol'), {})
-                        if identity.get('issuer_id') == employer_id and employer_id is not None:
-                            exposure += value * amount(component['weight'])
+                        if component_weight == 0:
+                            continue
+                        # A fund sponsor's issuer identity says nothing about
+                        # underlying employer holdings. Nested look-through is
+                        # unresolved, even when an inner holdings table exists;
+                        # this operation does not recursively audit that table.
+                        if component.get('symbol') in funds or is_fund_identity(identity):
+                            unknown_overlap.append(component.get('symbol'))
+                        elif identity.get('issuer_id') == employer_id and employer_id is not None:
+                            exposure += value * component_weight
                         elif not identity.get('issuer_id') and identity.get('kind') != 'cash':
                             unknown_overlap.append(component.get('symbol'))
+                elif is_fund_identity(identities.get(asset, {})):
+                    unknown_overlap.append(asset)
                 elif identities.get(asset, {}).get('issuer_id') == employer_id and employer_id is not None:
                     exposure += value
                 elif not identities.get(asset, {}).get('issuer_id'):
@@ -322,14 +342,45 @@ def source_alternatives(document):
             # silently promote the known numerator to complete account exposure.
             if projection['other_assets_value'] is None or amount(projection['other_assets_value']) != 0:
                 unknown_overlap.append('unclassified_other_assets')
+            numerator_complete = not unknown_overlap
+            numerator_relation = 'EXACT' if numerator_complete else 'LOWER_BOUND' if employer_id is not None else 'UNKNOWN'
+            evidence_assumptions = [
+                'Conditional on the supplied dated projection and issuer identities; no live account completeness is verified.',
+                'The projection and fund look-through use nonnegative long-only assets and weights; unclassified exposure cannot offset known exposure.']
+            def concentration(denominator, complete):
+                result = ratio_evidence(
+                    exposure, denominator if denominator is not None and denominator > 0 else None,
+                    numerator_completeness='COMPLETE' if numerator_complete else 'INCOMPLETE',
+                    denominator_completeness='COMPLETE' if complete and denominator is not None and denominator > 0 else 'UNKNOWN',
+                    numerator_relation=numerator_relation,
+                    assumptions=evidence_assumptions)
+                result['denominator_unavailable_reason'] = 'MISSING' if denominator is None else 'NONPOSITIVE' if denominator <= 0 else None
+                return result
+            # Identified assets omit possible assets and liabilities. Even a
+            # lower dollar-exposure bound divided by them is not a lower ratio
+            # bound. Only explicit zero other assets AND liabilities make this
+            # denominator the full projected net-equity denominator.
+            identified_is_complete = (projection['other_assets_value'] is not None
+                                      and amount(projection['other_assets_value']) == 0
+                                      and projection.get('total_liabilities') is not None
+                                      and amount(projection['total_liabilities']) == 0
+                                      and equity is not None and identified == equity)
             rows.append({'id': alternative['id'], 'target_date': projection['target_date'],
                          'denominator': equity, 'denominator_basis': 'same-target-date post-flow net equity',
                          'identified_assets_sensitivity_denominator': identified,
                          'allocations': allocations, 'cash': projection['cash'],
                          'tax_reserve': projection['tax_reserve'],
                          'known_employer_exposure': exposure,
+                         'employer_exposure_evidence': {
+                             'value': exposure, 'unit': document['currency'],
+                             'completeness': 'COMPLETE' if numerator_complete else 'INCOMPLETE',
+                             'bound_status': numerator_relation,
+                             'assumptions': evidence_assumptions,
+                             'interpretation': 'Dollar exposure status only; it does not determine a concentration ratio bound.'},
                          'known_employer_fraction': weight(exposure, equity),
+                         'employer_concentration_evidence': concentration(equity, equity is not None),
                          'identified_assets_employer_fraction_sensitivity': weight(exposure, identified),
+                         'identified_assets_employer_concentration_evidence': concentration(identified, identified_is_complete),
                          'complete_employer_exposure': exposure if not unknown_overlap else None,
                          'unresolved_employer_overlap': list(dict.fromkeys(unknown_overlap)),
                          'projection_receipt': receipt})
@@ -359,7 +410,7 @@ def source_alternatives(document):
                       input_order_is_priority=False, retained_input=deepcopy(document),
                       limitations=['Target drift and employer fractions use each alternative post-flow equity on the shared target date.',
                                    'Identified-assets weights are labeled sensitivities, not complete-account weights.',
-                                   'Known issuer exposure can be a lower bound; unclassified residuals remain unknown.',
+                                   'Dollar exposure and concentration bounds are separate typed evidence. A known numerator divided by incomplete identified assets is a sensitivity, never an automatic lower concentration bound.',
                                    'No criterion direction, preference, tax law or uniquely optimal sale is inferred.'])
 
 

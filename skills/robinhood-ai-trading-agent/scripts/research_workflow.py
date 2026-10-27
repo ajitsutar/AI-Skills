@@ -15,14 +15,23 @@ from pathlib import Path
 import tempfile
 
 import handoff_report as exact_json
-import quant_report
-import quant_workbench
 import report_facts
 import research_contracts
-from quant_common import require
+from research_contracts import require
+
+# The execute checkpoint must remain available when numerical dependencies are
+# absent. These lightweight modules above use only the standard library.
+DEPENDENCY_FAILURE = None
+try:
+    import quant_report
+    import quant_workbench
+except ImportError as exc:
+    quant_report = quant_workbench = None
+    DEPENDENCY_FAILURE = {'type': type(exc).__name__, 'module': getattr(exc, 'name', None),
+                          'reason': str(exc)}
 
 ROOT = Path(__file__).resolve().parents[1]
-VERSION = 'research-workflow-2'
+VERSION = 'research-workflow-3'
 CONTRACT_OPERATIONS = {
     'research.bind_request': research_contracts.bind_request,
     'research.inventory_evidence': research_contracts.inventory_evidence,
@@ -118,6 +127,11 @@ def catalog():
                           'requirements', 'claims', 'omitted installed-helper defaults'],
             'output': 'New private directory containing plan.json and exact source bytes'},
         'summary': 'Verify a retained run, then project claims, coverage, source bindings and literal evidence states',
+        'execute': {
+            'input': 'The same explicit workbench request and source roles as prepare',
+            'output': 'New private root with prepare, run, verification and summary directories, fixed answer facts, completion receipt and artifact inventory',
+            'failure_policy': 'Preserve original request, partial artifacts and per-job failure states. Never overwrite or automatically retry.',
+            'scope': 'Offline installed helpers only. No dependency installation, backend, host download or remote action.'},
         'limits': ['Source identities and operation selection remain declared, not inferred from prose.',
                    'Requirements are an explicit checklist, not proof that the entire prompt was understood.',
                    'No execution prerequisites or external actions.'],
@@ -197,15 +211,18 @@ def check_preparation(document, sources, artifacts):
     require(encode(document) == prepared['plan.json'], 'PREPARED_REQUEST_BINDING_MISMATCH')
 
 
-def prepare(request, output, request_role, source_roles=None):
+def prepare(request, output, request_role, source_roles=None, attempted_source_writer=None):
     request, output = report_facts.local_path(request), report_facts.local_path(output)
     require(not output.is_relative_to(ROOT) and not output.exists(), 'NEW_PRIVATE_OUTPUT_REQUIRED')
 
-    def reader(path, _index):
+    def reader(path, index):
         # Preserve quant_report's local-path restrictions, including URL/UNC
         # rejection before joining. Original source names remain in the request.
         report_facts.local_path(path)
-        return report_facts.local_path(request.parent / path).read_bytes()
+        raw = report_facts.local_path(request.parent / path).read_bytes()
+        if attempted_source_writer is not None:
+            attempted_source_writer(path, index, raw)
+        return raw
 
     artifacts = prepare_artifacts(request.read_bytes(), reader, request_role, source_roles)
     output.mkdir()
@@ -348,7 +365,21 @@ def render(result, job_reports):
     return '\n'.join(lines).encode('utf-8')
 
 
-def build(raw, reader):
+class _RetainedArtifacts(dict):
+    """Optionally retain each completed artifact before a later stage can fail."""
+    def __init__(self, initial, writer=None):
+        super().__init__()
+        self.writer = writer
+        for name, data in initial.items():
+            self[name] = data
+
+    def __setitem__(self, name, data):
+        if self.writer is not None:
+            self.writer(name, data)
+        super().__setitem__(name, data)
+
+
+def build(raw, reader, artifact_writer=None):
     doc = report_facts.strict_json(raw)
     require(doc.get('schema_version') == 1 and doc.get('network_mode') == 'offline', 'OFFLINE_PLAN_REQUIRED')
     contract = doc['contract']
@@ -356,6 +387,7 @@ def build(raw, reader):
     jobs = doc.get('jobs', [])
     unique_rows(jobs, 'JOB')
     sources, values, artifacts = source_inventory(doc, reader)
+    artifacts = _RetainedArtifacts(artifacts, artifact_writer)
     if 'preparation' in doc:
         check_preparation(doc, sources, artifacts)
     artifacts['plan.json'] = raw
@@ -457,16 +489,26 @@ def build(raw, reader):
     return artifacts
 
 
-def run(plan, output):
+def _write_new(root, name, raw):
+    path = research_contracts.source_path(root, name)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with path.open('xb') as handle:
+        handle.write(raw)
+
+
+def run(plan, output, preserve_partial=False):
     plan, output = report_facts.local_path(plan), report_facts.local_path(output)
     require(not output.is_relative_to(ROOT) and not output.exists(), 'NEW_PRIVATE_OUTPUT_REQUIRED')
-    artifacts = build(plan.read_bytes(), lambda name: research_contracts.source_path(plan.parent, name).read_bytes())
-    output.mkdir()
-    for name, raw in artifacts.items():
-        path = output / name
-        path.parent.mkdir(parents=True, exist_ok=True)
-        with path.open('xb') as handle:
-            handle.write(raw)
+    writer = None
+    if preserve_partial:
+        output.mkdir()
+        writer = lambda name, raw: _write_new(output, name, raw)
+    artifacts = build(plan.read_bytes(), lambda name: research_contracts.source_path(plan.parent, name).read_bytes(),
+                      artifact_writer=writer)
+    if not preserve_partial:
+        output.mkdir()
+        for name, raw in artifacts.items():
+            _write_new(output, name, raw)
     return read_result(artifacts['result.json'])
 
 
@@ -539,6 +581,11 @@ def summarize(directory):
     """Project retained values only after the complete run and report verify."""
     directory = report_facts.local_path(directory)
     verification = verify(directory)
+    return _summarize_verified(directory, verification)
+
+
+def _summarize_verified(directory, verification):
+    """Internal projection shared with execute after its actual verification."""
     raw = (directory / 'result.json').read_bytes()
     result = read_result(raw)
     jobs = []
@@ -561,25 +608,151 @@ def summarize(directory):
                        'Consistency does not validate source truth, omitted tasks, operation choice or model adherence.']}
 
 
+def execute(request, output, request_role, source_roles=None):
+    """Run the existing protected stages once and retain their actual outcomes.
+
+    The root must be new and outside the skill. A rejected request leaves a
+    checkpoint instead of silently disappearing. Runtime failure never turns
+    retained historical artifacts or a partially computed job into completion.
+    """
+    import answer_facts
+    import evidence_provenance
+    request, output = report_facts.local_path(request), report_facts.local_path(output)
+    require(not output.is_relative_to(ROOT) and not output.exists(), 'NEW_PRIVATE_OUTPUT_REQUIRED')
+    output.mkdir()
+    stages = {name: {'status': 'NOT_STARTED'} for name in
+              ('prepare', 'run', 'verification', 'summary', 'answer_facts')}
+    raw, original, result, verification = None, None, None, None
+    failure = None
+    stage = 'prepare'
+    try:
+        stages[stage]['status'] = 'STARTED'
+        raw = request.read_bytes()
+        _write_new(output, 'original-request.json', raw)
+        original = report_facts.strict_json(raw)
+        require(DEPENDENCY_FAILURE is None, 'DEPENDENCY_UNAVAILABLE')
+        def retain_attempt(path, index, source_raw):
+            # Only bytes already requested by the existing validated local
+            # resolver are copied. No recursive directory or extra reads.
+            _write_new(output, f'attempted-sources/{index:04d}/source.json', source_raw)
+            _write_new(output, f'attempted-sources/{index:04d}/identity.json', encode({
+                'job_index': index, 'declared_source_path': path, 'sha256': sha(source_raw),
+                'status': 'READ_BYTES_NOT_YET_VALIDATED'}))
+        # Existing prepare validates source identities, exact roles and full
+        # object selections. Its reader never performs network acquisition.
+        prepare(request, output / 'prepare', request_role, source_roles,
+                attempted_source_writer=retain_attempt)
+        require((output / 'prepare/original-request.json').read_bytes() == raw,
+                'ORIGINAL_REQUEST_CHANGED_DURING_PREPARATION')
+        stages[stage]['status'] = 'COMPLETED'
+        stage = 'run'
+        stages[stage]['status'] = 'STARTED'
+        result = run(output / 'prepare/plan.json', output / 'run', preserve_partial=True)
+        stages[stage] = {'status': 'COMPLETED', 'research_status': result['status']}
+        stage = 'verification'
+        stages[stage]['status'] = 'STARTED'
+        verification = verify(output / 'run')
+        _write_new(output, 'verification/result.json', encode(verification))
+        stages[stage]['status'] = 'COMPLETED'
+        stage = 'summary'
+        stages[stage]['status'] = 'STARTED'
+        _write_new(output, 'summary/result.json', encode(_summarize_verified(output / 'run', verification)))
+        stages[stage]['status'] = 'COMPLETED'
+        stage = 'answer_facts'
+        stages[stage]['status'] = 'STARTED'
+        result_raw = (output / 'run/result.json').read_bytes()
+        facts = answer_facts._project(read_result(result_raw), sha(result_raw), artifact='run/result.json')
+        facts['verification'] = verification
+        _write_new(output, 'answer-facts.json', encode(facts))
+        _write_new(output, 'answer-facts.txt', answer_facts.text_projection(facts).encode('utf-8'))
+        stages[stage]['status'] = 'COMPLETED'
+    except Exception as exc:
+        # Preserve unexpected runtime/dependency failures too. KeyboardInterrupt
+        # and process termination are not caught or misrepresented as outcomes.
+        failure = {'stage': stage, 'type': type(exc).__name__, 'reason': str(exc)}
+        if DEPENDENCY_FAILURE is not None:
+            failure.update(category='DEPENDENCY_UNAVAILABLE', dependency=DEPENDENCY_FAILURE)
+        stages[stage] = {'status': 'FAILED', 'error': failure}
+        _write_new(output, 'failure.json', encode(failure))
+    requested_jobs = original.get('jobs', []) if isinstance(original, dict) else []
+    if not isinstance(requested_jobs, list):
+        requested_jobs = []
+    jobs = []
+    retained_jobs = result.get('jobs', []) if isinstance(result, dict) else []
+    for index, requested in enumerate(requested_jobs):
+        if not isinstance(requested, dict):
+            requested = {}
+        actual = retained_jobs[index] if index < len(retained_jobs) else None
+        partial = output / f'run/jobs/{index:04d}/quant/bundle.json'
+        partial_available = actual is None and partial.is_file()
+        status = actual['status'] if actual else 'NOT_EXECUTED_OR_UNRESOLVED'
+        if partial_available:
+            status = 'PARTIAL_ARTIFACTS_UNVERIFIED'
+        observed = status == 'COMPUTED'
+        evidence = evidence_provenance.classify_evidence({
+            'origin': 'current', 'kind': 'invocation', 'execution_observed': observed,
+            'artifacts_available': actual is not None or partial_available,
+            'verification_passed': verification is not None})
+        jobs.append({'job_index': index, 'id': requested.get('id'), 'operation': requested.get('operation'),
+                     'computation_status': status,
+                     'reason': actual.get('reason') if actual else 'No complete retained job outcome is available.',
+                     'result_pointer': f'/jobs/{index}/result' if actual else None,
+                     'nested_states': copy.deepcopy(actual.get('nested_states', [])) if actual else [],
+                     'partial_artifact': partial.relative_to(output).as_posix() if partial_available else None,
+                     'evidence': evidence,
+                     'financial_conclusion_validated': False})
+    diagnostics = (result is None or result.get('status') != 'COMPUTED' or
+                   any(j['computation_status'] != 'COMPUTED' for j in jobs))
+    completion = {'schema_version': 1, 'workflow_version': VERSION,
+                  'status': 'INCOMPLETE' if failure else
+                            'COMPLETED_WITH_DIAGNOSTICS' if diagnostics else 'COMPLETED_LOCAL_WORKFLOW',
+                  'request_sha256': sha(raw) if raw is not None else None,
+                  'request_hash_scope': 'exact_original_request_bytes',
+                  'stages': stages, 'jobs': jobs,
+                  'coverage': copy.deepcopy(result.get('coverage', [])) if result else [],
+                  'failure': failure, 'network_requests_performed': 0,
+                  'dependency_installs_performed': 0, 'host_download_observed': False,
+                  'whole_answer_pass': False, 'execution_authorized': False,
+                  'limits': ['Completion describes only these local stages and declared jobs, not full prompt understanding.',
+                             'Nested invalid, ambiguous or null outcomes remain unresolved even when computation and replay succeed.',
+                             'No source truth, arbitrary model prose, investment correctness or external file delivery was verified.']}
+    _write_new(output, 'completion.json', encode(completion))
+    inventory = [{'path': path.relative_to(output).as_posix(), 'bytes': path.stat().st_size,
+                  'sha256': sha(path.read_bytes())} for path in sorted(output.rglob('*')) if path.is_file()]
+    _write_new(output, 'export-inventory.json', encode({
+        'schema_version': 1, 'artifact_root': '.', 'artifacts': inventory,
+        'inventory_excludes_itself': True, 'location': 'local_filesystem',
+        'host_download_observed': False, 'remote_upload_observed': False}))
+    return completion
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('schema', 'prepare', 'run', 'verify', 'summary'))
+    parser.add_argument('command', choices=('schema', 'prepare', 'run', 'verify', 'summary', 'execute'))
     parser.add_argument('input', nargs='?')
     parser.add_argument('--private-output-dir')
     parser.add_argument('--request-role')
     parser.add_argument('--source-role', nargs=2, action='append', metavar=('PATH', 'ROLE'))
     args = parser.parse_args()
     try:
-        if args.command != 'prepare':
+        if args.command != 'execute':
+            require(DEPENDENCY_FAILURE is None, 'DEPENDENCY_UNAVAILABLE')
+        if args.command not in ('prepare', 'execute'):
             require(args.request_role is None and args.source_role is None, 'PREPARE_OPTIONS_ONLY')
         if args.command == 'schema':
             print(encode(catalog()).decode(), end='')
-        elif args.command == 'prepare':
+        elif args.command in ('prepare', 'execute'):
             require(args.input and args.private_output_dir, 'REQUEST_AND_OUTPUT_REQUIRED')
             roles = args.source_role or []
             require(len(dict(roles)) == len(roles), 'DUPLICATE_SOURCE_ROLES')
-            prepare(args.input, args.private_output_dir, args.request_role, dict(roles))
-            print('PREPARED')
+            if args.command == 'prepare':
+                prepare(args.input, args.private_output_dir, args.request_role, dict(roles))
+                print('PREPARED')
+            else:
+                result = execute(args.input, args.private_output_dir, args.request_role, dict(roles))
+                print(result['status'])
+                if result['status'] != 'COMPLETED_LOCAL_WORKFLOW':
+                    parser.exit(2)
         elif args.command == 'run':
             require(args.input and args.private_output_dir, 'PLAN_AND_OUTPUT_REQUIRED')
             print(run(args.input, args.private_output_dir)['status'])

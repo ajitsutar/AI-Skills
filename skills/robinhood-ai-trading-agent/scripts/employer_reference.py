@@ -33,6 +33,10 @@ def employer_diversification_baseline(document):
     require(isinstance(document.get('source_ref'), str) and document['source_ref'].strip(), 'SOURCE_REF_REQUIRED')
     require(document.get('source_role') in {'supplied_observation', 'hypothetical_scenario', 'user_assumption', 'unknown'},
             'SOURCE_ROLE_REQUIRED')
+    # These fixed references always continue the bound opening/source events.
+    # Independent scenarios belong in source_alternatives with explicit scope.
+    require('projection_scope' not in document or document['projection_scope'] == {'mode': 'baseline_continuation'},
+            'EMPLOYER_REFERENCE_REQUIRES_BASELINE_CONTINUATION')
     with localcontext(Context(prec=64 + _precision(document) + _precision(source))):
         return _baseline(document, source, sha)
 
@@ -110,6 +114,7 @@ def _baseline(document, original, sha):
     common = {'currency': document['currency'], 'role': document['role'], 'source': source,
               'source_ref': document['source_ref'], 'source_role': document['source_role'],
               'date_basis': 'source_calendar_label', 'target_date': target, 'included_states': selected,
+              'projection_scope': {'mode': 'baseline_continuation'},
               'mark_policy': 'carry_forward_supplied', 'opening_tax_reserve': baseline.get('tax_reserve'),
               'other_assets': deepcopy(source.get('other_assets')), 'liabilities': deepcopy(source.get('liabilities'))}
     def paths(sale_basis):

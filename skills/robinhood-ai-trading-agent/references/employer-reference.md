@@ -36,6 +36,22 @@ source event remains in the nested flow audit. Selecting no future vest returns
 an unresolved reference-date status and a separate retained projection; no sale
 date is invented.
 
+The operation binds `projection_scope: {"mode": "baseline_continuation"}` internally
+for every reference and denominator sensitivity, including the retained projection.
+Callers need not supply this field. If supplied, it must equal that exact scope;
+an independent opening/event scope is rejected. Source events remain in the audit
+and undergo the declared date/state filters. Additional independent scenarios use
+`planning.source_alternatives` with their own explicit scope; they do not redefine
+these fixed references. The lower-level explicit-scope requirement remains in force.
+
+The source `baseline_rebalance.equity` is total account equity, including the
+separately listed cash. Reconcile it against marked holdings plus that cash once;
+do not add cash to the declared equity again. Keep total account equity/NAV,
+identified assets, and any explicitly defined noncash sleeve denominator distinct.
+A reconciliation residual is unclassified, not additional cash or established
+employer exposure. The named residual sensitivity carries it as an unknown asset
+classification; the primary result does not invent missing account balances.
+
 The ordered reference paths are:
 
 1. Retain opening direct units and all included net grants.

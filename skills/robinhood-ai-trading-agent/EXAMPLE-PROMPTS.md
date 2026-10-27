@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-260 examples across 36 workflows, from first-time investing to quantitative research.
+266 examples across 37 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the robinhood-ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -55,6 +55,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Multi-asset paper accounting and platform evidence](#multi-asset-paper-accounting-and-platform-evidence) | Quant | 5 |
 | [Explicit time-series scenarios and diagnostics](#explicit-time-series-scenarios-and-diagnostics) | Quant | 3 |
 | [Portable quant methods without a backend](#portable-quant-methods-without-a-backend) | Quantitative researcher | 10 |
+| [Checked calculations and model comparisons](#checked-calculations-and-model-comparisons) | Intermediate to advanced | 6 |
 
 ## Getting started and learning
 
@@ -330,7 +331,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 58. Manage employer-stock concentration
 
-> Review [CURRENT EMPLOYER STOCK] and [NET VESTING SCHEDULE]. Account for shares withheld or sold for taxes, separate employment and investment exposure, and compare diversification paths without assuming gross grants are spendable cash.
+> Review [CURRENT EMPLOYER STOCK] and [NET VESTING SCHEDULE] from [ORIGINAL PORTFOLIO CONTEXT]. Compare the fixed baseline-continuation references: retain, sell net new vests, and sell existing direct shares plus net new vests. Carry supplied obligations and withdrawals, keep unknown balances unknown, and separate employment exposure and tax shares from spendable cash. Keep independent opening or event scenarios separate from these references; do not choose a preferred trade without my priorities.
 
 ### 59. Compare portfolio allocations
 
@@ -1274,6 +1275,35 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 ### 260. Continue when an optional library is missing
 
 > Check the requirements of my requested portable operations in this host. When an optional library is missing, preserve the explicit DEPENDENCY_UNAVAILABLE outcome and identify the affected operations. Continue unrelated bundled calculations that can actually run, retaining their inputs and outputs separately. Do not install packages, switch models, substitute another method or contact a backend. Tell me which work remains uncomputed and the local dependency it requires.
+
+
+## Checked calculations and model comparisons
+
+**Audience:** Intermediate to advanced. Guides: [model alignment hardening](references/model-alignment-hardening.md), [source bound workflow](references/source-bound-workflow.md), [model independent research](references/model-independent-research.md).
+
+### 261. Execute and verify a supplied request
+
+> Run [REQUEST.json] through the installed single-command offline workflow in a new private directory. Preserve the original inputs, report actual execution and verification, and build the numerical answer from generated facts. Keep incomplete work and host export limitations explicit.
+
+### 262. Keep sale proceeds distinct from costs
+
+> Using [TRADE REQUEST], calculate gross sale value, transaction costs and net proceeds. Preserve their distinct generated labels, units and result pointers in both the table and final explanation. Do not call costs spendable proceeds.
+
+### 263. Separate selected order from affordable maximum
+
+> For [ORDER INPUTS], report the selected quantity and its debit and remaining cash separately from the maximum affordable quantity and its own debit and remainder. Distinguish per-share cost rates from aggregate costs.
+
+### 264. Check concentration with an incomplete account
+
+> Using [ACCOUNT INPUTS], distinguish known dollar exposure, known-equity concentration and full-account concentration. Retain numerator and denominator completeness and justify any bound explicitly. If unknown assets could change both, report the concentration as unresolved rather than choosing a bound direction.
+
+### 265. Compare hash scopes before claiming equality
+
+> Compare [HASH DESCRIPTORS] using their algorithms, canonicalization and exact object scopes. Do not equate contract identity with full-input identity. Report incompatible scopes, missing metadata and different digests separately.
+
+### 266. Audit execution and export evidence
+
+> Review [RETAINED RUN RECORDS] without editing them. Separate synthetic historical invocation records, observed current execution, numerical replay and files actually collected. Check active package version consistency and preserve any failure or unavailable export.
 
 ## Keeping this catalog current
 

@@ -334,7 +334,7 @@
         },
         {
           "title": "Manage employer-stock concentration",
-          "prompt": "Review [CURRENT EMPLOYER STOCK] and [NET VESTING SCHEDULE]. Account for shares withheld or sold for taxes, separate employment and investment exposure, and compare diversification paths without assuming gross grants are spendable cash."
+          "prompt": "Review [CURRENT EMPLOYER STOCK] and [NET VESTING SCHEDULE] from [ORIGINAL PORTFOLIO CONTEXT]. Compare the fixed baseline-continuation references: retain, sell net new vests, and sell existing direct shares plus net new vests. Carry supplied obligations and withdrawals, keep unknown balances unknown, and separate employment exposure and tax shares from spendable cash. Keep independent opening or event scenarios separate from these references; do not choose a preferred trade without my priorities."
         },
         {
           "title": "Compare portfolio allocations",
@@ -1463,6 +1463,42 @@
         {
           "title": "Continue when an optional library is missing",
           "prompt": "Check the requirements of my requested portable operations in this host. When an optional library is missing, preserve the explicit DEPENDENCY_UNAVAILABLE outcome and identify the affected operations. Continue unrelated bundled calculations that can actually run, retaining their inputs and outputs separately. Do not install packages, switch models, substitute another method or contact a backend. Tell me which work remains uncomputed and the local dependency it requires."
+        }
+      ]
+    },
+    {
+      "id": "checked-model-answers",
+      "title": "Checked calculations and model comparisons",
+      "audience": "Intermediate to advanced",
+      "guides": [
+        "references/model-alignment-hardening.md",
+        "references/source-bound-workflow.md",
+        "references/model-independent-research.md"
+      ],
+      "prompts": [
+        {
+          "title": "Execute and verify a supplied request",
+          "prompt": "Run [REQUEST.json] through the installed single-command offline workflow in a new private directory. Preserve the original inputs, report actual execution and verification, and build the numerical answer from generated facts. Keep incomplete work and host export limitations explicit."
+        },
+        {
+          "title": "Keep sale proceeds distinct from costs",
+          "prompt": "Using [TRADE REQUEST], calculate gross sale value, transaction costs and net proceeds. Preserve their distinct generated labels, units and result pointers in both the table and final explanation. Do not call costs spendable proceeds."
+        },
+        {
+          "title": "Separate selected order from affordable maximum",
+          "prompt": "For [ORDER INPUTS], report the selected quantity and its debit and remaining cash separately from the maximum affordable quantity and its own debit and remainder. Distinguish per-share cost rates from aggregate costs."
+        },
+        {
+          "title": "Check concentration with an incomplete account",
+          "prompt": "Using [ACCOUNT INPUTS], distinguish known dollar exposure, known-equity concentration and full-account concentration. Retain numerator and denominator completeness and justify any bound explicitly. If unknown assets could change both, report the concentration as unresolved rather than choosing a bound direction."
+        },
+        {
+          "title": "Compare hash scopes before claiming equality",
+          "prompt": "Compare [HASH DESCRIPTORS] using their algorithms, canonicalization and exact object scopes. Do not equate contract identity with full-input identity. Report incompatible scopes, missing metadata and different digests separately."
+        },
+        {
+          "title": "Audit execution and export evidence",
+          "prompt": "Review [RETAINED RUN RECORDS] without editing them. Separate synthetic historical invocation records, observed current execution, numerical replay and files actually collected. Check active package version consistency and preserve any failure or unavailable export."
         }
       ]
     }

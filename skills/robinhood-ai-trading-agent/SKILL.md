@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # Robinhood Multi-Asset Quant Research and Portfolio Agent
 
-Package version: **5.1.1 - October 23, 2026**.
+Package version: **5.1.3 - October 27, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -113,6 +113,11 @@ baskets. Label earlier target allocations separately; do not compare their gross
 targets with another portfolio's cost-sized exposure. Final conclusions must
 preserve the differences among initial budget, gross invested amount, fees and
 outside cash instead of calling a partially invested position the full budget.
+
+For explicit workbench requests, prefer the single offline `research_workflow.py execute`
+command and its generated answer facts and completion record; see
+[checked answers across model hosts](references/model-alignment-hardening.md).
+Keep generated metric labels, scenario scopes and evidence states in the answer.
 
 Use the [source-bound workflow](references/source-bound-workflow.md) for supported
 numerical work. Start with its `prepare` command when the inputs already form an

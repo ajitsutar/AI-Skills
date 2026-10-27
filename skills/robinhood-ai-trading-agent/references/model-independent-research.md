@@ -214,3 +214,5 @@ certify a comparison. If both old and structured returns are supplied, they must
 agree. `arithmetic_valid` never establishes valuation evidence quality: preserve
 the EPS/FCF period and normalization bridge, terminal multiple or other numerical
 model, distributions and costs in case inputs, assumptions and evidence.
+
+Use [checked answers across hosts](model-alignment-hardening.md) for the single-command runner, fixed numeric labels, concentration bounds and scope-aware provenance checks. These checks classify retained evidence; they do not certify arbitrary model prose or host downloads.

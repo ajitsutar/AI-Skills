@@ -35,7 +35,9 @@ STATUSES = {'COMPUTED', 'REJECTED_INPUT', 'CALCULATION_FAILED', 'RESEARCH_QUEUE_
             'NO_INCLUDED_FUTURE_VEST_DATE', 'DATED_ALTERNATIVES_COMPARED',
             'SOURCE_BOUND_SCENARIO_AT_REQUESTED_EXIT', 'SOURCE_BOUND_CONDITIONAL_COMPARISON',
             'PRIMARY_APPLICABILITY_UNRESOLVED', 'CONDITIONAL_WEIGHTED_ARITHMETIC',
-            'COMPLETE_WITHIN_SUPPLIED_ROWS', 'KNOWN_LOWER_BOUND_ONLY'}
+            'COMPLETE_WITHIN_SUPPLIED_ROWS', 'KNOWN_LOWER_BOUND_ONLY',
+            'EXACT', 'LOWER_BOUND', 'UPPER_BOUND', 'UNKNOWN', 'COMPLETE',
+            'CONDITIONAL_RATIO', 'SENSITIVITY_ONLY', 'UNAVAILABLE'}
 # The original workbench numerical modules and existing schemas were inspected
 # byte-for-text-identical before the additive operation extension. This identifies
 # a known historical schema, not a successful replay with the current code.
@@ -53,7 +55,7 @@ QUANT_FILES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
                'research_analytics.py', 'evidence_semantics.py', 'ranking_alignment.py',
                'vqm_research.py', 'public_research.py', 'research_bundle.py', 'screen_review.py',
                'horizon_review.py', 'cash_benchmark.py', 'trading_calendar.py', 'allocation_policy.py',
-               'portfolio_decision.py', 'planning_roles.py', 'portfolio_projection.py', 'planning_comparison.py',
+               'portfolio_decision.py', 'planning_roles.py', 'portfolio_projection.py', 'planning_comparison.py', 'concentration_bounds.py',
                'flow_normalization.py', 'price_comparison.py', 'recommendation_report.py', 'employer_reference.py',
                'equity_cash_comparison.py', 'source_exposure.py', 'technical_toolkit.py',
                'fundamental_toolkit.py', 'sentiment_toolkit.py', 'factor_research.py',
