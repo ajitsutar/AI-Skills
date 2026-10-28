@@ -401,7 +401,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 73. Validate a return calibration
 
-> Audit [EXPECTED-RETURN CALIBRATION] before using it in portfolio construction. Check matching horizon and return units, training/test chronology, retained evidence and all variants; reject factor scores or analyst upside substituted for expected returns.
+> Audit [EXPECTED-RETURN CALIBRATION] before using it in portfolio construction. Check matching horizon and return units, training/test chronology, retained evidence and all variants; reject factor scores or analyst upside substituted for expected returns. Distinguish observed time gaps and evidence age from declared coverage and recency rules, and assess each retained statistical ledger separately from evidence labels. Do not invent continuous-coverage requirements or treat a solver result as calibration validation. Apply the selected workflow's field semantics and inherited metadata; separate paired-outcome dependence from invalid reuse. Keep policy-dependent checks conditional in the final recommendations and missing-requirements list; distinguish absent labels from unverified provenance and aggregate rankings from elementwise comparisons.
 
 ### 74. Stress covariance assumptions
 

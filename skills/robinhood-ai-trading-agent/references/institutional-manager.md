@@ -91,6 +91,72 @@ is not expected return. Inspect estimation sensitivity, constraint binding,
 concentration and an uncomplicated baseline before accepting an optimized proposal.
 Continuous weights are not affordable shares or executable orders.
 
+### Calibration audit boundaries
+
+Audit the declared profile, horizon, return units, benchmark and management mode,
+then distinguish contract consistency from verified forecast provenance and
+empirical adequacy. A successful solver or a nonempty evidence field establishes
+neither calibrated expected returns nor suitable investment weights.
+
+Check the selected operation's actual field semantics, defaults and metadata
+scope before declaring a required input missing. Apply document or calibration
+units and horizon to asset values when that operation defines them there; do not
+require duplicate per-asset fields or rename a valid input to match another
+workflow. For example, `benchmark_portfolio.py` consumes asset `alpha` under its
+document/calibration excess-return contract; the separate `quant_portfolio.py`
+robust-return contract does not add `expected_return` or `return_uncertainty`
+requirements to it. Missing empirical mapping or uncertainty evidence is a
+validation limitation, not proof that a particular literal key is required.
+A label's presence or absence alone neither proves nor disproves provenance.
+A scan finding no factor-score or analyst-upside keys supports only that limited
+observation, not a claim that supplied returns were never derived from them.
+Distinguish no substitution performed during this audit from unverified upstream
+derivation; establish provenance from retained source and transformation evidence.
+
+Report training, freeze, test and as-of ordering with retained operands. A gap
+between periods is an observed interval, not an automatic defect or a requirement
+to add observations. A deliberate embargo or untouched holdout may explain it,
+but do not assert that explanation without evidence. Apply an explicit coverage
+requirement when one is supplied; otherwise disclose the gap and its unknown
+purpose without inventing continuous-calendar coverage as a prerequisite.
+
+Report evidence age separately from freshness compliance. Classify an age limit
+as met or unmet only against an applicable declared recency rule; an observed
+regime or data change can separately support a relevance concern. Without either,
+state that recency adequacy is unassessed, not that elapsed time alone proves
+staleness. Newer evaluation may be recommended as additional research, but must
+not be presented as a mandatory missing interval absent that requirement.
+Keep timestamp precision and time zones: report exact elapsed durations or label
+whole-day truncation/calendar-date differences explicitly. Do not describe a
+truncated duration as an exact timestamp difference.
+
+Carry the same scope and conditions into the final recommendation and any
+`missing_requirements` list. Separate missing empirical evidence for a claimed
+calibration from missing policy needed only to assess compliance with that policy.
+An absent recency or coverage policy remains unassessed; it is not by itself a
+prerequisite to empirical calibration unless the selected contract or user requires
+it. Attach each applicable condition to its own checklist item, rather than relying
+on an earlier qualification or a trailing condition for a different item. Keep
+optional research recommendations separate from requirements. A correct overall
+verdict does not justify adding unsupported prerequisites in its remedy.
+
+Inventory the evidence field and every retained supporting ledger separately.
+A disclaimer or schema-only label does not erase supplied numerical observations;
+those observations also do not validate a fitted model, trial completeness,
+asset-return mapping or forecast provenance by their mere presence. Compute and
+qualify supported descriptive metrics for every supplied variant; retain unknown
+all-trial completeness, shared-outcome dependence and missing validation details.
+State which conclusion follows from which evidence rather than converting a
+field-level absence into a claim that the entire calibration record is absent.
+Variants evaluated on the same outcomes form a paired comparison. Shared outcomes
+do not by themselves invalidate it or require disjoint datasets or independent
+replications. Do not count duplicated outcomes as additional independent sample
+size; assess dependence, selection and the evaluation design for the particular
+inference being claimed. Aggregate error rankings do not establish that every
+individual error is smaller. Check aligned observations before making elementwise
+claims; distinguish aggregate metrics, maximum errors and pointwise comparisons,
+and retain tradeoffs when variants rank differently across metrics.
+
 For strategy development use causal data, purged expanding-window splits, a final
 untouched test, net costs, a complete variant registry, serial-dependence-aware
 inference, and forward paper execution. The period portfolio simulator and the

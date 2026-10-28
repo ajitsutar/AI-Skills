@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # Robinhood Multi-Asset Quant Research and Portfolio Agent
 
-Package version: **5.1.3 - October 27, 2026**.
+Package version: **5.1.6 - October 28, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -290,6 +290,11 @@ Treat supplied cash floors, sleeve weights, drift bands and limits as planning
 inputs; do not turn sample settings into user instructions or execution gates.
 Fractional quantities and native dollar amounts support small budgets when the
 host/broker offers them; see [fractional-shares.md](references/fractional-shares.md).
+
+For expected-return calibration audits, distinguish observed gaps and elapsed age
+from explicit coverage or recency requirements. Missing policy means unassessed,
+not a newly invented invalidity rule. Apply the selected workflow's schema and inherited metadata, and review retained
+statistical evidence separately from labels; follow the [calibration audit boundaries](references/institutional-manager.md#calibration-audit-boundaries).
 
 For allocation amounts without user weights or supported optimizer inputs, use
 the [shared allocation baseline](references/allocation-policy.md) and
