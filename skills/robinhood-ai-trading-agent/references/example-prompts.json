@@ -279,7 +279,8 @@
       "title": "Analyst reports, consensus and financial information",
       "audience": "Intermediate to expert",
       "guides": [
-        "references/analyst-research.md"
+        "references/analyst-research.md",
+        "references/analyst-source-adapter.md"
       ],
       "prompts": [
         {
@@ -313,6 +314,14 @@
         {
           "title": "Separate fair value from price targets",
           "prompt": "Compare [INTRINSIC FAIR-VALUE ESTIMATE], forward analyst targets and the historical 52-week trading range for [COMPANY]. Explain their different meanings and why none alone establishes a probability of achieving my desired return."
+        },
+        {
+          "title": "Extract analyst rows from a retained table",
+          "prompt": "Extract analyst records from [RETAINED HTML OR MARKDOWN TABLE] for [ISSUER AND CUTOFF]. Match columns by their labels and retain every accepted, excluded and conflicting row with its source location. Preserve target horizon, currency, share basis and access level; an aggregate table is not a full report and ambiguous rows must not be silently averaged."
+        },
+        {
+          "title": "Compare earnings multiples on compatible bases",
+          "prompt": "Using [DATED QUOTE] and [INDIVIDUALLY SOURCED EPS ESTIMATES], calculate separately labeled multiples only for compatible periods, currencies, accounting definitions and share bases. Keep fiscal-year adjusted and rolling GAAP estimates distinct, preserve publication cutoffs, and report missing or nonpositive EPS without manufacturing a comparable multiple."
         }
       ]
     },
@@ -481,12 +490,13 @@
       "guides": [
         "references/garch-volatility.md",
         "references/quant-workbench.md",
-        "references/portfolio-management.md"
+        "references/portfolio-management.md",
+        "references/risk-diagnostics.md"
       ],
       "prompts": [
         {
           "title": "Run evidenced GARCH",
-          "prompt": "Run the bundled GARCH(1,1) workflow on audited prices for [SYMBOL]. Report data counts, convergence, training/holdout separation, QLIKE against the baseline, forecast horizon and actual sizing eligibility."
+          "prompt": "Run the bundled GARCH(1,1) workflow on audited prices for [SYMBOL], with the declared Gaussian or Student-t innovation choice. Report data counts, convergence, stationarity and residual diagnostics, Student-t degrees of freedom when applicable, training/holdout separation, QLIKE against the baseline, forecast horizon and actual sizing eligibility. Preserve failed diagnostics rather than treating a fitted model as a reliable forecast."
         },
         {
           "title": "Compare asymmetric volatility models",
@@ -498,7 +508,7 @@
         },
         {
           "title": "Estimate historical tail losses",
-          "prompt": "Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps."
+          "prompt": "Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps. If applying current weights to aligned asset returns, label the result a current-weight shock distribution rather than a historical strategy backtest. Report the supplied notional denominator, effective tail sample mass and sparse-sample warnings; do not scale a short sample into a guaranteed future loss limit. Calculate drawdown only from a supplied realized portfolio or strategy return path; do not infer historical strategy drawdown from today’s weights."
         },
         {
           "title": "Run portfolio stress scenarios",
@@ -511,6 +521,10 @@
         {
           "title": "Estimate covariance and component risk",
           "prompt": "Estimate aligned-return covariance and component risk for [PORTFOLIO]. Review sample coverage, asset ordering and documented shrinkage settings, then show sensitivity without claiming an unimplemented estimator was run."
+        },
+        {
+          "title": "Combine conditional portfolio variance paths",
+          "prompt": "Combine [MARGINAL VARIANCE FORECASTS] with [DATED CORRELATION MATRIX], [CURRENT WEIGHTS] and [NOTIONAL] over [HORIZONS]. Preserve each model diagnostic and return-unit convention; distinguish cumulative, average-period and annualized volatility. State the fixed-correlation and cross-period assumptions, and do not turn this conditional approximation into a fitted multivariate model, loss ceiling or spending-target probability."
         }
       ]
     },
@@ -521,7 +535,8 @@
       "guides": [
         "references/data-and-analytics.md",
         "references/financial-normalization.md",
-        "references/quant-workbench.md"
+        "references/quant-workbench.md",
+        "references/quant-data-contracts.md"
       ],
       "prompts": [
         {
@@ -555,6 +570,18 @@
         {
           "title": "Audit earnings-yield arithmetic",
           "prompt": "Audit [VALUATION SNAPSHOT] for mismatched price/EPS dates, trailing versus forward definitions, negative earnings and inconsistent share counts. Show which comparisons remain valid and which require correction."
+        },
+        {
+          "title": "Resolve historical security identities",
+          "prompt": "Using [RETAINED IDENTITY SOURCES], reconstruct the listing, ticker and index-membership episodes known by [CUTOFF] for [DATE]. Preserve issuer and share-class identities, publication times and revision lineage. Report ambiguous or reused tickers instead of merging different securities, and distinguish missing evidence from an observed absence."
+        },
+        {
+          "title": "Preserve historical feature revisions",
+          "prompt": "Map [RETAINED FINANCIAL, ANALYST OR SENTIMENT RECORDS] into a point-in-time feature dataset at [CUTOFF]. Keep source-row pointers, event and first-availability times, units, currency and revision identity. Bind records to the supplied security identities, retain superseded vintages and flag missing availability rather than substituting a fiscal or retrieval date."
+        },
+        {
+          "title": "Reconcile revised price snapshots",
+          "prompt": "Compare [PREVIOUS PRICE SNAPSHOT] with [CURRENT PRICE SNAPSHOT] under the same security, provider and adjustment contract. Report changed, added and removed sessions and invalidate the declared affected calculations. Reuse an unchanged prefix only with my explicit opt-in and current provider evidence; otherwise require a full refresh. Do not describe this supplied-data reconciliation as a completed download or measured speedup."
         }
       ]
     },
@@ -565,7 +592,8 @@
       "guides": [
         "references/quant-research.md",
         "references/quant-workbench.md",
-        "references/research-methods.md"
+        "references/research-methods.md",
+        "references/experiment-registry.md"
       ],
       "prompts": [
         {
@@ -599,6 +627,18 @@
         {
           "title": "Evaluate a challenger model",
           "prompt": "Compare [CHAMPION] and [CHALLENGER] on the same frozen contract and genuinely new paper observations. Separate implementation agreement, forecast calibration, net performance and operational changes before recommending replacement."
+        },
+        {
+          "title": "Retain failed and revised experiment attempts",
+          "prompt": "Create [PRIVATE EXPERIMENT REGISTRY] for [RESEARCH CAMPAIGN] and register the frozen prompt, data vintages, runtime, selection rule and accounting conventions before execution. Retain successful, failed and abandoned outcomes with their actual evidence. Record changed assumptions as linked new attempts; audit missing or modified artifacts without overwriting losing runs or claiming the local journal proves a complete research history."
+        },
+        {
+          "title": "Audit overlapping experiment windows",
+          "prompt": "Review [REGISTERED ATTEMPTS], including failed trials, for overlap between screening, training, labels and evaluation periods. Show which comparisons reuse selection information and which data arrived after the declared cutoff. Keep late registrations visible and distinguish an overlap diagnostic from a multiple-testing correction or proof that a holdout was globally untouched."
+        },
+        {
+          "title": "Capture a prospective paper prediction",
+          "prompt": "For [PREVIOUSLY REGISTERED PAPER ATTEMPT], retain [ACTUAL PREDICTION OR TARGET WEIGHTS] after its decision time and before its target time, with source cutoff and execution assumptions. Later attach the actual outcome, accounting and benchmark evidence. Preserve missed or duplicate capture failures; do not backdate historical results, send orders or create a recurring schedule."
         }
       ]
     },
@@ -1594,7 +1634,9 @@
       "audience": "Investors comparing public disclosures and follower strategies",
       "guides": [
         "subskills/portfolio-following/SKILL.md",
-        "references/portfolio-follower-sources.md"
+        "references/portfolio-follower-sources.md",
+        "references/portfolio-disclosure-inputs.md",
+        "references/portfolio-follower-calculations.md"
       ],
       "prompts": [
         {
@@ -1608,6 +1650,18 @@
         {
           "title": "Compare corrected disclosures without duplicate signals",
           "prompt": "Compare this newly retrieved disclosure against the previous checkpoint. Identify amendments, withdrawals and new source records without treating the initial baseline as newly executed trades or inventing exact weights from amount ranges."
+        },
+        {
+          "title": "Normalize supplied public disclosures",
+          "prompt": "Normalize [RETAINED 13F FILINGS OR PUBLIC TRANSACTION DISCLOSURES] at [CUTOFF]. Reconcile source value units, cover-page totals, dated security mappings and the disclosed owner or reporting manager. Keep excluded options, unmapped securities, amount ranges and amendments visible; do not infer exact political-trade quantities, personal wealth weights or a complete replacement basket from an incomplete filing."
+        },
+        {
+          "title": "Build overlapping follower sleeves",
+          "prompt": "Using [NORMALIZED PUBLIC DISCLOSURES], [RECONCILED FOLLOWER BASELINES] and [SLEEVE BUDGETS], calculate a long-only USD common-stock target portfolio under my declared weighting, source-age and position-cap rules. Aggregate duplicate securities, retain cap overflow as cash and preserve frozen or unavailable-source holdings. Separate disclosed source allocations from my proposed targets and show issuer overlap across share classes separately."
+        },
+        {
+          "title": "Prepare a cash-funded follower rebalance",
+          "prompt": "Turn [FOLLOWER TARGETS] into proposals using [RECONCILED HOLDINGS], dated unadjusted quotes, settled cash, pending receivables, fees and quantity increments. Propose selling only shares attributed to the follower scope, including when I own unrelated shares of the same ticker. Fund buys only from spendable settled cash; show deferred trades, rounding cash and estimated unsettled sale proceeds without treating proposals as orders."
         }
       ]
     }

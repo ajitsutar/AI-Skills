@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # Robinhood Multi-Asset Quant Research and Portfolio Agent
 
-Package version: **5.5.2 - November 2, 2026**.
+Package version: **5.5.3 - November 2, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
