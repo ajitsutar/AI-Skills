@@ -370,10 +370,12 @@ class ReplayTests(unittest.TestCase):
             'experiment.validate_attempt', 'experiment.overlap_review',
             'release.rights_inventory', 'release.grade_response'}
         self.assertEqual(set(workbench.ASSURANCE_OPERATIONS), assurance_operations)
+        follower_operations = {'follower.normalize', 'follower.targets', 'follower.rebalance'}
+        self.assertEqual(set(workbench.FOLLOWER_OPERATIONS), follower_operations)
         self.assertEqual({j['operation'] for j in doc['jobs']},
                          set(workbench.OPERATIONS) - source_operations - set(workbench.ANALYSIS_OPERATIONS)
                          - set(workbench.MULTIASSET_OPERATIONS) - portable_operations - monthly_operations
-                         - assurance_operations)
+                         - assurance_operations - follower_operations)
 
     def fixture(self):
         return {'schema_version': 1, 'contract': {'prompt': 'Fictional risk review', 'purpose': 'compatibility',

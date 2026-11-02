@@ -110,7 +110,7 @@ def scenario_book(positions, scenarios, nav, base_currency):
         results.append({'name': scenario['name'], 'pnl_base': loss, 'pnl_fraction': loss/equity,
                         'post_scenario_nav': equity+loss, 'positions': impacts})
     return {'scenarios': results, 'execution_authorized': False, 'nav_reconciled': False,
-            'limitation': 'Model P&L, not liquidation bids or margin calculation. NAV/collateral must be reconciled separately. No automatic offset of cash demands or option assignment.'}
+            'limitation': 'Model P&L, not liquidation bids or margin calculation. NAV/collateral must be reconciled separately. No automatic offset of cash demands or option assignment. Direct price/FX P&L does not establish market, sector or issuer factor attribution, or absence of unmodeled rate or volatility exposure. Missing factor mappings, sensitivities or shocks remain unquantified; no zero-risk or instrument-level inapplicability conclusion follows.'}
 
 
 if __name__ == '__main__':

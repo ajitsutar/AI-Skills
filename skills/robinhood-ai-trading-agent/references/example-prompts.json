@@ -6,12 +6,28 @@
       "id": "quant-research-assurance",
       "title": "Research quality and reproducible releases",
       "audience": "Quantitative researchers and maintainers",
-      "guides": ["references/quant-research-assurance.md", "references/quant-data-contracts.md", "references/release-acceptance.md"],
+      "guides": [
+        "references/quant-research-assurance.md",
+        "references/quant-data-contracts.md",
+        "references/release-acceptance.md"
+      ],
       "prompts": [
-        {"title": "Assess data for my actual strategy", "prompt": "Given [SOURCE-BOUND DATA], freeze [UNIVERSE], decision and execution times, feature lookbacks and valuation policy. Build the exact strategy requirement grid, separate signal, valuation, execution and membership limitations, and carry observed, reference, modeled and missing classifications into every headline. Do not call a zero-gap modeled grid complete observed data."},
-        {"title": "Reconcile an action and funding sequence", "prompt": "Replay [DATED HOLDINGS AND LOTS] through [CORPORATE ACTIONS], explicit sales, taxes, settlement and withdrawals. Reconcile cash, units and entitlements. Preserve unquoted spin-off interests after a parent sale; keep unknown taxes or valuations unresolved and distinguish settled cash from receivables."},
-        {"title": "Challenge the optimized allocation", "prompt": "For [FROZEN PORTFOLIO INPUTS], compare Gaussian and Student-t volatility diagnostics, EWMA and realized-variance alternatives, empirical tail sample uncertainty and portfolio variance assumptions. Independently check the constrained minimum-risk solution, report binding caps, and run prespecified covariance and cap sensitivities without selecting a winner after seeing results."},
-        {"title": "Prepare a reproducible research release", "prompt": "Audit [SKILL CANDIDATE] using an artifact-hashed fresh environment, frozen regression fixtures, a complete registered experiment inventory and actual first-response host comparisons. Preserve failures and disagreements. Produce a capability card and source-rights inventory that separate implemented tools, tested environments, incomplete data, unrun hosts and unproven predictive performance."}
+        {
+          "title": "Assess data for my actual strategy",
+          "prompt": "Given [SOURCE-BOUND DATA], freeze [UNIVERSE], decision and execution times, feature lookbacks and valuation policy. Build the exact strategy requirement grid, separate signal, valuation, execution and membership limitations, and carry observed, reference, modeled and missing classifications into every headline. Do not call a zero-gap modeled grid complete observed data."
+        },
+        {
+          "title": "Reconcile an action and funding sequence",
+          "prompt": "Replay [DATED HOLDINGS AND LOTS] through [CORPORATE ACTIONS], explicit sales, taxes, settlement and withdrawals. Reconcile cash, units and entitlements. Preserve unquoted spin-off interests after a parent sale; keep unknown taxes or valuations unresolved and distinguish settled cash from receivables."
+        },
+        {
+          "title": "Challenge the optimized allocation",
+          "prompt": "For [FROZEN PORTFOLIO INPUTS], compare Gaussian and Student-t volatility diagnostics, EWMA and realized-variance alternatives, empirical tail sample uncertainty and portfolio variance assumptions. Independently check the constrained minimum-risk solution, report binding caps, and run prespecified covariance and cap sensitivities without selecting a winner after seeing results."
+        },
+        {
+          "title": "Prepare a reproducible research release",
+          "prompt": "Audit [SKILL CANDIDATE] using an artifact-hashed fresh environment, frozen regression fixtures, a complete registered experiment inventory and actual first-response host comparisons. Preserve failures and disagreements. Produce a capability card and source-rights inventory that separate implemented tools, tested environments, incomplete data, unrun hosts and unproven predictive performance."
+        }
       ]
     },
     {
@@ -486,7 +502,7 @@
         },
         {
           "title": "Run portfolio stress scenarios",
-          "prompt": "Stress [PORTFOLIO] under market, sector, issuer, rate, volatility and currency shocks appropriate to its instruments. Include every position and report loss concentrations, assumptions and unsupported pricing cases."
+          "prompt": "Stress [PORTFOLIO] under market, sector, issuer, rate, volatility and currency shocks appropriate to its instruments. Include every position and report loss concentrations, assumptions and unsupported pricing cases. For each requested risk dimension, identify the supplied mapping and inputs, what was computed, and what remains unquantified. Separate direct price/FX scenarios from factor shocks; do not infer zero or inapplicable economic exposure from absent model parameters."
         },
         {
           "title": "Assess a risk-model breach",
@@ -1162,7 +1178,7 @@
         },
         {
           "title": "Check risk and numerical explanations",
-          "prompt": "Compare [COVARIANCE MATRICES OR HEDGE SCENARIOS] using the supported arithmetic checks. Show individual variance multipliers, ratio changes, every option-expiry payoff and assumed residual hedge sensitivity. Use typed comparisons for numerical statements, retaining unknown units, exact inequality boundaries and declared floating-point tolerances."
+          "prompt": "Compare [COVARIANCE MATRICES OR HEDGE SCENARIOS] using the supported arithmetic checks. Show individual variance multipliers, ratio changes, every option-expiry payoff and assumed residual hedge sensitivity. Use typed comparisons for numerical statements, retaining unknown units, exact inequality boundaries and declared floating-point tolerances. Distinguish supplied scenario rows from algebraically established payoff-model properties; state the price domain, hedge coverage and costs, and separate conditional model bounds from real-world guarantees."
         },
         {
           "title": "Verify complete model-alignment evidence",
@@ -1571,6 +1587,29 @@
         }
       ],
       "id": "historical-coverage-recovery"
+    },
+    {
+      "id": "portfolio-following",
+      "title": "Public portfolio following",
+      "audience": "Investors comparing public disclosures and follower strategies",
+      "guides": [
+        "subskills/portfolio-following/SKILL.md",
+        "references/portfolio-follower-sources.md"
+      ],
+      "prompts": [
+        {
+          "title": "Refresh public investor portfolios on demand",
+          "prompt": "Refresh publicly available allocations for Berkshire, Pelosi-family disclosures, Scion, Pershing Square and other publicly listed Autopilot portfolios. Show holdings dates, publication dates, allocation denominators and unavailable sources; do not create a recurring schedule."
+        },
+        {
+          "title": "Model a long-only inverse recommendation sleeve",
+          "prompt": "Using these dated original recommendations and my supplied sleeve budget, build a long-only inverse Cramer proposal. Preserve stale and ambiguous signals, aggregate overlaps, show costs and cash, and distinguish proposed trades from actual orders."
+        },
+        {
+          "title": "Compare corrected disclosures without duplicate signals",
+          "prompt": "Compare this newly retrieved disclosure against the previous checkpoint. Identify amendments, withdrawals and new source records without treating the initial baseline as newly executed trades or inventing exact weights from amount ranges."
+        }
+      ]
     }
   ]
 }

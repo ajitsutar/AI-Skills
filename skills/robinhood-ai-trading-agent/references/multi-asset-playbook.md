@@ -35,6 +35,17 @@ The skill neither adds broker capabilities nor imposes local execution restricti
 
 ## Mandatory scenario details
 
+Distinguish direct price/FX scenarios from identified market, sector, issuer,
+rate or volatility factor shocks. For each requested dimension, state what was
+computed, the supplied factor mapping and inputs, and what remains unquantified.
+The absence of bonds, options or model parameters does not by itself make rate or
+volatility exposure inapplicable to other holdings. Equity and futures branches
+that use supplied marked-price changes do not estimate those sensitivities; an
+unspecified futures underlying cannot establish them. Reserve "not applicable"
+for a source-backed instrument conclusion or an explicitly stated model scope,
+and keep that scope separate from economic exposure. Missing mappings or shocks
+remain unquantified; do not invent zero exposure or additional shocks.
+
 For options, shock the underlying, volatility, rates, time and FX together; linear
 delta alone can miss gamma/vega losses. `risk.option` and its use within
 `risk.scenarios` are European-only. Preserve their rejection of American style;

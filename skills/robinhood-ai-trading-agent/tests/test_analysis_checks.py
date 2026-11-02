@@ -39,6 +39,49 @@ class AnalysisChecksTests(unittest.TestCase):
                 self.assertAlmostEqual(row['combined_net_pnl'], row['equity_pnl']+
                     row['hedge_payoff_before_cost']-row['premium']-row['total_explicit_cost'])
 
+    def test_expiry_put_model_properties_cover_unlisted_prices_and_unit_mismatch(self):
+        # Deliberately sample only rising prices: the analytic domain is wider.
+        for units in (40, 80, 120):
+            doc = {'shares':80, 'price':30, 'currency':'USD', 'shock_returns':[0.1, 0.4],
+                   'hedges':[{'id':'p', 'kind':'expiry_put', 'strike':27,
+                              'underlying_units':units, 'premium_per_unit':1.5,
+                              'basis':'same_underlying', 'total_explicit_cost':4}]}
+            hedge = checks.hedge_scenarios(doc)['hedges'][0]
+            model = hedge['expiry_payoff_model']
+            self.assertEqual(model['exactly_matched_underlying_units'], units == 80)
+            self.assertFalse(model['real_world_loss_guarantee_established'])
+            self.assertEqual(model['minimum_combined_net_pnl'], min(80, units)*27-2400-units*1.5-4)
+            expected_interval = [0,0] if units < 80 else [27,27] if units > 80 else [0,27]
+            self.assertEqual(model['minimum_attained_terminal_price_interval'], expected_interval)
+            for terminal in (0, 7, 17, 26.999, 27, 27.001, 33, 50, 1000):
+                direct = 80*(terminal-30)+units*max(27-terminal,0)-units*1.5-4
+                segment = model['below_or_at_strike'] if terminal <= 27 else model['at_or_above_strike']
+                self.assertAlmostEqual(direct, segment['slope']*terminal+segment['intercept'])
+                self.assertGreaterEqual(direct+1e-9, model['minimum_combined_net_pnl'])
+            for terminal in expected_interval:
+                direct = 80*(terminal-30)+units*max(27-terminal,0)-units*1.5-4
+                self.assertAlmostEqual(direct, model['minimum_combined_net_pnl'])
+            for row in hedge['scenarios']:
+                segment = model['at_or_above_strike']
+                self.assertAlmostEqual(row['combined_net_pnl'],
+                                       segment['slope']*row['equity_terminal_price']+segment['intercept'])
+
+    def test_expiry_model_does_not_round_near_matching_units_or_mislabel_other_models(self):
+        doc = {'shares':80, 'price':30, 'currency':'USD', 'shock_returns':[-1,0],
+               'hedges':[{'id':'p','kind':'expiry_put','strike':0,'underlying_units':80+1e-9,
+                          'premium_per_unit':0,'basis':'same_underlying','total_explicit_cost':0},
+                         {'id':'none','kind':'none','total_explicit_cost':0},
+                         {'id':'linear','kind':'short_linear','short_notional':2400,
+                          'shock_sensitivity':1,'total_explicit_cost':0}]}
+        results = checks.hedge_scenarios(doc)['hedges']
+        model = results[0]['expiry_payoff_model']
+        self.assertFalse(model['exactly_matched_underlying_units'])
+        self.assertLess(model['below_or_at_strike']['slope'],0)
+        self.assertEqual(model['minimum_attained_terminal_price_interval'],[0,0])
+        self.assertEqual(model['minimum_combined_net_pnl'],-2400)
+        self.assertNotIn('expiry_payoff_model',results[1])
+        self.assertNotIn('expiry_payoff_model',results[2])
+
     def test_missing_fee_is_not_zero_fee(self):
         with self.assertRaises(KeyError):
             checks.hedge_scenarios({'shares':1,'price':8,'currency':'USD','shock_returns':[0],

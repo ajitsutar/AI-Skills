@@ -54,6 +54,43 @@ def covariance_comparison(document):
             'interpretation': 'Matrix arithmetic only. Stable fitted weights do not prove unchanged relative risk or identify a causal mechanism.'}
 
 
+def _expiry_put_model(shares, price, strike, units, premium, fees):
+    """Algebraic long-equity/long-put properties over nonnegative expiry prices.
+
+    Coefficients describe the declared static payoff, not execution or funding.
+    The two segments meet at strike; their endpoint/slope signs locate the minimum.
+    """
+    cost = premium + fees
+    lower_slope = shares - units
+    lower_intercept = units * strike - shares * price - cost
+    upper_intercept = -shares * price - cost
+    if lower_slope > 0:
+        minimizers = [0.0, 0.0]
+    elif lower_slope < 0:
+        minimizers = [strike, strike]
+    else:
+        minimizers = [0.0, strike]
+    return {
+        'status': 'ALGEBRAIC_MODEL_PROPERTY',
+        'terminal_price_domain': {'minimum': 0.0, 'maximum': None},
+        'combined_net_pnl_formula': 'shares*(S-price) + underlying_units*max(strike-S,0) - premium - total_explicit_cost',
+        'below_or_at_strike': {'terminal_price_minimum': 0.0,
+                               'terminal_price_maximum': strike,
+                               'slope': lower_slope, 'intercept': lower_intercept},
+        'at_or_above_strike': {'terminal_price_minimum': strike,
+                               'terminal_price_maximum': None,
+                               'slope': shares, 'intercept': upper_intercept},
+        'exactly_matched_underlying_units': shares == units,
+        'minimum_combined_net_pnl': min(shares, units) * strike - shares * price - cost,
+        'minimum_attained_terminal_price_interval': minimizers,
+        'scope': 'All nonnegative terminal prices under this same-underlying expiry-payoff model, including prices absent from the scenario list.',
+        'assumptions': ['Fixed long equity shares and long put underlying units on the same underlying.',
+                        'Same terminal price for both legs at expiry; stated premium and explicit cost only.',
+                        'No additional cash flows, funding, taxes, settlement shortfall or execution effects.'],
+        'real_world_loss_guarantee_established': False,
+    }
+
+
 def hedge_scenarios(document):
     """Long equity plus explicit expiry-put or short-linear hedge economics.
 
@@ -105,7 +142,9 @@ def hedge_scenarios(document):
         results.append({'id': name, 'kind': kind, 'scenarios': rows,
                         'linear_hedge_offset': linear_offset,
                         'linear_residual_equity_sensitivity': notional-linear_offset if linear_offset is not None else None,
-                        'linear_residual_fraction': (notional-linear_offset)/notional if linear_offset is not None else None})
+                        'linear_residual_fraction': (notional-linear_offset)/notional if linear_offset is not None else None,
+                        **({'expiry_payoff_model': _expiry_put_model(shares, price, strike, units, premium, fees)}
+                           if kind == 'expiry_put' else {})})
     return {'status': 'COMPUTED', 'currency': currency, 'equity_notional': notional, 'hedges': results,
             'denominator': 'initial equity shares * initial equity price; excludes any additional premium/collateral funding',
             'limitations': ['Expiry scenario assumptions are not probabilities or guaranteed fills.',

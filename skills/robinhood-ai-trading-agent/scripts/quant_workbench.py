@@ -60,6 +60,8 @@ import analyst_adapter
 import risk_diagnostics
 import experiment_registry
 import release_acceptance
+import portfolio_follower
+import portfolio_disclosures
 from quant_common import digest, require
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -206,6 +208,12 @@ ASSURANCE_OPERATIONS = {
 # Only pure operations belong here: registry mutations and file-writing release
 # runners must never be invoked again by freeze/verify.
 OPERATIONS.update(ASSURANCE_OPERATIONS)
+FOLLOWER_OPERATIONS = {
+    'follower.normalize': portfolio_disclosures.normalize,
+    'follower.targets': portfolio_follower.build_targets,
+    'follower.rebalance': portfolio_follower.rebalance,
+}
+OPERATIONS.update(FOLLOWER_OPERATIONS)
 MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'quant_portfolio.py', 'multi_asset_risk.py', 'investment_ops.py',
            'primary_financial_data.py', 'price_audit.py', 'financial_normalize.py',
@@ -224,7 +232,8 @@ MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
                'portable_quant.py', 'point_in_time_data.py', 'costed_bar_replay.py', 'monthly_experiment.py',
                'research_contracts.py', 'quant_data_contracts.py', 'research_readiness.py', 'security_master.py',
                'price_refresh.py', 'holdings_ledger.py', 'analyst_adapter.py',
-               'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py')
+               'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py',
+               'portfolio_follower.py', 'portfolio_disclosures.py')
 
 
 def implementation_hash():
@@ -289,6 +298,12 @@ def run(document):
         require(isinstance(job['inputs'], dict), 'JOB_INPUT_OBJECT_REQUIRED')
         try:
             inputs = resolved_inputs(job['operation'], job['inputs'])
+            if job['operation'] in FOLLOWER_OPERATIONS:
+                payload = inputs['document']
+                decision = payload['target_document'] if job['operation'] == 'follower.rebalance' else payload
+                require(timestamp(decision['as_of']) <= timestamp(contract['as_of']), 'FUTURE_FOLLOWER_CUTOFF')
+                if 'currency' in payload:
+                    require(payload['currency'] == contract['base_currency'], 'FOLLOWER_CURRENCY_MISMATCH')
             if job['operation'] in ASSURANCE_OPERATIONS:
                 payload = inputs['document']
                 if job['operation'] == 'data.strategy_readiness':

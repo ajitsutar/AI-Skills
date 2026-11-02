@@ -41,6 +41,7 @@ STATUSES = {'COMPUTED', 'REJECTED_INPUT', 'CALCULATION_FAILED', 'RESEARCH_QUEUE_
 # Registered helper outcomes may be exported without releasing arbitrary source text.
 STATUSES.update({'DECLARED_STRICT_GRID_COMPLETE', 'RESEARCH_GAPS_REMAIN', 'NONPOSITIVE_OR_UNKNOWN_EPS', 'REDUCED_LONG_ONLY_ZERO_COST_ATTEMPT', 'COMPUTED_CURRENT_WEIGHT_SHOCK_DISTRIBUTION', 'CONDITIONAL_MINIMUM_CERTIFIED', 'COMPUTED_EXPLICIT_BASIS', 'FIXTURE_MATCH', 'DECLARED_EVIDENCE_CURRENT', 'unavailable', 'FULL_FETCH_REQUIRED', 'INCOMPATIBLE_WITH_QUOTE', 'NO_SUPPORTED_TABLE', 'DECLARED_CONTRACT_VALID', 'CONDITIONAL_RISK_SCENARIO', 'LINEAR_FEASIBILITY_FAILED', 'UNGRADABLE_RESPONSE', 'NO_REQUIREMENTS_IN_DECLARED_SCOPE', 'UNRESOLVED_BASIS', 'UNRESOLVED_OR_RESTRICTED', 'EXTRACTED', 'modeled', 'RECONCILED_FULL', 'RECONCILED_INCREMENTAL', 'FIXTURE_MISMATCH', 'COVARIANCE_SENSITIVITY_COMPARISON', 'reference', 'observed', 'CONFLICTS_PRESENT', 'DECLARED_SCENARIO_GRID_COMPLETE'})
 STATUSES.update({'REFERENCE_OR_MODEL_SCENARIO', 'CALLER_SUPPLIED_OBSERVED_MARKS', 'current_roster', 'historical_membership'})
+STATUSES.update({'proposed_targets_not_orders', 'proposals_only_no_orders_submitted', 'normalized', 'partial'})
 # The original workbench numerical modules and existing schemas were inspected
 # byte-for-text-identical before the additive operation extension. This identifies
 # a known historical schema, not a successful replay with the current code.
@@ -66,7 +67,8 @@ QUANT_FILES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
                'portable_quant.py', 'point_in_time_data.py', 'costed_bar_replay.py', 'monthly_experiment.py',
                'research_contracts.py', 'quant_data_contracts.py', 'research_readiness.py', 'security_master.py',
                'price_refresh.py', 'holdings_ledger.py', 'analyst_adapter.py',
-               'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py')
+               'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py',
+               'portfolio_follower.py', 'portfolio_disclosures.py')
 
 
 def digest(value):

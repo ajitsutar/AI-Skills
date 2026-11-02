@@ -1,5 +1,13 @@
 # Robinhood quant research and portfolio agent
 
+The [portfolio-following subskill](subskills/portfolio-following/SKILL.md) refreshes
+public investor disclosures on demand, normalizes supplied source records, and
+calculates follower targets and cash-funded buy/sell proposals. Its public source
+catalog distinguishes reporting managers, family transactions, stale portfolios
+and unavailable proprietary weights. Reverse Cramer supports long-only inverse
+signals. Source acquisition uses the host's public research tools; the calculation
+helpers do not log into Autopilot, place orders or start a recurring monitor.
+
 The [quantitative assurance workflow](references/quant-research-assurance.md)
 adds strategy-specific data readiness, historical identity/source adapters,
 corporate-action and tax/settlement accounting, Student-t GARCH and portfolio tail

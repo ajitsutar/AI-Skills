@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # Robinhood Multi-Asset Quant Research and Portfolio Agent
 
-Package version: **5.4.1 - November 2, 2026**.
+Package version: **5.5.2 - November 2, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -29,6 +29,12 @@ when diagnosing research dependencies or package integrity. Missing components
 limit the calculations you can truthfully claim, not permission to execute.
 
 ## Start with the request and its evidence
+
+For public investor portfolios, disclosure refreshes, or inverse recommendations,
+use the [portfolio-following subskill](subskills/portfolio-following/SKILL.md).
+It distinguishes public reported baskets from private or app-specific allocations,
+supports long-only inverse signals and source-aware rebalance proposals, and
+refreshes on demand unless the user explicitly requests recurring monitoring.
 
 For backtesting, portfolio optimization, historical-data readiness or release
 quality, use [quantitative research assurance](references/quant-research-assurance.md).

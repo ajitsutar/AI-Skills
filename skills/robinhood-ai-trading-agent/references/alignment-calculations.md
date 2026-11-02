@@ -371,7 +371,18 @@ needs `{short_notional,shock_sensitivity}`. Strike/premium/notional are
 nonnegative, put units positive. Put outputs are expiry payoff only; linear
 sensitivity is an assumption, not estimated beta. Combined P&L fraction divides
 by initial equity shares times price, excluding extra premium/collateral funding.
-No pre-expiry option price, guaranteed loss bound, borrow or margin is inferred.
+Separate the finite `scenarios` rows from `expiry_payoff_model`, which reports
+piecewise slopes/intercepts and the algebraic minimum combined P&L for every
+nonnegative terminal price under the declared same-underlying expiry model.
+The minimum's terminal-price interval is explicit. Exact matched units give a
+flat lower segment; undercoverage or overcoverage changes its slope and minimum.
+These properties can apply outside the supplied shock list because they follow
+from the payoff formula, not from extrapolating sampled rows. Do not deny a proved
+model identity merely because a scenario was not listed. Conversely, repeated
+scenario values alone do not establish a bound: use the formula, domain, coverage
+and costs, and disclose any missing assumptions. A conditional model floor is
+not a real-world loss guarantee or evidence about pre-expiry prices, execution,
+funding, settlement, borrow or margin. Retain both distinctions in the explanation.
 
 `analysis.compare_claim`: D requires `{left,right,relation}` with
 `relation=lt|le|gt|ge|eq`. Each operand needs

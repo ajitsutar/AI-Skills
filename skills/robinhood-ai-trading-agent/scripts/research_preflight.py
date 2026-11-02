@@ -8,6 +8,11 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITY_FILES = {
+    'public_portfolio_following': ['scripts/portfolio_follower.py', 'scripts/portfolio_disclosures.py',
+                                  'profiles/portfolio-followers-v1.json',
+                                  'subskills/portfolio-following/SKILL.md',
+                                  'references/portfolio-follower-calculations.md',
+                                  'references/portfolio-disclosure-inputs.md'],
     'quant_research_assurance': ['scripts/' + name + '.py' for name in
         ('research_readiness', 'quant_data_contracts', 'security_master', 'price_refresh',
          'holdings_ledger', 'analyst_adapter', 'risk_diagnostics', 'experiment_registry',

@@ -1,0 +1,23 @@
+{
+  "kind": "public_transactions",
+  "as_of": "2026-01-12T00:00:00Z",
+  "subject_id": "fictional-family",
+  "events": [
+    {
+      "event_id": "fictional:filing:row-1",
+      "source_ref": "fixture:fictional-disclosure-not-a-real-trade",
+      "event_at": "2026-01-02T16:00:00Z",
+      "published_at": "2026-01-10T16:00:00Z",
+      "available_at": "2026-01-10T16:01:00Z",
+      "revision": 0,
+      "withdrawn": false,
+      "security_id": "FICTIONAL-A",
+      "action": "BUY",
+      "asset_type": "common_stock",
+      "identity_reviewed": true,
+      "source_reviewed": true,
+      "owner": "spouse",
+      "amount_range": {"lower": 1001, "upper": 15000, "currency": "USD"}
+    }
+  ]
+}

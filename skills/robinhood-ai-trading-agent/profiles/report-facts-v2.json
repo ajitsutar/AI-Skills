@@ -2090,6 +2090,318 @@
         "unit": "status"
       }
     },
+    "follower.normalize": {
+      "as_of": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosure normalization cutoff",
+        "unit": "declared_clock"
+      },
+      "excluded_rows/*/reason": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Excluded disclosure row reason",
+        "unit": "text"
+      },
+      "records/*/amount_range/currency": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Transaction range currency",
+        "unit": "text"
+      },
+      "records/*/amount_range/lower": {
+        "basis": "Transaction range, not quantity or holding weight; retain the source currency.",
+        "denominator": null,
+        "metric": "Disclosed transaction range lower bound",
+        "unit": "source_currency_amount"
+      },
+      "records/*/amount_range/upper": {
+        "basis": "Transaction range, not quantity or holding weight; unbounded upper limit remains null.",
+        "denominator": null,
+        "metric": "Disclosed transaction range upper bound",
+        "unit": "source_currency_amount"
+      },
+      "records/*/available_at": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosure available at",
+        "unit": "declared_clock"
+      },
+      "records/*/complete_reported_basket": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosure complete reported basket",
+        "unit": "boolean"
+      },
+      "records/*/eligible_common": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosure eligible common",
+        "unit": "boolean"
+      },
+      "records/*/event_at": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosure event at",
+        "unit": "declared_clock"
+      },
+      "records/*/positions/*/market_value": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosed position market value",
+        "unit": "USD"
+      },
+      "records/*/published_at": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosure published at",
+        "unit": "declared_clock"
+      },
+      "records/*/qualifying": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosure qualifying",
+        "unit": "boolean"
+      },
+      "records/*/reported_table_value_usd": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosure reported table value usd",
+        "unit": "USD"
+      },
+      "records/*/revision": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosure revision",
+        "unit": "count"
+      },
+      "records/*/withdrawn": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosure withdrawn",
+        "unit": "boolean"
+      },
+      "status": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosure normalization status",
+        "unit": "status"
+      },
+      "warnings/*": {
+        "basis": "Normalized supplied source records; source review and identity are caller declarations, not independently authenticated.",
+        "denominator": null,
+        "metric": "Disclosure qualification",
+        "unit": "text"
+      }
+    },
+    "follower.rebalance": {
+      "account_nav": {
+        "basis": "Supplied account inputs and conditional proposal arithmetic; not a balance or fill confirmation.",
+        "denominator": null,
+        "metric": "account nav",
+        "unit": "USD"
+      },
+      "available_cash_for_buys": {
+        "basis": "Supplied account inputs and conditional proposal arithmetic; not a balance or fill confirmation.",
+        "denominator": null,
+        "metric": "available cash for buys",
+        "unit": "USD"
+      },
+      "cash_floor_shortfall_before_trades": {
+        "basis": "Supplied account inputs and conditional proposal arithmetic; not a balance or fill confirmation.",
+        "denominator": null,
+        "metric": "cash floor shortfall before trades",
+        "unit": "USD"
+      },
+      "deferred/*/reason": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": null,
+        "metric": "Unimplemented target reason",
+        "unit": "text"
+      },
+      "estimated_buy_cash_use": {
+        "basis": "Supplied account inputs and conditional proposal arithmetic; not a balance or fill confirmation.",
+        "denominator": null,
+        "metric": "estimated buy cash use",
+        "unit": "USD"
+      },
+      "estimated_new_unsettled_sale_proceeds": {
+        "basis": "Supplied account inputs and conditional proposal arithmetic; not a balance or fill confirmation.",
+        "denominator": null,
+        "metric": "estimated new unsettled sale proceeds",
+        "unit": "USD"
+      },
+      "existing_pending_receivables_not_spendable": {
+        "basis": "Supplied account inputs and conditional proposal arithmetic; not a balance or fill confirmation.",
+        "denominator": null,
+        "metric": "existing pending receivables not spendable",
+        "unit": "USD"
+      },
+      "notes/*": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": null,
+        "metric": "Rebalance qualification",
+        "unit": "text"
+      },
+      "proposals/*/action": {
+        "basis": "Unsubmitted proposal using caller-declared quotes, costs and quantities; settlement and fill remain external.",
+        "denominator": null,
+        "metric": "Proposed action",
+        "unit": "text"
+      },
+      "proposals/*/estimated_cost": {
+        "basis": "Unsubmitted proposal using caller-declared quotes, costs and quantities; settlement and fill remain external.",
+        "denominator": null,
+        "metric": "Proposed estimated cost",
+        "unit": "USD"
+      },
+      "proposals/*/estimated_notional": {
+        "basis": "Unsubmitted proposal using caller-declared quotes, costs and quantities; settlement and fill remain external.",
+        "denominator": null,
+        "metric": "Proposed estimated notional",
+        "unit": "USD"
+      },
+      "proposals/*/estimated_unsettled_proceeds": {
+        "basis": "Unsubmitted proposal using caller-declared quotes, costs and quantities; settlement and fill remain external.",
+        "denominator": null,
+        "metric": "Proposed estimated unsettled proceeds",
+        "unit": "USD"
+      },
+      "proposals/*/quantity": {
+        "basis": "Unsubmitted proposal using caller-declared quotes, costs and quantities; settlement and fill remain external.",
+        "denominator": null,
+        "metric": "Proposed quantity",
+        "unit": "shares"
+      },
+      "proposals/*/security_id": {
+        "basis": "Unsubmitted proposal using caller-declared quotes, costs and quantities; settlement and fill remain external.",
+        "denominator": null,
+        "metric": "Proposed security id",
+        "unit": "text"
+      },
+      "settled_cash_if_buys_fill": {
+        "basis": "Supplied account inputs and conditional proposal arithmetic; not a balance or fill confirmation.",
+        "denominator": null,
+        "metric": "settled cash if buys fill",
+        "unit": "USD"
+      },
+      "status": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": null,
+        "metric": "Follower proposal status",
+        "unit": "status"
+      },
+      "targets/as_of": {
+        "basis": "Caller-supplied information cutoff.",
+        "denominator": null,
+        "metric": "Follower decision cutoff",
+        "unit": "declared_clock"
+      },
+      "targets/cap_overflow_cash_weight": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": "total account NAV",
+        "metric": "Cash from concentration cap",
+        "unit": "weight_fraction"
+      },
+      "targets/frozen_security_ids/*": {
+        "basis": "Frozen securities remain unchanged; nominal target weights may not be implemented.",
+        "denominator": null,
+        "metric": "Unchanged security due to source uncertainty",
+        "unit": "text"
+      },
+      "targets/notes/*": {
+        "basis": "Retained calculation limitations; source text shown only when requested.",
+        "denominator": null,
+        "metric": "Follower qualification",
+        "unit": "text"
+      },
+      "targets/sleeves/*/budget_weight": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": "total account NAV",
+        "metric": "Follower sleeve budget",
+        "unit": "weight_fraction"
+      },
+      "targets/sleeves/*/weights/*": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": "sleeve budget",
+        "metric": "Proposed within-sleeve weight",
+        "unit": "weight_fraction"
+      },
+      "targets/status": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": null,
+        "metric": "Follower calculation status",
+        "unit": "status"
+      },
+      "targets/target_cash_weight": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": "total account NAV",
+        "metric": "Proposed follower cash weight",
+        "unit": "weight_fraction"
+      },
+      "targets/target_weights/*": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": "total account NAV",
+        "metric": "Proposed follower security weight",
+        "unit": "weight_fraction"
+      }
+    },
+    "follower.targets": {
+      "as_of": {
+        "basis": "Caller-supplied information cutoff.",
+        "denominator": null,
+        "metric": "Follower decision cutoff",
+        "unit": "declared_clock"
+      },
+      "cap_overflow_cash_weight": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": "total account NAV",
+        "metric": "Cash from concentration cap",
+        "unit": "weight_fraction"
+      },
+      "frozen_security_ids/*": {
+        "basis": "Frozen securities remain unchanged; nominal target weights may not be implemented.",
+        "denominator": null,
+        "metric": "Unchanged security due to source uncertainty",
+        "unit": "text"
+      },
+      "notes/*": {
+        "basis": "Retained calculation limitations; source text shown only when requested.",
+        "denominator": null,
+        "metric": "Follower qualification",
+        "unit": "text"
+      },
+      "sleeves/*/budget_weight": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": "total account NAV",
+        "metric": "Follower sleeve budget",
+        "unit": "weight_fraction"
+      },
+      "sleeves/*/weights/*": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": "sleeve budget",
+        "metric": "Proposed within-sleeve weight",
+        "unit": "weight_fraction"
+      },
+      "status": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": null,
+        "metric": "Follower calculation status",
+        "unit": "status"
+      },
+      "target_cash_weight": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": "total account NAV",
+        "metric": "Proposed follower cash weight",
+        "unit": "weight_fraction"
+      },
+      "target_weights/*": {
+        "basis": "Declared pretrade follower targets; not observed investor wealth weights or executed holdings.",
+        "denominator": "total account NAV",
+        "metric": "Proposed follower security weight",
+        "unit": "weight_fraction"
+      }
+    },
     "planning.allocate": {
       "advisory_only": {
         "basis": "Explicit helper declaration. Null stays unknown; arithmetic alone is not investment or broker evidence.",

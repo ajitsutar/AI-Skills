@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-279 examples across 40 workflows, from first-time investing to quantitative research.
+282 examples across 41 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the robinhood-ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -59,6 +59,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Checked calculations and model comparisons](#checked-calculations-and-model-comparisons) | Intermediate to advanced | 6 |
 | [Compressed historical data and staged portfolio experiments](#compressed-historical-data-and-staged-portfolio-experiments) | Research users and quantitative analysts | 6 |
 | [Historical identity and coverage recovery](#historical-identity-and-coverage-recovery) | Research users and quantitative analysts | 2 |
+| [Public portfolio following](#public-portfolio-following) | Investors comparing public disclosures and follower strategies | 3 |
 
 ## Research quality and reproducible releases
 
@@ -474,7 +475,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 88. Run portfolio stress scenarios
 
-> Stress [PORTFOLIO] under market, sector, issuer, rate, volatility and currency shocks appropriate to its instruments. Include every position and report loss concentrations, assumptions and unsupported pricing cases.
+> Stress [PORTFOLIO] under market, sector, issuer, rate, volatility and currency shocks appropriate to its instruments. Include every position and report loss concentrations, assumptions and unsupported pricing cases. For each requested risk dimension, identify the supplied mapping and inputs, what was computed, and what remains unquantified. Separate direct price/FX scenarios from factor shocks; do not infer zero or inapplicable economic exposure from absent model parameters.
 
 ### 89. Assess a risk-model breach
 
@@ -1041,7 +1042,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 211. Check risk and numerical explanations
 
-> Compare [COVARIANCE MATRICES OR HEDGE SCENARIOS] using the supported arithmetic checks. Show individual variance multipliers, ratio changes, every option-expiry payoff and assumed residual hedge sensitivity. Use typed comparisons for numerical statements, retaining unknown units, exact inequality boundaries and declared floating-point tolerances.
+> Compare [COVARIANCE MATRICES OR HEDGE SCENARIOS] using the supported arithmetic checks. Show individual variance multipliers, ratio changes, every option-expiry payoff and assumed residual hedge sensitivity. Use typed comparisons for numerical statements, retaining unknown units, exact inequality boundaries and declared floating-point tolerances. Distinguish supplied scenario rows from algebraically established payoff-model properties; state the price domain, hedge coverage and costs, and separate conditional model bounds from real-world guarantees.
 
 ### 212. Verify complete model-alignment evidence
 
@@ -1374,6 +1375,23 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 ### 279. Audit identity-qualified session coverage
 
 > Run historical_coverage.py on [DECLARED COVERAGE CONTRACT]. Check issuer and share-class identity, dated typed mappings and per-security membership/listing intervals. Retain rejected mappings and missing sessions; distinguish a multi-source union of dates from a usable return series or point-in-time certification.
+
+
+## Public portfolio following
+
+**Audience:** Investors comparing public disclosures and follower strategies. Guides: [SKILL](subskills/portfolio-following/SKILL.md), [portfolio follower sources](references/portfolio-follower-sources.md).
+
+### 280. Refresh public investor portfolios on demand
+
+> Refresh publicly available allocations for Berkshire, Pelosi-family disclosures, Scion, Pershing Square and other publicly listed Autopilot portfolios. Show holdings dates, publication dates, allocation denominators and unavailable sources; do not create a recurring schedule.
+
+### 281. Model a long-only inverse recommendation sleeve
+
+> Using these dated original recommendations and my supplied sleeve budget, build a long-only inverse Cramer proposal. Preserve stale and ambiguous signals, aggregate overlaps, show costs and cash, and distinguish proposed trades from actual orders.
+
+### 282. Compare corrected disclosures without duplicate signals
+
+> Compare this newly retrieved disclosure against the previous checkpoint. Identify amendments, withdrawals and new source records without treating the initial baseline as newly executed trades or inventing exact weights from amount ranges.
 
 ## Keeping this catalog current
 
