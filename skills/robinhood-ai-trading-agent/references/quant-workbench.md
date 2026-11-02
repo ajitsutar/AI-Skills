@@ -134,6 +134,13 @@ differences. A failed optimizer, unsupported operation or missing dependency is 
 observed outcome; do not replace it with a claimed successful model computation.
 Code replay proves that calculation's reproducibility, not investment effectiveness.
 
+For monthly historical selection and allocation studies, use
+[monthly portfolio validation](monthly-portfolio-validation.md) before binding
+`backtest.portfolio`. It also routes supplied historical revision records through
+the implemented `data.asof_snapshot`; no operation named `data.pit_snapshot` is
+provided. Neither operation authenticates historical source availability or
+reconstructs missing historical AI decisions.
+
 Use retained named helper facts for numeric conclusions they support, preserving
 their units, denominator and horizon. Identify additional calculations and
 inference separately and retain supporting calculation code or helper results.

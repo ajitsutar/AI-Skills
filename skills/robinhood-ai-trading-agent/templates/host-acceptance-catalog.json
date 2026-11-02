@@ -1,0 +1,11 @@
+{
+  "schema_version": 1,
+  "expected_hosts": [
+    "Codex",
+    "Muse",
+    "Claude"
+  ],
+  "prompt_sha256": "99d2e48fe8d4f152adbc288d284224c487c04c2b5577ad7692750c764bea3369",
+  "input_bundle_sha256": "b67166428d0ea58ed093be78e385d07fe89f91e1326a46c472a78f997aa25150",
+  "captures": []
+}

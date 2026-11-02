@@ -1,5 +1,13 @@
 # Robinhood quant research and portfolio agent
 
+The [quantitative assurance workflow](references/quant-research-assurance.md)
+adds strategy-specific data readiness, historical identity/source adapters,
+corporate-action and tax/settlement accounting, Student-t GARCH and portfolio tail
+diagnostics, independently checked constrained allocation, retained experiment
+history, semantic analyst extraction and artifact-locked release verification.
+Its capability claims distinguish implemented calculations, tested environments,
+actual host responses, external data coverage and future investment outcomes.
+
 For unspecified stock-discovery requests, use the full U.S. exchange-listed
 stock universe. An applicable explicit user scope overrides this default;
 analyst-news shortlists and incomplete acquisition do not. See
@@ -19,6 +27,30 @@ membership, quotes and full price/action history; estimates, news and events sti
 need current review. Codex, Muse and Claude use the same opt-in interface and
 fall back to fresh acquisition when the bundle or required checks are unavailable.
 Hidden model caches are neither assumed nor inspected; no speedup is guaranteed.
+
+For separately supplied price snapshots, the optional
+[revision-aware price reconciler](references/quant-data-contracts.md) can reuse a
+prefix only when its current evidence proves that prefix unchanged. Otherwise it
+requests a full refresh. It is a reconciliation adapter, not a new downloader;
+the existing statement-fetch workflow above continues to refresh full prices.
+
+Historical research also has an explicit-root [compressed data store](references/backtest-data-storage.md)
+for source manifests, bounded captures, same-contract checkpoints, coverage gaps
+and verified archive cleanup. Its portable inventory is usable across hosts;
+it does not infer freshness from a hidden cache or certify point-in-time data.
+Use [compact evidence](references/compact-evidence.md) for large source-bound
+calculations to retain replayable evidence without repeatedly expanding shared
+inputs in reports.
+
+For [monthly portfolio experiments](references/monthly-portfolio-validation.md),
+choose fixed composition with changing weights, equal-weight resets or actual
+reselection explicitly. Reusable capped inverse-volatility targets and frozen
+staged rankings support the first two controls. Native portfolio accounting
+remains authoritative; a weighting rule is not historical AI stock selection.
+An optional [history-first collection mode](references/research-campaign.md#optional-history-first-acquisition)
+keeps the full universe while avoiding fresh statement requests only after a valid
+price response establishes the profile's missing-history exclusion. Full financial
+collection remains the default; provider failures never count as that proof.
 
 A self-contained skill for investment recommendations, reproducible stock research,
 portfolio analysis and quantitative work across arbitrary holding periods. It
@@ -340,3 +372,20 @@ for explicit requests. It retains execution and verification evidence and render
 supported numeric fields with fixed metric and scenario labels. Concentration
 bounds and hash comparisons retain their scope and assumptions. Export availability
 is reported separately from calculations; no backend or additional service is needed.
+
+## Historical coverage recovery
+
+Use [historical coverage recovery](references/historical-coverage-recovery.md) to
+resolve former ticker, membership and publication gaps before a backtest.
+`scripts/historical_coverage.py` audits explicit issuer/share-class mappings and
+per-security eligible dates, rejects corporate-event shortcuts, and distinguishes
+single-source coverage from a multi-source date union. Its filings mode joins
+exact issuer/accession pairs and preserves conflicting or missing acceptance
+metadata. It does not fetch or
+stitch prices, authenticate caller reviews, or certify unbiased historical data.
+
+For option model selection, the European-only `risk.option` helper rejects American
+exercise. The [derivatives toolkit](references/derivatives-toolkit.md) separately
+supports bounded vanilla American CRR valuation with explicit grid, rate/dividend
+conventions and source metadata. Missing inputs stay unresolved; do not substitute
+a European price or import example assumptions.

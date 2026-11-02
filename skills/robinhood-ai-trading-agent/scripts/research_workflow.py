@@ -17,6 +17,7 @@ import tempfile
 import handoff_report as exact_json
 import report_facts
 import research_contracts
+import evidence_storage
 from research_contracts import require
 
 # The execute checkpoint must remain available when numerical dependencies are
@@ -126,6 +127,7 @@ def catalog():
             'preserved': ['contract', 'job IDs and operations', 'entire selected inputs',
                           'requirements', 'claims', 'omitted installed-helper defaults'],
             'output': 'New private directory containing plan.json and exact source bytes'},
+        'compact_evidence': 'Optional --compact-evidence on run/execute: lossless gzip object store, bounded presentation, complete on-demand facts; same numeric replay and claim verification.',
         'summary': 'Verify a retained run, then project claims, coverage, source bindings and literal evidence states',
         'execute': {
             'input': 'The same explicit workbench request and source roles as prepare',
@@ -344,7 +346,9 @@ def claims(rows, jobs):
     return result
 
 
-def render(result, job_reports):
+def render(result, job_reports, compact_evidence=False):
+    if compact_evidence:
+        return render_compact(result)
     lines = ['Source-bound research report', '',
              'Workflow: ' + result['status'] + '. Research diagnostics only; no execution gates.', '',
              'Declared objective: ' + json.dumps(result['contract']['prompt'], ensure_ascii=False), '',
@@ -365,6 +369,36 @@ def render(result, job_reports):
     return '\n'.join(lines).encode('utf-8')
 
 
+def render_compact(result):
+    """Bound presentation size; full values and all claims remain in result.json."""
+    def locator(pointer, value):
+        return {'artifact':'result.json', 'pointer':pointer, 'value_sha256':sha(encode(value))}
+    view = {'status':result['status'], 'result_artifact':'result.json',
+            'result_sha256':sha(encode(result)), 'job_count':len(result['jobs']),
+            'claims_count':len(result['claims']), 'coverage_count':len(result['coverage']),
+            'full_claims':locator('/claims', result['claims']),
+            'full_coverage':locator('/coverage', result['coverage']),
+            'all_bindings':locator('/bindings', result['bindings']),
+            'all_unused_fields':locator('/unused_source_pointers',result['unused_source_pointers']),
+            'jobs':[{'index':i,'id':j['id'],'operation':j['operation'],'status':j['status'],
+                     'result':locator('/jobs/'+str(i)+'/result',j.get('result'))}
+                    for i,j in enumerate(result['jobs'][:100])],
+            'jobs_displayed':min(100,len(result['jobs'])),
+            'complete_job_list':locator('/jobs',result['jobs'])}
+    # User-provided identifiers may themselves be large. A bounded preview is
+    # never substituted for a complete artifact or a verification step.
+    preview=encode(view).decode('utf-8')
+    if len(preview)>32768:
+        preview=encode({'status':result['status'],'result_sha256':sha(encode(result)),
+                        'result_artifact':'result.json','job_count':len(result['jobs']),
+                        'preview_omitted':'Full identifiers exceed presentation limit.'}).decode('utf-8')
+    return ('Source-bound research report (compact presentation)\n\n'
+            'Complete inputs, results, assumptions, unused-field inventory and claims are retained.\n'
+            'No source fields are deleted. Leaf-by-leaf fact projection is available on demand.\n'
+            'This report is a locator, not validation of source truth or arbitrary commentary.\n\n'
+            '```json\n'+preview+'```\n').encode('utf-8')
+
+
 class _RetainedArtifacts(dict):
     """Optionally retain each completed artifact before a later stage can fail."""
     def __init__(self, initial, writer=None):
@@ -379,7 +413,8 @@ class _RetainedArtifacts(dict):
         super().__setitem__(name, data)
 
 
-def build(raw, reader, artifact_writer=None):
+def build(raw, reader, artifact_writer=None, compact_evidence=False):
+    require(type(compact_evidence) is bool, 'COMPACT_OPTION_INVALID')
     doc = report_facts.strict_json(raw)
     require(doc.get('schema_version') == 1 and doc.get('network_mode') == 'offline', 'OFFLINE_PLAN_REQUIRED')
     contract = doc['contract']
@@ -387,7 +422,7 @@ def build(raw, reader, artifact_writer=None):
     jobs = doc.get('jobs', [])
     unique_rows(jobs, 'JOB')
     sources, values, artifacts = source_inventory(doc, reader)
-    artifacts = _RetainedArtifacts(artifacts, artifact_writer)
+    artifacts = (evidence_storage.CompressedArtifacts if compact_evidence else _RetainedArtifacts)(artifacts, artifact_writer)
     if 'preparation' in doc:
         check_preparation(doc, sources, artifacts)
     artifacts['plan.json'] = raw
@@ -414,7 +449,7 @@ def build(raw, reader, artifact_writer=None):
                 if op in quant_workbench.OPERATIONS:
                     request = {'schema_version': 1, 'contract': contract,
                                'jobs': [{'id': job['id'], 'operation': op, 'inputs': args}]}
-                    output = quant_report.build(encode(request), lambda *_: None)
+                    output = quant_report.build(encode(request), lambda *_: None, compact_evidence=compact_evidence)
                     for name, data in output.items():
                         artifacts[f'jobs/{index:04d}/quant/{name}'] = data
                     bundle = report_facts.strict_json(output['bundle.json'])
@@ -481,10 +516,11 @@ def build(raw, reader, artifact_writer=None):
                          'Only declared claims and requirements are checked; omissions from the plan remain possible.',
                          'Custom algorithms and external acquisitions require separately retained evidence.']}
     artifacts['result.json'] = encode(result)
-    artifacts['report.md'] = render(result, reports)
+    artifacts['report.md'] = render(result, reports, compact_evidence)
     artifacts['receipt.json'] = encode({'schema_version': 1, 'workflow_version': VERSION,
                                       'implementation_sha256': implementation_hash(),
                                       'plan_sha256': sha(raw),
+                                      **({'compact_evidence': True} if compact_evidence else {}),
                                       'artifacts': {k: sha(v) for k, v in sorted(artifacts.items())}})
     return artifacts
 
@@ -496,16 +532,18 @@ def _write_new(root, name, raw):
         handle.write(raw)
 
 
-def run(plan, output, preserve_partial=False):
+def run(plan, output, preserve_partial=False, compact_evidence=False):
     plan, output = report_facts.local_path(plan), report_facts.local_path(output)
     require(not output.is_relative_to(ROOT) and not output.exists(), 'NEW_PRIVATE_OUTPUT_REQUIRED')
     writer = None
-    if preserve_partial:
+    if compact_evidence:
+        writer = evidence_storage.ArtifactStore(output, create=True).write
+    elif preserve_partial:
         output.mkdir()
         writer = lambda name, raw: _write_new(output, name, raw)
     artifacts = build(plan.read_bytes(), lambda name: research_contracts.source_path(plan.parent, name).read_bytes(),
-                      artifact_writer=writer)
-    if not preserve_partial:
+                      artifact_writer=writer, compact_evidence=compact_evidence)
+    if not preserve_partial and not compact_evidence:
         output.mkdir()
         for name, raw in artifacts.items():
             _write_new(output, name, raw)
@@ -514,20 +552,23 @@ def run(plan, output, preserve_partial=False):
 
 def verify(directory):
     directory = report_facts.local_path(directory)
-    receipt = report_facts.strict_json((directory / 'receipt.json').read_bytes())
+    reader = evidence_storage.Reader(directory)
+    receipt = report_facts.strict_json(reader.read('receipt.json'))
+    compact = receipt.get('compact_evidence', False)
+    require(type(compact) is bool, 'COMPACT_OPTION_INVALID')
     require(receipt.get('workflow_version') == VERSION and
             receipt.get('implementation_sha256') == implementation_hash(), 'WORKFLOW_IMPLEMENTATION_MISMATCH')
     expected = receipt['artifacts']
     require(isinstance(expected, dict), 'ARTIFACT_MANIFEST_REQUIRED')
     for name, digest in expected.items():
-        require(sha(research_contracts.source_path(directory, name).read_bytes()) == digest, 'ARTIFACT_HASH_MISMATCH')
-    raw = (directory / 'plan.json').read_bytes()
+        require(sha(reader.read(name)) == digest, 'ARTIFACT_HASH_MISMATCH')
+    raw = reader.read('plan.json')
     require(sha(raw) == receipt['plan_sha256'], 'PLAN_HASH_MISMATCH')
-    rebuilt = build(raw, lambda name: research_contracts.source_path(directory / 'sources', name).read_bytes())
+    rebuilt = build(raw, lambda name: reader.read('sources/' + name), compact_evidence=compact)
     require(set(expected) == set(rebuilt) - {'receipt.json'}, 'ARTIFACT_SET_MISMATCH')
     # Runtime metadata is observational. Replay compares numerical outputs with
     # workbench tolerances; verify retained quant artifacts with their own runner.
-    original_result = read_result((directory / 'result.json').read_bytes())
+    original_result = read_result(reader.read('result.json'))
     new_result = read_result(rebuilt['result.json'])
     def exact_metadata(result):
         view = copy.deepcopy(result)
@@ -544,7 +585,7 @@ def verify(directory):
             {j['id']: j for j in original_result['jobs']})), 'RETAINED_CLAIM_BINDING_MISMATCH')
     for name, content in rebuilt.items():
         if name not in ('result.json', 'report.md', 'receipt.json') and '/quant/' not in name:
-            require((directory / name).read_bytes() == content, 'RETAINED_INPUT_BINDING_MISMATCH')
+            require(reader.read(name) == content, 'RETAINED_INPUT_BINDING_MISMATCH')
     for index, job in enumerate(original_result['jobs']):
         require(encode(job['nested_states']) == encode(list(nested_states(job.get('result')))),
                 'NESTED_STATE_BINDING_MISMATCH')
@@ -554,11 +595,11 @@ def verify(directory):
         if job['operation'] in ('report.quant', 'report.public_vqm'):
             require(encode(job) == encode(new_result['jobs'][index]), 'EXACT_PROJECTION_BINDING_MISMATCH')
         quant = directory / f'jobs/{index:04d}/quant'
-        if quant.is_dir():
-            quant_report.verify(quant)
-            require((quant / 'request.json').read_bytes() == rebuilt[f'jobs/{index:04d}/quant/request.json'],
+        if reader.exists(f'jobs/{index:04d}/quant/receipt.json'):
+            quant_report.verify(quant, storage=reader.store, prefix=f'jobs/{index:04d}/quant/' if reader.store else '')
+            require(reader.read(f'jobs/{index:04d}/quant/request.json') == rebuilt[f'jobs/{index:04d}/quant/request.json'],
                     'QUANT_REQUEST_BINDING_MISMATCH')
-            bundle = report_facts.strict_json((quant / 'bundle.json').read_bytes())
+            bundle = report_facts.strict_json(reader.read(f'jobs/{index:04d}/quant/bundle.json'))
             actual = bundle['result']['results'][0]
             fields = ('status', 'result', 'reason')
             require(encode({key: actual.get(key) for key in fields}) ==
@@ -567,11 +608,11 @@ def verify(directory):
     reports = {}
     for index, job in enumerate(original_result['jobs']):
         quant = directory / f'jobs/{index:04d}/quant/report.md'
-        if quant.is_file():
-            reports[job['id']] = quant.read_text(encoding='utf-8')
+        if reader.exists(f'jobs/{index:04d}/quant/report.md'):
+            reports[job['id']] = reader.read(f'jobs/{index:04d}/quant/report.md').decode('utf-8')
         elif job['operation'] in ('report.quant', 'report.public_vqm') and job['status'] == 'COMPUTED':
             reports[job['id']] = report_facts.markdown(job['result']['facts'])
-    require((directory / 'report.md').read_bytes() == render(original_result, reports), 'CANONICAL_REPORT_MISMATCH')
+    require(reader.read('report.md') == render(original_result, reports, compact), 'CANONICAL_REPORT_MISMATCH')
     return {'status': 'WORKFLOW_REPLAY_AND_REPORT_MATCH', 'jobs_verified': len(original_result['jobs']),
             'research_status': original_result['status'], 'execution_gates': [],
             'limits': 'Consistency only; source truth, operation selection and free-form commentary are not validated.'}
@@ -586,7 +627,7 @@ def summarize(directory):
 
 def _summarize_verified(directory, verification):
     """Internal projection shared with execute after its actual verification."""
-    raw = (directory / 'result.json').read_bytes()
+    raw = evidence_storage.Reader(directory).read('result.json')
     result = read_result(raw)
     jobs = []
     for index, job in enumerate(result['jobs']):
@@ -608,7 +649,7 @@ def _summarize_verified(directory, verification):
                        'Consistency does not validate source truth, omitted tasks, operation choice or model adherence.']}
 
 
-def execute(request, output, request_role, source_roles=None):
+def execute(request, output, request_role, source_roles=None, compact_evidence=False):
     """Run the existing protected stages once and retain their actual outcomes.
 
     The root must be new and outside the skill. A rejected request leaves a
@@ -647,7 +688,7 @@ def execute(request, output, request_role, source_roles=None):
         stages[stage]['status'] = 'COMPLETED'
         stage = 'run'
         stages[stage]['status'] = 'STARTED'
-        result = run(output / 'prepare/plan.json', output / 'run', preserve_partial=True)
+        result = run(output / 'prepare/plan.json', output / 'run', preserve_partial=True, compact_evidence=compact_evidence)
         stages[stage] = {'status': 'COMPLETED', 'research_status': result['status']}
         stage = 'verification'
         stages[stage]['status'] = 'STARTED'
@@ -660,7 +701,7 @@ def execute(request, output, request_role, source_roles=None):
         stages[stage]['status'] = 'COMPLETED'
         stage = 'answer_facts'
         stages[stage]['status'] = 'STARTED'
-        result_raw = (output / 'run/result.json').read_bytes()
+        result_raw = evidence_storage.Reader(output / 'run').read('result.json')
         facts = answer_facts._project(read_result(result_raw), sha(result_raw), artifact='run/result.json')
         facts['verification'] = verification
         _write_new(output, 'answer-facts.json', encode(facts))
@@ -684,7 +725,7 @@ def execute(request, output, request_role, source_roles=None):
             requested = {}
         actual = retained_jobs[index] if index < len(retained_jobs) else None
         partial = output / f'run/jobs/{index:04d}/quant/bundle.json'
-        partial_available = actual is None and partial.is_file()
+        partial_available = actual is None and evidence_storage.Reader(output / 'run').exists(f'jobs/{index:04d}/quant/bundle.json')
         status = actual['status'] if actual else 'NOT_EXECUTED_OR_UNRESOLVED'
         if partial_available:
             status = 'PARTIAL_ARTIFACTS_UNVERIFIED'
@@ -732,9 +773,11 @@ def main():
     parser.add_argument('input', nargs='?')
     parser.add_argument('--private-output-dir')
     parser.add_argument('--request-role')
+    parser.add_argument('--compact-evidence', action='store_true', help='Lossless gzip object store and bounded reports; unchanged calculations.')
     parser.add_argument('--source-role', nargs=2, action='append', metavar=('PATH', 'ROLE'))
     args = parser.parse_args()
     try:
+        require(not args.compact_evidence or args.command in ('run', 'execute'), 'COMPACT_RUN_OR_EXECUTE_ONLY')
         if args.command != 'execute':
             require(DEPENDENCY_FAILURE is None, 'DEPENDENCY_UNAVAILABLE')
         if args.command not in ('prepare', 'execute'):
@@ -749,13 +792,13 @@ def main():
                 prepare(args.input, args.private_output_dir, args.request_role, dict(roles))
                 print('PREPARED')
             else:
-                result = execute(args.input, args.private_output_dir, args.request_role, dict(roles))
+                result = execute(args.input, args.private_output_dir, args.request_role, dict(roles), compact_evidence=args.compact_evidence)
                 print(result['status'])
                 if result['status'] != 'COMPLETED_LOCAL_WORKFLOW':
                     parser.exit(2)
         elif args.command == 'run':
             require(args.input and args.private_output_dir, 'PLAN_AND_OUTPUT_REQUIRED')
-            print(run(args.input, args.private_output_dir)['status'])
+            print(run(args.input, args.private_output_dir, compact_evidence=args.compact_evidence)['status'])
         else:
             require(args.input and not args.private_output_dir, 'DIRECTORY_REQUIRED')
             if args.command == 'summary':

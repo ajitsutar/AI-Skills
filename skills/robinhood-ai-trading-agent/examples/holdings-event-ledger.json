@@ -1,0 +1,82 @@
+{
+  "currency": "USD",
+  "as_of": "2026-01-04T00:00:00Z",
+  "price_basis": "unadjusted",
+  "valuation_policy": "observed_only",
+  "tax_mode": "explicit_event_amounts",
+  "equal_time_order": "supplied_order",
+  "opening": {
+    "at": "2026-01-01T00:00:00Z",
+    "cash": "100",
+    "lots": [
+      {
+        "lot_id": "a",
+        "security_id": "P",
+        "quantity": "10",
+        "basis": "500",
+        "acquired_at": "2026-01-01T00:00:00Z"
+      }
+    ],
+    "marks": [
+      {
+        "security_id": "P",
+        "price": "100",
+        "kind": "observed",
+        "observed_at": "2026-01-01T00:00:00Z",
+        "available_at": "2026-01-01T00:00:00Z",
+        "source": "fictional-fixture"
+      }
+    ]
+  },
+  "events": [
+    {
+      "id": "spinoff",
+      "type": "spinoff",
+      "at": "2026-01-02T00:00:00Z",
+      "source": "fictional-fixture",
+      "security_id": "P",
+      "child_security_id": "C",
+      "child_ratio": ".5",
+      "child_basis_fraction": ".2",
+      "tax_amount": "0"
+    },
+    {
+      "id": "parentmark",
+      "type": "mark",
+      "at": "2026-01-02T00:00:00Z",
+      "source": "fictional-fixture",
+      "security_id": "P",
+      "price": "90",
+      "kind": "observed",
+      "observed_at": "2026-01-02T00:00:00Z",
+      "available_at": "2026-01-02T00:00:00Z"
+    },
+    {
+      "id": "childmark",
+      "type": "mark",
+      "at": "2026-01-02T00:00:00Z",
+      "source": "fictional-fixture",
+      "security_id": "C",
+      "price": "20",
+      "kind": "observed",
+      "observed_at": "2026-01-02T00:00:00Z",
+      "available_at": "2026-01-02T00:00:00Z"
+    },
+    {
+      "id": "sell",
+      "type": "sell",
+      "at": "2026-01-02T00:00:00Z",
+      "source": "fictional-fixture",
+      "security_id": "P",
+      "quantity": "10",
+      "price": "90",
+      "cost": "0",
+      "lots": [
+        "a"
+      ],
+      "execution_price_basis": "observed",
+      "settles_at": "2026-01-03T00:00:00Z",
+      "tax_amount": "0"
+    }
+  ]
+}

@@ -14,6 +14,8 @@ from quant_validation import tail_risk
 def simulate(document):
     symbols = document['symbols']
     require(symbols and len(set(symbols)) == len(symbols), 'UNIQUE_SYMBOLS')
+    include_positions = document.get('include_positions', False)
+    require(type(include_positions) is bool, 'INCLUDE_POSITIONS_MUST_BE_BOOL')
     n = len(symbols)
     equity = scalar(document['initial_equity'], 'initial_equity', 1e-12)
     holdings = equity*vector(document['initial_weights'], 'initial_weights', n, 0)
@@ -37,6 +39,9 @@ def simulate(document):
         benchmark = scalar(row['benchmark_return'], 'benchmark_return', -1)
         start_equity = cash+float(holdings.sum())
         require(start_equity > 0, 'PORTFOLIO_INSOLVENT')
+        if include_positions:
+            opening_holdings = holdings.copy()
+            opening_cash = cash
         trade_cost = 0.
         trade = np.zeros(n)
         if row.get('decision') is not None:
@@ -56,6 +61,9 @@ def simulate(document):
             cash = start_equity-float(target.sum())-trade_cost
             require(cash >= floor*start_equity-1e-8, 'CASH_FLOOR_AFTER_COSTS')
             holdings = target
+        if include_positions:
+            post_trade_holdings = holdings.copy()
+            post_trade_cash = cash
         cash *= 1+cash_return
         holdings *= 1+returns
         equity = cash+float(holdings.sum())
@@ -64,18 +72,39 @@ def simulate(document):
         benchmark_returns.append(benchmark)
         costs_paid += trade_cost
         traded += float(abs(trade).sum())
-        records.append({'start': start.isoformat(), 'end': end.isoformat(), 'equity': equity,
+        record = {'start': start.isoformat(), 'end': end.isoformat(), 'equity': equity,
                         'cash': cash, 'net_return': period_return, 'trade_cost': trade_cost,
-                        'traded_notional': float(abs(trade).sum())})
+                        'traded_notional': float(abs(trade).sum())}
+        if include_positions:
+            record['positions'] = {
+                'opening_equity': start_equity,
+                'opening_cash': opening_cash,
+                'opening_holdings': dict(zip(symbols, map(float, opening_holdings))),
+                'post_trade_cash': post_trade_cash,
+                'post_trade_holdings': dict(zip(symbols, map(float, post_trade_holdings))),
+                'trades': dict(zip(symbols, map(float, trade))),
+                'ending_holdings': dict(zip(symbols, map(float, holdings))),
+                'ending_weights': dict(zip(symbols, map(float, holdings/equity))) if equity > 0 else None,
+                'ending_cash_weight': cash/equity if equity > 0 else None,
+            }
+        records.append(record)
     metrics = tail_risk(net_returns)
     benchmark_total = float(np.prod(1+np.array(benchmark_returns))-1)
-    return {'status': 'SIMULATED', 'curve': records, 'metrics': metrics,
+    result = {'status': 'SIMULATED', 'curve': records, 'metrics': metrics,
             'benchmark_total_return': benchmark_total,
             'total_return_difference': metrics['total_return']-benchmark_total,
             'costs_paid': costs_paid, 'gross_traded_notional': traded,
             'input_sha256': digest(document), 'validated_for_live': False,
             'point_in_time_evidence_verified': False,
             'limitation': 'Inputs declare total returns/causal weights. No settlement recycling, market impact calibration, partial fills, queue priority, tax-lot or borrow model. Use event-driven strategy_lab and broker gates for intraday execution.'}
+    if include_positions:
+        result['position_trace'] = {
+            'enabled': True,
+            'scope': 'Input-symbol positions at supplied period boundaries; not issuer look-through, intraperiod peaks or verified fills. Zero-equity ending weights are unknown.',
+            'final_weights': records[-1]['positions']['ending_weights'],
+            'final_cash_weight': records[-1]['positions']['ending_cash_weight'],
+        }
+    return result
 
 
 if __name__ == '__main__':

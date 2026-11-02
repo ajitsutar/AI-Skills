@@ -21,12 +21,15 @@ from pathlib import Path
 import numpy as np
 from arch import arch_model
 from arch.univariate import EGARCH
+from statsmodels.stats.diagnostic import acorr_ljungbox, het_arch
 
 from price_audit import audit_prices
 
 
-def model_specification(family, observations):
-    """Construct a zero-mean normal model with explicit input units."""
+def model_specification(family, observations, distribution="normal"):
+    """Construct an explicitly distributed zero-mean model; normal remains default."""
+    if distribution not in ("normal", "t"):
+        raise ValueError("Innovation distribution must be normal or t")
     choices = {"garch": ("GARCH", 0), "gjr": ("GARCH", 1), "egarch": ("EGARCH", 1)}
     if family not in choices:
         raise ValueError(f"Unknown volatility family: {family}")
@@ -37,7 +40,7 @@ def model_specification(family, observations):
         raise ValueError("Returns must have nonzero variation")
     process, asymmetry = choices[family]
     return arch_model(data, mean="Zero", vol=process, p=1, o=asymmetry,
-                      q=1, dist="normal", rescale=False)
+                      q=1, dist=distribution, rescale=False)
 
 
 def require_usable_fit(estimate):
@@ -47,6 +50,8 @@ def require_usable_fit(estimate):
     if not np.isfinite(numbers).all() or np.any(estimate.conditional_volatility <= 0):
         raise ValueError("Volatility fit contains invalid numerical values")
     pars = estimate.params
+    if "nu" in pars and float(pars["nu"]) <= 2:
+        raise ValueError("Student-t conditional variance requires nu greater than two")
     persistence = float(pars["beta[1]"])
     if not isinstance(estimate.model.volatility, EGARCH):
         persistence += float(pars["alpha[1]"]) + .5 * float(pars.get("gamma[1]", 0))
@@ -54,8 +59,8 @@ def require_usable_fit(estimate):
         raise ValueError("A stationary volatility fit is required for this sizing adapter")
 
 
-def fit_model(family, observations):
-    result = model_specification(family, observations).fit(
+def fit_model(family, observations, distribution="normal"):
+    result = model_specification(family, observations, distribution).fit(
         disp="off", update_freq=0, show_warning=False,
         options={"maxiter": 2500, "ftol": 1e-10})
     require_usable_fit(result)
@@ -92,30 +97,89 @@ def variance_loss(squared_returns, predictions):
     return float(np.average(scaled - 1 - np.log(scaled)))
 
 
-def holdout_validation(observations, family, train, test):
+def holdout_validation(observations, family, train, test, distribution="normal", ewma_decay=.94):
     if train < 3 or test < 1 or len(observations) < train + test:
         return {"status": "insufficient_data"}
     data = np.asarray(observations, dtype=float)
+    if not math.isfinite(ewma_decay) or not 0 < ewma_decay < 1:
+        raise ValueError("EWMA decay must be strictly between zero and one")
     try:
-        estimate = fit_model(family, data[:train])
+        estimate = fit_model(family, data[:train], distribution)
         predictions = []
         for end in range(train, train + test):
             # The target and future data never enter the backend. Parameters stay
             # fixed; arch filters/backcasts using only this observed prefix.
-            past = model_specification(family, data[:end]).fix(estimate.params)
+            past = model_specification(family, data[:end], distribution).fix(estimate.params)
             predictions.append(float(analytic_variance(past, 1)[0]))
         expected = np.asarray(predictions)
         actual = np.square(data[train:train + test])
         baseline = np.repeat(max(float(data[:train].var(ddof=1)), 1e-8), test)
         score, reference = variance_loss(actual, expected), variance_loss(actual, baseline)
+        # Initialization uses only training data. Each held-out return updates
+        # the next forecast AFTER its prediction, never its own prediction.
+        state = float(baseline[0])
+        for value in data[:train]:
+            state = ewma_decay * state + (1-ewma_decay) * float(value)**2
+        ewma_predictions = []
+        for value in data[train:train+test]:
+            ewma_predictions.append(max(state, 1e-12))
+            state = ewma_decay * state + (1-ewma_decay) * float(value)**2
+        ewma_score = variance_loss(actual, ewma_predictions)
         return {"status": "ok", "n": test, "qlike": score,
                 "mse": float(np.square(actual - expected).mean()),
                 "baseline_qlike": reference, "beats_constant_variance": score < reference,
+                "ewma_qlike": ewma_score, "beats_ewma": score < ewma_score,
+                "ewma_decay": ewma_decay,
+                "ewma_predicted_variance_percent_squared": ewma_predictions,
                 "predicted_variance_percent_squared": predictions,
                 "method": "fixed_parameter_sequential_one_step",
                 "filtering": "arch fixed parameters; observed prefixes only"}
     except (ValueError, FloatingPointError, OverflowError) as error:
         return {"status": "fit_failed", "message": str(error)}
+
+
+def residual_diagnostics(estimate, lags=(10, 20)):
+    """Diagnostic evidence, not a proof of calibration or a trade permission."""
+    pars = estimate.params
+    persistence = float(pars["beta[1]"])
+    if not isinstance(estimate.model.volatility, EGARCH):
+        persistence += float(pars["alpha[1]"]) + .5*float(pars.get("gamma[1]", 0))
+    nu = float(pars["nu"]) if "nu" in pars else None
+    flags = []
+    if persistence >= .995:
+        flags.append("NEAR_UNIT_PERSISTENCE")
+    if nu is not None and nu <= 4:
+        flags.append("STUDENT_T_FOURTH_MOMENT_NOT_FINITE")
+    if nu is not None and nu <= 2:
+        flags.append("STUDENT_T_SECOND_MOMENT_NOT_FINITE")
+    z = np.asarray(estimate.std_resid, dtype=float)
+    if z.ndim != 1 or len(z) < 30 or not np.isfinite(z).all():
+        return {"status": "INSUFFICIENT_FINITE_RESIDUALS", "flags": flags+["RESIDUAL_DIAGNOSTICS_UNAVAILABLE"],
+                "persistence": persistence, "student_t_nu": nu, "diagnostics_passed": False}
+    use = sorted(set(int(k) for k in lags if type(k) is int and 0 < k < len(z)//4))
+    if not use:
+        raise ValueError("Provide at least one supported residual diagnostic lag")
+    lb = acorr_ljungbox(z, lags=use, return_df=True)
+    squared = acorr_ljungbox(z*z, lags=use, return_df=True)
+    arch_p = float(het_arch(z, nlags=use[0])[1])
+    raw = {str(k): float(lb.loc[k, "lb_pvalue"]) for k in use}
+    sq = {str(k): float(squared.loc[k, "lb_pvalue"]) for k in use}
+    if not all(math.isfinite(x) for x in [arch_p, *raw.values(), *sq.values()]):
+        return {"status": "NONFINITE_DIAGNOSTIC", "flags": flags+["RESIDUAL_DIAGNOSTICS_UNAVAILABLE"],
+                "persistence": persistence, "student_t_nu": nu, "diagnostics_passed": False}
+    if min(raw.values()) < .05:
+        flags.append("STANDARDIZED_RESIDUAL_AUTOCORRELATION")
+    if min(sq.values()) < .05:
+        flags.append("SQUARED_RESIDUAL_AUTOCORRELATION")
+    if arch_p < .05:
+        flags.append("RESIDUAL_ARCH_EFFECT")
+    return {"status": "COMPUTED", "persistence": persistence, "student_t_nu": nu,
+            "conditional_second_moment_finite": nu is None or nu > 2,
+            "innovation_fourth_moment_finite": nu is None or nu > 4,
+            "ljung_box_pvalues": raw, "squared_ljung_box_pvalues": sq,
+            "arch_lm_lag": use[0], "arch_lm_pvalue": arch_p, "flags": flags,
+            "diagnostics_passed": not flags,
+            "limitation": "Unadjusted diagnostic p-values, not independent tests of forecasting skill. Finite innovation moments do not establish finite unconditional GARCH moments."}
 
 
 def load_price_input(path, close_column, timestamp_column):
@@ -140,6 +204,8 @@ def parse_options(argv=None):
     parser.add_argument("csv")
     parser.add_argument("--data-audit")
     parser.add_argument("--model", default="garch", choices=("garch", "gjr", "egarch", "auto"))
+    parser.add_argument("--distribution", default="normal", choices=("normal", "t"))
+    parser.add_argument("--ewma-decay", default=.94, type=float)
     parser.add_argument("--close-column", default="close")
     parser.add_argument("--timestamp-column", default="timestamp")
     parser.add_argument("--horizon", default=1, type=int)
@@ -151,12 +217,16 @@ def parse_options(argv=None):
         raise ValueError("Minimums: horizon 1, training returns 30, holdout returns 10")
     if not math.isfinite(opts.periods_per_year) or opts.periods_per_year <= 0:
         raise ValueError("Annualization periods must be finite and positive")
+    if not math.isfinite(opts.ewma_decay) or not 0 < opts.ewma_decay < 1:
+        raise ValueError("EWMA decay must be strictly between zero and one")
     if opts.model == "egarch" and opts.horizon > 1:
         raise ValueError("Multi-step EGARCH needs simulation; request horizon=1")
     return opts
 
 
 def run_analysis(opts):
+    distribution = getattr(opts, "distribution", "normal")
+    ewma_decay = getattr(opts, "ewma_decay", .94)
     raw, prices, times = load_price_input(opts.csv, opts.close_column, opts.timestamp_column)
     required = opts.min_observations + opts.validation_test + 1
     if prices.size < required:
@@ -171,17 +241,18 @@ def run_analysis(opts):
     families = [name for name in families if name != "egarch" or opts.horizon == 1]
     diagnostics, estimates = {}, {}
     for family in families:
-        diagnostics[family] = holdout_validation(changes, family, prefix_size, opts.validation_test)
+        diagnostics[family] = holdout_validation(changes, family, prefix_size, opts.validation_test, distribution, ewma_decay)
         if diagnostics[family]["status"] != "ok":
             continue
         try:
-            estimates[family] = fit_model(family, changes)
+            estimates[family] = fit_model(family, changes, distribution)
         except (ValueError, FloatingPointError, OverflowError) as error:
             diagnostics[family]["refit_error"] = str(error)
     if not estimates:
         raise ValueError("No usable model after chronological validation: " + json.dumps(diagnostics))
     selected = min(estimates, key=lambda name: diagnostics[name]["qlike"])
     fitted = estimates[selected]
+    residuals = residual_diagnostics(fitted)
     variances = forecast(fitted, opts.horizon)
     period_sigma = float(np.sqrt(variances[0]) * .01)
     recent_count = min(60, int(changes.size))
@@ -192,7 +263,7 @@ def run_analysis(opts):
     digest = lambda value: hashlib.sha256(value).hexdigest()
     script = Path(__file__)
     spec = {
-        "implementation": "arch-adapter-3.2.0", "backend": "arch",
+        "implementation": "arch-adapter-3.3.0", "backend": "arch",
         "script_sha256": digest(script.read_bytes()),
         "audit_helper_sha256": digest(script.with_name("price_audit.py").read_bytes()),
         "csv_sha256": quality["csv_sha256"],
@@ -205,7 +276,8 @@ def run_analysis(opts):
         "training_returns": prefix_size, "holdout_returns": opts.validation_test,
         "training_last_return_end": times[prefix_size].isoformat(),
         "holdout_first_return_end": times[prefix_size + 1].isoformat(),
-        "return_definition": "100 * log(P[t] / P[t-1]); zero mean; Gaussian innovations",
+        "return_definition": "100 * log(P[t] / P[t-1]); zero mean; " + ("Gaussian" if distribution == "normal" else "standardized Student-t") + " innovations",
+        "distribution": distribution, "ewma_decay": ewma_decay,
         "requested_model": opts.model, "selected_model": selected, "horizon": opts.horizon,
         "periods_per_year": opts.periods_per_year,
         "variance_initialization": "arch default backcast and variance bounds on observed prefix",
@@ -224,8 +296,13 @@ def run_analysis(opts):
         "recent_realized_daily_volatility": realized_sigma, "regime": bucket,
         "fit_success": True, "fit_message": str(fitted.optimization_result.message),
         "log_likelihood": float(fitted.loglikelihood), "validation": diagnostics,
-        "periods_per_year": opts.periods_per_year, "innovation_distribution": "Gaussian; zero conditional mean",
+        "periods_per_year": opts.periods_per_year, "innovation_distribution": ("Gaussian" if distribution == "normal" else "standardized Student-t") + "; zero conditional mean",
         "eligible_as_sizing_input": bool(quality["eligible_for_sizing"] and diagnostics[selected]["beats_constant_variance"]),
+        "legacy_eligibility_basis": "Audited declaration and beating constant variance only; preserved for compatibility. Use strict_diagnostic_eligibility for the extended diagnostic screen.",
+        "strict_diagnostic_eligibility": bool(quality["eligible_for_sizing"] and diagnostics[selected]["beats_constant_variance"] and diagnostics[selected]["beats_ewma"] and residuals["diagnostics_passed"]),
+        "residual_diagnostics": residuals,
+        "forecast_cumulative_sigma": float(np.sqrt(variances.sum())*.01),
+        "forecast_average_annualized_sigma": float(np.sqrt(variances.mean())*.01*math.sqrt(opts.periods_per_year)),
         "data_quality": quality, "selection_caveat": "Selection holdout is not independent strategy-performance evidence",
         "run_specification": spec,
     }

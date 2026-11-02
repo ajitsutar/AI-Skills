@@ -3,6 +3,18 @@
   "title": "Example prompts: learning, investing, trading and quantitative research",
   "sections": [
     {
+      "id": "quant-research-assurance",
+      "title": "Research quality and reproducible releases",
+      "audience": "Quantitative researchers and maintainers",
+      "guides": ["references/quant-research-assurance.md", "references/quant-data-contracts.md", "references/release-acceptance.md"],
+      "prompts": [
+        {"title": "Assess data for my actual strategy", "prompt": "Given [SOURCE-BOUND DATA], freeze [UNIVERSE], decision and execution times, feature lookbacks and valuation policy. Build the exact strategy requirement grid, separate signal, valuation, execution and membership limitations, and carry observed, reference, modeled and missing classifications into every headline. Do not call a zero-gap modeled grid complete observed data."},
+        {"title": "Reconcile an action and funding sequence", "prompt": "Replay [DATED HOLDINGS AND LOTS] through [CORPORATE ACTIONS], explicit sales, taxes, settlement and withdrawals. Reconcile cash, units and entitlements. Preserve unquoted spin-off interests after a parent sale; keep unknown taxes or valuations unresolved and distinguish settled cash from receivables."},
+        {"title": "Challenge the optimized allocation", "prompt": "For [FROZEN PORTFOLIO INPUTS], compare Gaussian and Student-t volatility diagnostics, EWMA and realized-variance alternatives, empirical tail sample uncertainty and portfolio variance assumptions. Independently check the constrained minimum-risk solution, report binding caps, and run prespecified covariance and cap sensitivities without selecting a winner after seeing results."},
+        {"title": "Prepare a reproducible research release", "prompt": "Audit [SKILL CANDIDATE] using an artifact-hashed fresh environment, frozen regression fixtures, a complete registered experiment inventory and actual first-response host comparisons. Preserve failures and disagreements. Produce a capability card and source-rights inventory that separate implemented tools, tested environments, incomplete data, unrun hosts and unproven predictive performance."}
+      ]
+    },
+    {
       "id": "getting-started",
       "title": "Getting started and learning",
       "audience": "Beginner",
@@ -71,6 +83,10 @@
         {
           "title": "Resolve an arbitrary holding period",
           "prompt": "Interpret [HOLDING PERIOD] precisely, including calendar versus trading days, entry window, fixed or rolling exit and early-exit rules. Route the request to intraday, swing or long-term research as appropriate."
+        },
+        {
+          "title": "Use history-first collection without narrowing the universe",
+          "prompt": "For [FULL PUBLIC-VQM UNIVERSE] and [HORIZON], opt in to history-first collection. Attempt fresh info and full history for every member, then omit fresh statements only for a valid nonempty history that fails the native missing-session check. Retain skipped-component receipts, preserve the computed ranking and all coverage gaps, and keep failed or malformed history distinct from a legitimate exclusion. Resume only with the same frozen mode and original decision time; do not change a running collector or assume hidden model caches."
         },
         {
           "title": "Audit partial coverage",
@@ -629,7 +645,7 @@
         },
         {
           "title": "Identify unsupported option assumptions",
-          "prompt": "Assess [OPTION OR HEDGE] for exercise style, payoff, settlement and volatility assumptions. Explain whether the bundled European model applies and what is missing for American or exotic structures."
+          "prompt": "Assess [OPTION OR HEDGE] for exercise style, payoff, settlement and volatility assumptions. Distinguish the European-only model from bounded vanilla American CRR support, identify the explicit inputs missing for that route, and state the limits for exotic payoffs and discrete dividends."
         },
         {
           "title": "Analyze a fixed bond",
@@ -1501,6 +1517,60 @@
           "prompt": "Review [RETAINED RUN RECORDS] without editing them. Separate synthetic historical invocation records, observed current execution, numerical replay and files actually collected. Check active package version consistency and preserve any failure or unavailable export."
         }
       ]
+    },
+    {
+      "id": "historical-data-and-monthly-experiments",
+      "title": "Compressed historical data and staged portfolio experiments",
+      "audience": "Research users and quantitative analysts",
+      "guides": [
+        "references/backtest-data-storage.md",
+        "references/compact-evidence.md",
+        "references/monthly-portfolio-validation.md"
+      ],
+      "prompts": [
+        {
+          "title": "Resume a bounded historical download",
+          "prompt": "Capture [DATA REQUESTS] in the explicit local storage root [ROOT], keeping immutable compressed responses and source metadata. Set disk and request-size limits. Resume the same frozen run from its completed captures without redownloading them, and report missing or incomplete data separately."
+        },
+        {
+          "title": "Opt into portable reuse without stale history",
+          "prompt": "I opt into partial fetch using [PORTABLE BUNDLE] and [CURRENT SOURCE CHECKS]. Verify exact provider, security identity, date range, schema and adjustment conventions. Reuse only compatible verified data; refresh affected historical data when revisions or corporate actions invalidate reuse. Preserve original retrieval times and report the actual network and reuse counts."
+        },
+        {
+          "title": "Narrow and archive an owned research dataset",
+          "prompt": "From [OWNED DATA ROOT], retain only the historical member keys and benchmarks specified in [SCOPE]. Preserve raw source witnesses, coverage gaps and availability dates. Fully verify a compressed archive before deleting only the explicitly authorized owned expanded files. Keep unrelated files and skill release evidence intact."
+        },
+        {
+          "title": "Run a large calculation with compact evidence",
+          "prompt": "Execute [SOURCE-BOUND REQUEST] using compact evidence mode in [OUTPUT ROOT]. Keep complete inputs, results and claim pointers recoverable, avoid repeating shared source objects in every report, verify the saved run and compare its numerical results with the equivalent legacy calculation."
+        },
+        {
+          "title": "Compare fixed portfolios with changing monthly weights",
+          "prompt": "Using [DATED PRICE PANEL] and [COMPLETE EXCHANGE CALENDAR], freeze ten candidate stock lists. Change weights monthly using a declared capped inverse-volatility rule, with next-session execution and explicit costs and cash treatment. Screen one year, freeze five finalists before accessing their five-year results, then select two under the same predefined ranking. Keep failed candidates visible and disclose overlapping windows and current-constituent selection bias."
+        },
+        {
+          "title": "Check a monthly target rule before accounting",
+          "prompt": "Validate [MONTHLY TARGET REQUEST] for fixed composition, sufficient past-only observations, completed month ends and a genuine following execution session. Check the feasibility of stock caps and the pre-fee equity target, then pass supported decisions to native portfolio accounting without changing its cash and fee conventions."
+        }
+      ]
+    },
+    {
+      "title": "Historical identity and coverage recovery",
+      "audience": "Research users and quantitative analysts",
+      "guides": [
+        "references/historical-coverage-recovery.md"
+      ],
+      "prompts": [
+        {
+          "title": "Repair a historical coverage gap",
+          "prompt": "Repair [DATASET] within [EXPLICIT STORAGE ROOT AND CAP]. Classify missing sessions, ticker renames, reused symbols, corporate events, membership errors and missing filings. Reuse verified source pointers, acquire only needed public evidence, preserve original artifacts, and report before/after gaps on the same denominator without inventing prices or publication times."
+        },
+        {
+          "title": "Audit identity-qualified session coverage",
+          "prompt": "Run historical_coverage.py on [DECLARED COVERAGE CONTRACT]. Check issuer and share-class identity, dated typed mappings and per-security membership/listing intervals. Retain rejected mappings and missing sessions; distinguish a multi-source union of dates from a usable return series or point-in-time certification."
+        }
+      ],
+      "id": "historical-coverage-recovery"
     }
   ]
 }

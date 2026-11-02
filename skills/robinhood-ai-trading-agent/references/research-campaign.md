@@ -124,6 +124,43 @@ do not block comparison: no financial value could make that security rankable.
 Failed or empty history requests always block. A successfully acquired statement with missing accounting fields remains
 an explicit scoring exclusion, distinct from a failed provider request.
 
+## Optional history-first acquisition
+
+For a large new public-VQM run, `--history-first` is an optional request-saving
+mode. The default still requests all five components. This option retains the
+entire universe and attempts fresh company info and full price/action history
+before financial statements. It omits fresh income, balance and cash-flow
+requests only when a successful, nonempty, structurally valid price response
+fails the scorer's exact `MISSING_HISTORY_SESSIONS` check. The current profile
+cannot rank that security regardless of its financial statements. A failed,
+empty or malformed price response does not qualify for the omission.
+
+```text
+python scripts/public_research_fetch.py --output /research/new-run --decision-at <timezone-bearing-now> --hold <actual-hold> --prompt-file /research/prompt.txt --universe-preset us-listed --history-first
+```
+
+Skipped components have explicit `not_requested` provenance and a retained
+history/profile receipt; they are not current financial observations or provider
+failures. Previously successful same-run components and valid explicit
+partial-fetch reuse are preserved. Report financial-coverage omissions alongside
+the normal exclusions and gaps. This mode does not establish investment
+eligibility or reject a company's investment thesis.
+
+Collection mode is part of the frozen acquisition contract. Resume with the same
+mode and original decision time; do not change a running collector or upgrade its
+code mid-run. Resume continues to retry failed components without replacing
+successful checkpoints. An omitted mode in a legacy contract means the original
+full-financial collection, subject to the existing code-hash compatibility check.
+
+More workers alone cannot remove the shared component-call spacing. Keep the
+documented provider retry/backoff and pause behavior; do not use parallelism,
+account changes or proxy changes to bypass a provider limit. Logical component
+calls can contain several HTTP requests inside the provider library, so distinguish
+component counts from measured network calls and wall time. Do not promise a
+speedup without a matched measurement. Larger reductions may require supported
+provider batching or the existing source-checked portable partial-fetch route;
+hidden model memory, a TTL or an unchanged quote is not such evidence.
+
 ## Common review coverage and definitions
 
 Review the computed queue in order, beginning with the requested candidate count.

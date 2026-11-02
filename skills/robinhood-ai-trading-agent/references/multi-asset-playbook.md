@@ -21,7 +21,7 @@ instrument support; `execution_handoff.py` preserves requests without submitting
 | Investment-grade/high-yield/sovereign debt | Cash-flow schedule, clean/dirty/accrued price, curve/spread, duration/convexity, covenants, recovery/default, liquidity | Fixed noncallable cash-flow pricing and parallel-shift scenarios; no spread/default forecast or callable model |
 | Futures/commodities | Multiplier, tick value, expiry/roll, physical delivery/first notice, margin and variation cash, negative prices, term structure | Linear marked P&L with explicit absolute price shocks; notional is not funded value; transactions belong to native tools |
 | FX/international holdings | Base/quote convention, local return plus FX cross term, settlement holidays, hedging cost and counterparty | Exact spot translation scenarios and currency cash ladder; forwards/swaps require additional pricing and broker adapters |
-| Options/volatility | Exercise/settlement style, multiplier, surface/skew/term structure, bid/ask, liquidity, Greeks, gap/pin/assignment/dividend risk | European constant-volatility valuation/Greeks and full scenario repricing; American, exotic and discrete-dividend pricing explicitly unsupported |
+| Options/volatility | Exercise/settlement style, multiplier, surface/skew/term structure, bid/ask, liquidity, Greeks, gap/pin/assignment/dividend risk | European constant-volatility valuation/Greeks and scenario repricing via `risk.option`; bounded American/European vanilla CRR pricing via the [derivatives toolkit](derivatives-toolkit.md). Exotic and discrete-dividend pricing remain unsupported |
 | REITs/real assets | Common unadjusted FFO bridge, debt maturity/refinancing, occupancy, cap rates, maintenance/development capex | Strict specialized accounting adapter and source recovery; no automatic private-property valuation |
 | Insurers/banks | Legal-entity and capital scope, reserves/credit quality, asset-liability mismatch, regulatory/distribution constraints | Existing specialized financial factors and primary-data recovery; qualitative/supplemental risk review still required |
 | Crypto/alternative assets | Custody/key/counterparty, 24/7 liquidity, token concentration, forks, funding/depeg/redemption and tax | Spot-price/FX stress and research procedure only; derivatives/staking/DeFi custody and execution unsupported |
@@ -36,11 +36,28 @@ The skill neither adds broker capabilities nor imposes local execution restricti
 ## Mandatory scenario details
 
 For options, shock the underlying, volatility, rates, time and FX together; linear
-delta alone can miss gamma/vega losses. The European helper rejects American style.
-When the actual instrument is American, stop at that unsupported result: do not
-change its exercise style to obtain a European price, even under a generic
-"research only" label. A separate, explicitly requested hypothetical European
-comparison is a different analysis and cannot stand in for the actual position.
+delta alone can miss gamma/vega losses. `risk.option` and its use within
+`risk.scenarios` are European-only. Preserve their rejection of American style;
+do not change the supplied exercise style to obtain a European price. This
+helper limitation does not mean American pricing is absent from the package.
+For vanilla American or European option valuation, use
+`derivatives.calculate` with `operation: option_crr` under the
+[derivatives toolkit contract](derivatives-toolkit.md). It models exercise on a
+finite CRR grid with constant volatility, continuous rates and continuous
+dividend yield. A single grid result does not establish convergence.
+
+Preserve supplied terms when mapping between interfaces: `years` maps to
+`time_years`, `rate` to `risk_free_rate`, and `exercise_style` to `exercise` only
+when their economic meanings match. Read the complete toolkit envelope and exact
+input contract before running it. The grid, rate compounding, dividend model,
+currency and information timestamps must be explicit; do not obtain missing
+values by copying a bundled example. If the supplied record lacks these fields,
+report the specific missing inputs and the available model's limits. A separately
+labeled assumption-based scenario is not a price established by the original
+record. An assessment of model applicability does not require inventing a price.
+Exotic payoffs, discrete cash dividends and settlement mechanics remain outside
+the CRR pricing model. A separate, explicitly requested hypothetical European
+comparison cannot stand in for the actual American position.
 Do not infer an exercise/assignment decision from theoretical price. Spreads need
 each leg repriced and separate assignment/funding analysis; exercise can create a
 stock obligation even when the account cannot fund it.

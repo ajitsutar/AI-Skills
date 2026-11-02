@@ -33,6 +33,9 @@ or explore the [prompt catalog for investors, traders and quants](skills/robinho
 Examples cover supported workflows and useful gap assessments without a fixed count.
 For implementation boundaries and remaining research needs, see the
 [capabilities and limits](skills/robinhood-ai-trading-agent/references/capabilities-and-limits.md).
+The [prioritized institutional research backlog](docs/robinhood-institutional-backlog.md)
+separates the completed 5.4.0 software foundation from the data, pilot, validation
+and operational work needed for broader professional use.
 
 ## Download one skill
 

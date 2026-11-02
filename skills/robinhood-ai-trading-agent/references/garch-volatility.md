@@ -11,8 +11,10 @@ helper and any separately verified alternative implementation.
 
 GARCH forecasts conditional variance, not price direction or profitability.
 Estimation/filtering/forecasting use arch 8.0.0 with its installed numerical dependencies.
-See [dependency notices](../THIRD-PARTY-NOTICES.md). The helper assumes zero conditional mean and
-Gaussian innovations; percent log returns improve numerical scale.
+See [dependency notices](../THIRD-PARTY-NOTICES.md). The helper assumes zero
+conditional mean. Gaussian innovations remain the default; `--distribution t`
+explicitly requests standardized Student-t innovations. Percent log returns
+improve numerical scale. Do not label these variants the same model.
 
 ## Correct recursion
 
@@ -153,3 +155,33 @@ sizing separately, against simpler alternatives and untouched data.
 
 All model-quality flags describe analytical suitability. Missing data, failed fits,
 regime labels and skipped overlays never impose an execution pause or approval.
+
+## Extended diagnostics and compatibility
+
+The optional distribution argument is appended to `model_specification`,
+`fit_model` and `holdout_validation`; existing calls still use normal innovations.
+`--ewma-decay` defaults to 0.94. The EWMA benchmark initializes only from the
+training prefix and incorporates each held-out return after forecasting it.
+Its decay is a disclosed convention, not a fitted or validated optimum.
+
+Holdout output now retains both constant-variance and EWMA QLIKE comparisons.
+Residual diagnostics include Ljung-Box tests on standardized residuals and their
+squares, an ARCH LM check, persistence and Student-t innovation moment flags.
+Student-t variance requires nu greater than two. Nu at most four flags an infinite
+innovation fourth moment; this does not imply infinite conditional variance.
+Finite innovation moments alone do not establish finite unconditional GARCH
+moments. The diagnostic p-values are unadjusted screens, not independent proof
+of model calibration. Near-unit persistence (at least 0.995) is flagged.
+
+`eligible_as_sizing_input` preserves the earlier audited-declaration plus
+constant-variance comparison contract. Its `legacy_eligibility_basis` field makes
+that scope explicit. Use `strict_diagnostic_eligibility` for the extended screen:
+reviewed input declaration, better QLIKE than both elementary baselines and no
+residual/persistence/moment flags. Neither field certifies future performance or
+authorizes a trade. Models that fail remain visible; do not relabel warnings as
+calibrated forecasts.
+
+Forecast output adds cumulative horizon sigma and annualized average sigma,
+distinct from the existing next-period annualized sigma. These quantities assume
+zero cross-period innovation covariance. Portfolio aggregation and current-weight
+tail diagnostics are documented in [risk diagnostics](risk-diagnostics.md).

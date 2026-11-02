@@ -141,7 +141,7 @@ def project_verified(directory):
     run_directory = directory / 'run' if execution_root else directory
     artifact = 'run/result.json' if execution_root else 'result.json'
     verification = workflow.verify(run_directory)
-    raw = (run_directory / 'result.json').read_bytes()
+    raw = workflow.evidence_storage.Reader(run_directory).read('result.json')
     projected = _project(workflow.read_result(raw), workflow.sha(raw), artifact=artifact)
     projected['verification'] = verification
     return projected

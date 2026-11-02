@@ -1,0 +1,23 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-11-01T00:00:00Z",
+  "intended_use": "redistribution",
+  "sources": [
+    {
+      "id": "replace-with-source-id",
+      "provider": "Replace with exact provider",
+      "artifact_kind": "market_data",
+      "source_url": null,
+      "terms_url": null,
+      "terms_sha256": null,
+      "terms_observed_at": null,
+      "valid_until": null,
+      "permitted_uses": [],
+      "review_status": "unknown",
+      "reviewer": null,
+      "attribution": null,
+      "retention_days": null,
+      "evidence_ref": null
+    }
+  ]
+}

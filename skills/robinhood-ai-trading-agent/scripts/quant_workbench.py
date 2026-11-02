@@ -51,6 +51,15 @@ import time_series_toolkit
 import portable_quant
 import point_in_time_data
 import costed_bar_replay
+import monthly_experiment
+import research_readiness
+import security_master
+import price_refresh
+import holdings_ledger
+import analyst_adapter
+import risk_diagnostics
+import experiment_registry
+import release_acceptance
 from quant_common import digest, require
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -171,6 +180,32 @@ PORTABLE_OPERATIONS = {
     'backtest.costed_bars': costed_bar_replay.simulate,
 }
 OPERATIONS.update(PORTABLE_OPERATIONS)
+MONTHLY_OPERATIONS = {
+    'portfolio.capped_inverse_volatility': monthly_experiment.capped_inverse_volatility,
+    'backtest.monthly_targets': monthly_experiment.monthly_targets,
+    'experiment.freeze': monthly_experiment.freeze_experiment,
+    'experiment.rank_stage': monthly_experiment.rank_stage,
+}
+OPERATIONS.update(MONTHLY_OPERATIONS)
+ASSURANCE_OPERATIONS = {
+    'data.strategy_readiness': research_readiness.assess,
+    'data.security_snapshot': security_master.snapshot,
+    'data.source_features': security_master.adapt_records,
+    'data.price_refresh': price_refresh.reconcile,
+    'backtest.holdings_ledger': holdings_ledger.replay,
+    'analyst.extract_table': analyst_adapter.extract,
+    'analyst.earnings_basis': analyst_adapter.earnings_basis,
+    'risk.empirical_tail': risk_diagnostics.empirical_tail,
+    'risk.conditional_portfolio': risk_diagnostics.conditional_portfolio,
+    'portfolio.sensitivity': quant_portfolio.sensitivity,
+    'experiment.validate_attempt': experiment_registry.validate_attempt,
+    'experiment.overlap_review': experiment_registry.overlap_review,
+    'release.rights_inventory': release_acceptance.rights_inventory,
+    'release.grade_response': release_acceptance.grade_response,
+}
+# Only pure operations belong here: registry mutations and file-writing release
+# runners must never be invoked again by freeze/verify.
+OPERATIONS.update(ASSURANCE_OPERATIONS)
 MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'quant_portfolio.py', 'multi_asset_risk.py', 'investment_ops.py',
            'primary_financial_data.py', 'price_audit.py', 'financial_normalize.py',
@@ -186,7 +221,10 @@ MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'equity_cash_comparison.py', 'source_exposure.py', 'technical_toolkit.py',
            'fundamental_toolkit.py', 'sentiment_toolkit.py', 'factor_research.py',
            'derivatives_toolkit.py', 'paper_exchange.py', 'platform_readiness.py', 'time_series_toolkit.py',
-               'portable_quant.py', 'point_in_time_data.py', 'costed_bar_replay.py')
+               'portable_quant.py', 'point_in_time_data.py', 'costed_bar_replay.py', 'monthly_experiment.py',
+               'research_contracts.py', 'quant_data_contracts.py', 'research_readiness.py', 'security_master.py',
+               'price_refresh.py', 'holdings_ledger.py', 'analyst_adapter.py',
+               'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py')
 
 
 def implementation_hash():
@@ -251,6 +289,24 @@ def run(document):
         require(isinstance(job['inputs'], dict), 'JOB_INPUT_OBJECT_REQUIRED')
         try:
             inputs = resolved_inputs(job['operation'], job['inputs'])
+            if job['operation'] in ASSURANCE_OPERATIONS:
+                payload = inputs['document']
+                if job['operation'] == 'data.strategy_readiness':
+                    for decision in payload['decisions']:
+                        require(all(timestamp(decision[key]) <= timestamp(contract['as_of'])
+                                    for key in ('decision_at', 'valuation_at', 'execution_at')), 'FUTURE_READINESS_CLOCK')
+                if 'as_of' in payload:
+                    require(timestamp(payload['as_of']) <= timestamp(contract['as_of']), 'FUTURE_ASSURANCE_CUTOFF')
+                if 'currency' in payload:
+                    require(payload['currency'] == contract['base_currency'], 'ASSURANCE_CURRENCY_MISMATCH')
+                if job['operation'] == 'analyst.earnings_basis':
+                    require(payload['quote']['currency'] == contract['base_currency'], 'ASSURANCE_CURRENCY_MISMATCH')
+                if job['operation'] == 'data.price_refresh':
+                    require(timestamp(payload['acquired_at']) <= timestamp(contract['as_of']), 'FUTURE_REFRESH_CAPTURE')
+                if job['operation'] == 'portfolio.sensitivity':
+                    base = payload['base']
+                    require(base['currency'] == contract['base_currency'] and base['horizon_id'] == contract['horizon_id'], 'WORKBENCH_PORTFOLIO_CONTRACT')
+                    require(timestamp(base['decision_at']) <= timestamp(contract['as_of']), 'FUTURE_DECISION')
             if job['operation'] in PORTABLE_OPERATIONS:
                 payload = inputs['document']
                 require(timestamp(payload['as_of']) <= timestamp(contract['as_of']), 'FUTURE_PORTABLE_CUTOFF')
@@ -289,6 +345,9 @@ def run(document):
                 require(inputs['document']['horizon_id'] == contract['horizon_id'] and
                         inputs['document']['currency'] == contract['base_currency'], 'WORKBENCH_PORTFOLIO_CONTRACT')
                 require(timestamp(inputs['document']['decision_at']) <= timestamp(contract['as_of']), 'FUTURE_DECISION')
+            if job['operation'] in {'backtest.monthly_targets', 'experiment.freeze', 'experiment.rank_stage'}:
+                field = 'as_of' if job['operation'] == 'backtest.monthly_targets' else 'sealed_at'
+                require(timestamp(inputs['document'][field]) <= timestamp(contract['as_of']), 'FUTURE_EXPERIMENT_CUTOFF')
             if job['operation'] == 'data.sec_extract':
                 require(timestamp(inputs['information_cutoff']) <= timestamp(contract['as_of']), 'FUTURE_INFORMATION_CUTOFF')
             if job['operation'] == 'validation.factors':

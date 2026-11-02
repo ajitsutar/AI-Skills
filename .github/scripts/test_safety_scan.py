@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check that preserving a public upstream notice does not weaken export scanning."""
 import hashlib
+import json
 import tempfile
 import unittest
 from pathlib import Path
@@ -46,6 +47,33 @@ class PublicNoticeTests(unittest.TestCase):
         digest = hashlib.sha256(modified.encode()).hexdigest()
         with patch.dict(safety_scan.PUBLIC_LICENSE_EMAIL_EXCEPTIONS, {self.name: digest}):
             self.assertTrue(any("OpenAI-style key" in s for s in self.findings(modified)))
+
+
+class SbomIdentifierTests(unittest.TestCase):
+    def test_only_consistent_structured_identifiers_are_recognized(self):
+        component = {'name': 'python-dateutil', 'version': '2.9.0.post0',
+                     'bom-ref': 'python-dateutil' + '@' + '2.9.0.post0',
+                     'purl': 'pkg:pypi/python-dateutil' + '@' + '2.9.0.post0'}
+        doc = {'bomFormat': 'CycloneDX', 'components': [component]}
+        path = 'skills/robinhood-ai-trading-agent/environments/windows-cp312-core/sbom.cdx.json'
+        text = json.dumps(doc)
+        self.assertEqual(len(safety_scan.sbom_package_identifier_spans(text, path)), 2)
+        self.assertEqual(safety_scan.sbom_package_identifier_spans(text, 'other.json'), [])
+        component['version'] = 'example.invalid'
+        self.assertEqual(safety_scan.sbom_package_identifier_spans(json.dumps(doc), path), [])
+
+    def test_real_email_and_secret_remain_findings_inside_sbom(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            path = root / 'skills/robinhood-ai-trading-agent/environments/windows-cp312-core/sbom.cdx.json'
+            path.parent.mkdir(parents=True)
+            doc = {'bomFormat': 'CycloneDX', 'components': [],
+                   'note': 'private' + '@' + 'example.invalid', 'secret': 'sk-' + 'a' * 24}
+            path.write_text(json.dumps(doc), encoding='utf-8')
+            with patch.object(safety_scan, 'ROOT', root):
+                findings = safety_scan.scan()
+            self.assertTrue(any('personal email' in row for row in findings))
+            self.assertTrue(any('OpenAI-style key' in row for row in findings))
 
 
 if __name__ == "__main__":

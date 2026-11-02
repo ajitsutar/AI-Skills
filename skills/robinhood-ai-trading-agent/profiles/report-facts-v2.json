@@ -180,6 +180,90 @@
         "unit": "status"
       }
     },
+    "analyst.earnings_basis": {
+      "averaged_multiples": {
+        "basis": "Incompatible earnings cohorts are not averaged.",
+        "denominator": null,
+        "metric": "averaged multiples",
+        "unit": "boolean"
+      },
+      "results/*/multiple": {
+        "basis": "Explicit supplied quote divided by compatible positive EPS; retain each fiscal/rolling and GAAP/adjusted cohort. Not fair value.",
+        "denominator": "EPS for the supplied period and accounting/share basis",
+        "metric": "results * multiple",
+        "unit": "ratio"
+      }
+    },
+    "analyst.extract_table": {
+      "consensus_computed": {
+        "basis": "Provider-attributed analyst row, supplied currency/share basis and target horizon; not a forecast or independent full-report authentication.",
+        "denominator": null,
+        "metric": "consensus computed",
+        "unit": "boolean"
+      },
+      "full_report_access_inferred": {
+        "basis": "Provider-attributed analyst row, supplied currency/share basis and target horizon; not a forecast or independent full-report authentication.",
+        "denominator": null,
+        "metric": "full report access inferred",
+        "unit": "boolean"
+      },
+      "records/*/previous_target": {
+        "basis": "Provider-attributed analyst row, supplied currency/share basis and target horizon; not a forecast or independent full-report authentication.",
+        "denominator": null,
+        "metric": "records * previous target",
+        "unit": "input_currency_per_share"
+      },
+      "records/*/target": {
+        "basis": "Provider-attributed analyst row, supplied currency/share basis and target horizon; not a forecast or independent full-report authentication.",
+        "denominator": null,
+        "metric": "records * target",
+        "unit": "input_currency_per_share"
+      }
+    },
+    "backtest.costed_bars": {
+      "cash": {
+        "basis": "Single-instrument cash-funded bar model; explicit costs; no observed fills.",
+        "denominator": null,
+        "metric": "Modeled cash",
+        "unit": "input_currency_amount"
+      },
+      "equity": {
+        "basis": "Single-instrument cash-funded bar model; explicit costs; no observed fills.",
+        "denominator": null,
+        "metric": "Modeled equity",
+        "unit": "input_currency_amount"
+      },
+      "fills/*/quantity": {
+        "basis": "Input instrument quantity step; hypothetical paper replay.",
+        "denominator": null,
+        "metric": "Modeled quantity",
+        "unit": "instrument_units"
+      },
+      "initial_cash": {
+        "basis": "Single-instrument cash-funded bar model; explicit costs; no observed fills.",
+        "denominator": null,
+        "metric": "Modeled initial cash",
+        "unit": "input_currency_amount"
+      },
+      "pending_order/remaining": {
+        "basis": "Input instrument quantity step; hypothetical paper replay.",
+        "denominator": null,
+        "metric": "Modeled quantity",
+        "unit": "instrument_units"
+      },
+      "position": {
+        "basis": "Input instrument quantity step; hypothetical paper replay.",
+        "denominator": null,
+        "metric": "Modeled quantity",
+        "unit": "instrument_units"
+      },
+      "total_fees": {
+        "basis": "Single-instrument cash-funded bar model; explicit costs; no observed fills.",
+        "denominator": null,
+        "metric": "Modeled total fees",
+        "unit": "input_currency_amount"
+      }
+    },
     "backtest.dual_sma": {
       "accounting_residual": {
         "basis": "final_equity - initial_cash - realized_pnl - unrealized_pnl",
@@ -568,6 +652,170 @@
         "unit": "status"
       }
     },
+    "backtest.holdings_ledger": {
+      "cash_and_receivable_conservation_residual": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "cash and receivable conservation residual",
+        "unit": "input_currency_amount"
+      },
+      "final/cash_available_after_tax_reserve": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "final cash available after tax reserve",
+        "unit": "input_currency_amount"
+      },
+      "final/cash_floor_shortfall": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "final cash floor shortfall",
+        "unit": "input_currency_amount"
+      },
+      "final/cash_receivables": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "final cash receivables",
+        "unit": "input_currency_amount"
+      },
+      "final/declared_tax_liability": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "final declared tax liability",
+        "unit": "input_currency_amount"
+      },
+      "final/gross_nav": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "final gross nav",
+        "unit": "input_currency_amount"
+      },
+      "final/net_nav_after_declared_tax": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "final net nav after declared tax",
+        "unit": "input_currency_amount"
+      },
+      "final/positions/*/quantity": {
+        "basis": "Supplied shares or units after explicit corporate actions; not executable liquidity.",
+        "denominator": null,
+        "metric": "final positions * quantity",
+        "unit": "security_units"
+      },
+      "final/positions/*/value": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "final positions * value",
+        "unit": "input_currency_amount"
+      },
+      "final/settled_cash": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "final settled cash",
+        "unit": "input_currency_amount"
+      },
+      "final/tax_reserve_shortfall": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "final tax reserve shortfall",
+        "unit": "input_currency_amount"
+      },
+      "final/valuation_status": {
+        "basis": "Observed supplied marks, explicit reference/model scenario, or unresolved mark; modeled values are not executable quotes.",
+        "denominator": null,
+        "metric": "Holdings valuation evidence classification",
+        "unit": "status"
+      },
+      "net_external_cash_flows": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "net external cash flows",
+        "unit": "input_currency_amount"
+      },
+      "source_authenticity_verified": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "source authenticity verified",
+        "unit": "boolean"
+      },
+      "tax_law_verified": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "tax law verified",
+        "unit": "boolean"
+      },
+      "timeline/*/cash_available_after_tax_reserve": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "timeline * cash available after tax reserve",
+        "unit": "input_currency_amount"
+      },
+      "timeline/*/cash_floor_shortfall": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "timeline * cash floor shortfall",
+        "unit": "input_currency_amount"
+      },
+      "timeline/*/cash_receivables": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "timeline * cash receivables",
+        "unit": "input_currency_amount"
+      },
+      "timeline/*/declared_tax_liability": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "timeline * declared tax liability",
+        "unit": "input_currency_amount"
+      },
+      "timeline/*/gross_nav": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "timeline * gross nav",
+        "unit": "input_currency_amount"
+      },
+      "timeline/*/net_nav_after_declared_tax": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "timeline * net nav after declared tax",
+        "unit": "input_currency_amount"
+      },
+      "timeline/*/positions/*/quantity": {
+        "basis": "Supplied shares or units after explicit corporate actions; not executable liquidity.",
+        "denominator": null,
+        "metric": "timeline * positions * quantity",
+        "unit": "security_units"
+      },
+      "timeline/*/positions/*/value": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "timeline * positions * value",
+        "unit": "input_currency_amount"
+      },
+      "timeline/*/settled_cash": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "timeline * settled cash",
+        "unit": "input_currency_amount"
+      },
+      "timeline/*/tax_reserve_shortfall": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "timeline * tax reserve shortfall",
+        "unit": "input_currency_amount"
+      },
+      "timeline/*/valuation_status": {
+        "basis": "Observed supplied marks, explicit reference/model scenario, or unresolved mark; modeled values are not executable quotes.",
+        "denominator": null,
+        "metric": "Holdings valuation evidence classification",
+        "unit": "status"
+      },
+      "transaction_costs": {
+        "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
+        "denominator": null,
+        "metric": "transaction costs",
+        "unit": "input_currency_amount"
+      }
+    },
     "backtest.opening_range": {
       "as_of": {
         "basis": "Declared audit cutoff or modeled bar-end mark.",
@@ -660,6 +908,14 @@
         "unit": "status"
       }
     },
+    "data.asof_snapshot": {
+      "exclusion_counts/*": {
+        "basis": "Partitioned future event, future availability or superseded revision; caller-declared data.",
+        "denominator": null,
+        "metric": "Snapshot excluded records",
+        "unit": "count"
+      }
+    },
     "data.normalize_flows": {
       "normalization/issuers/*/fields/*/rounding_error_bound": {
         "basis": "Installed financial normalizer over explicitly mapped supplied observations. Field status, period, unit, rounding bounds and source reviews remain part of the result; caller reviews are not independent authentication.",
@@ -710,6 +966,158 @@
         "unit": "status"
       }
     },
+    "data.price_refresh": {
+      "actual_prefix_reuse": {
+        "basis": "Supplied input contract only; source authenticity and exhaustive historical universe are not certified.",
+        "denominator": null,
+        "metric": "actual prefix reuse",
+        "unit": "boolean"
+      },
+      "downloaded_row_count": {
+        "basis": "Supplied normalized snapshot row counts; no measured network savings are inferred.",
+        "denominator": null,
+        "metric": "downloaded row count",
+        "unit": "count"
+      },
+      "mutates_input": {
+        "basis": "Supplied input contract only; source authenticity and exhaustive historical universe are not certified.",
+        "denominator": null,
+        "metric": "mutates input",
+        "unit": "boolean"
+      },
+      "network_saving_measured": {
+        "basis": "Supplied input contract only; source authenticity and exhaustive historical universe are not certified.",
+        "denominator": null,
+        "metric": "network saving measured",
+        "unit": "boolean"
+      },
+      "old_row_count": {
+        "basis": "Supplied normalized snapshot row counts; no measured network savings are inferred.",
+        "denominator": null,
+        "metric": "old row count",
+        "unit": "count"
+      },
+      "retained_row_count": {
+        "basis": "Supplied normalized snapshot row counts; no measured network savings are inferred.",
+        "denominator": null,
+        "metric": "retained row count",
+        "unit": "count"
+      },
+      "source_authenticity_verified": {
+        "basis": "Supplied input contract only; source authenticity and exhaustive historical universe are not certified.",
+        "denominator": null,
+        "metric": "source authenticity verified",
+        "unit": "boolean"
+      },
+      "source_vintages_preserved": {
+        "basis": "Supplied input contract only; source authenticity and exhaustive historical universe are not certified.",
+        "denominator": null,
+        "metric": "source vintages preserved",
+        "unit": "boolean"
+      }
+    },
+    "data.security_snapshot": {
+      "historical_universe_complete": {
+        "basis": "Supplied input contract only; source authenticity and exhaustive historical universe are not certified.",
+        "denominator": null,
+        "metric": "historical universe complete",
+        "unit": "boolean"
+      },
+      "source_authenticity_verified": {
+        "basis": "Supplied input contract only; source authenticity and exhaustive historical universe are not certified.",
+        "denominator": null,
+        "metric": "source authenticity verified",
+        "unit": "boolean"
+      },
+      "source_pointer_checks_passed": {
+        "basis": "Supplied input contract only; source authenticity and exhaustive historical universe are not certified.",
+        "denominator": null,
+        "metric": "source pointer checks passed",
+        "unit": "boolean"
+      }
+    },
+    "data.source_features": {
+      "coverage_complete": {
+        "basis": "Supplied input contract only; source authenticity and exhaustive historical universe are not certified.",
+        "denominator": null,
+        "metric": "coverage complete",
+        "unit": "boolean"
+      },
+      "source_authenticity_verified": {
+        "basis": "Supplied input contract only; source authenticity and exhaustive historical universe are not certified.",
+        "denominator": null,
+        "metric": "source authenticity verified",
+        "unit": "boolean"
+      },
+      "source_pointer_checks_passed": {
+        "basis": "Supplied input contract only; source authenticity and exhaustive historical universe are not certified.",
+        "denominator": null,
+        "metric": "source pointer checks passed",
+        "unit": "boolean"
+      }
+    },
+    "data.strategy_readiness": {
+      "declared_policy_grid_complete": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "declared policy grid complete",
+        "unit": "boolean"
+      },
+      "grid/*/observation_status": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "grid * observation status",
+        "unit": "status"
+      },
+      "grid/*/usable_for_declared_purpose": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "grid * usable for declared purpose",
+        "unit": "boolean"
+      },
+      "grid_status_counts/*": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "grid status counts *",
+        "unit": "count"
+      },
+      "historical_universe_completeness_certified": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "historical universe completeness certified",
+        "unit": "boolean"
+      },
+      "requested_security_count": {
+        "basis": "Supplied input contract only; source authenticity and exhaustive historical universe are not certified.",
+        "denominator": null,
+        "metric": "requested security count",
+        "unit": "count"
+      },
+      "source_authenticity_verified": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "source authenticity verified",
+        "unit": "boolean"
+      },
+      "strict_observed_grid_complete": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "strict observed grid complete",
+        "unit": "boolean"
+      },
+      "universe_mode": {
+        "basis": "Current-roster history is survivor-conditioned; declared historical membership still requires substantive source review.",
+        "denominator": null,
+        "metric": "Declared universe membership convention",
+        "unit": "status"
+      },
+      "unusable_requirements": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "unusable requirements",
+        "unit": "count"
+      }
+    },
     "evidence.price_comparison": {
       "comparisons/*/conditional_sensitivity/calculations/price_change_from_quote_to_reference_pct/value": {
         "basis": "Named price formula; original basis compatibility and conditional assumptions remain in the result.",
@@ -734,6 +1142,46 @@
         "denominator": "reference price",
         "metric": "quote_discount_relative_to_reference_pct",
         "unit": "percent"
+      }
+    },
+    "experiment.overlap_review": {
+      "all_trials_correction_computed": {
+        "basis": "Window overlap review, not a multiple-testing correction or proof of independence.",
+        "denominator": null,
+        "metric": "all trials correction computed",
+        "unit": "boolean"
+      },
+      "registered_attempt_count": {
+        "basis": "Only supplied attempts, including losses and revisions; not total researcher trials.",
+        "denominator": null,
+        "metric": "registered attempt count",
+        "unit": "count"
+      },
+      "search_completeness_established": {
+        "basis": "Window overlap review, not a multiple-testing correction or proof of independence.",
+        "denominator": null,
+        "metric": "search completeness established",
+        "unit": "boolean"
+      }
+    },
+    "experiment.validate_attempt": {
+      "external_execution_verified": {
+        "basis": "Validation of supplied attempt metadata; does not establish complete search history or independent execution.",
+        "denominator": null,
+        "metric": "external execution verified",
+        "unit": "boolean"
+      },
+      "point_in_time_inputs_established": {
+        "basis": "Validation of supplied attempt metadata; does not establish complete search history or independent execution.",
+        "denominator": null,
+        "metric": "point in time inputs established",
+        "unit": "boolean"
+      },
+      "search_completeness_established": {
+        "basis": "Validation of supplied attempt metadata; does not establish complete search history or independent execution.",
+        "denominator": null,
+        "metric": "search completeness established",
+        "unit": "boolean"
       }
     },
     "financial.acquisition_cash": {
@@ -2931,6 +3379,90 @@
         "metric": "denominator",
         "unit": "currency"
       },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/bound_status": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_bound_status",
+        "unit": "status"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/denominator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_denominator_completeness",
+        "unit": "status"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/denominator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_denominator_relation",
+        "unit": "status"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/numerator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_numerator_completeness",
+        "unit": "status"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/numerator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_numerator_relation",
+        "unit": "status"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/ratio": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
+        "metric": "employer_concentration_evidence_ratio",
+        "unit": "fraction"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/value_role": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_value_role",
+        "unit": "status"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_bound_status",
+        "unit": "status"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
+        "unit": "status"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
+        "unit": "status"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
+        "unit": "status"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
+        "unit": "status"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
+        "metric": "identified_assets_employer_concentration_evidence_ratio",
+        "unit": "fraction"
+      },
+      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_value_role",
+        "unit": "status"
+      },
       "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_fraction_sensitivity": {
         "basis": "Known employer look-through numerator; incomplete coverage is not a complete exposure estimate.",
         "denominator": "identified assets sensitivity",
@@ -3002,6 +3534,90 @@
         "denominator": null,
         "metric": "denominator",
         "unit": "currency"
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/bound_status": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_bound_status",
+        "unit": "status"
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/denominator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_denominator_completeness",
+        "unit": "status"
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/denominator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_denominator_relation",
+        "unit": "status"
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/numerator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_numerator_completeness",
+        "unit": "status"
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/numerator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_numerator_relation",
+        "unit": "status"
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/ratio": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
+        "metric": "employer_concentration_evidence_ratio",
+        "unit": "fraction"
+      },
+      "primary_result/alternatives/*/employer_concentration_evidence/value_role": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_value_role",
+        "unit": "status"
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_bound_status",
+        "unit": "status"
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
+        "unit": "status"
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
+        "unit": "status"
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
+        "unit": "status"
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
+        "unit": "status"
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
+        "metric": "identified_assets_employer_concentration_evidence_ratio",
+        "unit": "fraction"
+      },
+      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_value_role",
+        "unit": "status"
       },
       "primary_result/alternatives/*/identified_assets_employer_fraction_sensitivity": {
         "basis": "Known employer look-through numerator; incomplete coverage is not a complete exposure estimate.",
@@ -3075,6 +3691,90 @@
         "metric": "denominator",
         "unit": "currency"
       },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/bound_status": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_bound_status",
+        "unit": "status"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/denominator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_denominator_completeness",
+        "unit": "status"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/denominator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_denominator_relation",
+        "unit": "status"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/numerator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_numerator_completeness",
+        "unit": "status"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/numerator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_numerator_relation",
+        "unit": "status"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/ratio": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
+        "metric": "employer_concentration_evidence_ratio",
+        "unit": "fraction"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/value_role": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_value_role",
+        "unit": "status"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_bound_status",
+        "unit": "status"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
+        "unit": "status"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
+        "unit": "status"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
+        "unit": "status"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
+        "unit": "status"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
+        "metric": "identified_assets_employer_concentration_evidence_ratio",
+        "unit": "fraction"
+      },
+      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_value_role",
+        "unit": "status"
+      },
       "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_fraction_sensitivity": {
         "basis": "Known employer look-through numerator; incomplete coverage is not a complete exposure estimate.",
         "denominator": "identified assets sensitivity",
@@ -3147,6 +3847,90 @@
         "metric": "denominator",
         "unit": "currency"
       },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/bound_status": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_bound_status",
+        "unit": "status"
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/denominator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_denominator_completeness",
+        "unit": "status"
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/denominator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_denominator_relation",
+        "unit": "status"
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/numerator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_numerator_completeness",
+        "unit": "status"
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/numerator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_numerator_relation",
+        "unit": "status"
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/ratio": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
+        "metric": "employer_concentration_evidence_ratio",
+        "unit": "fraction"
+      },
+      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/value_role": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_value_role",
+        "unit": "status"
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_bound_status",
+        "unit": "status"
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
+        "unit": "status"
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
+        "unit": "status"
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
+        "unit": "status"
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
+        "unit": "status"
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
+        "metric": "identified_assets_employer_concentration_evidence_ratio",
+        "unit": "fraction"
+      },
+      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_value_role",
+        "unit": "status"
+      },
       "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_fraction_sensitivity": {
         "basis": "Known employer look-through numerator; incomplete coverage is not a complete exposure estimate.",
         "denominator": "identified assets sensitivity",
@@ -3188,342 +3972,6 @@
         "denominator": null,
         "metric": "status",
         "unit": "status"
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/ratio": {
-        "metric": "employer_concentration_evidence_ratio",
-        "unit": "fraction",
-        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/bound_status": {
-        "metric": "employer_concentration_evidence_bound_status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/value_role": {
-        "metric": "employer_concentration_evidence_value_role",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/numerator/completeness": {
-        "metric": "employer_concentration_evidence_numerator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/denominator/completeness": {
-        "metric": "employer_concentration_evidence_denominator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/numerator/relation": {
-        "metric": "employer_concentration_evidence_numerator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/denominator/relation": {
-        "metric": "employer_concentration_evidence_denominator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
-        "metric": "identified_assets_employer_concentration_evidence_ratio",
-        "unit": "fraction",
-        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
-        "metric": "identified_assets_employer_concentration_evidence_bound_status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
-        "metric": "identified_assets_employer_concentration_evidence_value_role",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
-        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
-        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
-        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
-        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/ratio": {
-        "metric": "employer_concentration_evidence_ratio",
-        "unit": "fraction",
-        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/bound_status": {
-        "metric": "employer_concentration_evidence_bound_status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/value_role": {
-        "metric": "employer_concentration_evidence_value_role",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/numerator/completeness": {
-        "metric": "employer_concentration_evidence_numerator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/denominator/completeness": {
-        "metric": "employer_concentration_evidence_denominator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/numerator/relation": {
-        "metric": "employer_concentration_evidence_numerator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/employer_concentration_evidence/denominator/relation": {
-        "metric": "employer_concentration_evidence_denominator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
-        "metric": "identified_assets_employer_concentration_evidence_ratio",
-        "unit": "fraction",
-        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
-        "metric": "identified_assets_employer_concentration_evidence_bound_status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
-        "metric": "identified_assets_employer_concentration_evidence_value_role",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
-        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
-        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
-        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "source_vest_price_sensitivity/alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
-        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/employer_concentration_evidence/ratio": {
-        "metric": "employer_concentration_evidence_ratio",
-        "unit": "fraction",
-        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/employer_concentration_evidence/bound_status": {
-        "metric": "employer_concentration_evidence_bound_status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/employer_concentration_evidence/value_role": {
-        "metric": "employer_concentration_evidence_value_role",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/employer_concentration_evidence/numerator/completeness": {
-        "metric": "employer_concentration_evidence_numerator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/employer_concentration_evidence/denominator/completeness": {
-        "metric": "employer_concentration_evidence_denominator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/employer_concentration_evidence/numerator/relation": {
-        "metric": "employer_concentration_evidence_numerator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/employer_concentration_evidence/denominator/relation": {
-        "metric": "employer_concentration_evidence_denominator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
-        "metric": "identified_assets_employer_concentration_evidence_ratio",
-        "unit": "fraction",
-        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
-        "metric": "identified_assets_employer_concentration_evidence_bound_status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
-        "metric": "identified_assets_employer_concentration_evidence_value_role",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
-        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
-        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
-        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "primary_result/alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
-        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/ratio": {
-        "metric": "employer_concentration_evidence_ratio",
-        "unit": "fraction",
-        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/bound_status": {
-        "metric": "employer_concentration_evidence_bound_status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/value_role": {
-        "metric": "employer_concentration_evidence_value_role",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/numerator/completeness": {
-        "metric": "employer_concentration_evidence_numerator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/denominator/completeness": {
-        "metric": "employer_concentration_evidence_denominator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/numerator/relation": {
-        "metric": "employer_concentration_evidence_numerator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/employer_concentration_evidence/denominator/relation": {
-        "metric": "employer_concentration_evidence_denominator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
-        "metric": "identified_assets_employer_concentration_evidence_ratio",
-        "unit": "fraction",
-        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
-        "metric": "identified_assets_employer_concentration_evidence_bound_status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
-        "metric": "identified_assets_employer_concentration_evidence_value_role",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
-        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
-        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
-        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "denominator_sensitivity/comparison/alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
-        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
       }
     },
     "planning.friction_context": {
@@ -4511,95 +4959,95 @@
         "metric": "target_weight",
         "unit": "fraction"
       },
+      "alternatives/*/employer_concentration_evidence/bound_status": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_bound_status",
+        "unit": "status"
+      },
+      "alternatives/*/employer_concentration_evidence/denominator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_denominator_completeness",
+        "unit": "status"
+      },
+      "alternatives/*/employer_concentration_evidence/denominator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_denominator_relation",
+        "unit": "status"
+      },
+      "alternatives/*/employer_concentration_evidence/numerator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_numerator_completeness",
+        "unit": "status"
+      },
+      "alternatives/*/employer_concentration_evidence/numerator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_numerator_relation",
+        "unit": "status"
+      },
+      "alternatives/*/employer_concentration_evidence/ratio": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
+        "metric": "employer_concentration_evidence_ratio",
+        "unit": "fraction"
+      },
+      "alternatives/*/employer_concentration_evidence/value_role": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "employer_concentration_evidence_value_role",
+        "unit": "status"
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_bound_status",
+        "unit": "status"
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
+        "unit": "status"
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
+        "unit": "status"
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
+        "unit": "status"
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
+        "unit": "status"
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
+        "metric": "identified_assets_employer_concentration_evidence_ratio",
+        "unit": "fraction"
+      },
+      "alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
+        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound.",
+        "denominator": null,
+        "metric": "identified_assets_employer_concentration_evidence_value_role",
+        "unit": "status"
+      },
       "status": {
         "basis": "Source-bound advisory calculation; supplied mappings and assumptions remain declared.",
         "denominator": null,
         "metric": "status",
         "unit": "status"
-      },
-      "alternatives/*/employer_concentration_evidence/ratio": {
-        "metric": "employer_concentration_evidence_ratio",
-        "unit": "fraction",
-        "denominator": "same-target-date post-flow net equity; inspect operand completeness",
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/employer_concentration_evidence/bound_status": {
-        "metric": "employer_concentration_evidence_bound_status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/employer_concentration_evidence/value_role": {
-        "metric": "employer_concentration_evidence_value_role",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/employer_concentration_evidence/numerator/completeness": {
-        "metric": "employer_concentration_evidence_numerator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/employer_concentration_evidence/denominator/completeness": {
-        "metric": "employer_concentration_evidence_denominator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/employer_concentration_evidence/numerator/relation": {
-        "metric": "employer_concentration_evidence_numerator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/employer_concentration_evidence/denominator/relation": {
-        "metric": "employer_concentration_evidence_denominator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/identified_assets_employer_concentration_evidence/ratio": {
-        "metric": "identified_assets_employer_concentration_evidence_ratio",
-        "unit": "fraction",
-        "denominator": "identified-assets sensitivity; not a full-account denominator unless explicitly proven complete",
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/identified_assets_employer_concentration_evidence/bound_status": {
-        "metric": "identified_assets_employer_concentration_evidence_bound_status",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/identified_assets_employer_concentration_evidence/value_role": {
-        "metric": "identified_assets_employer_concentration_evidence_value_role",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/identified_assets_employer_concentration_evidence/numerator/completeness": {
-        "metric": "identified_assets_employer_concentration_evidence_numerator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/identified_assets_employer_concentration_evidence/denominator/completeness": {
-        "metric": "identified_assets_employer_concentration_evidence_denominator_completeness",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/identified_assets_employer_concentration_evidence/numerator/relation": {
-        "metric": "identified_assets_employer_concentration_evidence_numerator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
-      },
-      "alternatives/*/identified_assets_employer_concentration_evidence/denominator/relation": {
-        "metric": "identified_assets_employer_concentration_evidence_denominator_relation",
-        "unit": "status",
-        "denominator": null,
-        "basis": "Conditional declared evidence only. Read numerator/denominator completeness and assumptions together; UNKNOWN establishes no ratio bound."
       }
     },
     "planning.source_budget_sizing": {
@@ -5684,6 +6132,376 @@
         "unit": "shares"
       }
     },
+    "portable.arima": {
+      "forecast/*": {
+        "basis": "Same unit as document.value_unit; one step uses declared observation_frequency.",
+        "denominator": null,
+        "metric": "Conditional ARIMA forecast",
+        "unit": "declared_value_unit"
+      },
+      "observations": {
+        "basis": "Supplied equally spaced array; caller-declared availability.",
+        "denominator": null,
+        "metric": "Training observations",
+        "unit": "count"
+      },
+      "prediction_intervals/*/*": {
+        "basis": "Conditional fitted-model interval at declared alpha; no all-model uncertainty guarantee.",
+        "denominator": null,
+        "metric": "Conditional ARIMA prediction bound",
+        "unit": "declared_value_unit"
+      },
+      "residual_diagnostics/ljung_box_pvalue": {
+        "basis": "Residual diagnostic at explicit lag and model degrees of freedom.",
+        "denominator": null,
+        "metric": "Ljung-Box p-value",
+        "unit": "probability"
+      }
+    },
+    "portable.cointegration": {
+      "observations": {
+        "basis": "One prespecified pair; no pair-search correction.",
+        "denominator": null,
+        "metric": "Aligned supplied observations",
+        "unit": "count"
+      },
+      "pvalue": {
+        "basis": "Directional test; null no cointegration; I(1) assumed, not verified.",
+        "denominator": null,
+        "metric": "Engle-Granger p-value",
+        "unit": "probability"
+      },
+      "statistic": {
+        "basis": "Explicit trend, maxlag and autolag.",
+        "denominator": null,
+        "metric": "Engle-Granger statistic",
+        "unit": "test_statistic"
+      }
+    },
+    "portable.european": {
+      "delta": {
+        "basis": "Derivative of option value per underlying unit with respect to spot.",
+        "denominator": null,
+        "metric": "Option delta",
+        "unit": "dimensionless"
+      },
+      "gamma": {
+        "basis": "Second spot derivative of option value per underlying unit.",
+        "denominator": null,
+        "metric": "Option gamma",
+        "unit": "inverse_input_currency"
+      },
+      "npv": {
+        "basis": "Flat continuous rates/dividend yield; constant volatility; no contract multiplier.",
+        "denominator": null,
+        "metric": "European option value per underlying unit",
+        "unit": "input_currency_amount_per_underlying_unit"
+      },
+      "rho": {
+        "basis": "Per 1.0 continuous rate change.",
+        "denominator": null,
+        "metric": "Option rate sensitivity",
+        "unit": "input_currency_amount_per_absolute_rate"
+      },
+      "theta_per_year": {
+        "basis": "Analytic theta per year, no daily conversion.",
+        "denominator": null,
+        "metric": "Option time decay",
+        "unit": "input_currency_amount_per_year"
+      },
+      "vega": {
+        "basis": "Per 1.0 volatility change, not per percentage point.",
+        "denominator": null,
+        "metric": "Option vega",
+        "unit": "input_currency_amount_per_absolute_volatility"
+      },
+      "year_fraction": {
+        "basis": "Actual365Fixed date-level convention.",
+        "denominator": null,
+        "metric": "Time to expiry",
+        "unit": "years"
+      }
+    },
+    "portfolio.sensitivity": {
+      "baseline/cash_after_modeled_cost": {
+        "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
+        "denominator": "initial portfolio equity",
+        "metric": "baseline cash after modeled cost",
+        "unit": "fraction"
+      },
+      "baseline/estimated_cost_fraction": {
+        "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
+        "denominator": "initial portfolio equity",
+        "metric": "baseline estimated cost fraction",
+        "unit": "fraction"
+      },
+      "baseline/gross_turnover": {
+        "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
+        "denominator": "initial portfolio equity",
+        "metric": "baseline gross turnover",
+        "unit": "fraction"
+      },
+      "baseline/weights/*": {
+        "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
+        "denominator": "initial portfolio equity",
+        "metric": "baseline weights *",
+        "unit": "fraction"
+      },
+      "cases/*/gross_weight_change_from_baseline": {
+        "basis": "Sum of absolute asset-weight differences from baseline; not a return or a feasible funded trade.",
+        "denominator": "initial portfolio equity",
+        "metric": "cases * gross weight change from baseline",
+        "unit": "fraction"
+      },
+      "cases/*/result/cash_after_modeled_cost": {
+        "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
+        "denominator": "initial portfolio equity",
+        "metric": "cases * result cash after modeled cost",
+        "unit": "fraction"
+      },
+      "cases/*/result/estimated_cost_fraction": {
+        "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
+        "denominator": "initial portfolio equity",
+        "metric": "cases * result estimated cost fraction",
+        "unit": "fraction"
+      },
+      "cases/*/result/gross_turnover": {
+        "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
+        "denominator": "initial portfolio equity",
+        "metric": "cases * result gross turnover",
+        "unit": "fraction"
+      },
+      "cases/*/result/weights/*": {
+        "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
+        "denominator": "initial portfolio equity",
+        "metric": "cases * result weights *",
+        "unit": "fraction"
+      },
+      "constraint_cases/*/gross_weight_change_from_baseline": {
+        "basis": "Sum of absolute asset-weight differences from baseline; not a return or a feasible funded trade.",
+        "denominator": "initial portfolio equity",
+        "metric": "constraint cases * gross weight change from baseline",
+        "unit": "fraction"
+      },
+      "constraint_cases/*/hypothesis_changed": {
+        "basis": "Changed research constraints are disclosed as separate hypotheses; this is not a trade-approval requirement.",
+        "denominator": null,
+        "metric": "constraint cases * hypothesis changed",
+        "unit": "boolean"
+      },
+      "constraint_cases/*/new_registry_attempt_required_for_research_claim": {
+        "basis": "Changed research constraints are disclosed as separate hypotheses; this is not a trade-approval requirement.",
+        "denominator": null,
+        "metric": "constraint cases * new registry attempt required for research claim",
+        "unit": "boolean"
+      },
+      "constraint_cases/*/result/cash_after_modeled_cost": {
+        "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
+        "denominator": "initial portfolio equity",
+        "metric": "constraint_cases * result cash after modeled cost",
+        "unit": "fraction"
+      },
+      "constraint_cases/*/result/estimated_cost_fraction": {
+        "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
+        "denominator": "initial portfolio equity",
+        "metric": "constraint cases * result estimated cost fraction",
+        "unit": "fraction"
+      },
+      "constraint_cases/*/result/gross_turnover": {
+        "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
+        "denominator": "initial portfolio equity",
+        "metric": "constraint cases * result gross turnover",
+        "unit": "fraction"
+      },
+      "constraint_cases/*/result/weights/*": {
+        "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
+        "denominator": "initial portfolio equity",
+        "metric": "constraint cases * result weights *",
+        "unit": "fraction"
+      }
+    },
+    "release.grade_response": {
+      "external_invocation_authenticated": {
+        "basis": "Grade of supplied response bytes against a fictional fixture, not authenticated host equivalence.",
+        "denominator": null,
+        "metric": "external invocation authenticated",
+        "unit": "boolean"
+      }
+    },
+    "release.rights_inventory": {
+      "inventory_complete": {
+        "basis": "Declared source-use review records only; no permission grant, legal opinion or independently authenticated terms.",
+        "denominator": null,
+        "metric": "inventory complete",
+        "unit": "boolean"
+      },
+      "legal_compliance_certified": {
+        "basis": "Declared source-use review records only; no permission grant, legal opinion or independently authenticated terms.",
+        "denominator": null,
+        "metric": "legal compliance certified",
+        "unit": "boolean"
+      },
+      "rights_granted": {
+        "basis": "Declared source-use review records only; no permission grant, legal opinion or independently authenticated terms.",
+        "denominator": null,
+        "metric": "rights granted",
+        "unit": "boolean"
+      },
+      "source_evidence_authenticated": {
+        "basis": "Declared source-use review records only; no permission grant, legal opinion or independently authenticated terms.",
+        "denominator": null,
+        "metric": "source evidence authenticated",
+        "unit": "boolean"
+      }
+    },
+    "risk.conditional_portfolio": {
+      "calibration_established": {
+        "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
+        "denominator": null,
+        "metric": "calibration established",
+        "unit": "boolean"
+      },
+      "cross_basis_approximation": {
+        "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
+        "denominator": null,
+        "metric": "cross basis approximation",
+        "unit": "boolean"
+      },
+      "horizons/*/annualized_average_sigma_fraction": {
+        "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
+        "denominator": "supplied notional",
+        "metric": "horizons * annualized average sigma fraction",
+        "unit": "fraction"
+      },
+      "horizons/*/average_period_sigma_fraction": {
+        "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
+        "denominator": "supplied notional",
+        "metric": "horizons * average period sigma fraction",
+        "unit": "fraction"
+      },
+      "horizons/*/cumulative_sigma_fraction": {
+        "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
+        "denominator": "supplied notional",
+        "metric": "horizons * cumulative sigma fraction",
+        "unit": "fraction"
+      },
+      "horizons/*/cumulative_sigma_notional": {
+        "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
+        "denominator": null,
+        "metric": "horizons * cumulative sigma notional",
+        "unit": "input_currency_amount"
+      },
+      "horizons/*/periods": {
+        "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
+        "denominator": null,
+        "metric": "horizons * periods",
+        "unit": "count"
+      },
+      "notional": {
+        "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
+        "denominator": null,
+        "metric": "notional",
+        "unit": "input_currency_amount"
+      },
+      "periods_per_year": {
+        "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
+        "denominator": null,
+        "metric": "periods per year",
+        "unit": "count"
+      },
+      "variance_per_period_decimal_squared/*": {
+        "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
+        "denominator": null,
+        "metric": "variance per period decimal squared *",
+        "unit": "decimal_return_squared"
+      }
+    },
+    "risk.empirical_tail": {
+      "cash_weight_assumed_zero_shock": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": null,
+        "metric": "cash weight assumed zero shock",
+        "unit": "fraction"
+      },
+      "empirical_standard_deviation_fraction": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": "supplied notional",
+        "metric": "empirical standard deviation fraction",
+        "unit": "fraction"
+      },
+      "invested_weight": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": null,
+        "metric": "invested weight",
+        "unit": "fraction"
+      },
+      "minimum_effective_tail_observations": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": null,
+        "metric": "minimum effective tail observations",
+        "unit": "count"
+      },
+      "notional": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": null,
+        "metric": "notional",
+        "unit": "input_currency_amount"
+      },
+      "observations": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": null,
+        "metric": "observations",
+        "unit": "count"
+      },
+      "tails/*/confidence": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": null,
+        "metric": "tails * confidence",
+        "unit": "fraction"
+      },
+      "tails/*/effective_tail_observations": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": null,
+        "metric": "tails * effective tail observations",
+        "unit": "count"
+      },
+      "tails/*/loss_expected_shortfall_fraction": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": "supplied notional",
+        "metric": "tails * loss expected shortfall fraction",
+        "unit": "fraction"
+      },
+      "tails/*/loss_expected_shortfall_notional": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": null,
+        "metric": "tails * loss expected shortfall notional",
+        "unit": "input_currency_amount"
+      },
+      "tails/*/loss_var_fraction": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": "supplied notional",
+        "metric": "tails * loss var fraction",
+        "unit": "fraction"
+      },
+      "tails/*/loss_var_notional": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": null,
+        "metric": "tails * loss var notional",
+        "unit": "input_currency_amount"
+      },
+      "tails/*/sparse_tail_warning": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": null,
+        "metric": "tails * sparse tail warning",
+        "unit": "boolean"
+      },
+      "tails/*/tail_order_statistics_used": {
+        "basis": "Empirical current-weight shock distribution over supplied aligned total-return rows; not executed performance, calibrated future probabilities or future loss bounds.",
+        "denominator": null,
+        "metric": "tails * tail order statistics used",
+        "unit": "count"
+      }
+    },
     "validation.forward_observations": {
       "additional_admissible_observations_needed": {
         "basis": "max(0, declared minimum - admissible count); null when minimum missing/invalid.",
@@ -5926,148 +6744,6 @@
         "denominator": null,
         "metric": "supplied_observations",
         "unit": "count"
-      }
-    },
-    "portable.european": {
-      "npv": {
-        "metric": "European option value per underlying unit",
-        "unit": "input_currency_amount_per_underlying_unit",
-        "denominator": null,
-        "basis": "Flat continuous rates/dividend yield; constant volatility; no contract multiplier."
-      },
-      "delta": {
-        "metric": "Option delta",
-        "unit": "dimensionless",
-        "denominator": null,
-        "basis": "Derivative of option value per underlying unit with respect to spot."
-      },
-      "gamma": {
-        "metric": "Option gamma",
-        "unit": "inverse_input_currency",
-        "denominator": null,
-        "basis": "Second spot derivative of option value per underlying unit."
-      },
-      "vega": {
-        "metric": "Option vega",
-        "unit": "input_currency_amount_per_absolute_volatility",
-        "denominator": null,
-        "basis": "Per 1.0 volatility change, not per percentage point."
-      },
-      "rho": {
-        "metric": "Option rate sensitivity",
-        "unit": "input_currency_amount_per_absolute_rate",
-        "denominator": null,
-        "basis": "Per 1.0 continuous rate change."
-      },
-      "theta_per_year": {
-        "metric": "Option time decay",
-        "unit": "input_currency_amount_per_year",
-        "denominator": null,
-        "basis": "Analytic theta per year, no daily conversion."
-      },
-      "year_fraction": {
-        "metric": "Time to expiry",
-        "unit": "years",
-        "denominator": null,
-        "basis": "Actual365Fixed date-level convention."
-      }
-    },
-    "portable.arima": {
-      "forecast/*": {
-        "metric": "Conditional ARIMA forecast",
-        "unit": "declared_value_unit",
-        "denominator": null,
-        "basis": "Same unit as document.value_unit; one step uses declared observation_frequency."
-      },
-      "prediction_intervals/*/*": {
-        "metric": "Conditional ARIMA prediction bound",
-        "unit": "declared_value_unit",
-        "denominator": null,
-        "basis": "Conditional fitted-model interval at declared alpha; no all-model uncertainty guarantee."
-      },
-      "observations": {
-        "metric": "Training observations",
-        "unit": "count",
-        "denominator": null,
-        "basis": "Supplied equally spaced array; caller-declared availability."
-      },
-      "residual_diagnostics/ljung_box_pvalue": {
-        "metric": "Ljung-Box p-value",
-        "unit": "probability",
-        "denominator": null,
-        "basis": "Residual diagnostic at explicit lag and model degrees of freedom."
-      }
-    },
-    "portable.cointegration": {
-      "pvalue": {
-        "metric": "Engle-Granger p-value",
-        "unit": "probability",
-        "denominator": null,
-        "basis": "Directional test; null no cointegration; I(1) assumed, not verified."
-      },
-      "statistic": {
-        "metric": "Engle-Granger statistic",
-        "unit": "test_statistic",
-        "denominator": null,
-        "basis": "Explicit trend, maxlag and autolag."
-      },
-      "observations": {
-        "metric": "Aligned supplied observations",
-        "unit": "count",
-        "denominator": null,
-        "basis": "One prespecified pair; no pair-search correction."
-      }
-    },
-    "data.asof_snapshot": {
-      "exclusion_counts/*": {
-        "metric": "Snapshot excluded records",
-        "unit": "count",
-        "denominator": null,
-        "basis": "Partitioned future event, future availability or superseded revision; caller-declared data."
-      }
-    },
-    "backtest.costed_bars": {
-      "initial_cash": {
-        "metric": "Modeled initial cash",
-        "unit": "input_currency_amount",
-        "denominator": null,
-        "basis": "Single-instrument cash-funded bar model; explicit costs; no observed fills."
-      },
-      "cash": {
-        "metric": "Modeled cash",
-        "unit": "input_currency_amount",
-        "denominator": null,
-        "basis": "Single-instrument cash-funded bar model; explicit costs; no observed fills."
-      },
-      "equity": {
-        "metric": "Modeled equity",
-        "unit": "input_currency_amount",
-        "denominator": null,
-        "basis": "Single-instrument cash-funded bar model; explicit costs; no observed fills."
-      },
-      "total_fees": {
-        "metric": "Modeled total fees",
-        "unit": "input_currency_amount",
-        "denominator": null,
-        "basis": "Single-instrument cash-funded bar model; explicit costs; no observed fills."
-      },
-      "position": {
-        "metric": "Modeled quantity",
-        "unit": "instrument_units",
-        "denominator": null,
-        "basis": "Input instrument quantity step; hypothetical paper replay."
-      },
-      "pending_order/remaining": {
-        "metric": "Modeled quantity",
-        "unit": "instrument_units",
-        "denominator": null,
-        "basis": "Input instrument quantity step; hypothetical paper replay."
-      },
-      "fills/*/quantity": {
-        "metric": "Modeled quantity",
-        "unit": "instrument_units",
-        "denominator": null,
-        "basis": "Input instrument quantity step; hypothetical paper replay."
       }
     }
   },

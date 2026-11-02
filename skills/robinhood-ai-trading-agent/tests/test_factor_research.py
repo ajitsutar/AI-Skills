@@ -20,7 +20,7 @@ class FactorTests(unittest.TestCase):
         rng=np.random.default_rng(10)
         x=rng.normal(0,.02,(20,5))
         rows=[dict(timestamp=f'2026-01-{i+1:02d}T00:00:00Z',rf=.001,
-                   asset_return=float(.004+row@np.array([1,2,3,4,5])),
+                   asset_return=float(.004 + row @ np.array([1,2,3,4,5])),
                    **dict(zip(['mkt_rf','smb','hml','rmw','cma'],map(float,row)))) for i,row in enumerate(x)]
         r=f.fama_french(rows,'FF5','daily')
         self.assertAlmostEqual(r['alpha_per_period'],.003)

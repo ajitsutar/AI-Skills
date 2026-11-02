@@ -360,9 +360,20 @@ class ReplayTests(unittest.TestCase):
                                'portable.european', 'portable.vader',
                                'data.asof_snapshot', 'backtest.costed_bars'}
         self.assertEqual(set(workbench.PORTABLE_OPERATIONS), portable_operations)
+        monthly_operations = {'portfolio.capped_inverse_volatility', 'backtest.monthly_targets',
+                              'experiment.freeze', 'experiment.rank_stage'}
+        self.assertEqual(set(workbench.MONTHLY_OPERATIONS), monthly_operations)
+        assurance_operations = {'data.strategy_readiness', 'data.security_snapshot',
+            'data.source_features', 'data.price_refresh', 'backtest.holdings_ledger',
+            'analyst.extract_table', 'analyst.earnings_basis', 'risk.empirical_tail',
+            'risk.conditional_portfolio', 'portfolio.sensitivity',
+            'experiment.validate_attempt', 'experiment.overlap_review',
+            'release.rights_inventory', 'release.grade_response'}
+        self.assertEqual(set(workbench.ASSURANCE_OPERATIONS), assurance_operations)
         self.assertEqual({j['operation'] for j in doc['jobs']},
                          set(workbench.OPERATIONS) - source_operations - set(workbench.ANALYSIS_OPERATIONS)
-                         - set(workbench.MULTIASSET_OPERATIONS) - portable_operations)
+                         - set(workbench.MULTIASSET_OPERATIONS) - portable_operations - monthly_operations
+                         - assurance_operations)
 
     def fixture(self):
         return {'schema_version': 1, 'contract': {'prompt': 'Fictional risk review', 'purpose': 'compatibility',

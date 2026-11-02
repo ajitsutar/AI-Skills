@@ -8,6 +8,19 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITY_FILES = {
+    'quant_research_assurance': ['scripts/' + name + '.py' for name in
+        ('research_readiness', 'quant_data_contracts', 'security_master', 'price_refresh',
+         'holdings_ledger', 'analyst_adapter', 'risk_diagnostics', 'experiment_registry',
+         'release_acceptance', 'dependency_inventory')] +
+        ['references/quant-research-assurance.md',
+         'environments/windows-cp312-data-quant/requirements.lock.txt',
+         'environments/windows-cp312-data-quant/sbom.cdx.json'],
+    'historical_data_storage': ['scripts/research_data_store.py',
+                                'references/backtest-data-storage.md'],
+    'compact_evidence': ['scripts/evidence_storage.py',
+                         'references/compact-evidence.md'],
+    'monthly_experiments': ['scripts/monthly_experiment.py',
+                            'references/monthly-portfolio-validation.md'],
     'alignment_hardening': ['scripts/research_workflow.py', 'scripts/answer_facts.py',
                             'scripts/concentration_bounds.py', 'scripts/evidence_provenance.py',
                             'references/model-alignment-hardening.md'],
@@ -98,7 +111,7 @@ def package_integrity():
 
 def check():
     dependencies = {}
-    for name in ('exchange_calendars', 'numpy', 'pandas', 'tzdata', 'scipy', 'arch', 'yfinance', 'requests', 'lxml', 'statsmodels', 'QuantLib', 'vaderSentiment'):
+    for name in ('exchange_calendars', 'numpy', 'pandas', 'tzdata', 'scipy', 'arch', 'yfinance', 'requests', 'lxml', 'statsmodels', 'QuantLib', 'vaderSentiment', 'pyarrow'):
         try:
             importlib.import_module(name)
             dependencies[name] = {'status': 'IMPORTABLE', 'version': importlib.metadata.version(name)}
@@ -110,13 +123,18 @@ def check():
     available = lambda names: all(dependencies[n]['status'] == 'IMPORTABLE' for n in names)
     integrity = package_integrity()
     return {'skill_version': (ROOT / 'VERSION').read_text(encoding='utf-8').strip(),
+            'quant_research_assurance': 'AVAILABLE_SUPPLIED_INPUTS_NOT_EXTERNAL_VALIDATION' if integrity['status'] == 'VERIFIED' and not missing_by_capability['quant_research_assurance'] and available(['numpy', 'scipy']) else 'UNAVAILABLE',
             'package_integrity': integrity,
+            'historical_data_storage': 'AVAILABLE_REQUIRES_EXPLICIT_ROOT' if integrity['status'] == 'VERIFIED' and not missing_by_capability['historical_data_storage'] else 'UNAVAILABLE',
+            'parquet_storage': 'IMPORTABLE_NOT_QUALIFIED' if available(['pyarrow']) else 'UNAVAILABLE_GZIP_STORAGE_UNAFFECTED',
+            'compact_evidence': 'AVAILABLE_OPT_IN' if integrity['status'] == 'VERIFIED' and not missing_by_capability['compact_evidence'] else 'UNAVAILABLE',
+            'monthly_experiments': 'AVAILABLE_REQUIRES_DATED_INPUTS' if integrity['status'] == 'VERIFIED' and not missing_by_capability['monthly_experiments'] and available(['numpy', 'scipy']) else 'UNAVAILABLE',
             'alignment_hardening': 'AVAILABLE_REQUIRES_SUPPLIED_REQUEST' if integrity['status'] == 'VERIFIED' and not missing_by_capability['alignment_hardening'] and available(['numpy', 'scipy', 'lxml', 'tzdata']) else 'UNAVAILABLE',
             'research_handoff': 'AVAILABLE' if integrity['status'] == 'VERIFIED' and not missing_by_capability['research_handoff'] else 'UNAVAILABLE',
             'missing_files': missing, 'missing_by_capability': missing_by_capability, 'dependencies': dependencies,
             'public_research': 'AVAILABLE' if not missing_by_capability['public_research'] and available(['yfinance', 'requests', 'lxml', 'pandas', 'exchange_calendars']) else 'UNAVAILABLE',
             'shared_default': 'AVAILABLE' if not missing_by_capability['shared_default'] and available(['exchange_calendars', 'numpy', 'pandas', 'tzdata']) else 'UNAVAILABLE',
-            'volatility': 'AVAILABLE' if not missing_by_capability['volatility'] and available(['arch', 'numpy', 'pandas', 'scipy']) else 'SKIPPED_MISSING_COMPONENTS',
+            'volatility': 'AVAILABLE' if not missing_by_capability['volatility'] and available(['arch', 'numpy', 'pandas', 'scipy', 'statsmodels']) else 'SKIPPED_MISSING_COMPONENTS',
             'allocation': 'AVAILABLE_REQUIRES_CALIBRATION' if not missing_by_capability['allocation'] and available(['numpy', 'scipy']) else 'UNAVAILABLE',
             'portable_optional_calculations': {
                 'arima_and_cointegration': 'IMPORTABLE_NOT_QUALIFIED' if available(['statsmodels']) else 'UNAVAILABLE',

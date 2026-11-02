@@ -18,6 +18,7 @@ import re
 
 import quant_workbench as workbench
 import report_facts
+import evidence_storage
 from quant_common import digest, require
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -127,7 +128,8 @@ def markdown(analysis, facts, bindings):
     return '\n'.join(rows)
 
 
-def build(raw, source_reader, include_source_text=False):
+def build(raw, source_reader, include_source_text=False, compact_evidence=False):
+    require(type(compact_evidence) is bool, 'COMPACT_OPTION_INVALID')
     materialized, sources, artifacts = resolve_request(raw, source_reader)
     prepared, bindings = prepare_request(materialized)
     bundle = workbench.freeze(prepared)
@@ -137,7 +139,7 @@ def build(raw, source_reader, include_source_text=False):
             require(binding.get('resolved_inputs_sha256') == result['resolved_inputs_sha256'],
                     'EXECUTED_INPUT_BINDING_MISMATCH')
     bundle_raw = encoded(bundle)
-    facts = report_facts.project(bundle_raw, 'quant', include_source_text=include_source_text)
+    facts = (report_facts.compact_descriptor if compact_evidence else report_facts.project)(bundle_raw, 'quant', include_source_text=include_source_text)
     analysis = summary(bundle)
     artifacts.update({'prepared.json': encoded(prepared), 'bindings.json': encoded(bindings),
                       'bundle.json': bundle_raw, 'facts.json': encoded(facts),
@@ -150,6 +152,9 @@ def build(raw, source_reader, include_source_text=False):
                'request_sha256': sha(raw), 'materialized_input_sha256': digest(materialized),
                'prepared_input_sha256': digest(prepared), 'contract_sha256': digest(prepared['contract']),
                'source_bindings': sources, 'include_source_text': include_source_text,
+               **({'compact_evidence': True,
+                   'storage_code_sha256': report_facts.code_hash('evidence_storage.py')}
+                  if compact_evidence else {}),
                'analysis_status': analysis['status'],
                'numeric_replay_tolerances': replay_tolerances(), 'report_comparison': 'EXACT_BYTES',
                'artifacts': {name: sha(content) for name, content in sorted(artifacts.items())},
@@ -160,7 +165,7 @@ def build(raw, source_reader, include_source_text=False):
     return artifacts
 
 
-def run(source, output, include_source_text=False):
+def run(source, output, include_source_text=False, compact_evidence=False):
     source, output = report_facts.local_path(source), report_facts.local_path(output)
     require(not output.is_relative_to(ROOT), 'OUTPUT_OUTSIDE_SKILL_REQUIRED')
     require(not output.exists(), 'NEW_OUTPUT_DIRECTORY_REQUIRED')
@@ -170,7 +175,12 @@ def run(source, output, include_source_text=False):
         report_facts.local_path(path)
         return report_facts.local_path(source.parent / path).read_bytes()
 
-    artifacts = build(source.read_bytes(), read_source, include_source_text)
+    artifacts = build(source.read_bytes(), read_source, include_source_text, compact_evidence)
+    if compact_evidence:
+        store = evidence_storage.ArtifactStore(output, create=True)
+        for name, content in artifacts.items():
+            store.write(name, content)
+        return report_facts.strict_json(artifacts['receipt.json'])
     output.mkdir()  # Exclusive, after all analysis: never overwrite a prior run.
     for name, content in artifacts.items():
         with (output / name).open('xb') as handle:
@@ -178,9 +188,15 @@ def run(source, output, include_source_text=False):
     return report_facts.strict_json(artifacts['receipt.json'])
 
 
-def verify(directory):
+def verify(directory, storage=None, prefix=''):
     directory = report_facts.local_path(directory)
-    receipt = report_facts.strict_json((directory / 'receipt.json').read_bytes())
+    reader = evidence_storage.Reader(directory, storage, prefix)
+    receipt = report_facts.strict_json(reader.read('receipt.json'))
+    compact = receipt.get('compact_evidence', False)
+    require(type(compact) is bool, 'COMPACT_OPTION_INVALID')
+    if compact:
+        require(receipt.get('storage_code_sha256') == report_facts.code_hash('evidence_storage.py'),
+                'COMPACT_STORAGE_CODE_MISMATCH')
     require(receipt.get('workflow_version') == VERSION, 'WORKFLOW_VERSION_MISMATCH')
     require(receipt.get('workflow_code_sha256') == report_facts.code_hash('quant_report.py'), 'WORKFLOW_CODE_MISMATCH')
     require(receipt.get('implementation_sha256') == workbench.implementation_hash(), 'IMPLEMENTATION_MISMATCH')
@@ -192,27 +208,27 @@ def verify(directory):
     for name, expected_hash in expected.items():
         require(name in {'request.json', 'prepared.json', 'bindings.json', 'bundle.json', 'facts.json', 'analysis.json', 'report.md'}
                 or re.fullmatch(r'source-\d{4,}\.json', name), 'ARTIFACT_NAME_INVALID')
-        require(sha((directory / name).read_bytes()) == expected_hash, 'ARTIFACT_HASH_MISMATCH')
-    raw = (directory / 'request.json').read_bytes()
-    materialized, sources, source_artifacts = resolve_request(raw, lambda path, index: (directory / f'source-{index:04d}.json').read_bytes())
+        require(sha(reader.read(name)) == expected_hash, 'ARTIFACT_HASH_MISMATCH')
+    raw = reader.read('request.json')
+    materialized, sources, source_artifacts = resolve_request(raw, lambda path, index: reader.read(f'source-{index:04d}.json'))
     prepared, bindings = prepare_request(materialized)
     require(set(expected) == set(source_artifacts) | {'prepared.json', 'bindings.json', 'bundle.json', 'facts.json', 'analysis.json', 'report.md'}, 'ARTIFACT_SET_MISMATCH')
     require(receipt.get('request_sha256') == sha(raw) and receipt.get('source_bindings') == sources, 'REQUEST_BINDING_MISMATCH')
     require(receipt.get('materialized_input_sha256') == digest(materialized) and receipt.get('prepared_input_sha256') == digest(prepared)
             and receipt.get('contract_sha256') == digest(prepared['contract']), 'INPUT_BINDING_MISMATCH')
-    require((directory / 'prepared.json').read_bytes() == encoded(prepared)
-            and (directory / 'bindings.json').read_bytes() == encoded(bindings), 'PREPARATION_MISMATCH')
-    bundle_raw = (directory / 'bundle.json').read_bytes()
+    require(reader.read('prepared.json') == encoded(prepared)
+            and reader.read('bindings.json') == encoded(bindings), 'PREPARATION_MISMATCH')
+    bundle_raw = reader.read('bundle.json')
     bundle = report_facts.strict_json(bundle_raw)
     require(bundle['input'] == prepared, 'BUNDLE_INPUT_MISMATCH')
     replay = workbench.verify(bundle)
     require(type(receipt.get('include_source_text')) is bool, 'SOURCE_TEXT_OPTION_REQUIRED')
-    facts = report_facts.project(bundle_raw, 'quant', include_source_text=receipt['include_source_text'])
+    facts = (report_facts.compact_descriptor if compact else report_facts.project)(bundle_raw, 'quant', include_source_text=receipt['include_source_text'])
     analysis = summary(bundle)
     require(receipt.get('analysis_status') == analysis['status'], 'ANALYSIS_STATUS_MISMATCH')
     for name, content in {'facts.json': encoded(facts), 'analysis.json': encoded(analysis),
                           'report.md': markdown(analysis, facts, bindings).encode('utf-8')}.items():
-        require((directory / name).read_bytes() == content, 'CANONICAL_REPORT_MISMATCH')
+        require(reader.read(name) == content, 'CANONICAL_REPORT_MISMATCH')
     return {'status': 'REPLAY_AND_REPORT_MATCH', 'analysis_status': analysis['status'],
             'jobs_verified': replay['jobs_verified'], 'request_sha256': sha(raw),
             'numeric_replay_tolerances': replay_tolerances(), 'report_comparison': 'EXACT_BYTES',
@@ -225,13 +241,14 @@ def main():
     parser.add_argument('input')
     parser.add_argument('--private-output-dir')
     parser.add_argument('--include-source-text', action='store_true')
+    parser.add_argument('--compact-evidence', action='store_true', help='Compressed source-bound artifacts and on-demand full fact projection.')
     args = parser.parse_args()
     try:
         if args.command == 'run':
             require(args.private_output_dir is not None, 'PRIVATE_OUTPUT_DIRECTORY_REQUIRED')
-            run(args.input, args.private_output_dir, args.include_source_text)
+            run(args.input, args.private_output_dir, args.include_source_text, args.compact_evidence)
         else:
-            require(args.private_output_dir is None and not args.include_source_text, 'VERIFY_OPTIONS_INVALID')
+            require(args.private_output_dir is None and not args.include_source_text and not args.compact_evidence, 'VERIFY_OPTIONS_INVALID')
             result = verify(args.input)
             print(result['status'])  # No private values or paths on stdout.
     except (ValueError, KeyError, TypeError, IndexError, OverflowError, OSError):

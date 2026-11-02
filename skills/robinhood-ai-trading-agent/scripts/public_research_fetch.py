@@ -22,10 +22,12 @@ import xml.etree.ElementTree as ET
 from zipfile import ZipFile
 from zoneinfo import ZoneInfo
 
-from public_research import digest, profile, incomplete_components
+from public_research import (digest, profile, incomplete_components,
+                             history as validate_history, number, positive, nonnegative)
 from listed_universe import DIRECTORIES, build_universe
 from trading_calendar import sessions
 from incremental_research import PartialFetch
+from research_data_store import Store
 
 _request_lock = threading.Lock()
 _next_request = 0.0
@@ -36,12 +38,17 @@ def request_call(call):
     """Bound rate-limited retries; never rotate accounts, proxies or identities."""
     global _next_request, _provider_paused
     for attempt in range(2):
-        with _request_lock:
-            if _provider_paused:
-                raise RuntimeError('PROVIDER_PAUSED_AFTER_REPEATED_RATE_LIMIT; resume later')
-            wait = max(0, _next_request - time.monotonic())
-            _next_request = max(time.monotonic(), _next_request) + .2
-        if wait:
+        # Grant a slot only when it is due. Another worker can extend the
+        # cooldown or pause the provider while this caller is asleep.
+        while True:
+            with _request_lock:
+                if _provider_paused:
+                    raise RuntimeError('PROVIDER_PAUSED_AFTER_REPEATED_RATE_LIMIT; resume later')
+                current = time.monotonic()
+                wait = max(0, _next_request - current)
+                if not wait:
+                    _next_request = current + .2
+                    break
             time.sleep(wait)
         try:
             return call()
@@ -178,7 +185,45 @@ def acquire_universe(folder, supplied=None, preset=None, price_date=None):
     return data
 
 
-def fetch_row(identity, grid, folder, prior=None, reusable=None, source_checks=None):
+def history_ineligibility(row, grid):
+    """Retain only the scorer's exact terminal exclusion, never transport failure."""
+    value = row.get('history', {})
+    if (not grid or not isinstance(value, dict)
+            or not all(value.get(k) for k in ('index', 'columns', 'data'))
+            or any(e.get('component') == 'history' for e in row.get('errors', []))):
+        return None
+    required = [session['date'] for session in grid]
+    try:
+        # A short but broken frame is an acquisition-quality problem, not proof
+        # that the issuer lacks the required history. Validate every present
+        # price row before relying on the native missing-session exclusion.
+        present = validate_history(value, [])
+        if not {'Close', 'Adj Close', 'Volume'}.issubset(value['columns']):
+            return None
+        for prices in present.values():
+            positive(number(prices['Close']), 'Close')
+            positive(number(prices['Adj Close']), 'Adj Close')
+            nonnegative(number(prices['Volume']), 'Volume')
+        history_sha256 = digest(value)
+    except (ValueError, ArithmeticError, KeyError, TypeError):
+        return None
+    try:
+        validate_history(value, required)
+    except ValueError as exc:
+        if str(exc) == 'MISSING_HISTORY_SESSIONS':
+            return {'reason': str(exc), 'validator': 'public_research.history',
+                    'profile_sha256': digest(profile()),
+                    'required_session_dates': required,
+                    'required_session_dates_sha256': digest(required),
+                    'history_sha256': history_sha256, 'checked_at': now(),
+                    'meaning': 'Successful nonempty history fails the frozen profile session grid; no statement value can repair this exclusion.'}
+    except (KeyError, TypeError):
+        pass
+    return None
+
+
+def fetch_row(identity, grid, folder, prior=None, reusable=None, source_checks=None,
+              history_first=False, component_store=None, contract_vintage=None):
     import yfinance as yf
     symbol = identity['symbol']
     provider_symbol = identity.get('provider_symbol', symbol.replace('.', '-'))
@@ -192,7 +237,7 @@ def fetch_row(identity, grid, folder, prior=None, reusable=None, source_checks=N
     result['errors'] = [e for e in result['errors'] if e['component'] not in
                        {'info', 'income', 'balance', 'cashflow', 'history'}]
     ticker = yf.Ticker(provider_symbol)
-    for key, call in (
+    components = (
         ('info', ticker.get_info),
         ('income', lambda: frame(ticker.get_income_stmt(freq='quarterly'))),
         ('balance', lambda: frame(ticker.get_balance_sheet(freq='quarterly'))),
@@ -200,7 +245,11 @@ def fetch_row(identity, grid, folder, prior=None, reusable=None, source_checks=N
         ('history', lambda: frame(ticker.history(start=grid[0]['date'],
             end=(datetime.fromisoformat(grid[-1]['date']) + timedelta(days=1)).date().isoformat(),
             auto_adjust=False, repair=False, actions=True, raise_errors=True, timeout=20), price=True)),
-    ):
+    )
+    if history_first:
+        components = (components[0], components[4], *components[1:4])
+        result.pop('history_ineligibility', None)
+    for key, call in components:
         if (reusable and key in reusable
                 and (not result.get('info', {}).get('financialCurrency')
                      or result['info']['financialCurrency'] ==
@@ -213,8 +262,48 @@ def fetch_row(identity, grid, folder, prior=None, reusable=None, source_checks=N
             continue
         if needed is not None and key not in needed:
             continue
+        if history_first and key in {'income', 'balance', 'cashflow'}:
+            proof = history_ineligibility(result, grid)
+            if proof:
+                result['history_ineligibility'] = proof
+                result[key] = {'index': [], 'columns': [], 'data': []}
+                # A skipped request is neither a provider failure nor a current
+                # statement observation. Previously successful/reusable data
+                # were preserved by the branches above.
+                for field in ('component_retrieved_at', 'component_source_checks'):
+                    result.get(field, {}).pop(key, None)
+                result.setdefault('component_acquisition', {})[key] = {
+                    'acquisition': 'not_requested', 'reason': 'HISTORY_INELIGIBLE',
+                    'native_reason': proof['reason'],
+                    'eligibility_receipt': '/history_ineligibility'}
+                continue
         try:
-            value = request_call(call)
+            captured = None
+            component_recovered = False
+            if component_store is None:
+                value = request_call(call)
+            else:
+                if not contract_vintage:
+                    raise ValueError('COMPONENT_STORE_REQUIRES_FROZEN_CONTRACT')
+                request = {'provider': 'yfinance', 'security_id': identity['issuer_id'] + '|' + symbol,
+                    'provider_symbol': provider_symbol, 'identity': identity, 'component': key,
+                    'start': grid[0]['date'] if key == 'history' else 'not_applicable',
+                    'end': grid[-1]['date'] if key == 'history' else 'not_applicable',
+                    'adjustment': 'auto_adjust=False;repair=False;actions=True' if key == 'history' else 'provider_representation',
+                    'schema_version': 'yfinance-component-v1', 'parser_version': 'public-fetch-component-v1',
+                    'fields': [key], 'source_role': 'provider_decoded_representation_not_HTTP_wire_bytes',
+                    'vintage': contract_vintage}
+                from research_data_store import validate_request
+                component_recovered = component_store.path('records/' + validate_request(request) + '.json').exists()
+                def capture_component():
+                    # yfinance materializes the response; this is a durable decoded
+                    # checkpoint, not a claim of streaming Yahoo HTTP wire bytes.
+                    response_value = request_call(call)
+                    if key != 'info' and not response_value.get('index'):
+                        raise ValueError('EMPTY_PROVIDER_RESPONSE:' + key)
+                    yield from (s.encode('utf-8') for s in json.JSONEncoder(allow_nan=False).iterencode(response_value))
+                captured = component_store.capture(request, capture_component, resume=True)
+                value = json.loads(component_store.read_bytes(captured))
             if key != 'info' and not value.get('index'):
                 raise ValueError('EMPTY_PROVIDER_RESPONSE:' + key)
             if key == 'info':
@@ -229,8 +318,13 @@ def fetch_row(identity, grid, folder, prior=None, reusable=None, source_checks=N
                     result['security_type'] = 'provider_confirmed_equity'
                     result['security_type_basis'] = 'Yahoo EQUITY confirmation; common/ADR subtype and issuer identity still need primary review'
             result[key] = value
-            result.setdefault('component_retrieved_at', {})[key] = now()
-            result.setdefault('component_acquisition', {})[key] = {'acquisition': 'fresh_network_pull'}
+            result.setdefault('component_retrieved_at', {})[key] = captured['retrieved_at'] if captured else now()
+            result.setdefault('component_acquisition', {})[key] = {
+                'acquisition': 'same_contract_component_resume' if component_recovered else 'fresh_network_pull'}
+            if captured:
+                result['component_acquisition'][key].update(
+                    capture_request_id=captured['request_id'], capture_raw_sha256=captured['raw_sha256'],
+                    source_role=captured['request']['source_role'])
         except Exception as exc:
             result['errors'].append({'component': key, 'error': type(exc).__name__ + ':' + str(exc)})
             result[key] = {} if key == 'info' else {'index': [], 'columns': [], 'data': []}
@@ -275,6 +369,13 @@ def argument_parser():
     parser.add_argument('--reuse-from', type=Path, help='Explicit portable parent research-library root; no hidden cache discovery')
     parser.add_argument('--reuse-manifest', type=Path, help='Sealed research_memory manifest covering exactly one parent snapshot and its source-index evidence')
     parser.add_argument('--freshness-receipt', type=Path, help='Current source-index observations; can also bind source checks during a full fetch')
+    parser.add_argument('--history-first', action='store_true',
+        help='Opt in to fetching info/full history before statements; skip fresh statements only for the native missing-session exclusion, retaining all universe members')
+    parser.add_argument('--component-store', action='store_true',
+        help='Durably gzip each decoded provider component under the explicit output root; same-contract resume avoids refetch after later processing fails')
+    parser.add_argument('--min-free-bytes', type=int, default=256 * 1024 * 1024,
+        help='Reserve for optional component storage; no automatic drive fallback')
+    parser.add_argument('--max-component-bytes', type=int, default=512 * 1024 * 1024)
     parser.add_argument('--workers', type=int, default=4, choices=range(1, 5))
     return parser
 
@@ -301,16 +402,22 @@ def main():
     prompt = args.prompt_file.read_text(encoding='utf-8-sig').strip()
     contract = {'profile': profile(), 'profile_sha256': digest(profile()), 'defined_at': now(),
         'acquisition_code_sha256': {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
-            for name in ('public_research_fetch.py', 'listed_universe.py', 'incremental_research.py')},
+            for name in ('public_research_fetch.py', 'listed_universe.py', 'incremental_research.py', 'research_data_store.py')},
         'decision_at': args.decision_at, 'price_date': grid[-1]['date'], 'prompt': prompt,
         'prompt_sha256': digest(prompt), 'hold': args.hold, 'acquisition': 'independent_fresh_network_pull',
         'universe_selection': universe_spec(args.universe_preset, args.universe),
         'historical_information_certified': False,
+        'collection_mode': 'history_first' if args.history_first else 'full_financial',
+        'component_store': bool(args.component_store),
         'timing_note': 'Prices are frozen to the last completed session. Financial/provider facts are obtained now; historical publication and restatement timing are not certified. This is not a point-in-time backtest.'}
     prior = {}
     output_folder = folder
     if args.resume:
         old_contract = json.loads((folder / 'contract-before-fetch.json').read_text(encoding='utf-8'))
+        if old_contract.get('collection_mode', 'full_financial') != contract['collection_mode']:
+            raise ValueError('RESUME_CONTRACT_MISMATCH:collection_mode')
+        if old_contract.get('component_store', False) != contract['component_store']:
+            raise ValueError('RESUME_CONTRACT_MISMATCH:component_store')
         if ('acquisition_code_sha256' in old_contract
                 and old_contract['acquisition_code_sha256'] != contract['acquisition_code_sha256']):
             raise ValueError('RESUME_ACQUISITION_CODE_MISMATCH: use saved collector or start a new run')
@@ -341,6 +448,11 @@ def main():
         return
     rows = []
     checks = None
+    component_store = None
+    if args.component_store:
+        component_store = Store(folder / 'component-store', 'public-research-fetch:' + digest(contract),
+            create=not (folder / 'component-store').exists(), min_free_bytes=args.min_free_bytes,
+            max_capture_bytes=args.max_component_bytes)
     if args.partial_fetch or args.freshness_receipt:
         checks = PartialFetch(args.reuse_from, args.reuse_manifest, args.freshness_receipt,
                               output_folder, args.decision_at,
@@ -354,7 +466,7 @@ def main():
             else:
                 reusable = checks.choose(identity, contract['profile_sha256'], now()) if args.partial_fetch else None
                 futures.append(pool.submit(fetch_row, identity, grid, output_folder, old,
-                                           reusable, checks))
+                                           reusable, checks, args.history_first, component_store, digest(contract)))
         for future in as_completed(futures):
             rows.append(future.result())
             if len(rows) % 25 == 0 or len(rows) == len(universe['rows']):
@@ -369,6 +481,18 @@ def main():
             for n in ('yfinance', 'pandas', 'exchange_calendars')}}
     if checks:
         acquisition_receipt = checks.receipt(rows)
+        observed = {row['symbol']: row for row in rows}
+        not_requested = 0
+        for decision in acquisition_receipt['rows']:
+            row = observed.get(decision['symbol'], {})
+            for component in ('income', 'balance', 'cashflow'):
+                mode = row.get('component_acquisition', {}).get(component, {})
+                if (mode.get('acquisition') == 'not_requested'
+                        and mode.get('reason') == 'HISTORY_INELIGIBLE'):
+                    decision['components'][component] = 'NOT_REQUESTED:HISTORY_INELIGIBLE'
+                    not_requested += 1
+        acquisition_receipt['not_requested_statement_components'] = not_requested
+        acquisition_receipt['collection_mode'] = contract.get('collection_mode', 'full_financial')
         save(output_folder / 'partial-fetch-receipt.json', acquisition_receipt)
         snapshot['partial_fetch'] = acquisition_receipt
     snapshot['essential_acquisition_errors'] = sum(any(e['component'] in

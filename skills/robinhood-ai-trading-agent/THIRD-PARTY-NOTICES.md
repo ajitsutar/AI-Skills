@@ -96,3 +96,12 @@ not bundled in the skill; installed distributions retain their own notices.
 See [portable methods: sources and licenses](references/portable-quant.md#sources-and-licenses)
 for the upstream projects and license links. These optional libraries run inside
 the host Python environment and require no backend service.
+
+## Optional columnar data storage
+
+The original storage adapter can call separately installed Apache Arrow/PyArrow
+for Parquet files with ZSTD compression. No Arrow implementation or binary is
+bundled in the skill. Retain the installed distribution's own notices and
+transitive component terms. Apache Arrow is provided under Apache License 2.0;
+see its [upstream license](https://github.com/apache/arrow/blob/main/LICENSE.txt).
+The gzip and ZIP storage paths use Python's standard library.

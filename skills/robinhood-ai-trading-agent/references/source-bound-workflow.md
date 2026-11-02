@@ -23,6 +23,13 @@ python scripts/research_workflow.py summary NEW_DIRECTORY
 
 For a complete explicit request, `execute REQUEST.json --request-role "Original supplied request" --private-output-dir NEW_DIRECTORY` runs preparation, execution, verification and answer-fact projection together. Preserve its completion and export records, including failures. See [checked answers across hosts](model-alignment-hardening.md).
 
+For large or repeated portfolio jobs, add `--compact-evidence` to `run` or
+`execute`. It retains complete sources/results in a verified gzip object store,
+deduplicates identical artifacts and avoids repeating full leaf-fact tables in
+every report. Claims and numerical replay stay unchanged; leaf facts are available
+on demand. Read [compact evidence](compact-evidence.md) for logical-path readers,
+resource limits and the distinction between a locator and a materialized fact.
+
 
 The runner is offline. Obtain authorized current data separately and save its
 actual bytes and acquisition times before binding files. For an offline request,
@@ -147,7 +154,7 @@ fact projection. Historical provenance remains historical, not current replay.
 
 ## Use the generated results in the answer
 
-`report.md` contains bindings, assumptions, unused fields, requested-work coverage,
+In ordinary mode, `report.md` contains bindings, assumptions, unused fields, requested-work coverage,
 actual results and all supported facts. `COMPUTED` means an operation ran; nested
 results may remain unresolved, infeasible or inadmissible. Read the nested status
 and complete cash/scenario path, including deferred events.

@@ -82,6 +82,8 @@ volatility smiles or an executable market price. The helper is a local
 implementation of the published equations using SciPy's normal CDF/PDF, not an
 imported options-pricing implementation.
 
+For bounded vanilla American pricing, use `derivatives.calculate` with `option_crr`; see [the derivatives toolkit](derivatives-toolkit.md) for its exact envelope, explicit inputs and finite-grid limits. This separate route does not change the European-only `risk.option` or `risk.scenarios` contract. Keep omitted grid, conventions and source metadata unresolved instead of importing example values.
+
 Foundational sources: [Black and Scholes, The Pricing of Options and Corporate
 Liabilities (1973)](https://www.journals.uchicago.edu/doi/10.1086/260062),
 [Merton, Theory of Rational Option Pricing (1973)](https://www.jstor.org/stable/3003143),

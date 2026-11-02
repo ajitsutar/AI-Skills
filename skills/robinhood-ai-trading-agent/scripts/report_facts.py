@@ -38,6 +38,9 @@ STATUSES = {'COMPUTED', 'REJECTED_INPUT', 'CALCULATION_FAILED', 'RESEARCH_QUEUE_
             'COMPLETE_WITHIN_SUPPLIED_ROWS', 'KNOWN_LOWER_BOUND_ONLY',
             'EXACT', 'LOWER_BOUND', 'UPPER_BOUND', 'UNKNOWN', 'COMPLETE',
             'CONDITIONAL_RATIO', 'SENSITIVITY_ONLY', 'UNAVAILABLE'}
+# Registered helper outcomes may be exported without releasing arbitrary source text.
+STATUSES.update({'DECLARED_STRICT_GRID_COMPLETE', 'RESEARCH_GAPS_REMAIN', 'NONPOSITIVE_OR_UNKNOWN_EPS', 'REDUCED_LONG_ONLY_ZERO_COST_ATTEMPT', 'COMPUTED_CURRENT_WEIGHT_SHOCK_DISTRIBUTION', 'CONDITIONAL_MINIMUM_CERTIFIED', 'COMPUTED_EXPLICIT_BASIS', 'FIXTURE_MATCH', 'DECLARED_EVIDENCE_CURRENT', 'unavailable', 'FULL_FETCH_REQUIRED', 'INCOMPATIBLE_WITH_QUOTE', 'NO_SUPPORTED_TABLE', 'DECLARED_CONTRACT_VALID', 'CONDITIONAL_RISK_SCENARIO', 'LINEAR_FEASIBILITY_FAILED', 'UNGRADABLE_RESPONSE', 'NO_REQUIREMENTS_IN_DECLARED_SCOPE', 'UNRESOLVED_BASIS', 'UNRESOLVED_OR_RESTRICTED', 'EXTRACTED', 'modeled', 'RECONCILED_FULL', 'RECONCILED_INCREMENTAL', 'FIXTURE_MISMATCH', 'COVARIANCE_SENSITIVITY_COMPARISON', 'reference', 'observed', 'CONFLICTS_PRESENT', 'DECLARED_SCENARIO_GRID_COMPLETE'})
+STATUSES.update({'REFERENCE_OR_MODEL_SCENARIO', 'CALLER_SUPPLIED_OBSERVED_MARKS', 'current_roster', 'historical_membership'})
 # The original workbench numerical modules and existing schemas were inspected
 # byte-for-text-identical before the additive operation extension. This identifies
 # a known historical schema, not a successful replay with the current code.
@@ -60,7 +63,10 @@ QUANT_FILES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
                'equity_cash_comparison.py', 'source_exposure.py', 'technical_toolkit.py',
                'fundamental_toolkit.py', 'sentiment_toolkit.py', 'factor_research.py',
                'derivatives_toolkit.py', 'paper_exchange.py', 'platform_readiness.py', 'time_series_toolkit.py',
-               'portable_quant.py', 'point_in_time_data.py', 'costed_bar_replay.py')
+               'portable_quant.py', 'point_in_time_data.py', 'costed_bar_replay.py', 'monthly_experiment.py',
+               'research_contracts.py', 'quant_data_contracts.py', 'research_readiness.py', 'security_master.py',
+               'price_refresh.py', 'holdings_ledger.py', 'analyst_adapter.py',
+               'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py')
 
 
 def digest(value):
@@ -425,6 +431,36 @@ def project(raw, kind, custom_raw=None, include_source_text=False):
     return p.report()
 
 
+def compact_descriptor(raw, kind, custom_raw=None, include_source_text=False):
+    """Bind a complete on-demand projection without expanding every input leaf.
+
+    This is an evidence locator, not a partial numerical projection or a claim
+    that unmaterialized facts were inspected. The complete source is retained by
+    the workflow; materialize_compact regenerates the unchanged full adapter.
+    """
+    if kind not in ('quant', 'public-vqm') or not isinstance(strict_json(raw), dict):
+        raise ValueError('UNSUPPORTED_COMPACT_SOURCE')
+    if type(include_source_text) is not bool:
+        raise ValueError('SOURCE_TEXT_OPTION')
+    return {'schema_version':1, 'projection_mode':'COMPLETE_SOURCE_ON_DEMAND',
+            'kind':kind, 'source_artifact_sha256':hashlib.sha256(raw).hexdigest(),
+            'source_bytes':len(raw), 'adapter_code_sha256':code_hash('report_facts.py'),
+            'semantics_code_sha256':quant_hash(), 'source_text_exported':include_source_text,
+            'custom_bindings_sha256':hashlib.sha256(custom_raw).hexdigest() if custom_raw is not None else None,
+            'materialized_leaf_facts':False,
+            'limits':['Complete input and result fields remain in the hash-bound source artifact.',
+                      'This locator does not inspect or authenticate source fields, infer units or validate commentary.',
+                      'Materialize the full adapter when leaf-by-leaf facts are needed.']}
+
+
+def materialize_compact(raw, descriptor, custom_raw=None):
+    expected = compact_descriptor(raw, descriptor['kind'], custom_raw,
+                                  descriptor['source_text_exported'])
+    if descriptor != expected:
+        raise ValueError('COMPACT_PROJECTION_BINDING_MISMATCH')
+    return project(raw, descriptor['kind'], custom_raw, descriptor['source_text_exported'])
+
+
 def _changed_paths(expected, actual, path=''):
     """Structured, type-sensitive differences without copying selected values."""
     if type(expected) is not type(actual):
@@ -547,6 +583,10 @@ def verification_markdown(diagnostics):
 
 
 def markdown(report):
+    if report.get('projection_mode') == 'COMPLETE_SOURCE_ON_DEMAND':
+        return ('Complete report facts are available on demand from the retained source artifact.\n\n'
+                'Source SHA-256: ' + report['source_artifact_sha256'] + '\n\n'
+                'Leaf facts have not been materialized. This is a source locator, not a verified numerical summary.\n')
     def cell(value):
         text = json.dumps(value, ensure_ascii=False, sort_keys=True, allow_nan=False)
         return (html.escape(text).replace('\\', '&#92;').replace('[', '&#91;').replace(']', '&#93;')

@@ -1,5 +1,11 @@
 # Optional partial fetch from a portable research bundle
 
+For durable gzip captures, same-contract component recovery, verified archives and
+explicit storage roots, use [backtest data storage](backtest-data-storage.md).
+`--component-store` controls durable storage; it does not enable cross-run partial
+fetch. Dividend/split or provider corrections can change an older price prefix:
+local prefix hashes alone never justify joining it to a new tail.
+
 **Full fetch is the default.** Partial fetch requires an explicit user request
 and an explicitly supplied portable bundle. This applies identically to Codex,
 Muse, Claude and other hosts. Never assume their internal caches persist, inspect

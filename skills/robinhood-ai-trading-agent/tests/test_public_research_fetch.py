@@ -14,6 +14,20 @@ class YFRateLimitError(Exception):
     pass
 
 
+class AdvancingClock:
+    """A real wait-loop needs a clock that moves when fake sleep completes."""
+    def __init__(self, start=1.0):
+        self.value = start
+        self.sleeps = []
+
+    def monotonic(self):
+        return self.value
+
+    def sleep(self, delay):
+        self.sleeps.append(delay)
+        self.value += delay
+
+
 class AcquisitionTests(unittest.TestCase):
     def test_checkpoint_recovery_after_interruption_and_identity_guard(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -56,7 +70,9 @@ class AcquisitionTests(unittest.TestCase):
 
     def test_rate_limit_retries_once_then_pauses(self):
         call = Mock(side_effect=YFRateLimitError('Too Many Requests'))
-        with patch.object(fetch.time, 'sleep'), patch.object(fetch.time, 'monotonic', return_value=1):
+        clock = AdvancingClock()
+        with patch.object(fetch.time, 'sleep', side_effect=clock.sleep), \
+             patch.object(fetch.time, 'monotonic', side_effect=clock.monotonic):
             with self.assertRaises(YFRateLimitError):
                 fetch.request_call(call)
             with self.assertRaisesRegex(RuntimeError, 'PROVIDER_PAUSED'):
@@ -65,7 +81,9 @@ class AcquisitionTests(unittest.TestCase):
 
     def test_transient_rate_limit_recovers_without_pausing(self):
         call = Mock(side_effect=[YFRateLimitError(), 'recovered'])
-        with patch.object(fetch.time, 'sleep') as sleep, patch.object(fetch.time, 'monotonic', return_value=1):
+        clock = AdvancingClock()
+        with patch.object(fetch.time, 'sleep', side_effect=clock.sleep) as sleep, \
+             patch.object(fetch.time, 'monotonic', side_effect=clock.monotonic):
             self.assertEqual(fetch.request_call(call), 'recovered')
         self.assertEqual(call.call_count, 2)
         self.assertGreaterEqual(sleep.call_args[0][0], 60)

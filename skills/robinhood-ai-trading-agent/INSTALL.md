@@ -5,6 +5,14 @@ subfolders together. No files from another skill or the repository root are
 required to use it. Runtime tools, Python/Node packages, model downloads and
 authenticated services are separate prerequisites described in [SKILL.md](SKILL.md).
 
+For a reproducible Windows/CPython 3.12 research environment, use the complete
+artifact-hashed profiles in `environments/windows-cp312-core/` or
+`environments/windows-cp312-data-quant/`. The latter adds PyArrow, QuantLib and
+VADER. See [release acceptance](references/release-acceptance.md) for fresh-environment
+installation and frozen-fixture replay. These locks do not claim compatibility
+with other operating systems or include transformer model weights. Keep downloaded
+wheels and virtual environments outside the installed skill folder.
+
 ## Codex or another Agent Skills host
 
 Copy this entire `robinhood-ai-trading-agent` folder into the skills directory used by your host.
@@ -28,6 +36,20 @@ For a host that accepts skill ZIPs, zip this entire folder so the archive contai
 `robinhood-ai-trading-agent/SKILL.md` and its sibling resources. Do not zip only `SKILL.md`.
 Keep generated outputs, environments and account configuration outside the package.
 Uploading the package does not configure external tools or grant transaction authority.
+
+## Optional historical-data storage dependency
+
+The compressed raw-response store and compact evidence mode use the standard
+library. ZSTD Parquet batch reads/writes additionally require PyArrow:
+
+```text
+python -m pip install -r requirements-optional-data.txt
+```
+
+Install into the host's selected research environment. Missing PyArrow leaves
+gzip storage available and causes an explicit error for Parquet operations; it
+does not justify relabeling another format as Parquet. Run
+`python scripts/research_preflight.py` to inspect available components.
 
 ## License and notices
 

@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "fixtures": [
+    {
+      "id": "cent-conservation",
+      "operation": "planning.allocate",
+      "inputs": {
+        "schema_version": 1,
+        "currency": "USD",
+        "role": "hypothetical_scenario",
+        "budget": "500.00",
+        "budget_basis": "notional",
+        "candidate_set": {
+          "kind": "explicit_candidates",
+          "source_id": "fictional-three",
+          "declared_count": 3,
+          "rows": [
+            {
+              "symbol": "FICTION_A",
+              "issuer_id": "FICTION_A",
+              "currency": "USD"
+            },
+            {
+              "symbol": "FICTION_B",
+              "issuer_id": "FICTION_B",
+              "currency": "USD"
+            },
+            {
+              "symbol": "FICTION_C",
+              "issuer_id": "FICTION_C",
+              "currency": "USD"
+            }
+          ]
+        }
+      },
+      "expect": {
+        "/totals/reference_portfolio_notional": "500.00",
+        "/rows/0/reference_notional_before_fees": "166.67",
+        "/rows/1/reference_notional_before_fees": "166.67",
+        "/rows/2/reference_notional_before_fees": "166.66",
+        "/coverage_verified": false,
+        "/selected_count": 3
+      },
+      "absolute_tolerance": 0,
+      "relative_tolerance": 0
+    },
+    {
+      "id": "dated-cash",
+      "operation": "planning.cash_projection",
+      "inputs": {
+        "currency": "USD",
+        "role": "hypothetical_scenario",
+        "start_at": "2025-01-01T00:00:00Z",
+        "end_at": "2026-01-01T00:00:00Z",
+        "day_count": "ACT/365F",
+        "annual_effective_rate": "0.04",
+        "opening_cash": "100",
+        "floor": "100",
+        "events": []
+      },
+      "expect": {
+        "/ending_cash": 104.0,
+        "/conservation_residual": 0.0
+      },
+      "absolute_tolerance": 1e-10,
+      "relative_tolerance": 0
+    }
+  ]
+}
