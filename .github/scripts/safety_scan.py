@@ -47,7 +47,7 @@ FORBIDDEN_EXTENSIONS = {
 # Only the exact reviewed upstream notice may contain these public author emails.
 # Normalize line endings through read_text so the allowance survives Git checkout.
 PUBLIC_LICENSE_EMAIL_EXCEPTIONS = {
-    "skills/robinhood-ai-trading-agent/ARCH-LICENSE.txt": "c6e622bd89db4e13315f4e91605ff96fcbb9012d78ee74e429855870b203eed6",
+    "skills/ai-trading-agent/ARCH-LICENSE.txt": "c6e622bd89db4e13315f4e91605ff96fcbb9012d78ee74e429855870b203eed6",
 }
 
 
@@ -98,7 +98,7 @@ def sbom_package_identifier_spans(text: str, relative_path: str) -> list[tuple[i
     version, bom-ref and PyPI purl. Other fields and all other detectors still run.
     """
     profiles = {'windows-cp312-core', 'windows-cp312-data-quant'}
-    allowed = {f'skills/robinhood-ai-trading-agent/environments/{p}/sbom.cdx.json' for p in profiles}
+    allowed = {f'skills/ai-trading-agent/environments/{p}/sbom.cdx.json' for p in profiles}
     if relative_path not in allowed:
         return []
     try:

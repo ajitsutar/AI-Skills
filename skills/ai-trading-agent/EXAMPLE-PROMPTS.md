@@ -4,7 +4,7 @@
 
 294 examples across 41 workflows, from first-time investing to quantitative research.
 
-Start any prompt with **Use the robinhood-ai-trading-agent skill.** Replace
+Start any prompt with **Use the ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
 read or run the entire catalog. Examples describe requests you can make, not
 additional investment rules or permission to trade.

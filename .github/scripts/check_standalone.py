@@ -51,7 +51,7 @@ def check(source: Path, structure_only: bool = False) -> None:
                 if not node:
                     raise RuntimeError("Node is required to test the LinkedIn skill")
                 commands.append([node, str(copied / test)])
-            if source.name == "robinhood-ai-trading-agent":
+            if source.name in {"ai-trading-agent", "robinhood-ai-trading-agent"}:
                 commands.append([sys.executable, "-X", "utf8", "-B", "-m", "unittest",
                                  "discover", "-s", str(copied / "tests"), "-v"])
             for command in commands:

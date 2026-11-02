@@ -1,4 +1,4 @@
-# Install robinhood-ai-trading-agent
+# Install AI Trading Agent
 
 This folder is the complete skill source package. Keep `SKILL.md` and all its
 subfolders together. No files from another skill or the repository root are
@@ -15,25 +15,31 @@ wheels and virtual environments outside the installed skill folder.
 
 ## Codex or another Agent Skills host
 
-Copy this entire `robinhood-ai-trading-agent` folder into the skills directory used by your host.
-Do not install two copies of the same skill. Select `$robinhood-ai-trading-agent` in Codex, or use
+Copy this entire `ai-trading-agent` folder into the skills directory used by your host.
+Do not install two copies of the same skill. Select `$ai-trading-agent` in Codex, or use
 your host's skill selector. `agents/openai.yaml` supplies Codex presentation metadata.
+For an existing installation, move the old `robinhood-ai-trading-agent` folder out
+of the active skills directory after preserving any personal changes, then install
+this renamed folder. Existing references must use the new invocation name.
 
 ## Claude Code: one standalone skill
 
-Copy this entire folder to `~/.claude/skills/robinhood-ai-trading-agent/` (or your project's
-`.claude/skills/robinhood-ai-trading-agent/`). Invoke `/robinhood-ai-trading-agent`. No repository plugin is needed.
+Copy this entire folder to `~/.claude/skills/ai-trading-agent/` (or your project's
+`.claude/skills/ai-trading-agent/`). Invoke `/ai-trading-agent`. No repository plugin is needed.
 
 The optional specialized agent is included in `agents/robinhood-trading-agent.md`. To use it,
 copy that file to `~/.claude/agents/` (or your project's `.claude/agents/`) after
-installing the skill. It preloads the standalone skill by its unqualified name.
+installing the skill. It preloads `ai-trading-agent` and is named `ai-trading-agent`.
+The template filename is retained for compatibility; its old filename is not the
+skill or agent invocation name. Replace an older installed copy rather than keeping
+two versions.
 The nested `agents/plugin/` variant is only for the repository-wide `ai-skills`
 plugin; do not copy that variant into your standalone agents directory.
 
 ## ZIP upload
 
 For a host that accepts skill ZIPs, zip this entire folder so the archive contains
-`robinhood-ai-trading-agent/SKILL.md` and its sibling resources. Do not zip only `SKILL.md`.
+`ai-trading-agent/SKILL.md` and its sibling resources. Do not zip only `SKILL.md`.
 Keep generated outputs, environments and account configuration outside the package.
 Uploading the package does not configure external tools or grant transaction authority.
 

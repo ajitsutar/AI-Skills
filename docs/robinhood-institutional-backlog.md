@@ -32,8 +32,8 @@ recorded separately rather than retroactively relabeling that evidence.
 5.4.0 tested-foundation manifest SHA-256:
 `067fb10ceab4319350381d34994ef4a55464eda76bf61e662ace0235dc8f03c6`.
 
-See [research assurance](../skills/robinhood-ai-trading-agent/references/quant-research-assurance.md)
-and [release acceptance](../skills/robinhood-ai-trading-agent/references/release-acceptance.md).
+See [research assurance](../skills/ai-trading-agent/references/quant-research-assurance.md)
+and [release acceptance](../skills/ai-trading-agent/references/release-acceptance.md).
 These are scoped local software results. Complete historical membership and
 delisting data, provider entitlements, independent host acceptance and predictive
 performance remain separate evidence requirements. Raw data, private comparison

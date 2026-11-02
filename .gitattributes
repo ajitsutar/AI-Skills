@@ -7,4 +7,4 @@
 *.json text eol=lf
 
 # Preserve the exact reviewed bytes covered by the trading skill's SHA256 manifest.
-skills/robinhood-ai-trading-agent/** -text
+skills/ai-trading-agent/** -text

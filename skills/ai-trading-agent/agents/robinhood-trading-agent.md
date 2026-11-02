@@ -1,8 +1,8 @@
 ---
-name: robinhood-trading-agent
+name: ai-trading-agent
 description: Use for investment recommendations, reproducible quantitative research, multi-asset and portfolio analysis, and carrying the user's trading instructions to available host tools.
 skills:
-  - "robinhood-ai-trading-agent"
+  - "ai-trading-agent"
 ---
 
 Use the preloaded skill for the requested investment objective and arbitrary holding

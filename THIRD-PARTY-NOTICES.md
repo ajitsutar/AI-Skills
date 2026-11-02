@@ -14,12 +14,12 @@ Each independently downloadable skill includes its own dependency/source record:
 | Karaoke video | [Notices](skills/create-karaoke-video/THIRD-PARTY-NOTICES.md) | [Provenance](skills/create-karaoke-video/PROVENANCE.md) |
 | Deal watch alerts | [Notices](skills/deal-watch-alerts/THIRD-PARTY-NOTICES.md) | [Provenance](skills/deal-watch-alerts/PROVENANCE.md) |
 | LinkedIn digest | [Notices](skills/linkedin-knowledge-digest/THIRD-PARTY-NOTICES.md) | [Provenance](skills/linkedin-knowledge-digest/PROVENANCE.md) |
-| Trading agent | [Notices](skills/robinhood-ai-trading-agent/THIRD-PARTY-NOTICES.md) | [Provenance](skills/robinhood-ai-trading-agent/PROVENANCE.md) |
+| Trading agent | [Notices](skills/ai-trading-agent/THIRD-PARTY-NOTICES.md) | [Provenance](skills/ai-trading-agent/PROVENANCE.md) |
 | Travel deals | [Notices](skills/travel-deal-finder/THIRD-PARTY-NOTICES.md) | [Provenance](skills/travel-deal-finder/PROVENANCE.md) |
 
 The trading skill intentionally retains the complete
-[arch NCSA notice](skills/robinhood-ai-trading-agent/ARCH-LICENSE.txt) and
-[workflow source credits](skills/robinhood-ai-trading-agent/SOURCES.md).
+[arch NCSA notice](skills/ai-trading-agent/ARCH-LICENSE.txt) and
+[workflow source credits](skills/ai-trading-agent/SOURCES.md).
 Those credits and terms remain intact under the repository's MIT licensing.
 
 Dependencies are installed separately. A release that also distributes a runtime,

@@ -11,7 +11,7 @@ Reusable Agent Skills in self-contained folders. Download any one folder under `
 - `linkedin-knowledge-digest`: Filter LinkedIn feed and inbox activity into concise knowledge-bearing digests with clickable source links while excluding career milestones, hiring posts, self-promotion, and low-value outreach.
 - `travel-deal-finder`: Compare current travel deals across flights, hotels, packages, and rental cars with clear ranking rules and source verification.
 
-- `robinhood-ai-trading-agent`: Research and recommend stocks, analyze portfolios and day/swing strategies over arbitrary holding periods, and produce reproducible Value–Quality–Momentum rankings, evidence-backed financial normalization, and GARCH/GJR/EGARCH risk diagnostics. Research findings are advisory. Order intent goes to the host's normal broker workflow with zero execution gates imposed by this skill. The shared ranking is an uncalibrated research baseline, not a Strong Buy classifier.
+- `ai-trading-agent`: Research and recommend stocks, analyze portfolios and day/swing strategies over arbitrary holding periods, and produce reproducible Value–Quality–Momentum rankings, evidence-backed financial normalization, and GARCH/GJR/EGARCH risk diagnostics. Research findings are advisory. Order intent goes to the host's normal broker workflow with zero execution gates imposed by this skill. The shared ranking is an uncalibrated research baseline, not a Strong Buy classifier.
 
 The trading skill supports current stock research, portfolio management, news and
 guidance review, analyst evidence, statistical strategy validation, multi-asset
@@ -28,18 +28,18 @@ Offline run/report helpers connect explicit quant jobs and separate analyst coho
 to those reports, while advisory payload receipts expose order-instruction changes.
 Source selection and surrounding narrative still require review.
 
-Read its [current capabilities and setup](skills/robinhood-ai-trading-agent/README.md)
-or explore the [prompt catalog for investors, traders and quants](skills/robinhood-ai-trading-agent/EXAMPLE-PROMPTS.md).
+Read its [current capabilities and setup](skills/ai-trading-agent/README.md)
+or explore the [prompt catalog for investors, traders and quants](skills/ai-trading-agent/EXAMPLE-PROMPTS.md).
 Examples cover supported workflows and useful gap assessments without a fixed count.
 For implementation boundaries and remaining research needs, see the
-[capabilities and limits](skills/robinhood-ai-trading-agent/references/capabilities-and-limits.md).
+[capabilities and limits](skills/ai-trading-agent/references/capabilities-and-limits.md).
 The [prioritized institutional research backlog](docs/robinhood-institutional-backlog.md)
 separates the completed 5.4.0 software foundation from the data, pilot, validation
 and operational work needed for broader professional use.
 
 ## Download one skill
 
-The trading skill also supports a [local research library and incremental review](skills/robinhood-ai-trading-agent/references/research-memory.md): preserve evidence and replay inputs, refresh changing data, and reuse verified unchanged primary research without carrying old stock picks forward automatically.
+The trading skill also supports a [local research library and incremental review](skills/ai-trading-agent/references/research-memory.md): preserve evidence and replay inputs, refresh changing data, and reuse verified unchanged primary research without carrying old stock picks forward automatically.
 
 Open a skill folder below and follow its local `INSTALL.md`. Copy the **whole folder**,
 not just `SKILL.md`. Everything specific to that skill stays in that folder.
@@ -51,7 +51,7 @@ not just `SKILL.md`. Everything specific to that skill stays in that folder.
 | [create-karaoke-video](skills/create-karaoke-video) | [Guide](skills/create-karaoke-video/INSTALL.md) |
 | [deal-watch-alerts](skills/deal-watch-alerts) | [Guide](skills/deal-watch-alerts/INSTALL.md) |
 | [linkedin-knowledge-digest](skills/linkedin-knowledge-digest) | [Guide](skills/linkedin-knowledge-digest/INSTALL.md) |
-| [robinhood-ai-trading-agent](skills/robinhood-ai-trading-agent) | [Guide](skills/robinhood-ai-trading-agent/INSTALL.md) |
+| [ai-trading-agent](skills/ai-trading-agent) | [Guide](skills/ai-trading-agent/INSTALL.md) |
 | [travel-deal-finder](skills/travel-deal-finder) | [Guide](skills/travel-deal-finder/INSTALL.md) |
 
 Without Git, use GitHub's **Code > Download ZIP**, extract it, and keep only the
@@ -61,10 +61,10 @@ files without the other skill folders. For example:
 ```bash
 git clone --depth 1 --filter=blob:none --sparse https://github.com/ajitsutar/AI-Skills.git
 cd AI-Skills
-git sparse-checkout set skills/robinhood-ai-trading-agent
+git sparse-checkout set skills/ai-trading-agent
 ```
 
-The resulting `skills/robinhood-ai-trading-agent/` folder can be copied or zipped
+The resulting `skills/ai-trading-agent/` folder can be copied or zipped
 on its own. External runtimes, libraries, configured services and model downloads
 remain prerequisites where the individual skill calls for them.
 
@@ -138,7 +138,7 @@ The matching Claude plugin agents have these scoped names:
 - `ai-skills:karaoke-video-agent`
 - `ai-skills:linkedin-digest-agent`
 - `ai-skills:travel-deal-agent`
-- `ai-skills:robinhood-trading-agent`
+- `ai-skills:ai-trading-agent`
 
 Claude can delegate automatically from each agent's description. To guarantee one runs, type `@` and choose its scoped name from the agent picker. A manual mention uses `@agent-` followed by the scoped name, for example `@agent-ai-skills:guitar-karaoke-agent`. Each agent preloads only its corresponding skill to keep context focused.
 
@@ -168,7 +168,7 @@ cp -R skills/create-karaoke-video ~/.claude/skills/
 cp -R skills/deal-watch-alerts ~/.claude/skills/
 cp -R skills/linkedin-knowledge-digest ~/.claude/skills/
 cp -R skills/travel-deal-finder ~/.claude/skills/
-cp -R skills/robinhood-ai-trading-agent ~/.claude/skills/
+cp -R skills/ai-trading-agent ~/.claude/skills/
 ```
 
 PowerShell equivalent:
@@ -181,7 +181,7 @@ Copy-Item -Recurse skills\create-karaoke-video "$HOME\.claude\skills\"
 Copy-Item -Recurse skills\deal-watch-alerts "$HOME\.claude\skills\"
 Copy-Item -Recurse skills\linkedin-knowledge-digest "$HOME\.claude\skills\"
 Copy-Item -Recurse skills\travel-deal-finder "$HOME\.claude\skills\"
-Copy-Item -Recurse skills\robinhood-ai-trading-agent "$HOME\.claude\skills\"
+Copy-Item -Recurse skills\ai-trading-agent "$HOME\.claude\skills\"
 ```
 
 If the top-level skills directory did not exist when the session started, restart Claude Code once. Otherwise Claude detects skill changes live. Standalone skills can be invoked with `/skill-name` or preloaded into a custom agent:
@@ -210,7 +210,7 @@ Before publishing or updating this repository:
 1. Export only skill source files and supporting references.
 2. Do not include local task folders, browser/session data, generated outputs, audio/video files, lyrics supplied by users, credentials, keys, tokens, cookies, or personal paths.
 3. Replace copyrighted or user-specific examples with generic placeholders.
-4. For trading-skill changes, follow its [documentation maintenance procedure](skills/robinhood-ai-trading-agent/references/maintaining-the-skill.md): review the current README and capabilities, refresh the prompt catalog and regenerate it before packaging. Validate the shared skill contract, resource links, Codex metadata, Claude plugin mappings, script syntax, and text hygiene:
+4. For trading-skill changes, follow its [documentation maintenance procedure](skills/ai-trading-agent/references/maintaining-the-skill.md): review the current README and capabilities, refresh the prompt catalog and regenerate it before packaging. Validate the shared skill contract, resource links, Codex metadata, Claude plugin mappings, script syntax, and text hygiene:
 
 ```powershell
 python .github/scripts/validate_portability.py
@@ -261,7 +261,7 @@ license has not been established, and Demucs's software license does not establi
 permission for its pretrained weights. Use verified supplied stems/instrumentals,
 or follow the affected skill's model-specific permission workflow.
 
-The trading skill has separate Python dependencies in `skills/robinhood-ai-trading-agent/requirements-tested.txt`. Use its isolated research environment. Packaging it as a Claude agent does not establish broker availability; order execution belongs to the host's broker integration.
+The trading skill has separate Python dependencies in `skills/ai-trading-agent/requirements-tested.txt`. Use its isolated research environment. Packaging it as a Claude agent does not establish broker availability; order execution belongs to the host's broker integration.
 
 Agents inherit the tools and MCP servers enabled in the user's Claude Code session. Live browser, web, Slack/email, or other external operations require the corresponding configured capability and authenticated session; the agents stop clearly when a required capability is unavailable.
 

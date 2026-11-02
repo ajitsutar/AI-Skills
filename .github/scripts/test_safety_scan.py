@@ -55,7 +55,7 @@ class SbomIdentifierTests(unittest.TestCase):
                      'bom-ref': 'python-dateutil' + '@' + '2.9.0.post0',
                      'purl': 'pkg:pypi/python-dateutil' + '@' + '2.9.0.post0'}
         doc = {'bomFormat': 'CycloneDX', 'components': [component]}
-        path = 'skills/robinhood-ai-trading-agent/environments/windows-cp312-core/sbom.cdx.json'
+        path = 'skills/ai-trading-agent/environments/windows-cp312-core/sbom.cdx.json'
         text = json.dumps(doc)
         self.assertEqual(len(safety_scan.sbom_package_identifier_spans(text, path)), 2)
         self.assertEqual(safety_scan.sbom_package_identifier_spans(text, 'other.json'), [])
@@ -65,7 +65,7 @@ class SbomIdentifierTests(unittest.TestCase):
     def test_real_email_and_secret_remain_findings_inside_sbom(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)
-            path = root / 'skills/robinhood-ai-trading-agent/environments/windows-cp312-core/sbom.cdx.json'
+            path = root / 'skills/ai-trading-agent/environments/windows-cp312-core/sbom.cdx.json'
             path.parent.mkdir(parents=True)
             doc = {'bomFormat': 'CycloneDX', 'components': [],
                    'note': 'private' + '@' + 'example.invalid', 'secret': 'sk-' + 'a' * 24}

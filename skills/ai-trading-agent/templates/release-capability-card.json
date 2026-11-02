@@ -1,0 +1,71 @@
+{
+  "schema_version": 1,
+  "release_version": "5.5.4",
+  "package_manifest_sha256": null,
+  "scope": "Populate from actual release receipts; template alone proves no qualification",
+  "capabilities": [
+    {
+      "id": "deterministic_numeric_replay",
+      "implementation": "local_helpers_present_end_to_end_scope_requires_review",
+      "receipt": null,
+      "status": "not_reviewed"
+    },
+    {
+      "id": "point_in_time_backtest",
+      "implementation": "local_helpers_present_end_to_end_scope_requires_review",
+      "receipt": null,
+      "status": "not_reviewed"
+    },
+    {
+      "id": "host_semantic_comparison",
+      "implementation": "local_helpers_present_end_to_end_scope_requires_review",
+      "receipt": null,
+      "status": "not_reviewed"
+    },
+    {
+      "id": "live_broker_handoff",
+      "implementation": "local_helpers_present_end_to_end_scope_requires_review",
+      "receipt": null,
+      "status": "not_reviewed"
+    }
+  ],
+  "environment_acceptance": [
+    {
+      "platform": "Windows CPython3.12",
+      "status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "platform": "Linux",
+      "status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "platform": "macOS",
+      "status": "NOT_RUN",
+      "receipt": null
+    }
+  ],
+  "host_acceptance": [
+    {
+      "host": "Codex",
+      "status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "host": "Muse",
+      "status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "host": "Claude",
+      "status": "NOT_RUN",
+      "receipt": null
+    }
+  ],
+  "predictive_skill_established": false,
+  "production_readiness_established": false,
+  "limitations": [
+    "Fill each capability with bounded scope and actual evidence; do not promote implementation presence into a tested live capability."
+  ]
+}

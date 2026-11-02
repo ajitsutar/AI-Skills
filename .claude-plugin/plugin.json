@@ -8,12 +8,12 @@
   },
   "repository": "https://github.com/ajitsutar/AI-Skills",
   "agents": [
+    "./skills/ai-trading-agent/agents/plugin/robinhood-trading-agent.md",
     "./skills/concert-ticket-checkout/agents/plugin/concert-ticket-agent.md",
     "./skills/create-guitar-karaoke/agents/plugin/guitar-karaoke-agent.md",
     "./skills/create-karaoke-video/agents/plugin/karaoke-video-agent.md",
     "./skills/deal-watch-alerts/agents/plugin/deal-watch-agent.md",
     "./skills/linkedin-knowledge-digest/agents/plugin/linkedin-digest-agent.md",
-    "./skills/robinhood-ai-trading-agent/agents/plugin/robinhood-trading-agent.md",
     "./skills/travel-deal-finder/agents/plugin/travel-deal-agent.md"
   ]
 }
