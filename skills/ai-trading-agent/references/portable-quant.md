@@ -74,7 +74,10 @@ parameter uncertainty.
 Raw arrays have no timestamp or revision proof. Build them from observations
 eligible at `as_of`, retain that mapping, and disclose gaps. The skill's
 `point_in_time_data.py` snapshot workflow (`data.asof_snapshot`) can help select supplied observations; it
-does not authenticate a provider's availability claims. See its executable
+does not authenticate a provider's availability claims. If publication evidence
+is date-only or required metadata is absent, use the
+[vintage eligibility audit](vintage-eligibility.md), not invented timestamps,
+event dates, currencies or units to force a snapshot. See its executable
 example and reference for that separate schema.
 
 Prompt: “Using these frozen daily log returns available by the declared as-of

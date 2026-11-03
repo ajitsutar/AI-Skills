@@ -1,0 +1,8 @@
+{
+  "event_id": "synthetic-terminal-event",
+  "event_source_ref": "urn:synthetic:terminal-coverage/event",
+  "terminal_return": -0.35,
+  "series_id": null,
+  "series_coverage": "unknown",
+  "coverage_evidence": []
+}

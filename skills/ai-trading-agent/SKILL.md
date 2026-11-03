@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # AI Trading Agent
 
-Package version: **5.5.4 - November 2, 2026**.
+Package version: **5.5.6 - November 3, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -212,6 +212,16 @@ rerank the whole requested universe. A shared cache is not independent acquisiti
 
 For missing historical sessions, former tickers, uncertain index membership or
 publication gaps, use [historical coverage recovery](references/historical-coverage-recovery.md).
+For historical values, restatements and split-adjusted per-share bases, also use
+[vintage eligibility](references/vintage-eligibility.md): bound each exact value
+by its first publication and supersession, then intersect its applicable basis
+dates. A date-only publication or amendment leaves its same-day availability
+unresolved; never invent midnight to satisfy a timestamp-only helper.
+For delistings, use [terminal return coverage](references/terminal-return-coverage.md).
+Preserve the supplied terminal event and include it exactly once. A price series
+ending on the delisting date does not prove the terminal return is embedded:
+require explicit coverage evidence, apply separately only when not embedded,
+and retain unknown coverage or missing terminal values as unresolved.
 Resolve issuer/share-class identity and eligible date ranges before treating a
 provider error as missing history. Keep pure renames separate from mergers,
 reused symbols and financial issuer mappings; report remaining gaps explicitly.

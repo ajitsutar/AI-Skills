@@ -16,6 +16,14 @@ history, semantic analyst extraction and artifact-locked release verification.
 Its capability claims distinguish implemented calculations, tested environments,
 actual host responses, external data coverage and future investment outcomes.
 
+The [vintage eligibility audit](references/vintage-eligibility.md) separates a
+value's first publication, supersession and applicable share/metric basis.
+Date-only release days stay unresolved; a conditional date window does not
+certify historical provider coverage or intraday availability. The separate
+[terminal-return coverage audit](references/terminal-return-coverage.md) requires
+event inclusion evidence before skipping or separately applying a delisting
+return; a final price date alone cannot resolve that decision.
+
 For unspecified stock-discovery requests, use the full U.S. exchange-listed
 stock universe. An applicable explicit user scope overrides this default;
 analyst-news shortlists and incomplete acquisition do not. See

@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-294 examples across 41 workflows, from first-time investing to quantitative research.
+296 examples across 41 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -55,7 +55,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Explicit multi-asset valuation and settlement research](#explicit-multi-asset-valuation-and-settlement-research) | Quant | 5 |
 | [Multi-asset paper accounting and platform evidence](#multi-asset-paper-accounting-and-platform-evidence) | Quant | 5 |
 | [Explicit time-series scenarios and diagnostics](#explicit-time-series-scenarios-and-diagnostics) | Quant | 3 |
-| [Portable quant methods without a backend](#portable-quant-methods-without-a-backend) | Quantitative researcher | 10 |
+| [Portable quant methods without a backend](#portable-quant-methods-without-a-backend) | Quantitative researcher | 12 |
 | [Checked calculations and model comparisons](#checked-calculations-and-model-comparisons) | Intermediate to advanced | 6 |
 | [Compressed historical data and staged portfolio experiments](#compressed-historical-data-and-staged-portfolio-experiments) | Research users and quantitative analysts | 6 |
 | [Historical identity and coverage recovery](#historical-identity-and-coverage-recovery) | Research users and quantitative analysts | 2 |
@@ -1299,7 +1299,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ## Portable quant methods without a backend
 
-**Audience:** Quantitative researcher. Guides: [portable quant](references/portable-quant.md), [costed bar replay](references/costed-bar-replay.md).
+**Audience:** Quantitative researcher. Guides: [portable quant](references/portable-quant.md), [costed bar replay](references/costed-bar-replay.md), [vintage eligibility](references/vintage-eligibility.md), [terminal return coverage](references/terminal-return-coverage.md).
 
 ### 265. Inspect local capability
 
@@ -1307,37 +1307,45 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 266. Select historical revisions
 
-> Use examples/point-in-time-data.json as the format for my supplied observations and run data.asof_snapshot at [AS_OF]. Retain instrument IDs, event and availability timestamps, revision IDs, units, currency and source declarations. Show selected revisions, exclusion counts and hashes; explain that recorded availability and licensing are supplied claims, not independently verified facts.
+> Use examples/point-in-time-data.json as the format for my supplied observations and run data.asof_snapshot at [AS_OF]. Retain instrument IDs, event and availability timestamps, revision IDs, units, currency and source declarations. Show selected revisions, exclusion counts and hashes; explain that recorded availability and licensing are supplied claims, not independently verified facts. Use this timestamp-only route only with source-supported timestamps and metadata; otherwise preserve missing inputs and use the vintage eligibility audit.
 
-### 267. Fit a forecast explicitly
+### 267. Bound historical value eligibility without invented times
+
+> Audit these supplied historical values and revisions using data.vintage_eligibility. For each exact value and basis, retain its source pointer, first publication, next superseding publication, and any explicitly declared inclusive basis start and exclusive basis end. Show dates before first publication, publication and amendment boundary days, and the intervening conditional window. Preserve date-only precision and unknown same-day availability; do not invent timestamps, assume an estimate revision from incompatible provider rows, or certify complete point-in-time research from a conditional window.
+
+### 268. Include a delisting return exactly once
+
+> Audit my supplied delisting event and price/return series with data.terminal_return_coverage. Preserve the terminal return, verify event-specific provider methodology or reconciliation evidence for whether the series already includes it, and separate embedded, not embedded and unknown coverage. Do not infer inclusion from the series ending on the delisting date. Apply the event once when absent, avoid reapplication when included, and leave missing values or unknown coverage unresolved without assuming zero or a total loss. Keep this condition explicit in the final report.
+
+### 269. Fit a forecast explicitly
 
 > Use my frozen observations in the format of examples/portable-quant-arima.json and run portable.arima. Keep the declared as-of time, currency, units, frequency, [p,d,q], trend, forecast steps, maxiter, diagnostic_lags and alpha explicit, with input_basis set to caller_declared_frozen_inputs. Report convergence, residual diagnostics, model-conditional intervals and runtime versions. Preserve failure instead of emitting an unconverged forecast; distinguish fitting from held-out accuracy or profitability.
 
-### 268. Test cointegration
+### 270. Test cointegration
 
 > Run portable.cointegration on my frozen aligned series using examples/portable-quant-cointegration.json as the format. Preserve y0 as dependent and y1 as regressor, their units, frequency, as-of time and currency, and the explicit trend, maxlag, autolag and significance settings. Set input_basis to caller_declared_frozen_inputs. Explain the no-cointegration null, unverified I(1) assumption, directional normalization and multiple-pair testing limits; significance alone does not establish a profitable pairs strategy.
 
-### 269. Price a vanilla option
+### 271. Price a vanilla option
 
 > Run portable.european using examples/portable-quant-european.json as the template for my supplied European call or put. Preserve spot, strike, volatility, flat continuous interest and dividend yields, currency and exact dates; evaluation_date must match the UTC as-of date and day_count must be Actual365Fixed. Report the QuantLib version, value per underlying unit and Greek units, including vega and rho per 1.0 absolute change and theta per year. State the limits for American exercise and discrete dividends.
 
-### 270. Compare named sentiment baseline
+### 272. Compare named sentiment baseline
 
 > Run portable.vader on my supplied English texts using the format in examples/portable-quant-vader.json, with explicit as-of time and currency. Preserve input order and the original neg, neu, pos and compound scores, and record the actual local package version. Explain that lexical tone does not establish entity-specific sentiment, publication timing or a calibrated financial prediction. If VADER is unavailable, retain that failure.
 
-### 271. Paper-test with costs
+### 273. Paper-test with costs
 
 > Run backtest.costed_bars on my frozen document using examples/costed-bar-replay.json as the template. Preserve as_of, currency, asset class, initial cash, quantity step, all bar and signal availability times, spread/slippage/fee basis points, fixed fee, participation and carry-or-cancel policy. Fill only at opens strictly after both the source close and signal availability, using prior available volume as a liquidity proxy. Reconcile partial fills, fees, cash, held position and final pending quantity; do not invent final liquidation or observed liquidity.
 
-### 272. Replay all six portable examples
+### 274. Replay all six portable examples
 
 > Run the unchanged fictional examples/portable-workbench.json through scripts/quant_workbench.py prepare, run and verify. Preserve each job document and the shared contract; save prepared inputs and the first result bundle in new files outside the installed skill folder. Show the outcome of all six operations, hashes and runtime versions, retaining errors and unavailable dependencies. A replayed rejection is not a successful calculation. Explain the examples as method checks, not market history or investment-performance evidence.
 
-### 273. Compare models on the same frozen packet
+### 275. Compare models on the same frozen packet
 
 > Prepare examples/portable-workbench.json once and compare Codex, Muse and Claude on that exact input-only packet and identical prompt, using the same skill candidate in fresh participant contexts. Withhold other participants' answers, accepted answers and correctness feedback. Preserve every first response, error, input hash and runtime version; verify calculations locally after collection. Report correct agreement separately from shared mistakes, interpretation differences and execution limits. Label comparisons exploratory when memory, blinding or environments differ; do not replace a failed attempt.
 
-### 274. Continue when an optional library is missing
+### 276. Continue when an optional library is missing
 
 > Check the requirements of my requested portable operations in this host. When an optional library is missing, preserve the explicit DEPENDENCY_UNAVAILABLE outcome and identify the affected operations. Continue unrelated bundled calculations that can actually run, retaining their inputs and outputs separately. Do not install packages, switch models, substitute another method or contact a backend. Tell me which work remains uncomputed and the local dependency it requires.
 
@@ -1346,27 +1354,27 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate to advanced. Guides: [model alignment hardening](references/model-alignment-hardening.md), [source bound workflow](references/source-bound-workflow.md), [model independent research](references/model-independent-research.md).
 
-### 275. Execute and verify a supplied request
+### 277. Execute and verify a supplied request
 
 > Run [REQUEST.json] through the installed single-command offline workflow in a new private directory. Preserve the original inputs, report actual execution and verification, and build the numerical answer from generated facts. Keep incomplete work and host export limitations explicit.
 
-### 276. Keep sale proceeds distinct from costs
+### 278. Keep sale proceeds distinct from costs
 
 > Using [TRADE REQUEST], calculate gross sale value, transaction costs and net proceeds. Preserve their distinct generated labels, units and result pointers in both the table and final explanation. Do not call costs spendable proceeds.
 
-### 277. Separate selected order from affordable maximum
+### 279. Separate selected order from affordable maximum
 
 > For [ORDER INPUTS], report the selected quantity and its debit and remaining cash separately from the maximum affordable quantity and its own debit and remainder. Distinguish per-share cost rates from aggregate costs.
 
-### 278. Check concentration with an incomplete account
+### 280. Check concentration with an incomplete account
 
 > Using [ACCOUNT INPUTS], distinguish known dollar exposure, known-equity concentration and full-account concentration. Retain numerator and denominator completeness and justify any bound explicitly. If unknown assets could change both, report the concentration as unresolved rather than choosing a bound direction.
 
-### 279. Compare hash scopes before claiming equality
+### 281. Compare hash scopes before claiming equality
 
 > Compare [HASH DESCRIPTORS] using their algorithms, canonicalization and exact object scopes. Do not equate contract identity with full-input identity. Report incompatible scopes, missing metadata and different digests separately.
 
-### 280. Audit execution and export evidence
+### 282. Audit execution and export evidence
 
 > Review [RETAINED RUN RECORDS] without editing them. Separate synthetic historical invocation records, observed current execution, numerical replay and files actually collected. Check active package version consistency and preserve any failure or unavailable export.
 
@@ -1375,27 +1383,27 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Research users and quantitative analysts. Guides: [backtest data storage](references/backtest-data-storage.md), [compact evidence](references/compact-evidence.md), [monthly portfolio validation](references/monthly-portfolio-validation.md).
 
-### 281. Resume a bounded historical download
+### 283. Resume a bounded historical download
 
 > Capture [DATA REQUESTS] in the explicit local storage root [ROOT], keeping immutable compressed responses and source metadata. Set disk and request-size limits. Resume the same frozen run from its completed captures without redownloading them, and report missing or incomplete data separately.
 
-### 282. Opt into portable reuse without stale history
+### 284. Opt into portable reuse without stale history
 
 > I opt into partial fetch using [PORTABLE BUNDLE] and [CURRENT SOURCE CHECKS]. Verify exact provider, security identity, date range, schema and adjustment conventions. Reuse only compatible verified data; refresh affected historical data when revisions or corporate actions invalidate reuse. Preserve original retrieval times and report the actual network and reuse counts.
 
-### 283. Narrow and archive an owned research dataset
+### 285. Narrow and archive an owned research dataset
 
 > From [OWNED DATA ROOT], retain only the historical member keys and benchmarks specified in [SCOPE]. Preserve raw source witnesses, coverage gaps and availability dates. Fully verify a compressed archive before deleting only the explicitly authorized owned expanded files. Keep unrelated files and skill release evidence intact.
 
-### 284. Run a large calculation with compact evidence
+### 286. Run a large calculation with compact evidence
 
 > Execute [SOURCE-BOUND REQUEST] using compact evidence mode in [OUTPUT ROOT]. Keep complete inputs, results and claim pointers recoverable, avoid repeating shared source objects in every report, verify the saved run and compare its numerical results with the equivalent legacy calculation.
 
-### 285. Compare fixed portfolios with changing monthly weights
+### 287. Compare fixed portfolios with changing monthly weights
 
 > Using [DATED PRICE PANEL] and [COMPLETE EXCHANGE CALENDAR], freeze ten candidate stock lists. Change weights monthly using a declared capped inverse-volatility rule, with next-session execution and explicit costs and cash treatment. Screen one year, freeze five finalists before accessing their five-year results, then select two under the same predefined ranking. Keep failed candidates visible and disclose overlapping windows and current-constituent selection bias.
 
-### 286. Check a monthly target rule before accounting
+### 288. Check a monthly target rule before accounting
 
 > Validate [MONTHLY TARGET REQUEST] for fixed composition, sufficient past-only observations, completed month ends and a genuine following execution session. Check the feasibility of stock caps and the pre-fee equity target, then pass supported decisions to native portfolio accounting without changing its cash and fee conventions.
 
@@ -1404,11 +1412,11 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Research users and quantitative analysts. Guides: [historical coverage recovery](references/historical-coverage-recovery.md).
 
-### 287. Repair a historical coverage gap
+### 289. Repair a historical coverage gap
 
 > Repair [DATASET] within [EXPLICIT STORAGE ROOT AND CAP]. Classify missing sessions, ticker renames, reused symbols, corporate events, membership errors and missing filings. Reuse verified source pointers, acquire only needed public evidence, preserve original artifacts, and report before/after gaps on the same denominator without inventing prices or publication times.
 
-### 288. Audit identity-qualified session coverage
+### 290. Audit identity-qualified session coverage
 
 > Run historical_coverage.py on [DECLARED COVERAGE CONTRACT]. Check issuer and share-class identity, dated typed mappings and per-security membership/listing intervals. Retain rejected mappings and missing sessions; distinguish a multi-source union of dates from a usable return series or point-in-time certification.
 
@@ -1417,27 +1425,27 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Investors comparing public disclosures and follower strategies. Guides: [SKILL](subskills/portfolio-following/SKILL.md), [portfolio follower sources](references/portfolio-follower-sources.md), [portfolio disclosure inputs](references/portfolio-disclosure-inputs.md), [portfolio follower calculations](references/portfolio-follower-calculations.md).
 
-### 289. Refresh public investor portfolios on demand
+### 291. Refresh public investor portfolios on demand
 
 > Refresh publicly available allocations for Berkshire, Pelosi-family disclosures, Scion, Pershing Square and other publicly listed Autopilot portfolios. Show holdings dates, publication dates, allocation denominators and unavailable sources; do not create a recurring schedule.
 
-### 290. Model a long-only inverse recommendation sleeve
+### 292. Model a long-only inverse recommendation sleeve
 
 > Using these dated original recommendations and my supplied sleeve budget, build a long-only inverse Cramer proposal. Preserve stale and ambiguous signals, aggregate overlaps, show costs and cash, and distinguish proposed trades from actual orders.
 
-### 291. Compare corrected disclosures without duplicate signals
+### 293. Compare corrected disclosures without duplicate signals
 
 > Compare this newly retrieved disclosure against the previous checkpoint. Identify amendments, withdrawals and new source records without treating the initial baseline as newly executed trades or inventing exact weights from amount ranges.
 
-### 292. Normalize supplied public disclosures
+### 294. Normalize supplied public disclosures
 
 > Normalize [RETAINED 13F FILINGS OR PUBLIC TRANSACTION DISCLOSURES] at [CUTOFF]. Reconcile source value units, cover-page totals, dated security mappings and the disclosed owner or reporting manager. Keep excluded options, unmapped securities, amount ranges and amendments visible; do not infer exact political-trade quantities, personal wealth weights or a complete replacement basket from an incomplete filing.
 
-### 293. Build overlapping follower sleeves
+### 295. Build overlapping follower sleeves
 
 > Using [NORMALIZED PUBLIC DISCLOSURES], [RECONCILED FOLLOWER BASELINES] and [SLEEVE BUDGETS], calculate a long-only USD common-stock target portfolio under my declared weighting, source-age and position-cap rules. Aggregate duplicate securities, retain cap overflow as cash and preserve frozen or unavailable-source holdings. Separate disclosed source allocations from my proposed targets and show issuer overlap across share classes separately.
 
-### 294. Prepare a cash-funded follower rebalance
+### 296. Prepare a cash-funded follower rebalance
 
 > Turn [FOLLOWER TARGETS] into proposals using [RECONCILED HOLDINGS], dated unadjusted quotes, settled cash, pending receivables, fees and quantity increments. Propose selling only shares attributed to the follower scope, including when I own unrelated shares of the same ticker. Fund buys only from spendable settled cash; show deferred trades, rounding cash and estimated unsettled sale proceeds without treating proposals as orders.
 

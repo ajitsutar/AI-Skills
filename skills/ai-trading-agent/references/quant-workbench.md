@@ -138,7 +138,12 @@ For monthly historical selection and allocation studies, use
 [monthly portfolio validation](monthly-portfolio-validation.md) before binding
 `backtest.portfolio`. It also routes supplied historical revision records through
 the implemented `data.asof_snapshot`; no operation named `data.pit_snapshot` is
-provided. Neither operation authenticates historical source availability or
+provided. For source-bound publication and value-basis windows, use
+`data.vintage_eligibility` and [its precision contract](vintage-eligibility.md).
+For delisting-event inclusion use `data.terminal_return_coverage` and its
+[coverage evidence contract](terminal-return-coverage.md); date coincidence is
+not proof that the event is in a price/return series.
+Neither operation authenticates historical source availability or
 reconstructs missing historical AI decisions.
 
 Use retained named helper facts for numeric conclusions they support, preserving

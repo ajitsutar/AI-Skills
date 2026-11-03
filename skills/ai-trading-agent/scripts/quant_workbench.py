@@ -50,6 +50,8 @@ import platform_readiness
 import time_series_toolkit
 import portable_quant
 import point_in_time_data
+import vintage_eligibility
+import terminal_return_coverage
 import costed_bar_replay
 import monthly_experiment
 import research_readiness
@@ -86,6 +88,8 @@ def technical_analysis(request, data_available_at):
 
 
 OPERATIONS = {
+    'data.vintage_eligibility': vintage_eligibility.assess,
+    'data.terminal_return_coverage': terminal_return_coverage.assess,
     'validation.folds': quant_validation.purged_walk_forward,
     'validation.tail': quant_validation.tail_risk,
     'validation.hac': quant_validation.hac_mean,
@@ -229,7 +233,7 @@ MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'equity_cash_comparison.py', 'source_exposure.py', 'technical_toolkit.py',
            'fundamental_toolkit.py', 'sentiment_toolkit.py', 'factor_research.py',
            'derivatives_toolkit.py', 'paper_exchange.py', 'platform_readiness.py', 'time_series_toolkit.py',
-               'portable_quant.py', 'point_in_time_data.py', 'costed_bar_replay.py', 'monthly_experiment.py',
+               'portable_quant.py', 'point_in_time_data.py', 'vintage_eligibility.py', 'terminal_return_coverage.py', 'costed_bar_replay.py', 'monthly_experiment.py',
                'research_contracts.py', 'quant_data_contracts.py', 'research_readiness.py', 'security_master.py',
                'price_refresh.py', 'holdings_ledger.py', 'analyst_adapter.py',
                'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py',

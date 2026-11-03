@@ -1493,7 +1493,9 @@
       "audience": "Quantitative researcher",
       "guides": [
         "references/portable-quant.md",
-        "references/costed-bar-replay.md"
+        "references/costed-bar-replay.md",
+        "references/vintage-eligibility.md",
+        "references/terminal-return-coverage.md"
       ],
       "prompts": [
         {
@@ -1502,7 +1504,15 @@
         },
         {
           "title": "Select historical revisions",
-          "prompt": "Use examples/point-in-time-data.json as the format for my supplied observations and run data.asof_snapshot at [AS_OF]. Retain instrument IDs, event and availability timestamps, revision IDs, units, currency and source declarations. Show selected revisions, exclusion counts and hashes; explain that recorded availability and licensing are supplied claims, not independently verified facts."
+          "prompt": "Use examples/point-in-time-data.json as the format for my supplied observations and run data.asof_snapshot at [AS_OF]. Retain instrument IDs, event and availability timestamps, revision IDs, units, currency and source declarations. Show selected revisions, exclusion counts and hashes; explain that recorded availability and licensing are supplied claims, not independently verified facts. Use this timestamp-only route only with source-supported timestamps and metadata; otherwise preserve missing inputs and use the vintage eligibility audit."
+        },
+        {
+          "title": "Bound historical value eligibility without invented times",
+          "prompt": "Audit these supplied historical values and revisions using data.vintage_eligibility. For each exact value and basis, retain its source pointer, first publication, next superseding publication, and any explicitly declared inclusive basis start and exclusive basis end. Show dates before first publication, publication and amendment boundary days, and the intervening conditional window. Preserve date-only precision and unknown same-day availability; do not invent timestamps, assume an estimate revision from incompatible provider rows, or certify complete point-in-time research from a conditional window."
+        },
+        {
+          "title": "Include a delisting return exactly once",
+          "prompt": "Audit my supplied delisting event and price/return series with data.terminal_return_coverage. Preserve the terminal return, verify event-specific provider methodology or reconciliation evidence for whether the series already includes it, and separate embedded, not embedded and unknown coverage. Do not infer inclusion from the series ending on the delisting date. Apply the event once when absent, avoid reapplication when included, and leave missing values or unknown coverage unresolved without assuming zero or a total loss. Keep this condition explicit in the final report."
         },
         {
           "title": "Fit a forecast explicitly",
