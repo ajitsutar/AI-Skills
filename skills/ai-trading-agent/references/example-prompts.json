@@ -989,6 +989,14 @@
         {
           "title": "Create a clean research handoff",
           "prompt": "Prepare a portable handoff for [CAMPAIGN] with the actual prompt, contract, data, evidence decisions, coverage and hashes. Keep broker credentials, account identifiers and copyrighted full reports out of the shared package."
+        },
+        {
+          "title": "Distinguish archive integrity from source freshness",
+          "prompt": "Audit [SAVED CAMPAIGN] for reuse at [NEW CUTOFF]. Verify its archive bytes, then distinguish that result from actual issuer/release-index checks covering the cutoff. Preserve source_currentness NOT_ASSESSED and primary reuse UNKNOWN where current evidence is missing, even if snapshot values match. Run feasible historical diagnostics through the source-bound workflow with the retained scorer/profile and horizon. Do not describe unchanged primary evidence as revalidated without the check evidence."
+        },
+        {
+          "title": "Save an honestly partial refresh",
+          "prompt": "Save the feasible work from [PARTIAL REFRESH] as a new archive linked to its parent manifest. Keep original source publication and retrieval times, separately record the archive time and any actual new checks, and retain gaps for primary-source currency, prices, news, membership and event coverage. Preserve the saved campaign method and holding period unless I change them. Do not relabel an archive timestamp or a successful historical rerank as fresh acquisition."
         }
       ]
     },

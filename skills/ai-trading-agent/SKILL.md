@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # AI Trading Agent
 
-Package version: **5.5.6 - November 3, 2026**.
+Package version: **5.5.7 - November 4, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -133,6 +133,11 @@ For explicit workbench requests, prefer the single offline `research_workflow.py
 command and its generated answer facts and completion record; see
 [checked answers across model hosts](references/model-alignment-hardening.md).
 Keep generated metric labels, scenario scopes and evidence states in the answer.
+
+For saved-campaign refreshes, read [research memory](references/research-memory.md).
+Verified archive bytes or unchanged snapshot fields do not establish current
+primary-source revalidation. Carry missing source checks into the final answer;
+historical replay and new-cutoff freshness are separate results.
 
 Use the [source-bound workflow](references/source-bound-workflow.md) for supported
 numerical work. Start with its `prepare` command when the inputs already form an

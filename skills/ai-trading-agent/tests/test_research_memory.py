@@ -61,6 +61,58 @@ class ResearchMemoryTests(unittest.TestCase):
         with self.assertRaises(ValueError):
             verify(self.root, manifest)
 
+    def test_unchanged_bytes_never_establish_source_currentness(self):
+        manifest = seal(self.root, self.catalog)
+        original = copy.deepcopy(manifest)
+        for result in (verify(self.root, manifest),
+                       refresh_plan(self.root, manifest, '2026-10-12T20:00:00Z',
+                                    'P1M', 'CUSTOM')):
+            scope = result['evidence_scope']
+            self.assertEqual(scope['archive_integrity'], 'VERIFIED')
+            self.assertEqual(scope['source_currentness'], 'NOT_ASSESSED')
+            self.assertEqual(scope['primary_reuse_eligibility'], 'UNKNOWN')
+            self.assertIs(scope['current_source_checks_performed'], False)
+            self.assertIs(scope['numerical_replay_performed'], False)
+        self.assertEqual(manifest, original)
+
+    def test_embedded_freshness_claims_do_not_become_verified_checks(self):
+        self.catalog['artifacts'][0].update(
+            source_currentness='VERIFIED', primary_reuse_eligibility='ELIGIBLE',
+            current_source_checks_performed=True)
+        manifest = seal(self.root, self.catalog)
+        self.assertTrue(manifest['artifacts'][0]['current_source_checks_performed'])
+        result = verify(self.root, manifest)
+        self.assertFalse(result['evidence_scope']['current_source_checks_performed'])
+        self.assertEqual(result['evidence_scope']['source_currentness'], 'NOT_ASSESSED')
+
+    def test_snapshot_only_inventory_still_cannot_establish_primary_reuse(self):
+        for kind in ('snapshot', 'result', 'filing', 'review'):
+            with self.subTest(kind=kind):
+                self.catalog['artifacts'][0]['kind'] = kind
+                manifest = seal(self.root, self.catalog)
+                plan = refresh_plan(self.root, manifest, '2026-10-12T20:00:00Z',
+                                    'P1M', 'CUSTOM')
+                self.assertEqual(plan['evidence_scope']['primary_reuse_eligibility'],
+                                 'UNKNOWN')
+                self.assertFalse(plan['planned_actions_completed'])
+                self.assertFalse(plan['automatic_download_performed'])
+                self.assertFalse(plan['context_changed'])
+
+    def test_partial_archive_keeps_source_time_without_claiming_freshness(self):
+        parent = seal(self.root, self.catalog)
+        partial = copy.deepcopy(self.catalog)
+        partial.update(run_id='partial-refresh', as_of='2026-10-12T20:00:00Z')
+        partial['artifacts'][0].update(parent_manifest_sha256=parent['manifest_sha256'],
+                                       refresh_status='PARTIAL')
+        current = seal(self.root, partial)
+        self.assertEqual(current['artifacts'][0]['as_of'],
+                         parent['artifacts'][0]['as_of'])
+        self.assertNotEqual(current['as_of'], parent['as_of'])
+        self.assertEqual(current['artifacts'][0]['parent_manifest_sha256'],
+                         parent['manifest_sha256'])
+        self.assertEqual(verify(self.root, current)['evidence_scope']['source_currentness'],
+                         'NOT_ASSESSED')
+
 
 if __name__ == '__main__':
     unittest.main()

@@ -72,6 +72,16 @@ def seal(root, catalog):
     return {**document, 'manifest_sha256': digest(document)}
 
 
+def evidence_scope():
+    # This helper examines archive bytes only. Even a current-looking catalog or
+    # an embedded check label cannot establish a new issuer/source-index check.
+    return {'archive_integrity': 'VERIFIED',
+            'source_currentness': 'NOT_ASSESSED',
+            'primary_reuse_eligibility': 'UNKNOWN',
+            'current_source_checks_performed': False,
+            'numerical_replay_performed': False}
+
+
 def verify(root, manifest):
     document = {k: v for k, v in manifest.items() if k != 'manifest_sha256'}
     if manifest.get('schema_version') != 1 or digest(document) != manifest.get('manifest_sha256'):
@@ -80,7 +90,8 @@ def verify(root, manifest):
     if rebuilt != manifest:
         raise ValueError('Archived bytes changed')
     return {'status': 'ARCHIVE_BYTES_MATCH', 'files': len(manifest['artifacts']),
-            'manifest_sha256': manifest['manifest_sha256'], 'execution_authorized': False}
+            'manifest_sha256': manifest['manifest_sha256'],
+            'evidence_scope': evidence_scope(), 'execution_authorized': False}
 
 
 def refresh_plan(root, manifest, as_of, hold, universe):
@@ -104,6 +115,8 @@ def refresh_plan(root, manifest, as_of, hold, universe):
             'parent_manifest_sha256': manifest['manifest_sha256'], 'as_of': as_of,
             'hold': hold, 'universe': universe,
             'context_changed': hold != manifest['hold'] or universe != manifest['universe'],
+            'evidence_scope': evidence_scope(),
+            'planned_actions_completed': False,
             'artifacts': [{**item, 'action': actions[item['kind']][0],
                            'reason': actions[item['kind']][1]} for item in manifest['artifacts']],
             'automatic_download_performed': False, 'execution_authorized': False}

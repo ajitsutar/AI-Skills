@@ -1,5 +1,10 @@
 # AI Trading Agent
 
+Saved-research [verification and refresh planning](references/research-memory.md)
+separate archive integrity from primary-source freshness. Matching hashes or
+unchanged snapshot values permit historical replay, but do not establish a
+current issuer/release check or completion of a new-cutoff refresh.
+
 The [portfolio-following subskill](subskills/portfolio-following/SKILL.md) refreshes
 public investor disclosures on demand, normalizes supplied source records, and
 calculates follower targets and cash-funded buy/sell proposals. Its public source
