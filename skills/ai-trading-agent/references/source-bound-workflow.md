@@ -140,6 +140,15 @@ object must satisfy the helper's schema. Defaults come from the installed helper
 A chosen scenario instead uses
 `{"$assumption": 0.01, "reason": "Analyst-proposed slippage scenario"}`.
 Assumptions remain visible and do not become observed data.
+For a derived financial observation, a formula written in an assumption reason is
+not execution evidence. Bind the raw operands and use the supported calculation:
+[fundamental ratios](fundamental-toolkit.md#derived-observed-inputs) can compute
+midpoint balances and revenue-minus-gross-profit directly. Keep their derivation
+output and source bindings, and reconcile intermediate and final narrative
+numbers. Where no supported operation exists, retain the executed local
+calculation and bind its output as a derived source rather than disguising it as
+an observed value or forecast assumption. The workflow does not parse assumption
+reasons or certify arithmetic described in prose.
 
 Use `quant_workbench.py operations` and the calculation guide for exact arguments.
 `ranking.route`, `ranking.replay` and `ranking.compare` bind retained profile

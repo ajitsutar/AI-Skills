@@ -36,10 +36,60 @@ def result(operation, **values):
     return {'operation': operation, 'status': 'COMPUTED', 'forecast_basis': 'supplied_inputs_only', **values}
 
 
+def ratio_input_derivations(document):
+    """Resolve optional raw operands; retain arithmetic, not source verification."""
+    d = copy.deepcopy(document)
+    derivations, errors, basis = {}, {}, {}
+    specifications = {
+        'average_assets': ('opening_assets', 'closing_assets', 'arithmetic_midpoint'),
+        'average_equity': ('opening_equity', 'closing_equity', 'arithmetic_midpoint'),
+        'average_invested_capital': ('opening_invested_capital', 'closing_invested_capital', 'arithmetic_midpoint'),
+        'cogs': ('revenue', 'gross_profit', 'revenue_minus_gross_profit'),
+    }
+    for target, (first, last, method) in specifications.items():
+        requested = last in d if target == 'cogs' else first in d or last in d
+        if not requested:
+            if target in d:
+                basis[target] = 'supplied_value; derivation_not_verified'
+            continue
+        record = {'method': method, 'input_fields': [first, last],
+                  'source_basis_status': 'NOT_VERIFIED',
+                  'limitation': 'Arithmetic from supplied operands; caller must establish matching entity, units and period boundaries. ' +
+                  ('A midpoint is not a time-weighted average.' if method == 'arithmetic_midpoint' else
+                   'Revenue less gross profit is a residual calculation, not independently verified COGS.')}
+        try:
+            a = number(d, first, minimum=0 if target in ('average_assets', 'cogs') else None)
+            b = number(d, last, minimum=0 if target == 'average_assets' else None)
+            # Halving first avoids overflowing the sum of two finite endpoints.
+            value = a / 2 + b / 2 if method == 'arithmetic_midpoint' else a - b
+            if not math.isfinite(value):
+                raise ValueError('NONFINITE_DERIVED_INPUT: ' + target)
+            if target == 'cogs' and value < 0:
+                raise ValueError('NEGATIVE_DERIVED_COGS')
+            record.update(status='COMPUTED', operands={first: a, last: b}, value=value)
+        except ValueError as exc:
+            errors[target] = str(exc)
+            record.update(status='UNAVAILABLE', value=None, reason=str(exc))
+            d.pop(target, None)  # A partial declared derivation cannot silently use a fallback.
+        else:
+            if target in d and not math.isclose(number(d, target), value, rel_tol=1e-9, abs_tol=1e-9):
+                raise ValueError('CONFLICTING_DERIVED_INPUT: ' + target)
+            if target in d:
+                record['supplied_value_comparison'] = 'MATCH_WITHIN_TOLERANCE'
+            d[target] = value
+            basis[target] = method + '; source_compatibility_not_verified'
+        derivations[target] = record
+    return d, derivations, errors, basis
+
+
 def ratios(d):
     """Each ratio independently reports missing inputs or invalid economic domains."""
+    d, derivations, derivation_errors, input_basis = ratio_input_derivations(d)
     nonnegative={'current_assets','current_liabilities','cash','marketable_securities','receivables','interest_expense','revenue','cogs','average_assets'}
-    n = lambda k: number(d, k, minimum=0 if k in nonnegative else None)
+    def n(k):
+        if k in derivation_errors:
+            raise ValueError('DERIVATION_UNAVAILABLE: ' + k + ': ' + derivation_errors[k])
+        return number(d, k, minimum=0 if k in nonnegative else None)
     formulas = {
         'roic': lambda: ratio(n('ebit') * (1-fraction(d, 'tax_rate')), n('average_invested_capital'), 'invested capital'),
         'current_ratio': lambda: ratio(n('current_assets'), n('current_liabilities'), 'current liabilities'),
@@ -78,7 +128,8 @@ def ratios(d):
         values['dupont_roe'] = values['net_margin'] * values['asset_turnover'] * values['equity_multiplier']
     else:
         values['dupont_roe'] = None
-    return result('ratios', ratios=values, unavailable=unavailable, status='PARTIAL' if unavailable else 'COMPUTED')
+    return result('ratios', ratios=values, unavailable=unavailable, status='PARTIAL' if unavailable else 'COMPUTED',
+                  input_derivations=derivations, derived_input_basis=input_basis)
 
 
 def applicability(d, allowed):
@@ -338,6 +389,7 @@ OPERATIONS={'ratios':ratios,'piotroski':piotroski,'altman':altman,'beneish':bene
 
 
 RATIO_FIELDS=set('ebit tax_rate average_invested_capital current_assets current_liabilities cash marketable_securities receivables interest_expense revenue cogs net_income average_assets average_equity cfo capex debt equity price eps eps_growth_rate'.split())
+RATIO_FIELDS.update('opening_assets closing_assets opening_equity closing_equity opening_invested_capital closing_invested_capital gross_profit'.split())
 DCF_FIELDS=set('cash_flow_type discount_rate_basis discount_rate terminal_growth annual_cash_flows terminal_next_cash_flow shares equity_bridge'.split())
 PIOTROSKI_PERIOD_FIELDS=set('beginning_assets assets income_before_extraordinary cfo long_term_debt current_assets current_liabilities sales cogs'.split())
 BENEISH_PERIOD_FIELDS=set('sales cogs receivables current_assets net_ppe assets depreciation depreciation_amortization sga current_liabilities long_term_debt cash current_maturities_ltd tax_payable'.split())

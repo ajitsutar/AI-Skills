@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # AI Trading Agent
 
-Package version: **5.5.7 - November 4, 2026**.
+Package version: **5.5.10 - November 5, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -276,6 +276,9 @@ When the supplied financial observations are not already normalized, map them
 explicitly with `data.normalize_flows` and [flow-normalization.md](references/flow-normalization.md).
 Run the installed normalizer; do not treat a missing input envelope as missing
 financial evidence or create a separate model-written TTM calculation.
+For statement education/comparisons, follow the [financial evidence and derivation contract](references/fundamental-toolkit.md#financial-statement-evidence).
+Preserve EPS period/numerator basis and comparator provenance; do not infer SBC issuance or covenant definitions. Use supported `fundamental.calculate` ratios and raw opening/closing or gross-profit operands.
+Derived observations are executed calculations, not assumptions. Retain source bindings and derived results, and reconcile intermediate inputs and every final narrative metric. Historical trend claims need a separate same-metric current/prior evidence row, including in the conclusion.
 
 Sources are open: SEC, issuer filings and releases, accessible finance publishers,
 market-data providers and configured paid services. Yahoo is one adapter, not a

@@ -346,6 +346,13 @@ The [analysis contracts](references/analysis-contracts.md) route reproducible of
   SVG charts and costed next-bar replay. Supplied market-depth snapshots are not a live feed.
 - [Fundamental](references/fundamental-toolkit.md): ratios and accounting screens, reconciled
   simplified forecasts, FCFF/FCFE DCF, reverse DCF, DDM, residual income, SOTP and seeded scenarios.
+  Financial-statement explanations retain period-weighted EPS evidence, separate SBC
+  expense from evidenced share issuance, and distinguish analytical leverage from
+  contractual covenant definitions; see the [statement evidence contract](references/fundamental-toolkit.md#financial-statement-evidence).
+  Ratios can derive midpoint balance denominators and COGS from separately bound
+  raw operands, retaining the calculation instead of relying on a typed average.
+  Historical financial trends also retain separate current/prior evidence for
+  each metric; conclusions cannot infer profit or cash growth from another measure.
 - [Sentiment](references/sentiment-toolkit.md): entity/aspect evidence, weighted time decay,
   duplicate review, polarity trends, calibration and causal costed replay. An optional pinned
   local transformer adapter requires separately permitted model weights and dependencies.

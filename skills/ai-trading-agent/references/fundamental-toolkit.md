@@ -14,9 +14,147 @@ The `run`/CLI boundary enforces operation-specific and nested schemas. Every lis
 
 Before use, retain source dates, filing periods, accounting basis, restatements, unit conversions and forecast rationale with the job. Inputs must be known as of the research date. Never treat a forward assumption as an observed filing value. Annual periods must be consecutive, comparable in duration and on a consistent consolidated basis. This toolkit accepts the declared comparability; it cannot independently verify source authenticity.
 
+## Financial-statement evidence
+
+Use this contract when explaining statements or comparing per-share and leverage
+metrics. Continue useful supported calculations when another claim lacks evidence;
+these are interpretation boundaries, not execution or broker gates.
+
+- **Earnings per share:** retain the income period, amount scale, numerator
+  attribution and basic/diluted denominator basis. Reported EPS uses the applicable
+  period-weighted share basis and earnings adjustments under the issuer's reporting
+  framework. A dated outstanding share count, even when labeled diluted, does not
+  establish that period-weighted basis. Earnings divided by that count may be shown
+  as an explicitly labeled illustrative per-share ratio, with its date and
+  limitation; do not call it reported/basic/diluted EPS. Do not manufacture
+  `gaap_parent` or another accounting label to satisfy a helper: zero preferred
+  equity or noncontrolling-interest balances do not prove period income
+  attribution, preferred dividends or the reporting framework. Missing numerator
+  or denominator evidence stays unknown. [IAS 33 overview](https://www.ifrs.org/issued-standards/list-of-standards/ias-33-earnings-per-share.html/)
+  explains period weighting for IFRS EPS; citing it does not establish that a
+  particular issuer reports under IFRS.
+- **Stock compensation and shares:** distinguish the supplied period's SBC expense
+  and any noncash CFO addback from issuance, vesting, exercise, repurchase and
+  dilution observations. A change between two share counts does not establish how
+  much came from that expense or when it occurred. Attribute share changes only to
+  a supporting share/award rollforward. CFO less capex retains any SBC addback;
+  a separate SBC deduction is an economic proxy, not cash paid or measured dilution.
+- **Leverage and covenants:** label the exact arithmetic (for example debt / (EBIT + supplied
+  depreciation and amortization)) as an analytical proxy.
+  Contractual debt, netting, EBITDA adjustments, test dates and permitted addbacks
+  come from the covenant evidence. A numerical threshold alone does not define
+  its numerator or denominator; do not claim compliance/headroom by substituting
+  an analyst's ratio when the contractual definition is missing.
+- **Comparators:** preserve each operand's own source, date, units, earnings/share
+  basis and coverage. Do not copy a computed price-times-shares denominator or its
+  dates onto a separately supplied market capitalization to force compatibility.
+  A helper's `CHECKED` result checks supplied declarations, not whether those
+  declarations were evidenced. Report unresolved basis mismatches instead of an
+  unqualified reconciliation.
+
+### Per-metric trend evidence at final authoring
+
+For each retrospective financial claim such as increased, declined, improved,
+weakened or recovered, retain a compact evidence row before writing that claim.
+The row can be in the private working notes or report; it is an authoring check,
+not a new helper schema, investment gate or assertion that software verified prose.
+
+| Field | Evidence to retain for that specific metric |
+|---|---|
+| Metric and scope | Exact measure and entity/consolidation scope; distinguish total amounts, margins, per-share values and cash balances/flows. |
+| Current operand | Numeric value, period or observation date, unit/basis and its source or computed-result pointer. |
+| Prior operand | Numeric value for the same measure and scope, comparison period/date, unit/basis and its own pointer. |
+| Comparability | Compatible period lengths, currency/scale, accounting definitions and any restatement or stated normalization; preserve unresolved differences. |
+| Executed comparison | Retained calculation/formula, actual current-minus-prior result and any valid percentage-change denominator, with result location. |
+| Permitted wording | Increase/decrease/unchanged only as supported by the comparison; otherwise current level only and historical direction unknown. |
+
+Keep a distinct row for each metric mentioned, including a composite sentence.
+Revenue growth, a change in share count, an asset balance or a current-period
+margin does not establish historical growth in earnings, operating cash flow,
+free cash flow or another metric. Nor does one positive current value establish
+an improvement. Do not borrow a prior operand from a related metric, assume a
+missing prior value is zero, or convert a missing comparison into an assertion
+that the metric was unchanged.
+
+When both comparable operands are available, calculate their difference from the
+retained values. Distinguish that directional change from an economic-quality
+judgment: an increase in expenses or debt is not automatically an improvement.
+A negative or zero prior denominator may make a conventional percentage-growth
+claim misleading or undefined; retain the absolute change and explain the
+chosen convention rather than manufacturing a rate.
+
+Before submitting, check every historical-direction phrase in headings, tables,
+explanatory paragraphs and the final summary against its own evidence row and
+actual calculation result. A conclusion must not add a trend that the body could
+not establish. If a prior operand or its comparability is missing, omit that
+metric's directional summary and state its supported current level or that its
+historical direction is unknown. This does not block discussion of other metrics
+whose comparisons are supported. Clearly conditional forecasts and explicitly
+labeled hypothetical scenarios stay separate from retrospective observations.
+
+### Supported statement calculations
+
+`fundamental.calculate` is a bundled workbench operation. Its `inputs.d`
+contains a fundamental-toolkit request, with `operation: ratios`, `currency`,
+`amount_unit` and the available supported fields. It computes gross/operating/net
+margins, EBIT interest coverage, liquidity, ROIC/ROE, turnover, FCF, debt/equity and
+PEG where their inputs suffice. Missing components remain individually unavailable;
+this does not mean the entire ratios operation is absent. PEG consumes supplied
+EPS; it does not derive or verify reported EPS from share counts. The existing
+`financial.owner_cash_bridge` separates reported CFO, capex, declared SBC and
+cash adjustments. Use the source-bound workflow for these supported jobs and
+retain source metadata beside strict-schema numerical inputs. Unsupported
+illustrative arithmetic should be labeled with its formula and limitations,
+without relabeling it as a bundled operation or a verified reporting measure.
+
+### Derived observed inputs
+
+An average balance or residual cost derived from supplied observations is a
+calculation, not a forecast assumption. Bind each raw operand independently with
+`$source` in the source-bound workflow. Do not enter a mentally calculated value
+as `$assumption` with a formula in its reason. For supported ratio derivations,
+pass the raw fields below to `fundamental.calculate` using `inputs.d`; the helper
+computes and retains `input_derivations` with method, operands, value and status.
+The binding receipt carries the original file hashes and pointers. Before the
+final explanation, reconcile both intermediate values and every downstream metric
+with those retained results, including numbers added outside the main table.
+
+- `opening_assets` and `closing_assets` compute `average_assets` as the arithmetic
+  midpoint. Equivalent pairs `opening_equity` / `closing_equity` and
+  `opening_invested_capital` / `closing_invested_capital` supply their averages.
+  Bind the intended period endpoints in consistent units and entity scope. A
+  two-point midpoint is a declared approximation, not a time-weighted mean or
+  automatically the right average for every ratio.
+- `revenue` and `gross_profit` compute `cogs = revenue - gross_profit` when gross
+  profit is supplied. Confirm matched period, reporting scope and units before
+  interpreting this residual as cost of goods sold.
+- A pair must be complete. Missing, nonnumeric, boolean or nonfinite operands
+  leave dependent ratios unavailable while unrelated ratios still run. Assets
+  must be nonnegative; signed equity and invested capital are retained, but
+  nonpositive average denominators remain unavailable for their ratios.
+- Supplying both a complete derivation and its result is a consistency check:
+  a mismatch beyond absolute/relative tolerance `1e-9` rejects the request.
+  A matching supplied result uses the executed calculation, without intermediate
+  rounding. A partial/invalid declared pair does not fall back to a supplied
+  average or COGS; the affected derived input stays unavailable. Remove that
+  incomplete route only if independently supplied input is actually the intended
+  evidence and disclose its basis.
+- Legacy `average_assets`, `average_equity`, `average_invested_capital` and `cogs`
+  remain supported without raw operand fields. `derived_input_basis` labels them
+  supplied values whose derivation was not verified. This does not invalidate a
+  genuinely sourced average; it prevents implying that the helper recomputed it.
+  Arithmetic success never verifies source authenticity or period comparability.
+
+For other derived financial inputs, use an existing supported calculation where
+available. Otherwise retain a reproducible local calculation from the separately
+bound raw operands and its formula/output, then bind that output as a derived
+source with its limitations. Distinguish this evidence from original observations
+and from actual scenario assumptions; do not describe an unexecuted formula as a
+verified calculation. This guidance adds no global execution gate.
+
 ## Ratios and accounting screens
 
-`ratios`: accepts any subset of `ebit, tax_rate, average_invested_capital, current_assets, current_liabilities, cash, marketable_securities, receivables, interest_expense, revenue, cogs, net_income, average_assets, average_equity, cfo, capex, debt, equity, price, eps, eps_growth_rate`. ROIC uses EBIT after supplied tax divided by average invested capital. Quick assets are cash + marketable securities + receivables (no inventory/prepayments). DuPont uses net margin × turnover × equity multiplier, all with consistent averages. PEG uses P/E divided by EPS growth in percentage points; positive EPS and growth required. Zero interest coverage denominators are unavailable, not infinity. Negative earnings remain negative. Sector interpretation is the caller's responsibility; these are not bank/REIT scorecards.
+`ratios`: accepts the optional raw-operand fields above and any subset of `ebit, tax_rate, average_invested_capital, current_assets, current_liabilities, cash, marketable_securities, receivables, interest_expense, revenue, cogs, net_income, average_assets, average_equity, cfo, capex, debt, equity, price, eps, eps_growth_rate`. ROIC uses EBIT after supplied tax divided by average invested capital. Quick assets are cash + marketable securities + receivables (no inventory/prepayments). DuPont uses net margin × turnover × equity multiplier, all with consistent averages. PEG uses P/E divided by EPS growth in percentage points; positive EPS and growth required. Zero interest coverage denominators are unavailable, not infinity. Negative earnings remain negative. Sector interpretation is the caller's responsibility; these are not bank/REIT scorecards.
 
 For liquidity ratios, cash, marketable securities and receivables must be current assets on the same reporting/consolidation basis. If any known nonnegative subset of these components already exceeds supplied total current assets beyond relative/absolute tolerance `1e-9`, current and quick ratios become unavailable with an inconsistency reason. Unrelated margin/profitability calculations remain available when their own inputs support them. Missing components are not filled with zero. Piotroski likewise rejects current assets above total assets.
 

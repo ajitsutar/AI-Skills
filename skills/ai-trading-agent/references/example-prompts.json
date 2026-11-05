@@ -37,7 +37,8 @@
       "guides": [
         "references/personal-setup.md",
         "references/small-account-research.md",
-        "references/portfolio-decision-calculations.md"
+        "references/portfolio-decision-calculations.md",
+        "references/fundamental-toolkit.md"
       ],
       "prompts": [
         {
@@ -67,6 +68,18 @@
         {
           "title": "Run the fictional exercises",
           "prompt": "Run the bundled learning exercises and explain the resulting analytical findings. Separate fictional investment numbers, software behavior and evidence that would be needed for real investing."
+        },
+        {
+          "title": "Explain statements without inventing reporting bases",
+          "prompt": "Explain [SOURCE-BOUND FINANCIAL STATEMENTS] using supported fundamental.calculate ratios and the owner-cash bridge. Distinguish period earnings and weighted-average EPS evidence from dated share counts, SBC expense and CFO addbacks from evidenced share issuance, and analytical leverage from covenant-defined measures. Preserve each comparator's own dates and basis; label illustrative arithmetic and unresolved reporting or covenant definitions explicitly."
+        },
+        {
+          "title": "Calculate statement ratios from raw balance operands",
+          "prompt": "Use [SOURCE-BOUND STATEMENTS] to calculate supported ratios. Bind opening and closing assets, equity and invested capital separately, and use reported revenue and gross profit where COGS is derived. Retain executed midpoint and residual calculations, their source pointers, period conventions and unavailable inputs. Reconcile the intermediate denominators and every final ratio; do not enter a calculated observation as a forecast assumption."
+        },
+        {
+          "title": "Check each financial trend before summarizing",
+          "prompt": "Explain [DATED FINANCIAL STATEMENTS] and retain a per-metric trend evidence table with current and prior values, periods, units, source pointers and executed differences. Separate revenue, earnings, margins, per-share results and cash flow. Check every retrospective directional statement in the conclusion against its own comparison; where prior evidence is missing, report the supported current level and unknown historical direction."
         }
       ]
     },
