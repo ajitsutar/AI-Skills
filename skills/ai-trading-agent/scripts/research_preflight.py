@@ -8,6 +8,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITY_FILES = {
+    'execution_policy': ['scripts/execution_policy.py', 'scripts/execution_mode.py',
+                         'templates/execution-policy.example.json',
+                         'references/execution-modes.md'],
     'public_portfolio_following': ['scripts/portfolio_follower.py', 'scripts/portfolio_disclosures.py',
                                   'profiles/portfolio-followers-v1.json',
                                   'subskills/portfolio-following/SKILL.md',

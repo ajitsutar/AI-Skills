@@ -1,4 +1,4 @@
-"""Validate legacy personal-policy fixtures for optional research calculations.
+"""Validate personal-policy research fields separately from execution mode.
 
 These scenario fields are not prerequisites for native host/broker execution.
 """
@@ -20,8 +20,8 @@ def validate_personal_fields(policy):
     if set(requirements["garch_by_sleeve"]) != set(policy["sleeves"]) or any(
             type(v) is not bool for v in requirements["garch_by_sleeve"].values()):
         raise ValueError("GARCH requirement must be explicit for each sleeve")
-    if set(requirements["strategy_validation_required_modes"]) != {"approval", "bounded_autonomous"}:
-        raise ValueError("Live tactical modes require retained strategy validation")
+    if set(requirements["strategy_validation_required_modes"]) != {"approval", "autonomous"}:
+        raise ValueError("Analytical strategy-validation mode set must be approval and autonomous")
     for field in ("stress_loss_fraction", "portfolio_annualized_volatility"):
         if not 0 < dec(policy["limits"][field]) <= 1:
             raise ValueError("Invalid personal portfolio risk cap")

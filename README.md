@@ -28,12 +28,16 @@ Offline run/report helpers connect explicit quant jobs and separate analyst coho
 to those reports, while advisory payload receipts expose order-instruction changes.
 Source selection and surrounding narrative still require review.
 
-Its optional [autonomous mode](skills/ai-trading-agent/references/execution-modes.md)
-uses rules and standing instructions from the user's prompts. On a permitted host
-such as Muse, it directs in-scope orders through native broker tools without an
-additional skill-created per-order ask. Host permissions, approvals, scheduling,
-authentication and order management remain external; the skill adds no backend.
-The optional local planner describes the instructions and does not submit orders.
+Its [execution policy](skills/ai-trading-agent/references/execution-modes.md)
+is separate for each task, including each scheduled task, and defaults to `paper`.
+There is no global execution policy. Each private file binds the actual task ID;
+only an explicit user request changes that task's saved mode to `paper`,
+`approval` or `autonomous`. Prompts define its work and rules, with clarification
+when needed. Changing one task does not change another or a new task's default.
+On a permitted host such as Muse, an autonomous task uses native broker tools for
+in-scope standing instructions without an extra per-order ask. Host permissions,
+confirmations, scheduling and authentication still apply. The skill has no backend;
+local policy helpers neither start a schedule nor submit orders.
 
 Read its [current capabilities and setup](skills/ai-trading-agent/README.md)
 or explore the [prompt catalog for investors, traders and quants](skills/ai-trading-agent/EXAMPLE-PROMPTS.md).

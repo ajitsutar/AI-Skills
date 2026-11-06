@@ -1,12 +1,14 @@
 # AI Trading Agent
 
-[Autonomous mode](references/execution-modes.md) directs a permitted host such as
-Muse to carry out prompt-authorized orders through its native broker tools without
-an additional per-order ask. Your prompts define fixed rules, delegated judgment,
-limits and changes; no separate configuration or rule engine is required. The
-host supplies scheduling, authentication and order management. The skill adds no
-backend or broker permissions. Its optional Python planner is descriptive only
-and must not be mistaken for the host execution workflow.
+[Execution policy](references/execution-modes.md) selects `paper`, `approval` or
+`autonomous` in a separate persistent JSON file for each task, including each
+scheduled task. New task policies default to `paper`; no global policy applies.
+Each file is bound to the current task's stable `task_id`. Only an explicit user
+instruction changes that task's saved mode; other tasks remain unchanged. Prompts define tasks, rules and limits; the
+model may clarify missing intent but cannot silently change the policy mode.
+On a permitted Muse host, `autonomous` carries out in-scope orders under standing
+authority without an extra per-order ask. `approval` requires order approval;
+`paper` stays simulated. The host supplies broker tools, scheduling and permissions.
 
 Saved-research [verification and refresh planning](references/research-memory.md)
 separate archive integrity from primary-source freshness. Matching hashes or
@@ -86,11 +88,10 @@ portfolio analysis and quantitative work across arbitrary holding periods. It
 combines public evidence with replayable calculations and hands requested trades
 to the host's available broker tools.
 
-**The skill has no execution gates.** Research findings and risk diagnostics are
-advisory. It does not require a local policy, grant, ticket, strategy promotion,
-volatility/spread/funding test, supervised lease or repeated approval. Actual host,
-platform and broker requirements remain external; existing user instructions carry
-forward instead of triggering another skill approval.
+Research diagnostics and payload formatting remain advisory. They do not require
+an execution policy or add numerical risk gates, grants or tickets. Actual host
+execution separately follows the selected policy mode and the user's instructions.
+A configured mode is not proof of host permissions or an active monitoring job.
 
 Start with [example prompts](EXAMPLE-PROMPTS.md), [installation](INSTALL.md), or
 [agent instructions](SKILL.md). Research can cover investments beyond any one
@@ -291,7 +292,7 @@ personal recommendations or default constraints on the user's orders.
 
 `scripts/execution_handoff.py` preserves a supplied instruction/payload and advisory
 findings for the host. It performs no broker call and requires no local approval
-record or risk clearance. The host uses its real broker tools and existing user
+record or risk clearance. The host uses its real broker tools, selected policy mode and existing user
 instructions. A recommendation-only request is still a recommendation-only request.
 Market execution is the default handoff preference when the user requests a buy
 without specifying an order type; preserve explicit limit instructions.

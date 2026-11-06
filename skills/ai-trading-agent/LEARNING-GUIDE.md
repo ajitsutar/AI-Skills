@@ -8,9 +8,17 @@ dependencies described in [INSTALL.md](INSTALL.md) before numerical exercises.
 
 The skill turns the user's research question and supplied inputs into evidence,
 calculations, recommendations and an optional broker handoff. Research diagnostics
-are advisory. The skill imposes no execution gates, policies, grants or journals
-that must be completed before an order. Actual broker and platform requirements
-remain external. A local handoff is a proposed payload, not a submission or fill.
+are advisory; research and pure payload formatting need no execution-policy setup,
+grants or order journals. Each scheduled task has its own persistent policy bound
+to its actual task ID, defaulting to `paper`; there is no global policy or inherited
+mode. Host execution verifies that task binding and re-reads the task's saved
+policy: `paper` simulates, `approval` requires approval for the particular order,
+and `autonomous` uses in-scope standing instructions without another per-order ask.
+Only an explicit user request changes that task's mode. Prompts supply rules but
+do not override it; clarify missing intent without changing policy. Initializing
+a task preserves its valid existing policy instead of resetting it. Actual broker
+and platform requirements remain external. A local handoff is not a submission or fill. See
+[execution policy](references/execution-modes.md).
 
 ## 2. Run the short demo
 

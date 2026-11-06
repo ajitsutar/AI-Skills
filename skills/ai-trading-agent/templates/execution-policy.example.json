@@ -1,0 +1,6 @@
+{
+  "schema_version": 1,
+  "mode": "paper",
+  "description": "Inactive sample for one task only. Bind a private copy to the actual task ID. Every new task defaults to paper; no global policy applies. Only an explicit user request changes that task mode. Prompts supply its work and rules. Any numerical analytical examples are fictional, not automatically adopted trading limits. This file does not configure a broker or scheduler.",
+  "task_id": "REPLACE_WITH_ACTUAL_TASK_ID"
+}

@@ -11,6 +11,7 @@ import json
 from datetime import datetime, timezone
 from decimal import Decimal, InvalidOperation, ROUND_FLOOR
 from pathlib import Path
+from execution_policy import SUPPORTED_MODES
 
 
 class InvalidInput(ValueError):
@@ -63,7 +64,7 @@ def fresh(value, now, max_seconds):
 def validate_policy(policy):
     if type(policy["schema_version"]) is not int or policy["schema_version"] not in {2, 3}:
         raise InvalidInput("Unsupported policy version")
-    if policy["mode"] not in {"paper", "approval", "bounded_autonomous"}:
+    if type(policy["mode"]) is not str or policy["mode"] not in SUPPORTED_MODES:
         raise InvalidInput("Unknown execution mode")
     if policy["deployment_context"] not in {"learning", "personal"}:
         raise InvalidInput("Unknown deployment context")

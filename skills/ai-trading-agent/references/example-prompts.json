@@ -32,7 +32,7 @@
     },
     {
       "id": "execution-modes",
-      "title": "Autonomous operation with prompt-defined rules",
+      "title": "Per-task policy modes and autonomous workflows",
       "audience": "Users of Muse or another permitted execution host",
       "guides": [
         "references/execution-modes.md",
@@ -41,36 +41,52 @@
       ],
       "prompts": [
         {
+          "title": "Create a task with its own paper policy",
+          "prompt": "Set up [SCHEDULED TASK AND CADENCE] with its own stable task identity and private policy at [TASK PRIVATE POLICY PATH]. Initialize a new policy in paper by default. Keep an existing valid policy for that same task unchanged. Never inherit another task or global execution mode. A wrong-task or malformed file is an error. This is setup only; do not submit an order. Ask about missing task identity or instructions."
+        },
+        {
+          "title": "Explicitly change my saved execution policy",
+          "prompt": "For scheduled task [ACTUAL TASK ID], use only its own policy at [TASK PRIVATE POLICY PATH]. Verify the saved task_id matches this task; never use a global or another task's policy. I explicitly request that you set mode to autonomous in my selected policy at [TASK PRIVATE POLICY PATH]. Preserve all other fields and retain the previous file as a private backup. Read the file back and report the saved mode. This is a configuration change only; do not place an order or start a schedule."
+        },
+        {
+          "title": "Inspect my policy without changing it",
+          "prompt": "For scheduled task [ACTUAL TASK ID], use only its own policy at [TASK PRIVATE POLICY PATH]. Verify the saved task_id matches this task; never use a global or another task's policy. Read my selected policy at [TASK PRIVATE POLICY PATH]. Explain its saved mode and what paper, approval or autonomous permits. Do not alter the file, infer another mode from this prompt or choose a bundled example as my policy. Ask if the selected path is unclear."
+        },
+        {
           "title": "Run a price-drop instruction on Muse",
-          "prompt": "Use autonomous mode on Muse for [SELECTED ROBINHOOD ACCOUNT] during [DATES AND TIMEZONE]. Monitor [XXX] at [CADENCE]. If its [PRICE MEASURE] falls by at least [Y]% from [REFERENCE PRICE AND BASIS], buy [DOLLAR AMOUNT OR QUANTITY] using [ORDER INSTRUCTIONS]. Apply [REPEAT OR REARM RULE] and [TOTAL BUDGET AND OTHER LIMITS]. This prompt authorizes qualifying orders without asking me again. Use actual broker tools, reconcile uncertain outcomes before any retry, and notify me [CHANNEL AND TIMING] with the actual order status."
+          "prompt": "For scheduled task [ACTUAL TASK ID], use only its own policy at [TASK PRIVATE POLICY PATH]. Verify the saved task_id matches this task; never use a global or another task's policy. Use my selected policy at [TASK PRIVATE POLICY PATH] unchanged. For [ROBINHOOD ACCOUNT] during [DATES AND TIMEZONE], monitor [XXX] at [CADENCE]. If [PRICE MEASURE] falls by at least [Y]% from [REFERENCE PRICE AND BASIS], buy [DOLLAR AMOUNT OR QUANTITY] using [ORDER INSTRUCTIONS], [REPEAT RULE] and [LIMITS]. Follow the saved mode: simulate in paper, obtain order approval in approval, or execute within my standing authorization in autonomous. Ask clarifying questions if material instructions are missing; do not change my policy."
         },
         {
           "title": "Delegate vacation investment decisions",
-          "prompt": "Use autonomous mode while I am away from [START] to [END AND TIMEZONE]. For [ACCOUNT AND INVESTMENT UNIVERSE], pursue [OBJECTIVE AND HOLDING PERIOD] within [BUDGET, ACTIONS, LIMITS AND EXCLUSIONS]. I delegate [SPECIFIC SELECTION, TIMING OR SIZING DECISIONS] to you. Monitor at [CADENCE], and carry out in-scope orders without asking me again. Choosing not to trade is valid when the evidence does not support a trade. Use the permitted host's actual tools and send [REQUESTED OUTCOME AND BLOCKER NOTIFICATIONS]."
+          "prompt": "For scheduled task [ACTUAL TASK ID], use only its own policy at [TASK PRIVATE POLICY PATH]. Verify the saved task_id matches this task; never use a global or another task's policy. Follow the saved mode in [TASK PRIVATE POLICY PATH] while I am away [DATES]. For [ACCOUNT AND UNIVERSE], pursue [OBJECTIVE AND HORIZON] within [ACTIONS, BUDGET, LIMITS AND EXCLUSIONS]. I delegate [SPECIFIC DECISIONS]. Monitor at [CADENCE] and notify me [DETAILS]. In autonomous mode, my standing instructions cover in-scope orders without another ask. Choosing not to trade is valid. Clarify missing intent without changing the policy."
         },
         {
-          "title": "Combine fixed instructions and delegated judgment",
-          "prompt": "In autonomous mode, apply [EXACT FIXED RULES] unchanged and use your judgment only for [DELEGATED DECISIONS]. Follow my [ACCOUNT SCOPE, DURATION AND LIMITS]. My standing authorization covers resulting in-scope orders without another ask. Keep fixed-rule decisions distinct from discretionary decisions in the outcome report; do not invent extra triggers or change my constraints."
+          "title": "Combine fixed rules and delegated judgment",
+          "prompt": "For scheduled task [ACTUAL TASK ID], use only its own policy at [TASK PRIVATE POLICY PATH]. Verify the saved task_id matches this task; never use a global or another task's policy. Read [TASK PRIVATE POLICY PATH] and keep its mode unchanged. Apply [EXACT FIXED RULES] and use judgment only for [DELEGATED DECISIONS], within [SCOPE AND LIMITS]. Follow the saved paper, approval or autonomous behavior. Separate fixed-rule and discretionary decisions in the report. A task clarification does not authorize a policy change."
         },
         {
-          "title": "Update my autonomous instructions",
-          "prompt": "For my existing autonomous workflow, replace [SPECIFIC RULE] with [NEW RULE] effective [TIME AND TIMEZONE]. Preserve my other instructions. Apply this to future decisions; report any pending orders affected by the change without assuming they were canceled. Follow [EXPLICIT INSTRUCTIONS FOR PENDING ORDERS, IF ANY]."
+          "title": "Update trading rules without changing policy",
+          "prompt": "For scheduled task [ACTUAL TASK ID], use only its own policy at [TASK PRIVATE POLICY PATH]. Verify the saved task_id matches this task; never use a global or another task's policy. For the workflow governed by [TASK PRIVATE POLICY PATH], replace [SPECIFIC RULE] with [NEW RULE] effective [TIME]. Preserve the policy mode and all unaffected instructions. Apply the change to future decisions; report affected pending orders without assuming they were canceled. Follow [EXPLICIT PENDING-ORDER INSTRUCTIONS, IF ANY]."
         },
         {
-          "title": "Stop future autonomous decisions",
-          "prompt": "Stop future autonomous decisions for [WORKFLOW AND ACCOUNT] effective [TIME]. Revoke the standing authority for new orders and stop its host monitoring job if one exists. Report open, partially filled and unknown orders; stopping the workflow alone is not an instruction to cancel them or liquidate holdings."
+          "title": "Explicitly return my policy to paper",
+          "prompt": "For scheduled task [ACTUAL TASK ID], use only its own policy at [TASK PRIVATE POLICY PATH]. Verify the saved task_id matches this task; never use a global or another task's policy. I explicitly request that you change mode to paper in [TASK PRIVATE POLICY PATH], preserving other fields and a private backup. Read it back. Do not place new live orders. Report any existing open or unknown orders separately; changing this policy does not itself cancel them or liquidate holdings."
         },
         {
-          "title": "Assess Muse monitoring and execution support",
-          "prompt": "Assess whether my connected Muse host can run [AUTONOMOUS WORKFLOW] with [BROKER]. Distinguish documented support from actual connected tools, permissions, account scope, authentication and persistent scheduling. Do not change approval settings or place an order for this assessment. Explain any concrete blocker; do not require a separate skill configuration file."
+          "title": "Assess Muse policy and runtime support",
+          "prompt": "For scheduled task [ACTUAL TASK ID], use only its own policy at [TASK PRIVATE POLICY PATH]. Verify the saved task_id matches this task; never use a global or another task's policy. Assess whether Muse can retain and re-read my selected [TASK PRIVATE POLICY PATH] for [WORKFLOW]. Distinguish the saved mode from connected tools, account permissions, authentication and scheduling. Do not change policy or broker settings or place an order for this assessment. Identify concrete missing capabilities and clarify unknown task scope."
         },
         {
-          "title": "Paper-test my autonomous prompt",
-          "prompt": "Paper-test [MY AUTONOMOUS PROMPT] against [FICTIONAL PRICE AND EVENT SEQUENCE]. Cover a qualifying event, a non-event, repeated observations, an unknown prior submission, partial fills, expiry and a changed rule. Show which actions the permitted host workflow would take under my prompt and which facts remain unresolved. Use no live broker tools, and preserve the first results and failures."
+          "title": "Paper-test policy precedence and recovery",
+          "prompt": "For scheduled task [ACTUAL TASK ID], use only its own policy at [TASK PRIVATE POLICY PATH]. Verify the saved task_id matches this task; never use a global or another task's policy. Offline only, test [TASK-BOUND SAVED POLICY FIXTURES] with [TASK PROMPTS AND FICTIONAL EVENTS]. Cover all three modes, prompts attempting to override a mode, explicit user-requested policy changes, missing or malformed policies, repeated events, unknown submissions, partial fills and expiry. Preserve first results and failures. Use no live broker tools and do not change my real policy."
         },
         {
-          "title": "Reconcile an uncertain autonomous order",
-          "prompt": "For [AUTONOMOUS WORKFLOW], a previous submission has an unknown outcome. Use the permitted host's order-history and reconciliation facilities to determine its state before any retry. Do not equate a timeout or missing result with failure. Preserve the original order economics and report what is confirmed, unresolved or requires a real platform confirmation."
+          "title": "Reconcile an uncertain order under the current policy",
+          "prompt": "For scheduled task [ACTUAL TASK ID], use only its own policy at [TASK PRIVATE POLICY PATH]. Verify the saved task_id matches this task; never use a global or another task's policy. Read the current policy at [TASK PRIVATE POLICY PATH] without changing it. For [WORKFLOW], reconcile a previous submission whose outcome is unknown using the permitted host facilities. Do not equate a timeout with failure or retry before reconciliation. Apply the current mode and instructions to any new action; report confirmed facts, unresolved status and actual platform confirmations."
+        },
+        {
+          "title": "Keep two tasks independent",
+          "prompt": "Offline only, create separate fictional policies for task-A and task-B, both initially paper. Explicitly change task-A to autonomous and verify task-B remains paper. Reject running task-B with task-A's file, even if its prompt asks for autonomy. Confirm a new cloned task-C starts in paper and repeated initialization preserves task-A's saved mode. Use no live tools and change no real policies."
         }
       ]
     },
@@ -91,7 +107,7 @@
         },
         {
           "title": "Understand recommendations and handoff",
-          "prompt": "Explain which research and quantitative calculations this skill performs, how user-directed and prompt-defined autonomous workflows use a permitted host's broker tools, and how standing instructions avoid repeated per-order asks. Distinguish the optional offline formatter from actual host execution and scheduling."
+          "prompt": "Explain research and pure formatting versus host execution. Show how the selected saved policy controls paper, approval or autonomous behavior, why only an explicit user request can change it, and how prompts supply tasks and rules. Clarifying questions are allowed; policy mode cannot be inferred from task wording. Each task, including every schedule, has its own task-bound policy, defaulting to paper. There is no global mode."
         },
         {
           "title": "Create a research workspace",
@@ -1006,7 +1022,7 @@
         },
         {
           "title": "Audit legacy migration",
-          "prompt": "Review an older package installation for obsolete execution instructions. Use the current handoff and advisory references; do not reactivate policy.json, grants, tickets, monitoring leases or old live-readiness modules. Preserve private historical data unless I explicitly request its removal."
+          "prompt": "Review [OLDER INSTALLATION] for conflicting execution instructions. Verify that current policy modes, selected-file loading and host guidance agree. Preserve private historical data, do not activate a sample policy, and do not change the user-selected mode without an explicit request."
         }
       ]
     },

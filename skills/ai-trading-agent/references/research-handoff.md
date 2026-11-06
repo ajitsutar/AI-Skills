@@ -52,7 +52,8 @@ Keep unknown intent descriptive; do not turn it into inferred filters or limits.
 `standing_preferences` is `ignore` only when requested, otherwise
 `explicit_in_this_mandate`: copy applicable user instructions explicitly, never
 silently inherit another model's assertions about standing rules.
-These settings affect research selection only; the skill imposes no execution controls.
+These settings affect research selection only; they do not add execution controls.
+Host actions separately follow the selected [execution policy](execution-modes.md).
 `selection_mode` is `computed_order`; `custom_filters` is `[]` for this shared
 profile. `allowed_statuses` is `["Eligible"]`, or `["Eligible", "Speculative"]`
 for an explicitly aggressive speculative research comparison. This is not a

@@ -1,35 +1,34 @@
 # Personal setup
 
-Install the complete skill folder and a Python environment for the research
-helpers you intend to use. Run `scripts/research_preflight.py` to describe package
-integrity and dependencies. Missing data or models limit research claims; they
-are not execution gates. Keep reports, downloaded source evidence and personal
-account records outside the installed skill.
+Install the whole skill folder and the Python runtime needed for the research
+helpers you use. `scripts/research_preflight.py` reports package integrity and
+dependencies. Ordinary research initialization creates evidence/report folders;
+it does not create or choose an execution policy, schedule monitoring or trade.
 
-The skill needs no execution policy, grant, ticket, ledger, strategy promotion,
-volatility clearance or supervised-session activation. Optional local runtime
-commands organize research or return a handoff; they do not enable or restrict
-broker transactions. Existing runtime databases are retained as historical user
-records, not a current skill permission system.
+Each host execution task, including every scheduled task, needs its own private
+policy file bound to its stable task identity. There is no global execution policy.
+Initialize new tasks with `execution_policy.py init PATH --task-id TASK_ID`; the
+default is paper, and initialization retains an existing matching-task policy. Read
+[execution modes](execution-modes.md) for `paper`, `approval` and `autonomous`.
+The user alone authorizes changing the persisted mode. The model may apply an
+explicit configuration request using `execution_policy.py set`; it must not
+change the mode merely to satisfy a trading prompt. Prompts supply tasks and rules,
+and the model can ask clarifying questions about material missing intent.
 
-Configure external tools using the host's normal settings. Robinhood documents
-its official connection in [Agentic trading overview](https://robinhood.com/us/en/support/articles/agentic-trading-overview/).
-The host manages authentication and actual account/tool availability. Installation
-does not connect an account, create a schedule or place a trade.
+The minimal `templates/execution-policy.example.json` starts in paper mode. Copy
+or initialize a separate private paper policy during task setup; never treat the bundled template as
+an active account setting. Larger examples include fictional research inputs,
+which are not default trading limits. Keep policies, backups and account evidence
+outside the installed skill. The mode is read from the selected file on every run
+and before actions, with the current task ID checked each time. Prompts cannot
+silently override it. Changing one task does not change other tasks; copied
+schedules get their own paper policy. Wrong-task or malformed files are errors.
 
-A useful startup request:
+Configure external tools through the host's supported settings. Robinhood's
+[external-agent onboarding](https://robinhood.com/us/en/support/articles/agentic-trading-overview/)
+describes its connection. Actual host/account availability and approvals remain
+external. Installation or policy editing does not connect an account or start a job.
 
-> Load the complete skill and describe available research/data capabilities.
-> Recommend investments for [OBJECTIVE AND HORIZON], explain the supporting
-> evidence and uncertainty, and carry my existing execution instructions to the
-> host when I request a broker action. Do not add skill-level approval or risk gates.
-
-Use [execution-handoff.md](execution-handoff.md) for broker actions,
-[research-memory.md](research-memory.md) for saved research, and
-[maintaining-the-skill.md](maintaining-the-skill.md) when updating the package.
-
-For vacation operation on a permitted host such as Muse, use [autonomous mode](execution-modes.md).
-Provide rules and standing authorization in your prompt. The host carries out
-in-scope orders without another skill-created per-order ask. No policy file or
-planner run is required. Installation alone does not start monitoring or connect
-a broker; distinguish requested scheduling from an observed running host job.
+Use [execution-handoff.md](execution-handoff.md) for pure payload formatting,
+[research-memory.md](research-memory.md) for saved research and
+[maintaining-the-skill.md](maintaining-the-skill.md) for package updates.

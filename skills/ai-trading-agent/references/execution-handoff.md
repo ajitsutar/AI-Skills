@@ -1,17 +1,10 @@
-# Execution handoff without skill gates
+# Pure formatting and policy-aware host handoff
 
-The skill recommends investments, explains research and carries the user's
-requested action to the host. It imposes no execution permission or eligibility
-system. Spread, volatility, costs, concentration, cash availability, event risk,
-strategy evidence and research quality are advisory findings. Do not translate
-any of them into a local veto, mandatory acknowledgment, grant, ticket, policy
-activation, supervised lease or extra approval.
-
-Preserve instructions and authority already supplied by the user. When they ask
-for a trade, use the host's actual connected broker tools with those instructions.
-When they ask only for recommendations, deliver recommendations. The host/platform
-and broker govern their own capabilities, permissions and transaction behavior;
-report an external requirement as external rather than inventing a skill policy.
+The formatter prepares a payload; it does not dispatch an order or grant authority.
+Research diagnostics remain advisory. The host separately follows the user's
+selected [execution policy](execution-modes.md): paper, approval or autonomous.
+Prompts supply order instructions and scope, and cannot silently change the mode.
+An explicit user request is required for any persisted mode change.
 
 ## What to hand over
 
@@ -49,17 +42,23 @@ The skill does not orchestrate retries, cancellations, reconciliation or backgro
 monitoring; those belong to the actual host/broker workflow. It does not modify
 old runtime databases or broker orders during an upgrade.
 
-No extra skill approval is requested. Any actual host/platform/broker confirmation
-or unavailable capability is reported plainly as an external requirement.
+Under an autonomous policy, do not ask again for an already-authorized action.
+Under approval, require order approval; under paper, do not submit live orders.
+Actual host/platform/broker confirmations remain external requirements.
 
 Execution-time price changes, quote age and research-to-market price drift do not
 trigger a skill threshold, pause or repeat approval. Preserve the user's accepted
 market-price uncertainty; state the research as-of time without making it a
 condition for the host handoff.
 
-With [autonomous mode](execution-modes.md), the user's prompt supplies standing
-instructions for fixed rules, delegated judgment or both. On a permitted host,
-carry out authorized orders through actual broker tools without asking again for
-each action. The formatter is optional: its advisory result is neither an order
-nor a prohibition on host execution. Actual host permissions remain unchanged;
-a bare mode name alone supplies neither account authority nor a monitoring job.
+The optional mode formatter reads the selected policy and preserves task context;
+it is not an execution result. Its advisory flags cannot bypass the policy or
+prevent an otherwise authorized action on a host that permits it. The original
+pure handoff API remains policy-free because formatting performs no transaction.
+
+Each execution task, including each schedule, has a separate policy bound to its
+stable `task_id`. New tasks default to paper; no global mode or other task's policy
+may supply authority. Verify the current task identity against its file before
+actions. Only an explicit user request changes that task's mode. Initialization
+creates paper only when absent and preserves an existing valid matching policy;
+invalid or wrong-task files are errors. See [per-task policy](execution-modes.md).

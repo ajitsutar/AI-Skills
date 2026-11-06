@@ -22,6 +22,39 @@ allocations and hypothetical fills are not broker status. See
 [execution-handoff.md](execution-handoff.md) and
 [host-execution-integration.md](host-execution-integration.md).
 
+## Task-bound persistent execution policy
+
+Each scheduled task owns a separate persistent policy bound to its actual task
+ID. There is no global execution policy and no inheritance from another task.
+For host execution, use that task's private path and verify its task-ID binding
+before reading `mode`: `paper`, `approval` or `autonomous`. New task policies start
+in `paper`. Ordinary prompt text does not select or override that mode or replace
+the actual task identity. Prompts supply trading rules, scope and limits; clarify
+material missing intent without changing policy.
+
+Research initialization does not create or select an execution policy, and the
+pure handoff helper does not read or enforce one. Formatting a payload therefore
+cannot establish that the host may submit it.
+
+`scripts/execution_policy.py init PATH --task-id ID` initializes the specified
+task's private policy in paper mode. A valid existing policy for the same task is
+retained, not reset. Do not overwrite malformed or differently bound policies.
+`scripts/execution_policy.py show PATH --task-id ID` reads that task's policy.
+Only an explicit user request to change this task's mode permits
+`scripts/execution_policy.py set PATH --task-id ID --mode MODE`. Preserve other
+policy fields. These commands manage local configuration only: they do not connect
+a broker, enable a scheduler, submit orders or change external permissions.
+Re-read the same task's policy before each host action; do not cache an earlier
+mode or choose another task's more permissive policy. Missing or invalid policy
+never permits live dispatch.
+
+In `paper`, keep actions simulated. In `approval`, obtain approval for the
+particular order; an explicit exact one-shot instruction can supply it, but vague
+standing authority cannot. In `autonomous`, carry out actions covered by the
+user's current standing instructions without another skill-created per-order ask.
+The host and broker's actual permission and confirmation requirements still apply.
+See [execution policy](execution-modes.md) for task setup and conflict handling.
+
 ## Advisory diagnostic fields
 
 `risk_engine.evaluate` returns `within_research_limits`, `diagnostic_status`,

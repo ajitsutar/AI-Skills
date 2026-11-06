@@ -55,5 +55,9 @@ inputs to the instrument; explain unsupported cases without inventing calculatio
 
 Independent host services provide authentication, custody, order submission,
 reconciliation, monitoring and recovery. The skill does not create an always-on
-execution service or impose policy, ticket, spread, volatility or funding gates.
+execution service or impose ticket, spread, volatility or funding gates. The
+task's own persistent policy separately governs paper, approval or autonomous
+host behavior. Every new task defaults to paper, with no global policy. The policy
+must match the actual current task identity; only an explicit user request changes
+that task's mode, leaving other tasks unchanged.
 See [host integration](host-execution-integration.md).

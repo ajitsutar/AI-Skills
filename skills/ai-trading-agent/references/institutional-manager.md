@@ -168,8 +168,14 @@ execution prerequisite or a strategy-promotion requirement.
 Use [multi-asset-playbook.md](multi-asset-playbook.md) for the instrument/strategy
 route. Identify missing analytical models and preserve the instrument's actual
 type. Native host and broker tools determine available transactions and enforce
-their own permissions. The skill has no execution gates; `execution_handoff.py`
-preserves a requested payload without submitting it or issuing approval.
+their own permissions. Each scheduled task owns a separate persistent execution
+policy bound to its actual task ID and initialized in `paper`. There is no global
+policy or mode inheritance. Verify the task binding and re-read its private policy
+before acting. Its saved mode selects `paper`, `approval` or `autonomous`; prompts
+provide rules without overriding the mode. Only an explicit user-requested policy
+change for that task updates the mode. Clarifying missing task intent is allowed. Research diagnostics add no numerical trading gates. `execution_handoff.py`
+preserves a requested payload without submitting it, issuing approval or bypassing
+the selected mode. See [execution policy](execution-modes.md).
 
 ## Daily operation and incidents
 

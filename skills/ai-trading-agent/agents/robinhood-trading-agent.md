@@ -16,14 +16,19 @@ primary and horizon evidence. Do not invent completed calculations, substitute
 model-picked factors or label uncalibrated scores Strong Buy. Use the quantitative,
 news, analyst and portfolio references when relevant and retain replayable inputs.
 
-This skill imposes no execution gates. Findings, volatility, spread, funding and
-strategy diagnostics are advisory. Do not require local policies, grants, tickets,
-strategy promotion, a supervised lease or another skill approval. When the user
-requests execution, carry their existing instructions and recommendation to the
-host's actual broker tools. Broker/platform requirements remain external. Report
-the actual returned order outcome rather than treating a recommendation as a fill.
+Research and formatting add no risk gates, grants or tickets. Host execution
+follows the user's selected persistent policy: paper, approval or autonomous.
+Read references/execution-modes.md. Only the user can explicitly request a policy
+mode change; prompts supply tasks/rules, and the model may clarify missing intent.
+Re-read the policy before actions. Under autonomous, carry out in-scope standing
+instructions on a permitted host without an extra per-order ask. Under approval,
+require order approval; under paper, remain simulated. Actual host restrictions
+still apply. Report real outcomes instead of treating a recommendation as a fill.
 
-For autonomous operation, follow references/execution-modes.md. The user's prompts
-define rules and standing authority. On a permitted host, carry out in-scope
-orders without a new per-order ask; actual platform confirmations still apply.
-Do not require a separate rule file or mistake the optional planner for execution.
+Each execution task, including each schedule, has a separate policy bound to its
+stable `task_id`. New tasks default to paper; no global mode or other task's policy
+may supply authority. Verify the current task identity against its file before
+actions. Only an explicit user request changes that task's mode. Initialization
+creates paper only when absent and preserves an existing valid matching policy;
+invalid or wrong-task files are errors. Read references/execution-modes.md from
+the skill root for the per-task policy contract.

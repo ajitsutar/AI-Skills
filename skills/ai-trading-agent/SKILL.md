@@ -5,25 +5,28 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # AI Trading Agent
 
-Package version: **5.6.0 - November 5, 2026**.
+Package version: **5.6.1 - November 5, 2026**.
 
-This skill researches investments, recommends stocks and allocations, explains
-uncertainty and prepares an execution handoff. It imposes **no execution gates**.
-It does not require a skill policy, grant, ticket, ledger, strategy promotion,
-volatility clearance, spread threshold, cash test, supervised lease or repeated
-approval before a host can carry out the user's instructions. Research findings
-and risk diagnostics are advisory. Actual broker and platform requirements remain
-external to this skill; describe them accurately without inventing local substitutes.
+This skill researches investments, explains evidence and prepares host actions.
+Every execution task, including each scheduled task, has its own private persistent
+policy bound to its stable `task_id`; there is no global execution policy. New
+task policies default to `paper`. Read that task's policy and verify its identity
+against the current host task before actions; see
+[execution modes](references/execution-modes.md). Its `mode` is `paper`,
+`approval` or `autonomous`: respectively simulate only, require order approval,
+or carry out in-scope actions under standing authority on a permitted host.
+Only an explicit user request may change the policy. Ordinary prompts supply what
+to do, not which policy mode to use; ask clarifying questions where intent is missing.
+Re-read the task's file before each action. Initialize a new task's policy in paper;
+never inherit another task's mode or choose a bundled example as an active setting.
+An invalid, inaccessible or wrong-task policy is an error, never live authority.
 
-When the user asks to trade, carry the recommendation and their existing
-instructions to the host's available broker tools. Preserve authority already
-given instead of asking for another skill approval. Do not mistake a research-only
-request for an instruction to trade. Use the actual host/broker result to report
-what happened; a recommendation, local calculation or empty response is not a fill.
-Read [broker handoff](references/broker-integration.md) for that boundary.
-For prompt-defined `autonomous` execution, read [autonomous mode](references/execution-modes.md).
-On a permitted host such as Muse, carry out in-scope orders under the user's standing
-instructions without a new per-order ask. Rules live in prompts; actual host permissions apply.
+Research and pure payload formatting require no policy or approval. Research risk
+findings remain advisory; no grant, ticket, strategy promotion, volatility clearance
+or new numerical execution gate is introduced. Host/platform/broker requirements
+still apply. A policy setting cannot grant permissions the host does not have.
+Use actual host results: a recommendation, formatter output or empty response is
+not a fill. Read [broker handoff](references/broker-integration.md) for that boundary.
 
 Resolve all files relative to this SKILL.md. Keep the entire standalone folder;
 uploading only this file omits the implementation. Keep personal evidence and
@@ -457,13 +460,12 @@ an explicit user limit instruction. Native dollar input can be converted to shar
 at a recent price by the broker; it does not necessarily guarantee the exact final
 debit. Do not silently round small orders to whole shares or change approved economics.
 
-Use actual available host/broker capabilities for the requested action. No local
-readiness form, approval record, historical-data threshold or research status is a
-prerequisite imposed by this package. Carry forward existing user instructions;
-additional confirmations come only from the actual host/platform/broker or missing
-user intent, not a skill-created approval ritual. Report external limitations and
-actual order outcomes plainly. The skill does not manage custody, authentication,
-background execution, broker retries or order-state transitions.
+Use actual host/broker capabilities and the selected policy mode for execution.
+Honor paper-only scope, order approval in `approval`, and standing authority in
+`autonomous`. Only the user can explicitly request a persisted mode change.
+No research threshold, grant or ticket substitutes for those instructions.
+Report external requirements and actual outcomes plainly. The skill does not
+manage custody, authentication, background execution or broker order transitions.
 
 Preserve research quality and truthful accounting: distinguish proposed, submitted,
 acknowledged, partially filled, filled and unknown as reported by the host/broker.

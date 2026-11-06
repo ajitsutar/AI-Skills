@@ -2,7 +2,7 @@
   "schema_version": 3,
   "mode": "paper",
   "deployment_context": "personal",
-  "description": "Optional fictional analytical/schema example. Fields and thresholds describe a calculation only; they impose no execution gates, approvals, price-drift limits or account policy.",
+  "description": "Inactive sample for one task only. Bind a private copy to the actual task ID. Every new task defaults to paper; no global policy applies. Only an explicit user request changes that task mode. Prompts supply its work and rules. Any numerical analytical examples are fictional, not automatically adopted trading limits. This file does not configure a broker or scheduler.",
   "allow_leverage": false,
   "allow_shorting": false,
   "fractional_shares": {
@@ -93,7 +93,7 @@
     "garch_target_period_volatility": "0.015",
     "strategy_validation_required_modes": [
       "approval",
-      "bounded_autonomous"
+      "autonomous"
     ]
   },
   "event_policies": {
@@ -199,5 +199,6 @@
       "max_entries_per_symbol_session": 1
     }
   },
-  "role": "ADVISORY_ANALYTICAL_FIXTURE_NOT_EXECUTION_POLICY"
+  "role": "EXECUTION_MODE_WITH_FICTIONAL_RESEARCH_SETTINGS",
+  "task_id": "REPLACE_WITH_ACTUAL_TASK_ID"
 }
