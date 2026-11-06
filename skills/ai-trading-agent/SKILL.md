@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # AI Trading Agent
 
-Package version: **5.5.10 - November 5, 2026**.
+Package version: **5.6.0 - November 5, 2026**.
 
 This skill researches investments, recommends stocks and allocations, explains
 uncertainty and prepares an execution handoff. It imposes **no execution gates**.
@@ -21,6 +21,9 @@ given instead of asking for another skill approval. Do not mistake a research-on
 request for an instruction to trade. Use the actual host/broker result to report
 what happened; a recommendation, local calculation or empty response is not a fill.
 Read [broker handoff](references/broker-integration.md) for that boundary.
+For prompt-defined `autonomous` execution, read [autonomous mode](references/execution-modes.md).
+On a permitted host such as Muse, carry out in-scope orders under the user's standing
+instructions without a new per-order ask. Rules live in prompts; actual host permissions apply.
 
 Resolve all files relative to this SKILL.md. Keep the entire standalone folder;
 uploading only this file omits the implementation. Keep personal evidence and

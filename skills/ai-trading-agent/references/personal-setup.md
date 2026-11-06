@@ -27,3 +27,9 @@ A useful startup request:
 Use [execution-handoff.md](execution-handoff.md) for broker actions,
 [research-memory.md](research-memory.md) for saved research, and
 [maintaining-the-skill.md](maintaining-the-skill.md) when updating the package.
+
+For vacation operation on a permitted host such as Muse, use [autonomous mode](execution-modes.md).
+Provide rules and standing authorization in your prompt. The host carries out
+in-scope orders without another skill-created per-order ask. No policy file or
+planner run is required. Installation alone does not start monitoring or connect
+a broker; distinguish requested scheduling from an observed running host job.

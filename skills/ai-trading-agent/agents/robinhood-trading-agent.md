@@ -22,3 +22,8 @@ strategy promotion, a supervised lease or another skill approval. When the user
 requests execution, carry their existing instructions and recommendation to the
 host's actual broker tools. Broker/platform requirements remain external. Report
 the actual returned order outcome rather than treating a recommendation as a fill.
+
+For autonomous operation, follow references/execution-modes.md. The user's prompts
+define rules and standing authority. On a permitted host, carry out in-scope
+orders without a new per-order ask; actual platform confirmations still apply.
+Do not require a separate rule file or mistake the optional planner for execution.

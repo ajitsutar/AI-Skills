@@ -28,6 +28,13 @@ Offline run/report helpers connect explicit quant jobs and separate analyst coho
 to those reports, while advisory payload receipts expose order-instruction changes.
 Source selection and surrounding narrative still require review.
 
+Its optional [autonomous mode](skills/ai-trading-agent/references/execution-modes.md)
+uses rules and standing instructions from the user's prompts. On a permitted host
+such as Muse, it directs in-scope orders through native broker tools without an
+additional skill-created per-order ask. Host permissions, approvals, scheduling,
+authentication and order management remain external; the skill adds no backend.
+The optional local planner describes the instructions and does not submit orders.
+
 Read its [current capabilities and setup](skills/ai-trading-agent/README.md)
 or explore the [prompt catalog for investors, traders and quants](skills/ai-trading-agent/EXAMPLE-PROMPTS.md).
 Examples cover supported workflows and useful gap assessments without a fixed count.

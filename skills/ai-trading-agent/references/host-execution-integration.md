@@ -23,3 +23,11 @@ and transaction approvals. This package does not bypass or duplicate those syste
 Do not export credentials, authentication headers or private account/order evidence
 in research reports or skill packages. For the common workflow see
 [execution-handoff.md](execution-handoff.md).
+
+The optional `scripts/execution_mode.py` is a separate offline planning formatter
+for [autonomous mode](execution-modes.md). It is optional and does not change the
+handoff API, contact MCP tools, enable a runtime or establish account readiness.
+Its advisory flags describe the formatter, not the host workflow. A permitted host
+uses native broker tools to carry out prompt-authorized actions without a new
+per-order ask; it must not stop at formatting a handoff and claim an order was sent.
+MCP availability alone cannot override the host's transaction restrictions.

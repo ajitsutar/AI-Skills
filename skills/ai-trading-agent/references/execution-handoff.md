@@ -56,3 +56,10 @@ Execution-time price changes, quote age and research-to-market price drift do no
 trigger a skill threshold, pause or repeat approval. Preserve the user's accepted
 market-price uncertainty; state the research as-of time without making it a
 condition for the host handoff.
+
+With [autonomous mode](execution-modes.md), the user's prompt supplies standing
+instructions for fixed rules, delegated judgment or both. On a permitted host,
+carry out authorized orders through actual broker tools without asking again for
+each action. The formatter is optional: its advisory result is neither an order
+nor a prohibition on host execution. Actual host permissions remain unchanged;
+a bare mode name alone supplies neither account authority nor a monitoring job.

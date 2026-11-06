@@ -1,5 +1,13 @@
 # AI Trading Agent
 
+[Autonomous mode](references/execution-modes.md) directs a permitted host such as
+Muse to carry out prompt-authorized orders through its native broker tools without
+an additional per-order ask. Your prompts define fixed rules, delegated judgment,
+limits and changes; no separate configuration or rule engine is required. The
+host supplies scheduling, authentication and order management. The skill adds no
+backend or broker permissions. Its optional Python planner is descriptive only
+and must not be mistaken for the host execution workflow.
+
 Saved-research [verification and refresh planning](references/research-memory.md)
 separate archive integrity from primary-source freshness. Matching hashes or
 unchanged snapshot values permit historical replay, but do not establish a

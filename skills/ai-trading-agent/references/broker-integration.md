@@ -39,3 +39,10 @@ Authentication and private identifiers stay within the host/broker environment.
 The skill does not contain an OAuth client or an undocumented trading endpoint.
 See [execution-handoff.md](execution-handoff.md) and
 [host-execution-integration.md](host-execution-integration.md).
+
+For prompt-defined `autonomous` operation, follow [autonomous mode](execution-modes.md).
+When the prompt already authorizes the action on a permitted host, submit through
+its real broker tools without a new skill-created ask. Prompt rules can be fixed
+or discretionary. This does not bypass host restrictions or broker approval. If the host prohibits transactions,
+provide research, alerts or proposed actions without an alternate execution route.
+Mode selection never changes an account's approval settings.

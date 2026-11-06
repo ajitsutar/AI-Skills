@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release_version": "5.5.10",
+  "release_version": "5.6.0",
   "package_manifest_sha256": null,
   "scope": "Populate from actual release receipts; template alone proves no qualification",
   "capabilities": [

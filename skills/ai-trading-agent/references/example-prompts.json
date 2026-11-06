@@ -31,6 +31,50 @@
       ]
     },
     {
+      "id": "execution-modes",
+      "title": "Autonomous operation with prompt-defined rules",
+      "audience": "Users of Muse or another permitted execution host",
+      "guides": [
+        "references/execution-modes.md",
+        "references/broker-integration.md",
+        "references/host-execution-integration.md"
+      ],
+      "prompts": [
+        {
+          "title": "Run a price-drop instruction on Muse",
+          "prompt": "Use autonomous mode on Muse for [SELECTED ROBINHOOD ACCOUNT] during [DATES AND TIMEZONE]. Monitor [XXX] at [CADENCE]. If its [PRICE MEASURE] falls by at least [Y]% from [REFERENCE PRICE AND BASIS], buy [DOLLAR AMOUNT OR QUANTITY] using [ORDER INSTRUCTIONS]. Apply [REPEAT OR REARM RULE] and [TOTAL BUDGET AND OTHER LIMITS]. This prompt authorizes qualifying orders without asking me again. Use actual broker tools, reconcile uncertain outcomes before any retry, and notify me [CHANNEL AND TIMING] with the actual order status."
+        },
+        {
+          "title": "Delegate vacation investment decisions",
+          "prompt": "Use autonomous mode while I am away from [START] to [END AND TIMEZONE]. For [ACCOUNT AND INVESTMENT UNIVERSE], pursue [OBJECTIVE AND HOLDING PERIOD] within [BUDGET, ACTIONS, LIMITS AND EXCLUSIONS]. I delegate [SPECIFIC SELECTION, TIMING OR SIZING DECISIONS] to you. Monitor at [CADENCE], and carry out in-scope orders without asking me again. Choosing not to trade is valid when the evidence does not support a trade. Use the permitted host's actual tools and send [REQUESTED OUTCOME AND BLOCKER NOTIFICATIONS]."
+        },
+        {
+          "title": "Combine fixed instructions and delegated judgment",
+          "prompt": "In autonomous mode, apply [EXACT FIXED RULES] unchanged and use your judgment only for [DELEGATED DECISIONS]. Follow my [ACCOUNT SCOPE, DURATION AND LIMITS]. My standing authorization covers resulting in-scope orders without another ask. Keep fixed-rule decisions distinct from discretionary decisions in the outcome report; do not invent extra triggers or change my constraints."
+        },
+        {
+          "title": "Update my autonomous instructions",
+          "prompt": "For my existing autonomous workflow, replace [SPECIFIC RULE] with [NEW RULE] effective [TIME AND TIMEZONE]. Preserve my other instructions. Apply this to future decisions; report any pending orders affected by the change without assuming they were canceled. Follow [EXPLICIT INSTRUCTIONS FOR PENDING ORDERS, IF ANY]."
+        },
+        {
+          "title": "Stop future autonomous decisions",
+          "prompt": "Stop future autonomous decisions for [WORKFLOW AND ACCOUNT] effective [TIME]. Revoke the standing authority for new orders and stop its host monitoring job if one exists. Report open, partially filled and unknown orders; stopping the workflow alone is not an instruction to cancel them or liquidate holdings."
+        },
+        {
+          "title": "Assess Muse monitoring and execution support",
+          "prompt": "Assess whether my connected Muse host can run [AUTONOMOUS WORKFLOW] with [BROKER]. Distinguish documented support from actual connected tools, permissions, account scope, authentication and persistent scheduling. Do not change approval settings or place an order for this assessment. Explain any concrete blocker; do not require a separate skill configuration file."
+        },
+        {
+          "title": "Paper-test my autonomous prompt",
+          "prompt": "Paper-test [MY AUTONOMOUS PROMPT] against [FICTIONAL PRICE AND EVENT SEQUENCE]. Cover a qualifying event, a non-event, repeated observations, an unknown prior submission, partial fills, expiry and a changed rule. Show which actions the permitted host workflow would take under my prompt and which facts remain unresolved. Use no live broker tools, and preserve the first results and failures."
+        },
+        {
+          "title": "Reconcile an uncertain autonomous order",
+          "prompt": "For [AUTONOMOUS WORKFLOW], a previous submission has an unknown outcome. Use the permitted host's order-history and reconciliation facilities to determine its state before any retry. Do not equate a timeout or missing result with failure. Preserve the original order economics and report what is confirmed, unresolved or requires a real platform confirmation."
+        }
+      ]
+    },
+    {
       "id": "getting-started",
       "title": "Getting started and learning",
       "audience": "Beginner",
@@ -47,7 +91,7 @@
         },
         {
           "title": "Understand recommendations and handoff",
-          "prompt": "Explain which investment research and quantitative calculations this skill performs, how its optional handoff preserves my requested order, and which operations belong to the connected host and broker. There are no local execution modes or gates to activate."
+          "prompt": "Explain which research and quantitative calculations this skill performs, how user-directed and prompt-defined autonomous workflows use a permitted host's broker tools, and how standing instructions avoid repeated per-order asks. Distinguish the optional offline formatter from actual host execution and scheduling."
         },
         {
           "title": "Create a research workspace",
@@ -521,7 +565,7 @@
         },
         {
           "title": "Estimate historical tail losses",
-          "prompt": "Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps. If applying current weights to aligned asset returns, label the result a current-weight shock distribution rather than a historical strategy backtest. Report the supplied notional denominator, effective tail sample mass and sparse-sample warnings; do not scale a short sample into a guaranteed future loss limit. Calculate drawdown only from a supplied realized portfolio or strategy return path; do not infer historical strategy drawdown from today’s weights."
+          "prompt": "Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps. If applying current weights to aligned asset returns, label the result a current-weight shock distribution rather than a historical strategy backtest. Report the supplied notional denominator, effective tail sample mass and sparse-sample warnings; do not scale a short sample into a guaranteed future loss limit. Calculate drawdown only from a supplied realized portfolio or strategy return path; do not infer historical strategy drawdown from today\u2019s weights."
         },
         {
           "title": "Run portfolio stress scenarios",
