@@ -31,6 +31,36 @@ Do not claim a complete index-wide investment ranking when some members are miss
 
 ## Executable workflow
 
+### Explicit offline runs
+
+An offline task must not call a network acquisition helper merely because its
+transport happens to work. `--universe-only` still downloads membership for a
+preset such as `sp500` or `us-listed`; it is not an offline switch.
+
+The host/capture harness can enforce this collector's declared run boundary by
+setting `AI_TRADING_NETWORK_MODE=offline` in every child process and retaining
+that setting in its command receipt. The collector rejects network-capable CLI
+and imported entry points with `NETWORK_DISABLED_BY_RUN_CONTRACT` before a
+request. Invalid values fail closed. No CLI flag overrides the environment.
+The unset or explicit `online` value preserves existing acquisition behavior;
+it does not itself authorize network access contrary to the user's task.
+
+Offline `--universe-only --universe <retained-local.json>` and membership-only
+resume remain local operations. Missing supplied membership remains missing;
+do not switch to a preset to fill it. Parsers and other local calculations remain
+available. This guard covers this collector and inherited subprocess context,
+not arbitrary programs or malicious environment changes. It is not an OS
+network sandbox; record actual host isolation separately.
+
+On resume, the original research contract remains frozen for source/checkpoint
+identity. Its network mode and acquisition label describe the original run,
+not the current attempt. `resume-receipt.json/attempt` records the current mode,
+requested scope and acquisition path; completed snapshots repeat these under
+`acquisition_attempt` and label `contract_role` explicitly. Provider-job and
+reused-checkpoint counts describe execution, not the number of HTTP requests.
+An online full resume after offline membership preparation may acquire missing
+provider components; an offline membership-only resume cannot acquire them.
+
 Choose a unique output-directory path outside the skill, but do not create that
 directory: the collector creates it and rejects an existing path. Create its
 parent if needed and save the exact user prompt in a separate UTF-8 file outside

@@ -15,6 +15,7 @@ import hashlib
 import io
 import json
 import copy
+import os
 from pathlib import Path
 import threading
 import time
@@ -34,8 +35,32 @@ _next_request = 0.0
 _provider_paused = False
 
 
+class NetworkPolicyError(RuntimeError):
+    """A declared run boundary, not a retryable provider failure."""
+
+
+def network_mode():
+    """Unset preserves existing acquisition behavior; explicit values fail closed."""
+    mode = os.environ.get('AI_TRADING_NETWORK_MODE', 'online')
+    if mode not in {'online', 'offline'}:
+        raise NetworkPolicyError('INVALID_NETWORK_MODE: expected online or offline')
+    return mode
+
+
+def require_network():
+    if network_mode() == 'offline':
+        raise NetworkPolicyError('NETWORK_DISABLED_BY_RUN_CONTRACT')
+
+
+def network_get(url, **kwargs):
+    require_network()
+    import requests
+    return requests.get(url, **kwargs)
+
+
 def request_call(call):
     """Bound rate-limited retries; never rotate accounts, proxies or identities."""
+    require_network()
     global _next_request, _provider_paused
     for attempt in range(2):
         # Grant a slot only when it is due. Another worker can extend the
@@ -51,6 +76,7 @@ def request_call(call):
                     break
             time.sleep(wait)
         try:
+            require_network()
             return call()
         except Exception as exc:
             if 'RateLimit' not in type(exc).__name__ and 'Too Many Requests' not in str(exc):
@@ -118,8 +144,10 @@ def universe_spec(preset=None, supplied=None):
 
 
 def acquire_universe(folder, supplied=None, preset=None, price_date=None):
+    network_mode()  # Invalid run declarations also reject otherwise-local work.
+    if supplied is None:
+        require_network()
     import pandas as pd
-    import requests
     spec = universe_spec(preset, supplied)
     if supplied:
         data = json.loads(supplied.read_text(encoding='utf-8-sig'))
@@ -132,7 +160,7 @@ def acquire_universe(folder, supplied=None, preset=None, price_date=None):
             raise ValueError('PRICE_DATE_REQUIRED_FOR_DIRECTORY_FRESHNESS')
         documents = {}
         for kind, url in DIRECTORIES.items():
-            response = requests.get(url, timeout=40); response.raise_for_status()
+            response = network_get(url, timeout=40); response.raise_for_status()
             documents[kind] = response.content
             (folder / (kind + '.txt')).write_bytes(response.content)
         listing = build_universe(documents, price_date,
@@ -141,7 +169,7 @@ def acquire_universe(folder, supplied=None, preset=None, price_date=None):
         evidence['retrieved_at'] = now()
     elif spec['name'] == 'sp500':
         url = 'https://stockanalysis.com/list/sp-500-stocks/'
-        response = requests.get(url, timeout=40); response.raise_for_status()
+        response = network_get(url, timeout=40); response.raise_for_status()
         (folder / 'constituents.html').write_bytes(response.content)
         tables = pd.read_html(io.StringIO(response.text))
         candidates = [t for t in tables if 'Symbol' in t.columns and 'Company Name' in t.columns]
@@ -157,7 +185,7 @@ def acquire_universe(folder, supplied=None, preset=None, price_date=None):
             'issuer_identity_basis': 'Exact normalized constituent company name, not an SEC-certified identifier'}
         spy_url = 'https://www.ssga.com/library-content/products/fund-data/etfs/us/holdings-daily-us-en-spy.xlsx'
         try:
-            response = requests.get(spy_url, timeout=40); response.raise_for_status()
+            response = network_get(spy_url, timeout=40); response.raise_for_status()
             (folder / 'spy-holdings.xlsx').write_bytes(response.content)
             records = xlsx_rows(response.content)
             headers = [r for r in records if 'Ticker' in r.values()]
@@ -173,6 +201,8 @@ def acquire_universe(folder, supplied=None, preset=None, price_date=None):
                 'missing_from_fund': sorted(observed - tickers), 'fund_extras': sorted(tickers - observed),
                 'header_metadata': records[:header_index],
                 'note': 'SPY is a fund proxy. Residuals, cash and effective membership changes need explicit review; differences never silently change the universe.'}
+        except NetworkPolicyError:
+            raise
         except Exception as exc:
             evidence['fund_proxy_check'] = {'source': spy_url, 'status': 'UNAVAILABLE', 'error': str(exc)}
     else:
@@ -224,6 +254,7 @@ def history_ineligibility(row, grid):
 
 def fetch_row(identity, grid, folder, prior=None, reusable=None, source_checks=None,
               history_first=False, component_store=None, contract_vintage=None):
+    require_network()
     import yfinance as yf
     symbol = identity['symbol']
     provider_symbol = identity.get('provider_symbol', symbol.replace('.', '-'))
@@ -325,6 +356,8 @@ def fetch_row(identity, grid, folder, prior=None, reusable=None, source_checks=N
                 result['component_acquisition'][key].update(
                     capture_request_id=captured['request_id'], capture_raw_sha256=captured['raw_sha256'],
                     source_role=captured['request']['source_role'])
+        except NetworkPolicyError:
+            raise
         except Exception as exc:
             result['errors'].append({'component': key, 'error': type(exc).__name__ + ':' + str(exc)})
             result[key] = {} if key == 'info' else {'index': [], 'columns': [], 'data': []}
@@ -363,7 +396,7 @@ def argument_parser():
     universe_args.add_argument('--universe', type=Path, help='Explicit dated custom universe JSON')
     universe_args.add_argument('--universe-preset', choices=('us-listed', 'sp500'),
         help='Default for a new run: us-listed. An omitted selection on resume retains the frozen universe.')
-    parser.add_argument('--universe-only', action='store_true', help='Freeze and audit membership; do not fetch prices/financials or claim a completed stock screen')
+    parser.add_argument('--universe-only', action='store_true', help='Freeze and audit membership; presets still require network. No price/financial screen. Supplied local universe or membership-only resume can run offline.')
     parser.add_argument('--resume', action='store_true', help='Retry failed components of this run, preserving old snapshots')
     parser.add_argument('--partial-fetch', action='store_true', help='Opt in to source-checked statement reuse from an explicit sealed bundle; full fetch remains default')
     parser.add_argument('--reuse-from', type=Path, help='Explicit portable parent research-library root; no hidden cache discovery')
@@ -382,6 +415,9 @@ def argument_parser():
 
 def main():
     args = argument_parser().parse_args()
+    mode = network_mode()
+    if not args.universe_only or (not args.resume and args.universe is None):
+        require_network()  # Before directories, calendars, contracts or providers.
     if args.resume and (args.partial_fetch or args.reuse_from or args.reuse_manifest or args.freshness_receipt):
         raise ValueError('RESUME_AND_NEW_RUN_SOURCE_CHECKS_ARE_DISTINCT')
     if not args.partial_fetch and (args.reuse_from or args.reuse_manifest):
@@ -405,13 +441,22 @@ def main():
             for name in ('public_research_fetch.py', 'listed_universe.py', 'incremental_research.py', 'research_data_store.py')},
         'decision_at': args.decision_at, 'price_date': grid[-1]['date'], 'prompt': prompt,
         'prompt_sha256': digest(prompt), 'hold': args.hold, 'acquisition': 'independent_fresh_network_pull',
+        'network_mode': mode,
         'universe_selection': universe_spec(args.universe_preset, args.universe),
         'historical_information_certified': False,
         'collection_mode': 'history_first' if args.history_first else 'full_financial',
         'component_store': bool(args.component_store),
         'timing_note': 'Prices are frozen to the last completed session. Financial/provider facts are obtained now; historical publication and restatement timing are not certified. This is not a point-in-time backtest.'}
+    if args.universe_only and args.universe is not None:
+        contract['acquisition'] = 'supplied_local_universe_only'
+        contract['timing_note'] = 'Supplied membership bytes only; no price or financial acquisition. The calendar date does not verify membership freshness.'
     prior = {}
     output_folder = folder
+    attempt_context = {'network_mode': mode,
+        'requested_scope': 'membership_only' if args.universe_only else 'prices_and_financials',
+        'acquisition': ('retained_membership_only' if args.universe_only else 'resume_missing_price_financial_components')
+                       if args.resume else contract['acquisition'],
+        'scope_is_request_not_proof_of_network_calls': True}
     if args.resume:
         old_contract = json.loads((folder / 'contract-before-fetch.json').read_text(encoding='utf-8'))
         if old_contract.get('collection_mode', 'full_financial') != contract['collection_mode']:
@@ -434,12 +479,16 @@ def main():
         attempt = len(list(folder.glob('retry-*'))) + 1
         output_folder = folder / ('retry-%03d' % attempt)
         output_folder.mkdir(exist_ok=False); (output_folder / 'raw').mkdir()
+        attempt_context['original_contract_sha256'] = digest(contract)
         save(output_folder / 'resume-receipt.json', {'started_at': now(), 'prior_checkpoints_sha256': digest(prior),
             'corrupt_checkpoints_retained': corrupt,
-            'contract_sha256': digest(contract), 'scope': 'Only failed acquisition components; no ranking-based retries'})
+            'contract_sha256': digest(contract), 'attempt': attempt_context,
+            'scope': 'Retained membership only; no provider acquisition' if args.universe_only else
+                     'Only missing or failed acquisition components; no ranking-based retries'})
     else:
         if args.partial_fetch:
             contract['acquisition'] = 'explicit_optional_partial_fetch'
+        attempt_context['acquisition'] = contract['acquisition']
         save(folder / 'contract-before-fetch.json', contract)
         universe = acquire_universe(folder, args.universe, args.universe_preset, grid[-1]['date'])
     print('Universe', len(universe['rows']), 'securities; close', grid[-1]['date'], flush=True)
@@ -471,11 +520,14 @@ def main():
             rows.append(future.result())
             if len(rows) % 25 == 0 or len(rows) == len(universe['rows']):
                 print('Acquired', len(rows), '/', len(universe['rows']), flush=True)
+    attempt_context['provider_jobs_submitted'] = len(futures)
+    attempt_context['complete_checkpoints_reused'] = len(universe['rows']) - len(futures)
     snapshot = {'schema_version': 1, 'profile_sha256': contract['profile_sha256'],
         'price_date': grid[-1]['date'], 'session_dates': [s['date'] for s in grid],
         'mandate': {'universe': universe['evidence']['universe_id'], 'hold': args.hold,
                     'prompt_sha256': contract['prompt_sha256']},
-        'contract': contract, 'universe_evidence': universe['evidence'],
+        'contract': contract, 'contract_role': 'frozen_original_research_contract',
+        'acquisition_attempt': attempt_context, 'universe_evidence': universe['evidence'],
         'universe_symbols': sorted(r['symbol'] for r in rows), 'rows': sorted(rows, key=lambda r: r['symbol']),
         'completed_at': now(), 'dependencies': {n: importlib.metadata.version(n)
             for n in ('yfinance', 'pandas', 'exchange_calendars')}}

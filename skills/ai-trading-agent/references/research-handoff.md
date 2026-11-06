@@ -74,6 +74,42 @@ SKILL.md alone, stale agent entrypoints, or a version string without files do no
 establish the installed implementation. Instructions cannot force a model to use
 tools; require execution artifacts and reject unsubstantiated conformance claims.
 
+## Omitted intent and an explicit computational context
+
+Separate supplied intent, documented research defaults, analyst assumptions and
+unresolved fields in the mandate. When neither a hard exit nor a flexible review
+instruction is supplied, use the documented `comparison` mode for analytical
+context; it does not assert either user preference. Keep the actual exit plan and
+early-exit policy unresolved unless the request supplies them. A helper requiring
+an explicit mode is not evidence that the user chose one.
+
+In particular, `planning.recommendation_context` accepts `deadline_mode:
+comparison`; use that comparison-only context when the exit intention is unknown.
+Do not choose `flexible_review` merely to populate the required input. A proposed
+holding period or comparison date may be a clearly labeled research assumption,
+with its rationale and missing anchors disclosed. It is not a skill-wide default,
+a user instruction, an exit rule or a scheduled order. If the calculation needs
+an unavailable date, retain that limitation instead of inventing a supplied date.
+A clean-slate request limits mandate authority to the current request and its
+applicable documented defaults. When it excludes earlier personal preferences,
+exclude the entire prior preference/profile context from mandate selection unless
+the current request explicitly adopts it. This covers objectives, horizons,
+funding and contribution plans, loss tolerance, risk posture, filters and
+constraints wherever they appear: top-level fields are not more current than
+nested fields merely labeled prior or historical. An allowlist permits reading a
+file; it does not make every supplied preference an operative user instruction.
+
+Carry that exclusion into downstream context, sizing, scenario and recommendation
+inputs. Do not discard only an old watchlist while silently importing the rest of
+its profile, or relabel excluded values as inferred assumptions, skill defaults
+or current decision context. Keep unavailable intent unknown, or propose a
+separately justified research assumption from the actual request and applicable
+defaults without borrowing the excluded values. Permitted market, business and
+account observations remain evidence according to their own scope and provenance;
+their availability does not adopt an attached personal preference. If a genuinely
+ambiguous current request appears to adopt conflicting profile instructions,
+clarify the conflict rather than silently choosing prior intent.
+
 ## A comparison date is not a forced sale
 
 `horizon_mode: comparison` is the default and carries `forced_exit: false` and
@@ -93,6 +129,14 @@ beyond that window remain unassessed. A bare `decision_mode: long_term` review d
 not replace the handoff's exact-horizon evidence contract.
 
 ## Check release freshness, not just retrieval time
+
+A financial period normally ends before the market-price date. That ordering
+alone establishes age, not staleness. Label evidence stale only against an
+applicable declared age threshold or evidence that a newer relevant release,
+amendment or required period was available at the cutoff. State which test failed.
+When latest-release evidence is absent, freshness is unknown; neither the earlier
+period end nor a recent download resolves it. Keep measured age, threshold status
+and latest-public-period verification separate in the answer.
 
 Keep the original public snapshot unchanged. Build a ledger containing
 `contract_sha256`, `acquisition` (`independent_fresh`, `shared_snapshot`, or

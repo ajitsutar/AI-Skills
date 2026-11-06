@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # AI Trading Agent
 
-Package version: **5.6.1 - November 5, 2026**.
+Package version: **5.6.2 - November 6, 2026**.
 
 This skill researches investments, explains evidence and prepares host actions.
 Every execution task, including each scheduled task, has its own private persistent
@@ -189,11 +189,9 @@ For large shared-input calculation runs, use the documented
 results and resolvable claims while avoiding repeated expanded copies in every
 report. Compact output changes storage, not numerical methods or verification.
 
-Support the user's actual objective and horizon, including a same-session trade,
-a dated exit, a rolling thesis review and arbitrary years or longer. Distinguish
-calendar days from trading days and a forced sale from an intended holding period.
-Use [holding-period-planning.md](references/holding-period-planning.md). Future
-calendar and business uncertainty belong in the explanation, not invented forecasts.
+Support the user's actual objective and horizon, including a same-session trade, a dated exit, a rolling thesis review and arbitrary years or longer. Distinguish calendar days from trading days and a forced sale from an intended holding period.
+Use [holding-period-planning.md](references/holding-period-planning.md). Future calendar and business uncertainty belong in the explanation, not invented forecasts.
+For omitted exit intent, use the documented [comparison-only research context](references/research-handoff.md#omitted-intent-and-an-explicit-computational-context); do not infer a flexible or fixed exit to satisfy a helper.
 
 ### Mandatory default stock universe
 
@@ -210,8 +208,8 @@ For ranked fundamental requests, use
 cutoff and selection contract; run the shared `public-vqm-discovery` acquisition
 and scorer for its reproducible research queue. Preserve that computed queue,
 then review primary evidence and the requested horizon in its order. Use
-`scripts/research_handoff.py` for the final computed research ordering. A clean-slate
-request omits previous preferences and picks; it does not erase broker history.
+`scripts/research_handoff.py` for the final computed research ordering. A [clean-slate request](references/research-handoff.md#omitted-intent-and-an-explicit-computational-context)
+excludes all prior personal preferences and picks, including top-level profile fields; an input allowlist is not authority to adopt them. This does not erase broker history.
 
 Full data collection is the default. Use [optional partial-fetch](references/partial-fetch.md)
 only when the user explicitly requests partial collection or reuse of a supplied
@@ -278,11 +276,13 @@ horizon scenarios. Banks, insurers, REITs and cyclicals need appropriate metrics
 Read [screening-and-value-traps.md](references/screening-and-value-traps.md) and
 [financial-normalization.md](references/financial-normalization.md). Missing facts
 remain missing. Report incomplete research honestly without inventing certainty.
+For a recovery backlog, separate [value availability, normalization support and source assurance](references/financial-normalization.md#recovery-backlog-separate-calculation-support-from-source-assurance); missing original documents alone do not make a supported calculation unsupported.
 When the supplied financial observations are not already normalized, map them
 explicitly with `data.normalize_flows` and [flow-normalization.md](references/flow-normalization.md).
 Run the installed normalizer; do not treat a missing input envelope as missing
 financial evidence or create a separate model-written TTM calculation.
 For statement education/comparisons, follow the [financial evidence and derivation contract](references/fundamental-toolkit.md#financial-statement-evidence).
+For peer valuation, also verify the [numerator and cash-flow basis](references/fundamental-toolkit.md#valuation-numerator-and-cash-flow-basis) before recommending a multiple, including custom arithmetic.
 Preserve EPS period/numerator basis and comparator provenance; do not infer SBC issuance or covenant definitions. Use supported `fundamental.calculate` ratios and raw opening/closing or gross-profit operands.
 Derived observations are executed calculations, not assumptions. Retain source bindings and derived results, and reconcile intermediate inputs and every final narrative metric. Historical trend claims need a separate same-metric current/prior evidence row, including in the conclusion.
 

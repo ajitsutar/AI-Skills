@@ -47,6 +47,12 @@ UTF-8 JSON bytes and computed output. Its document has:
   supported calculation. A monetary unit alone does not establish average-period
   semantics; retain those source terms explicitly.
 
+For omitted exit intent, set the required `deadline_mode` to the documented
+analytical `comparison` default and leave unprovided `hard_exit` and `exit_plan`
+unbound. Explicit `flexible_review` or `fixed_exit` requires the corresponding
+request. This input requirement never establishes a user preference; follow
+[mandate omission semantics](research-handoff.md#omitted-intent-and-an-explicit-computational-context).
+
 The report calls the existing allocation-context arithmetic with reference gross
 notionals and the original allocation-budget denominator, separately for each
 single-stock alternative. It returns full source hashes, bindings, mapped row

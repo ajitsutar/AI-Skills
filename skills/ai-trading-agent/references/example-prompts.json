@@ -27,6 +27,26 @@
         {
           "title": "Prepare a reproducible research release",
           "prompt": "Audit [SKILL CANDIDATE] using an artifact-hashed fresh environment, frozen regression fixtures, a complete registered experiment inventory and actual first-response host comparisons. Preserve failures and disagreements. Produce a capability card and source-rights inventory that separate implemented tools, tested environments, incomplete data, unrun hosts and unproven predictive performance."
+        },
+        {
+          "title": "Keep supplied-data research offline",
+          "prompt": "Use only [ATTACHED FROZEN INPUTS] for this research run. Set AI_TRADING_NETWORK_MODE=offline for bundled acquisition helpers and preserve the setting in command receipts. Do not fetch current membership or financials, including indirectly through libraries. Complete supported local calculations, retain refusals and missing inputs, and distinguish the helper guard from host-enforced network isolation."
+        },
+        {
+          "title": "Check the capital basis of peer multiples",
+          "prompt": "Compare [ISSUERS] using [SOURCE-BOUND STATEMENTS AND MARKET DATA]. For each proposed multiple show its numerator, denominator, claimholders, period and source. Reconcile reported CFO less capex to the required enterprise or equity cash-flow basis before recommending it. Keep unsupported interest, tax and borrowing adjustments unknown; distinguish observed ratios from labeled assumption scenarios. Explain which metrics and peers fit without forcing a ranking. For each metric retain calculation status, capital basis, business and cycle applicability, unresolved inputs and a suitability conclusion. Keep numerical ordering distinct from a supported value ranking; positive earnings alone do not establish a best common metric. For earnings multiples, establish common-income attribution and the actual EPS/share basis before endorsing a computed headline P/E. Keep illustrative proxies distinct from conditional method proposals. Explain differences using each actual numerator and denominator; equal prices or market capitalizations do not make enterprise values equal."
+        },
+        {
+          "title": "Separate data recovery from calculation support",
+          "prompt": "Using [SUPPLIED OBSERVATIONS AND NORMALIZATION INPUTS], build a field-level recovery backlog. Run supported normalization and preserve its exact results. Distinguish absent values, unsupported concepts or representations, calculation diagnostics, and missing original documents or verification. Keep computed values with their limitations; do not call a supported transcription format unsupported solely because its original document is unavailable, or call a source authentic because normalization succeeded."
+        },
+        {
+          "title": "Lock a clean-slate research mandate",
+          "prompt": "Research [NAMED INSTRUMENT OR UNIVERSE] using only this request, [SUPPLIED INPUTS] and the current skill defaults. Record supplied intent, documented defaults, proposed research assumptions and unresolved fields separately. If I have not supplied an exit intention, use comparison-only analytical context and leave the actual exit plan unknown. Do not inherit prior preferences or infer flexible or fixed sale instructions from a required helper field. Treat any excluded prior preference/profile context as a whole, including top-level objectives, budgets, horizons and risk limits. Reading an allowlisted profile does not adopt it as my current intent. Do not reuse its values in sizing or relabel them as inferred assumptions."
+        },
+        {
+          "title": "Check financial freshness with the correct test",
+          "prompt": "Review [FINANCIAL PERIODS, PUBLICATION EVIDENCE AND PRICE TIMESTAMPS] at [INFORMATION CUTOFF]. Report measured financial age, any applicable age threshold, and latest-public-release verification separately. Identify the evidence for each stale classification; an earlier financial period than the price date alone is not enough. Keep unknown freshness and missing source documents explicit."
         }
       ]
     },
@@ -581,7 +601,7 @@
         },
         {
           "title": "Estimate historical tail losses",
-          "prompt": "Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps. If applying current weights to aligned asset returns, label the result a current-weight shock distribution rather than a historical strategy backtest. Report the supplied notional denominator, effective tail sample mass and sparse-sample warnings; do not scale a short sample into a guaranteed future loss limit. Calculate drawdown only from a supplied realized portfolio or strategy return path; do not infer historical strategy drawdown from today\u2019s weights."
+          "prompt": "Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps. If applying current weights to aligned asset returns, label the result a current-weight shock distribution rather than a historical strategy backtest. Report the supplied notional denominator, effective tail sample mass and sparse-sample warnings; do not scale a short sample into a guaranteed future loss limit. Calculate drawdown only from a supplied realized portfolio or strategy return path; do not infer historical strategy drawdown from today’s weights."
         },
         {
           "title": "Run portfolio stress scenarios",

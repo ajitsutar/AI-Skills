@@ -52,6 +52,111 @@ these are interpretation boundaries, not execution or broker gates.
   declarations were evidenced. Report unresolved basis mismatches instead of an
   unqualified reconciliation.
 
+### Valuation numerator and cash-flow basis
+
+Before calculating or recommending a peer multiple, retain the exact numerator,
+denominator, claimholders, period, units and source pointers. Match enterprise
+value to enterprise earnings or cash flows before financing claims; match common
+equity value to earnings or cash flows attributable to common equity. A correct
+division does not establish that the multiple fits the business.
+
+Reported CFO minus total capex is a reported cash-flow measure, not automatically
+unlevered FCFF or FCFE. Check the issuer's actual interest classification, cash-tax
+treatment, reinvestment and financing flows. Do not recommend EV / reported
+(CFO minus capex), or call it EV/FCFF, unless a sourced bridge establishes the
+enterprise cash-flow basis. Do not infer cash interest or a tax shield from an
+interest expense, a reported effective tax rate, or a forecast tax assumption.
+An explicit valuation assumption may support a separately labeled scenario,
+never relabel the observed reported cash flow.
+
+For the conventional case with interest paid within CFO, FCFF requires the
+appropriate after-tax interest adjustment; FCFE also reflects net borrowing.
+Avoid applying that bridge again where the reporting classification already
+excludes financing interest. Missing bridge operands or classification mean
+that cash-flow multiple's suitability remains unresolved. Continue other
+supported comparisons. A reported (CFO minus capex) / market-cap ratio may be
+shown with its exact definition and financing limitations; it is not automatically
+an FCFE yield or a valuation conclusion.
+
+Before final authoring, check this basis in every multiple table, suitability
+statement, ranking and summary, including supplemental custom calculations.
+Do not fix a mismatch by renaming its denominator. Distinguish numerical ratios
+from justified metric selection and peer comparability. See the
+[CFA Institute FCFF/FCFE framework](https://www.cfainstitute.org/insights/professional-learning/refresher-readings/2026/free-cash-flow-valuation)
+for the financing and tax bridge; source classifications still require evidence.
+
+### Earnings-multiple eligibility
+
+Separate recommending a valuation method in principle from endorsing the actual
+computed ratio as a headline measure. P/E may be a useful method to investigate
+for a profitable business; that does not establish the earnings and share basis
+of a particular supplied-data calculation.
+
+| Calculation | Basis needed for valuation interpretation |
+|---|---|
+| Share price / reported EPS | Price and EPS refer to compatible share classes, currency and split conventions. Retain the EPS period, common-equity earnings attribution and basic/diluted basis under the applicable reporting framework, including its period-weighted denominator and relevant adjustments. |
+| Common-equity market capitalization / earnings attributable to common equity | Both quantities cover the same common claims and consolidation scope; retain the earnings period and attribution evidence. This aggregate formulation does not require inventing an EPS denominator. Do not claim it equals price / reported EPS without reconciling their share-count definitions and dates. |
+| Share price / (unattributed net income / dated shares) | This is illustrative arithmetic while attribution or the appropriate EPS denominator remains unestablished. Preserve its exact formula and limitations; do not promote it to a supported headline P/E merely because earnings are positive. |
+
+A dated share count labeled diluted does not establish weighted diluted EPS;
+zero preferred-equity or noncontrolling-interest balances do not establish the
+period's common-income attribution. An `illustrative` label discloses a proxy,
+but does not make that proxy eligible as the best or most fitting headline P/E.
+If either basis remains unresolved, keep the computed proxy's suitability
+unresolved. A conditional method proposal can instead state that P/E would be
+useful after the specific attribution and EPS evidence is obtained. A separately
+specified assumption scenario remains conditional, not an observed supported
+multiple. Continue the educational arithmetic and other supported measures.
+The [EPS evidence contract above](#financial-statement-evidence), with its IAS 33
+source, explains numerator and denominator checks; the issuer's actual reporting
+framework still requires evidence.
+
+### Explain differences from the actual operands
+
+Before saying that multiple differences arise only from denominators, compare the
+actual numerator and denominator of every ratio being discussed. Equal share
+prices do not establish equal equity values when share counts differ. Even equal
+market capitalizations do not establish equal enterprise values when debt, cash
+or other bridge components differ. A numerical ordering can reflect changes in
+both numerator and denominator. Retain the computed bridge and explain the
+observed changes; do not transfer a constant-price explanation to an EV multiple
+whose numerator changed. This arithmetic attribution is separate from a causal
+business explanation or a value judgment.
+
+### Metric suitability is separate from computed ratios
+
+For each proposed peer metric, retain a suitability row alongside its calculation:
+
+| Finding | Required distinction |
+|---|---|
+| Computed ratio | Exact numerator and denominator, period, unit and result; arithmetic success only. |
+| Capital basis | Whether numerator and denominator represent compatible claimholders; identify an unresolved financing, interest or tax bridge. |
+| Business applicability | Whether accounting, asset intensity, segment mix and cycle position make this metric comparable for the businesses being assessed. |
+| Missing support | Specific normalization, segment, through-cycle or other evidence required before interpreting the metric. |
+| Suitability conclusion | Supported for the stated purpose, conditional on explicit assumptions, or unresolved; carry that conclusion into the final table and summary. |
+
+Positive earnings and common dates or currencies make some ratios calculable;
+they do not establish the best common valuation metric or comparable economics.
+For a cyclical or commodity-sensitive business, distinguish reported-period
+earnings from supported through-cycle or mid-cycle earnings. When cycle position
+or segment economics are missing, report that limitation rather than promoting
+reported EBIT to a universally suitable headline denominator. Follow the
+[sector review](screening-and-value-traps.md) and continue supported work.
+
+Raw arithmetic can be useful even when suitability is unresolved: retain it as
+an explicitly limited numerical diagnostic. Ordering those ratios numerically
+does not establish a value ranking, cheapness, cash support or preferred peer.
+Calling a mixed-claim cash-flow ratio a diagnostic or cash-support check does not
+repair its missing capital basis. Explain what the arithmetic actually shows and
+what it cannot support; use no positive valuation interpretation until the
+required basis is established. A clearly specified scenario may be interpreted
+conditionally, but its assumptions must remain separate from observed evidence.
+
+Reconcile every suitability statement, including a proposed best/headline metric,
+against that metric's row. A caveat elsewhere does not qualify a contradictory
+unconditional conclusion. This is an interpretation check, not a prohibition on
+reported-period ratios, a new scoring formula or an execution gate.
+
 ### Per-metric trend evidence at final authoring
 
 For each retrospective financial claim such as increased, declined, improved,

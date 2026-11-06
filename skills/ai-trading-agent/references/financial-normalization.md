@@ -79,6 +79,34 @@ model research judgment; recording a review status does not prove it. Models may
 propose a correction with evidence, but must create a separate input revision.
 They must not silently replace the shared ledger to obtain a preferred ranking.
 
+## Recovery backlog: separate calculation support from source assurance
+
+Classify each field on separate axes when diagnosing or recovering data:
+
+| Axis | Record the actual finding |
+|---|---|
+| Value availability | Supplied observation, successfully derived value, or absent operand; retain its source/result pointer. Inspect embedded normalization inputs as well as materialized rows. |
+| Normalization support | Whether this implementation supports the concept, adapter, unit, period path and input representation; cite a concrete unsupported feature or diagnostic when it does not. |
+| Executed calculation | Preserve the normalizer's actual result, status, issues and calculation trail, including READY, draft or unresolved output. |
+| Documentary assurance | Whether original source bytes, identity, publication, period and verification evidence are retained and independently checked; distinguish declarations from checks performed. |
+
+A supported reviewed transcription remains a supported input representation even
+when the original filing is not supplied. A successful normalization does not
+authenticate that transcription. Missing original bytes create a source-recovery
+or verification gap; they do not by themselves make its format, concept or
+calculation unsupported. Conversely, READY or a supplied verification flag cannot
+close a documentary assurance gap that has not been checked.
+
+Keep these findings together in the backlog. Preserve a computed value and its
+limitations rather than rewriting it as absent or changing the helper's status.
+For an unsupported mapping, identify the unsupported element and the supported
+reviewed-transcription or adapter work needed. For an absent observation, identify
+the missing operand. For missing original bytes, request or acquire the specific
+document and verify/re-extract it when authorized. These are distinct recovery
+actions; more than one can apply to a field. An unavailable source does not prove
+that no value exists, and a value's presence does not establish eligibility for
+real research. Fictional declarations remain fictional even when replay succeeds.
+
 ## Frozen accounting choices
 
 - Operating income means the reported GAAP operating-income line. No automatic
