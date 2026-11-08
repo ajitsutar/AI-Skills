@@ -280,6 +280,8 @@ class SafetyAndCacheTests(unittest.TestCase):
             attestation["stem_sha256"] = guitar.hash_file(stem)
             guitar.attestation_path(stem).write_text(json.dumps(attestation), encoding="utf-8")
             self.assertTrue(guitar.cache_is_valid(tile, stem, "model", "config", "0.44.5"))
+            # A pre-0.47 cache must not survive the overlap-semantics migration.
+            self.assertFalse(guitar.cache_is_valid(tile, stem, "model", "config", guitar.SEPARATOR_VERSION))
             stem.write_bytes(b"changed")
             self.assertFalse(guitar.cache_is_valid(tile, stem, "model", "config", "0.44.5"))
 
@@ -294,6 +296,22 @@ class SafetyAndCacheTests(unittest.TestCase):
             clip.write_bytes(b"changed clip")
             with self.assertRaises(SystemExit):
                 guitar.cache_is_valid(tile, stem, "model", "config", "0.44.5")
+
+    def test_overlap_count_change_invalidates_current_cache(self) -> None:
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            clip, stem = root / "clip.wav", root / "stem.wav"
+            clip.write_bytes(b"clip")
+            stem.write_bytes(b"stem")
+            tile = {"clip_wav": str(clip), "clip_sha256": guitar.hash_file(clip)}
+            record = guitar.attestation_core(tile, "model", "config", guitar.SEPARATOR_VERSION)
+            record["stem_sha256"] = guitar.hash_file(stem)
+            self.assertEqual(record["settings"]["mdxc_overlap"], 2)
+            guitar.attestation_path(stem).write_text(json.dumps(record), encoding="utf-8")
+            self.assertTrue(guitar.cache_is_valid(tile, stem, "model", "config", guitar.SEPARATOR_VERSION))
+            record["settings"]["mdxc_overlap"] = 8
+            guitar.attestation_path(stem).write_text(json.dumps(record), encoding="utf-8")
+            self.assertFalse(guitar.cache_is_valid(tile, stem, "model", "config", guitar.SEPARATOR_VERSION))
 
     def test_external_stem_source_must_remain_attested(self) -> None:
         with tempfile.TemporaryDirectory() as directory:

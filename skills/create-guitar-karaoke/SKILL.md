@@ -44,7 +44,8 @@ Read [references/modes-and-backends.md](references/modes-and-backends.md) when c
    - Include solo sections that overlap vocals; vocals are retained because the guitar stem is subtracted from the original mix.
 4. Choose the stem source:
    - Prefer an authorized full-length stem with `--stem-file` and its matching `--stem-kind`. This path needs no model download. An independently licensed separator can generate the stem before this workflow.
-   - For exact lead-only or rhythm-only work, verify that the supplied stem contains that role. The optional aggregate model cannot identify guitar roles.
+   - For lead-only or rhythm-only work, verify that the supplied stem contains that role. The optional aggregate model cannot identify guitar roles. An opt-in second-stage [lead/rhythm experiment](references/experimental-lead-rhythm.md) can estimate these roles from an authorized aggregate stem, but is not an exact separator.
+   - For text- or time-prompted targets, see the optional [SAM Audio adapter](references/sam-audio.md). It needs its own runtime and model access; do not silently use a generated residual as a vocals-preserving replacement for the original mix.
    - Optional BS-Roformer-SW inference requires local checkpoint/config files and an operator-reviewed rights record; public weight rights are unresolved. Follow [model rights and local inference](references/modes-and-backends.md). Do not infer weight permission from a software MIT license or accept a risk acknowledgement as permission.
 5. Before a full-song model run, process a representative 20-25-second smoke-test window and audition the target, retained vocals, and leakage.
 6. Keep processing in 32-bit float WAV, encode MP3 once, and render video from the uncompressed edited master.

@@ -1,9 +1,11 @@
 #!/usr/bin/env python
 import argparse
 import contextlib
+import hashlib
 import importlib.util
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -16,6 +18,13 @@ from pathlib import Path
 
 _PUBLICATION_LOCKS_GUARD = threading.Lock()
 _PUBLICATION_LOCKS = {}
+
+AUDIO_SEPARATOR_VERSION = "0.48.0"
+MELBAND_MODEL_FILENAME = "vocals_mel_band_roformer.ckpt"
+MELBAND_CONFIG_FILENAME = "vocals_mel_band_roformer.yaml"
+MELBAND_NO_VOCALS_STEM = "other"
+MELBAND_MODEL_SHA256 = "87201f4d31afb5bc79993230fc49446918425574db48c01c405e44f365c7559e"
+MELBAND_CONFIG_SHA256 = "b958b29c8f7195f0d86bee6759a33980db675c4ecaf2fcaa80fa125828e6cd38"
 
 
 def _lexists(path):
@@ -91,7 +100,7 @@ def publish_track(job_outdir, stem, outdir, overwrite=False, input_audio=None):
     try:
         relative_track = stem.parent.relative_to(job_outdir)
     except ValueError as exc:
-        raise SystemExit("Generated stem was outside the isolated Demucs output directory.") from exc
+        raise SystemExit("Generated stem was outside the isolated separation output directory.") from exc
 
     source_track = stem.parent
     destination = outdir / relative_track
@@ -200,6 +209,122 @@ def ensure_demucs_available():
         )
 
 
+def ensure_audio_separator_available(executable=None):
+    """Return an audio-separator 0.48.0 executable or fail before inference."""
+    candidate = executable
+    if candidate:
+        candidate_path = Path(candidate).expanduser()
+        if candidate_path.is_file():
+            candidate = str(candidate_path.resolve())
+        else:
+            candidate = shutil.which(candidate)
+    else:
+        candidate = shutil.which("audio-separator")
+    if not candidate:
+        raise SystemExit(
+            "audio-separator is not installed or is not on PATH. Install the pinned "
+            "dependency with: python -m pip install -r scripts/requirements-audio-separator.txt"
+        )
+
+    try:
+        completed = subprocess.run(
+            [candidate, "--version"],
+            check=True,
+            capture_output=True,
+            text=True,
+        )
+    except (OSError, subprocess.CalledProcessError) as exc:
+        raise SystemExit(f"Could not verify audio-separator version: {exc}") from exc
+    version_text = f"{completed.stdout}\n{completed.stderr}".strip()
+    match = re.search(
+        r"audio[- ]separator(?:\.exe)?(?:\s+version)?\s+v?(\d+\.\d+\.\d+)",
+        version_text,
+        flags=re.IGNORECASE,
+    )
+    if match is None and re.fullmatch(r"v?(\d+\.\d+\.\d+)", version_text):
+        match = re.fullmatch(r"v?(\d+\.\d+\.\d+)", version_text)
+    version = match.group(1) if match else None
+    if version != AUDIO_SEPARATOR_VERSION:
+        observed = version or version_text or "unreported"
+        raise SystemExit(
+            f"audio-separator {AUDIO_SEPARATOR_VERSION} is required; found {observed}. "
+            "Use the pinned requirements file in an isolated environment."
+        )
+    return candidate
+
+
+def _sha256(path):
+    digest = hashlib.sha256()
+    with Path(path).open("rb") as handle:
+        for chunk in iter(lambda: handle.read(1024 * 1024), b""):
+            digest.update(chunk)
+    return digest.hexdigest()
+
+
+def verify_melband_model_files(model_dir):
+    """Verify the registered checkpoint and config against the v0.48.0 manifest."""
+    model_dir = Path(model_dir)
+    expected = {
+        MELBAND_MODEL_FILENAME: MELBAND_MODEL_SHA256,
+        MELBAND_CONFIG_FILENAME: MELBAND_CONFIG_SHA256,
+    }
+    for filename, expected_hash in expected.items():
+        path = model_dir / filename
+        if not path.is_file() or path.is_symlink():
+            raise SystemExit(f"audio-separator did not provide the pinned model file: {path}")
+        actual_hash = _sha256(path)
+        if actual_hash != expected_hash:
+            raise SystemExit(
+                f"Refusing unverified audio-separator model file {path}: "
+                f"expected SHA-256 {expected_hash}, got {actual_hash}."
+            )
+
+
+def find_audio_separator_no_vocals(job_outdir, audio):
+    expected = Path(job_outdir) / "audio-separator" / Path(audio).stem / "no_vocals.wav"
+    if expected.is_file() and not expected.is_symlink():
+        return expected
+    return None
+
+
+def validate_audio_separator_output(stem, input_audio):
+    """Validate the WAV and, when readable, its resampled source frame count."""
+    try:
+        import soundfile
+    except ImportError as exc:
+        raise SystemExit(
+            "The audio-separator environment is missing soundfile; reinstall the pinned requirements."
+        ) from exc
+    try:
+        output_info = soundfile.info(str(stem))
+    except (OSError, RuntimeError, ValueError) as exc:
+        raise SystemExit(f"Cannot inspect the generated no-vocals WAV: {exc}") from exc
+    if str(output_info.format).upper() != "WAV":
+        raise SystemExit(f"Generated no-vocals output is not WAV: {output_info.format}")
+    if output_info.samplerate != 44100 or output_info.frames <= 0:
+        raise SystemExit(
+            "Generated no-vocals WAV has an invalid sample rate or no audio frames: "
+            f"{output_info.samplerate} Hz, {output_info.frames} frames."
+        )
+
+    # libsndfile cannot inspect every accepted compressed input (notably some
+    # M4A builds). When it can, require the separator's 44.1 kHz output to
+    # preserve the decoded source duration to within 10 ms of resampling.
+    try:
+        input_info = soundfile.info(str(input_audio))
+    except (OSError, RuntimeError, ValueError):
+        return
+    if input_info.samplerate <= 0 or input_info.frames <= 0:
+        raise SystemExit("Input audio metadata has an invalid sample rate or frame count.")
+    expected_frames = round(input_info.frames * 44100 / input_info.samplerate)
+    tolerance_frames = 441
+    if abs(output_info.frames - expected_frames) > tolerance_frames:
+        raise SystemExit(
+            "Generated no-vocals WAV duration does not match the input: "
+            f"expected about {expected_frames} frames at 44100 Hz, got {output_info.frames}."
+        )
+
+
 def validate_model_rights(path, model, use_category):
     """Check an operator's model-use record, not the legal validity of its claims."""
     try:
@@ -224,16 +349,26 @@ def validate_model_rights(path, model, use_category):
                 "Scientific-purpose model terms do not establish permission for this use. "
                 "Use separately permitted weights or a licensed instrumental."
             )
-    elif basis != "separate_permission":
-        raise SystemExit("Model rights record needs scientific_purposes or separate_permission rights_basis.")
+    elif basis not in ("separate_permission", "open_license"):
+        raise SystemExit(
+            "Model rights record needs scientific_purposes, separate_permission, "
+            "or open_license rights_basis."
+        )
     return record
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Run Demucs vocal separation and print the no-vocals stem path.")
+    parser = argparse.ArgumentParser(description="Run a vetted vocal separator and print the no-vocals stem path.")
     parser.add_argument("audio", help="Input audio file, such as MP3, M4A, WAV, or FLAC.")
     parser.add_argument("--outdir", default="work/separated", help="Separation output directory.")
-    parser.add_argument("--model", default="htdemucs", help="Demucs model name.")
+    parser.add_argument(
+        "--backend", choices=("demucs", "audio-separator"), default="demucs",
+        help="Separation backend. Demucs remains the default for backward compatibility.",
+    )
+    parser.add_argument(
+        "--model", default=None,
+        help="Demucs model name, or the fixed registered audio-separator model filename.",
+    )
     parser.add_argument("--rights-record", required=True, help="JSON record of model-specific permission and intended use.")
     parser.add_argument(
         "--use-category", required=True,
@@ -241,6 +376,14 @@ def main():
         help="Actual intended use; scientific-purpose terms do not cover the other categories.",
     )
     parser.add_argument("--device", default=None, help="Optional Demucs device, such as cpu or cuda.")
+    parser.add_argument(
+        "--audio-separator", default=None,
+        help="Optional path or command name for the pinned audio-separator executable.",
+    )
+    parser.add_argument(
+        "--model-dir", default="work/models/audio-separator",
+        help="External audio-separator model cache; keep it outside this skill package.",
+    )
     parser.add_argument("--overwrite", action="store_true", help="Replace an existing complete track output.")
     args = parser.parse_args()
 
@@ -248,36 +391,84 @@ def main():
     if not audio.is_file():
         raise SystemExit(f"Audio file not found: {audio}")
 
-    validate_model_rights(args.rights_record, args.model, args.use_category)
-    ensure_demucs_available()
+    model = args.model or ("htdemucs" if args.backend == "demucs" else MELBAND_MODEL_FILENAME)
+    if args.backend == "audio-separator" and model != MELBAND_MODEL_FILENAME:
+        raise SystemExit(
+            f"The audio-separator backend is pinned to registered model {MELBAND_MODEL_FILENAME}."
+        )
+    if args.backend == "audio-separator" and args.device:
+        raise SystemExit("--device applies only to Demucs; audio-separator 0.48.0 selects its runtime device.")
+    if args.backend == "demucs" and args.audio_separator:
+        raise SystemExit("--audio-separator applies only to the audio-separator backend.")
+
+    # Rights validation deliberately precedes dependency checks, cache creation,
+    # model download, and output creation.
+    validate_model_rights(args.rights_record, model, args.use_category)
+    separator_executable = None
+    if args.backend == "demucs":
+        ensure_demucs_available()
+    else:
+        separator_executable = ensure_audio_separator_available(args.audio_separator)
+
     outdir = Path(args.outdir).resolve()
     if outdir.exists() and not outdir.is_dir():
         raise SystemExit(f"Separation output path is not a directory: {outdir}")
     outdir.mkdir(parents=True, exist_ok=True)
-    job_outdir = Path(tempfile.mkdtemp(prefix=".demucs-job-", dir=outdir))
-
-    cmd = [
-        sys.executable,
-        "-m",
-        "demucs",
-        "--two-stems",
-        "vocals",
-        "-n",
-        args.model,
-        "-o",
-        str(job_outdir),
-    ]
-    if args.device:
-        cmd.extend(["--device", args.device])
-    cmd.append(str(audio))
+    job_outdir = Path(tempfile.mkdtemp(prefix=f".{args.backend}-job-", dir=outdir))
 
     try:
-        try:
-            subprocess.run(cmd, check=True)
-        except subprocess.CalledProcessError as exc:
-            raise SystemExit(f"Demucs failed with exit code {exc.returncode}") from exc
+        if args.backend == "demucs":
+            cmd = [
+                sys.executable,
+                "-m",
+                "demucs",
+                "--two-stems",
+                "vocals",
+                "-n",
+                model,
+                "-o",
+                str(job_outdir),
+            ]
+            if args.device:
+                cmd.extend(["--device", args.device])
+            cmd.append(str(audio))
+            try:
+                subprocess.run(cmd, check=True)
+            except subprocess.CalledProcessError as exc:
+                raise SystemExit(f"Demucs failed with exit code {exc.returncode}") from exc
+            generated = find_no_vocals(job_outdir, model, audio)
+        else:
+            model_dir = Path(args.model_dir).resolve()
+            if model_dir.exists() and not model_dir.is_dir():
+                raise SystemExit(f"Model cache path is not a directory: {model_dir}")
+            model_dir.mkdir(parents=True, exist_ok=True)
+            track_dir = job_outdir / "audio-separator" / audio.stem
+            track_dir.mkdir(parents=True)
+            cmd = [
+                separator_executable,
+                str(audio.resolve()),
+                "--model_filename", MELBAND_MODEL_FILENAME,
+                "--model_file_dir", str(model_dir),
+                "--output_dir", str(track_dir),
+                "--output_format", "WAV",
+                "--single_stem", MELBAND_NO_VOCALS_STEM,
+                "--custom_output_names", json.dumps({MELBAND_NO_VOCALS_STEM: "no_vocals"}, separators=(",", ":")),
+                "--normalization", "1.0",
+                "--amplification", "0.0",
+                "--sample_rate", "44100",
+                "--use_soundfile",
+            ]
+            environment = os.environ.copy()
+            environment["AUDIO_SEPARATOR_MODEL_DIR"] = str(model_dir)
+            try:
+                subprocess.run(cmd, check=True, env=environment)
+            except subprocess.CalledProcessError as exc:
+                raise SystemExit(f"audio-separator failed with exit code {exc.returncode}") from exc
+            verify_melband_model_files(model_dir)
+            generated = find_audio_separator_no_vocals(job_outdir, audio)
+            if generated:
+                validate_audio_separator_output(generated, audio)
 
-        generated = find_no_vocals(job_outdir, args.model, audio)
         if not generated:
             raise SystemExit(f"Could not find the no_vocals stem produced under {job_outdir}")
         no_vocals = publish_track(job_outdir, generated, outdir, args.overwrite, audio)

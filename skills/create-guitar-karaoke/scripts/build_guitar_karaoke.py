@@ -26,10 +26,10 @@ MODEL_LABEL = "BS-Roformer-SW"
 EXPECTED_MODEL_SHA256 = "24e7d35ee9c64415673d3fd33e06a67cac2c103c5df6267ba1576459c775916e"
 MODEL_CONFIG_FILENAME = "BS-Roformer-SW.yaml"
 EXPECTED_CONFIG_SHA256 = "b558996f1e25eb48798bd6502505a5de94c4f966d6edfb1a0420f06cc40b501a"
-SEPARATOR_VERSION = "0.44.5"
+SEPARATOR_VERSION = "0.48.0"
 TARGET_SAMPLE_RATE = 44_100
 MIN_MODEL_CLIP_SECONDS = 11.0
-TOOL_VERSION = "1.1.0"
+TOOL_VERSION = "1.2.0"
 MANIFEST_SCHEMA_VERSION = 3
 REPORT_SCHEMA_VERSION = 1
 ATTESTATION_SCHEMA_VERSION = 1
@@ -40,7 +40,9 @@ SEPARATOR_SETTINGS = {
     "normalization": 1.0,
     "amplification": 0.0,
     "use_soundfile": True,
-    "mdxc_overlap": 8,
+    # Since 0.47 this is a window-overlap count, not a hop in seconds.
+    # Two is the bounded CPU baseline; version/settings attestations invalidate old caches.
+    "mdxc_overlap": 2,
     "mdxc_batch_size": 1,
     "mdxc_pitch_shift": 0,
 }

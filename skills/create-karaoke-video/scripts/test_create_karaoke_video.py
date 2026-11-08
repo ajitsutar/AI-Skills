@@ -1,4 +1,5 @@
 import importlib.util
+import hashlib
 import json
 import subprocess
 import sys
@@ -269,7 +270,8 @@ class VocalSeparationTests(unittest.TestCase):
         with tempfile.TemporaryDirectory() as temporary:
             record_path = Path(temporary) / "rights.json"
             for category, basis in (("scientific_research", "scientific_purposes"),
-                                    ("publication", "separate_permission")):
+                                    ("publication", "separate_permission"),
+                                    ("commercial", "open_license")):
                 record = {
                     "model": "htdemucs", "use_category": category,
                     "intended_use": "The specific intended activity",
@@ -295,6 +297,137 @@ class VocalSeparationTests(unittest.TestCase):
         with mock.patch.object(separate.importlib.util, "find_spec", return_value=None):
             with self.assertRaisesRegex(SystemExit, "Demucs is not installed"):
                 separate.ensure_demucs_available()
+
+    def test_audio_separator_version_is_exactly_pinned(self):
+        completed = subprocess.CompletedProcess(
+            ["audio-separator", "--version"], 0,
+            stdout="audio-separator 0.48.0\n", stderr="",
+        )
+        with mock.patch.object(separate.shutil, "which", return_value="audio-separator"):
+            with mock.patch.object(separate.subprocess, "run", return_value=completed):
+                self.assertEqual(separate.ensure_audio_separator_available(), "audio-separator")
+
+        completed.stdout = r"C:\venv\Scripts\audio-separator.exe 0.48.0" + "\n"
+        with mock.patch.object(separate.shutil, "which", return_value="audio-separator.exe"):
+            with mock.patch.object(separate.subprocess, "run", return_value=completed):
+                self.assertEqual(separate.ensure_audio_separator_available(), "audio-separator.exe")
+
+        completed.stdout = "audio-separator 0.49.0\n"
+        with mock.patch.object(separate.shutil, "which", return_value="audio-separator"):
+            with mock.patch.object(separate.subprocess, "run", return_value=completed):
+                with self.assertRaisesRegex(SystemExit, "0.48.0 is required"):
+                    separate.ensure_audio_separator_available()
+
+    def test_melband_checkpoint_and_config_hashes_are_verified(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            model_dir = Path(temporary)
+            checkpoint = model_dir / separate.MELBAND_MODEL_FILENAME
+            config = model_dir / separate.MELBAND_CONFIG_FILENAME
+            checkpoint.write_bytes(b"checkpoint")
+            config.write_bytes(b"config")
+            checkpoint_hash = hashlib.sha256(b"checkpoint").hexdigest()
+            config_hash = hashlib.sha256(b"config").hexdigest()
+            with mock.patch.object(separate, "MELBAND_MODEL_SHA256", checkpoint_hash):
+                with mock.patch.object(separate, "MELBAND_CONFIG_SHA256", config_hash):
+                    separate.verify_melband_model_files(model_dir)
+            config.write_bytes(b"tampered")
+            with mock.patch.object(separate, "MELBAND_MODEL_SHA256", checkpoint_hash):
+                with mock.patch.object(separate, "MELBAND_CONFIG_SHA256", config_hash):
+                    with self.assertRaisesRegex(SystemExit, "Refusing unverified"):
+                        separate.verify_melband_model_files(model_dir)
+
+    def test_audio_separator_output_rejects_wrong_frame_count(self):
+        good_output = mock.Mock(format="WAV", samplerate=44100, frames=441000)
+        input_info = mock.Mock(samplerate=48000, frames=480000)
+        fake_soundfile = mock.Mock()
+        fake_soundfile.info.side_effect = [good_output, input_info]
+        with mock.patch.dict(sys.modules, {"soundfile": fake_soundfile}):
+            separate.validate_audio_separator_output("stem.wav", "input.wav")
+
+        bad_output = mock.Mock(format="WAV", samplerate=44100, frames=220500)
+        fake_soundfile.info.side_effect = [bad_output, input_info]
+        with mock.patch.dict(sys.modules, {"soundfile": fake_soundfile}):
+            with self.assertRaisesRegex(SystemExit, "duration does not match"):
+                separate.validate_audio_separator_output("stem.wav", "input.wav")
+
+    def test_audio_separator_rights_gate_precedes_dependency_and_directories(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            audio = root / "song.wav"
+            audio.write_bytes(b"audio")
+            rights = root / "rights.json"
+            rights.write_text(json.dumps({
+                "model": "wrong.ckpt",
+                "use_category": "personal",
+                "intended_use": "Personal karaoke practice",
+                "rights_basis": "separate_permission",
+                "evidence": "Operator-reviewed model permission",
+                "confirmed_by_operator": True,
+            }), encoding="utf-8")
+            outdir = root / "separated"
+            model_dir = root / "models"
+            argv = [
+                "separate_vocals.py", str(audio), "--backend", "audio-separator",
+                "--rights-record", str(rights), "--use-category", "personal",
+                "--outdir", str(outdir), "--model-dir", str(model_dir),
+            ]
+            with mock.patch.object(sys, "argv", argv):
+                with mock.patch.object(separate, "ensure_audio_separator_available") as dependency:
+                    with mock.patch.object(separate.subprocess, "run") as run:
+                        with self.assertRaisesRegex(SystemExit, "does not match"):
+                            separate.main()
+            dependency.assert_not_called()
+            run.assert_not_called()
+            self.assertFalse(outdir.exists())
+            self.assertFalse(model_dir.exists())
+
+    def test_audio_separator_command_and_safe_publication(self):
+        with tempfile.TemporaryDirectory() as temporary:
+            root = Path(temporary)
+            audio = root / "song.wav"
+            audio.write_bytes(b"audio")
+            rights = root / "rights.json"
+            rights.write_text(json.dumps({
+                "model": separate.MELBAND_MODEL_FILENAME,
+                "use_category": "publication",
+                "intended_use": "Publish a licensed karaoke video",
+                "rights_basis": "separate_permission",
+                "evidence": "Operator-reviewed model permission",
+                "confirmed_by_operator": True,
+            }), encoding="utf-8")
+            outdir = root / "separated"
+            model_dir = root / "models"
+            commands = []
+
+            def fake_run(command, check, env):
+                commands.append((command, env))
+                output_dir = Path(command[command.index("--output_dir") + 1])
+                output_dir.mkdir(parents=True, exist_ok=True)
+                (output_dir / "no_vocals.wav").write_bytes(b"instrumental")
+
+            argv = [
+                "separate_vocals.py", str(audio), "--backend", "audio-separator",
+                "--rights-record", str(rights), "--use-category", "publication",
+                "--outdir", str(outdir), "--model-dir", str(model_dir),
+            ]
+            with mock.patch.object(sys, "argv", argv):
+                with mock.patch.object(
+                    separate, "ensure_audio_separator_available", return_value="audio-separator"
+                ):
+                    with mock.patch.object(separate, "verify_melband_model_files") as verify:
+                        with mock.patch.object(separate, "validate_audio_separator_output") as validate:
+                            with mock.patch.object(separate.subprocess, "run", side_effect=fake_run):
+                                separate.main()
+
+            published = outdir / "audio-separator" / "song" / "no_vocals.wav"
+            self.assertEqual(published.read_bytes(), b"instrumental")
+            command, environment = commands[0]
+            self.assertEqual(command[command.index("--model_filename") + 1], separate.MELBAND_MODEL_FILENAME)
+            self.assertEqual(command[command.index("--single_stem") + 1], "other")
+            self.assertEqual(command[command.index("--custom_output_names") + 1], '{"other":"no_vocals"}')
+            self.assertEqual(environment["AUDIO_SEPARATOR_MODEL_DIR"], str(model_dir.resolve()))
+            verify.assert_called_once_with(model_dir.resolve())
+            validate.assert_called_once()
 
     def test_publish_track_atomically_moves_generated_files(self):
         with tempfile.TemporaryDirectory() as temporary:

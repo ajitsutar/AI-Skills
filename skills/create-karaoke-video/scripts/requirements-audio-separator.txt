@@ -1,0 +1,2 @@
+# Optional MelBand Roformer vocal-separation backend. Model files are not bundled.
+audio-separator[cpu]==0.48.0

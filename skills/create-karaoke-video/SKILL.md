@@ -54,10 +54,14 @@ Use this skill to create a finished karaoke video from an audio file and lyrics.
 
 ## Vocal Removal
 
-Use `scripts/separate_vocals.py` as a wrapper around Demucs only after documenting
-permission for the exact selected model and intended use. Demucs's MIT software
-license does not grant general-use rights to its pretrained weights; the
-maintainer describes those weights as scientific-purpose only. See
+Use `scripts/separate_vocals.py` with either Demucs (the backward-compatible
+default) or the opt-in `audio-separator` 0.48.0 MelBand Roformer adapter, only
+after documenting permission for the exact selected model and intended use.
+Software licenses do not grant rights to model weights. Demucs's maintainer
+describes its pretrained weights as scientific-purpose only; registry inclusion
+alone does not establish rights to the MelBand checkpoint. The exact registered
+MelBand checkpoint matches an original-author model card now declaring MIT; cite
+that primary evidence in the rights record. See
 [model terms and the rights-record format](THIRD-PARTY-NOTICES.md#model-weights).
 For ordinary karaoke or YouTube publication, use separately permitted weights or
 a licensed instrumental supplied by the user. Do not label that activity as
@@ -71,7 +75,8 @@ python "<skill-dir>/scripts/separate_vocals.py" "song.mp3" --outdir "work/separa
 ```
 
 The wrapper validates the record before checking or executing Demucs, which may
-download weights. This validates an operator's record, not the legal truth of its
+download weights. The same fail-closed order applies to audio-separator. This
+validates an operator's record, not the legal truth of its
 claims; do not manufacture a permission record. The separator publishes the
 complete track directory under a cross-process lock and refuses an existing track
 by default. For an intentional rerun, add `--overwrite`; never delete or replace
@@ -82,6 +87,20 @@ Current Demucs releases require Python 3.10 or newer. If Demucs is unavailable, 
 ```powershell
 python -m pip install "demucs>=4.1,<5"
 ```
+
+For the registered `vocals_mel_band_roformer.ckpt` backend, use the exact pinned
+dependency. The first inference can download a large checkpoint and config into
+the external `--model-dir`; obtain approval for installation/network use:
+
+```powershell
+python -m pip install -r "<skill-dir>/scripts/requirements-audio-separator.txt"
+python "<skill-dir>/scripts/separate_vocals.py" "song.mp3" --backend audio-separator --model vocals_mel_band_roformer.ckpt --model-dir "work/models/audio-separator" --outdir "work/separated" --rights-record "work/model-rights.json" --use-category publication
+```
+
+The wrapper requires audio-separator 0.48.0 and verifies the registered checkpoint
+and config against their upstream SHA-256 values before publishing. No model files
+are bundled. Read [vocal separation backends](references/vocal-separation.md) for
+the pinned hashes, output path, device behavior, and full commands.
 
 Use the separated `no_vocals` or instrumental stem for the final video. Keep the original audio available for transcription and timing because vocals are easier to align before removal.
 
@@ -105,7 +124,7 @@ If only `start,text` is available, the renderer uses the next line start as the 
 
 Use `scripts/render_karaoke_video.py` after audio and timings are ready.
 
-Preflight Python 3.10+, Pillow, FFmpeg with the `ass` filter, and ffprobe before rendering. `imageio-ffmpeg` is a fallback for FFmpeg, but a build without libass cannot burn captions. Install missing dependencies in an isolated environment and only with the user's approval. Demucs is required only for vocal separation.
+Preflight Python 3.10+, Pillow, FFmpeg with the `ass` filter, and ffprobe before rendering. `imageio-ffmpeg` is a fallback for FFmpeg, but a build without libass cannot burn captions. Install missing dependencies in an isolated environment and only with the user's approval. Demucs or the pinned audio-separator environment is required only when its corresponding vocal-separation backend is selected.
 
 Example:
 

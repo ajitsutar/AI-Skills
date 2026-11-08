@@ -8,6 +8,29 @@ permissions:
   contents: read
 
 jobs:
+  audio-runtime:
+    strategy:
+      fail-fast: false
+      matrix:
+        os: [ubuntu-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
+    steps:
+      - uses: actions/checkout@v7
+      - uses: actions/setup-python@v7
+        with:
+          python-version: "3.11"
+      - name: Install optional separator without model weights
+        run: python -m pip install -r skills/create-guitar-karaoke/scripts/requirements-separator.txt
+      - name: Check dependency resolution and import
+        run: |
+          python -m pip check
+          audio-separator --version
+          python -c "from audio_separator.separator import Separator; print('Separator import OK')"
+      - name: Test optional audio adapters offline
+        run: |
+          python skills/create-guitar-karaoke/scripts/test_split_lead_rhythm.py
+          python skills/create-guitar-karaoke/scripts/test_separate_prompted_audio.py
+          python skills/create-karaoke-video/scripts/test_create_karaoke_video.py
   validate:
     strategy:
       fail-fast: false

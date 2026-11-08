@@ -17,7 +17,11 @@ from validate_portability import validate_skill
 
 ROOT = Path(__file__).resolve().parents[2]
 PYTHON_TESTS = {
-    "create-guitar-karaoke": ["scripts/test_build_guitar_karaoke.py"],
+    "create-guitar-karaoke": [
+        "scripts/test_build_guitar_karaoke.py",
+        "scripts/test_split_lead_rhythm.py",
+        "scripts/test_separate_prompted_audio.py",
+    ],
     "create-karaoke-video": ["scripts/test_create_karaoke_video.py"],
     "deal-watch-alerts": ["scripts/test_deal_memory.py"],
     "travel-deal-finder": ["scripts/test_rank_offers.py"],

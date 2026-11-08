@@ -6,14 +6,14 @@ Use a full-length, aligned stem from the user or an independently authorized sep
 
 ## Optional Local Model Adapter
 
-The helper retains an adapter for `BS-Roformer-SW.ckpt` through `audio-separator` 0.44.5. It is **not an automatically downloaded default**. The public checkpoint's trainer and weight license could not be established; neither this skill's MIT license nor the separator's software MIT license grants rights to that checkpoint. The adapter requires already obtained local checkpoint/config files plus a reviewed rights record. A record documents the operator's review; the script cannot authenticate a legal grant.
+The helper retains an adapter for `BS-Roformer-SW.ckpt` through `audio-separator` 0.48.0. It is **not an automatically downloaded default**. The public checkpoint's trainer and weight license could not be established; neither this skill's MIT license nor the separator's software MIT license grants rights to that checkpoint. The adapter requires already obtained local checkpoint/config files plus a reviewed rights record. A record documents the operator's review; the script cannot authenticate a legal grant.
 
 The model exposes six labels: bass, drums, other, vocals, guitar, and piano. Its single `guitar` label does not distinguish guitar roles, and coverage varies by mix.
 
 Official project and model registry:
 
 - <https://github.com/nomadkaraoke/python-audio-separator>
-- <https://raw.githubusercontent.com/nomadkaraoke/python-audio-separator/v0.44.5/audio_separator/models.json>
+- <https://raw.githubusercontent.com/nomadkaraoke/python-audio-separator/v0.48.0/audio_separator/models.json>
 
 Do not vendor the roughly 699 MB checkpoint. The helper never requests a missing checkpoint/config download: it stops before invoking the backend when either is missing or its hash differs. The externally installed separator may access its own registry metadata; keep its dependencies and cache outside the skill.
 
@@ -35,7 +35,7 @@ After rights are established, install `scripts/requirements-separator.txt`, plac
 
 We did not silently replace this checkpoint with Demucs `htdemucs_6s`: the Demucs maintainer [distinguished model-weight terms from the software MIT license](https://github.com/facebookresearch/demucs/issues/327). That statement predates some newer models; it is not a verified commercial grant for the six-stem weights. A clearly licensed replacement can be added after its specific terms and output behavior are validated.
 
-Recommended settings for version 0.44.5:
+CPU starting settings for version 0.48.0 (audition a short sample before a full run):
 
 ```text
 --model_filename BS-Roformer-SW.ckpt
@@ -44,19 +44,19 @@ Recommended settings for version 0.44.5:
 --normalization 1.0
 --amplification 0.0
 --use_soundfile
---mdxc_overlap 8
+--mdxc_overlap 2
 --mdxc_batch_size 1
 --mdxc_pitch_shift 0
 ```
 
 Important version-specific behavior:
 
-- `--mdxc_overlap` behaves as a hop measured in seconds in this release. `8` is a balanced CPU setting; `2` is substantially slower.
+- Since 0.47, `--mdxc_overlap` is an overlap count rather than the old hop measured in seconds. Do not carry forward the old `8`: it now increases work substantially. Start at `2`; evaluate higher overlap only if the audible improvement justifies the cost. Version and settings are included in cache attestations, so old estimates are not silently reused.
 - `--single_stem Guitar` does not reduce the six-stem computation in this model branch. Expect all six output files.
 - Do not enable DirectML or autocast for the normal CPU path.
 - FFmpeg must be discoverable even when WAV and SoundFile output are used.
 - Process multiple bounded clips in one command so the model loads once and handles clips sequentially.
-- If memory still fails, try `--mdxc_override_model_segment_size --mdxc_segment_size 512 --mdxc_overlap 4`, accepting slower or lower-quality output.
+- If memory still fails in a separately validated backend invocation, try `--mdxc_override_model_segment_size --mdxc_segment_size 512 --mdxc_overlap 2`, accepting possible quality loss. Use fresh cache/work directories for changed settings.
 
 The six-stem backend writes all six float WAVs even though this workflow uses only `guitar`. A normal song can require several gigabytes of temporary disk once context overlap, the checkpoint, clips, stems, and master are included. The helper checks estimated free space before inference. `--cleanup-unused-stems` removes only generated non-guitar stem WAVs after the final outputs decode successfully; keep them when independent QA is still needed.
 
@@ -80,9 +80,10 @@ Tiling limits model inference size, but the final mixer uses several full-durati
 No standard open model used by this skill reliably divides an arbitrary commercial mix into separate lead and rhythm guitar stems. When exact lead or rhythm removal is requested:
 
 1. Look for an already supplied, legally obtained, full-length stem aligned to the same master.
-2. If a local lead/rhythm model is available, validate its documented output labels and audition its stems before mixing.
-3. A third-party service may be used only with explicit permission to upload the audio and after disclosing account, credit, privacy, and licensing implications.
-4. Otherwise offer one of the aggregate-guitar approximations and clearly state what additional guitar content it removes or preserves.
+2. With authorized local weights, the opt-in [listra92 adapter](experimental-lead-rhythm.md) predicts a lead estimate from an aggregate-guitar stem and defines rhythm as its residual. Validate the roles by listening before mixing; reconstruction consistency is not semantic accuracy. The public checkpoint's permission/provenance is unresolved, so it is not an automatic default.
+3. For experimental text/span targeting, read [SAM Audio](sam-audio.md). Use an isolated runtime and a short clip first. Its gated access, custom license and hardware requirements are separate prerequisites; prompts cannot guarantee clean lead/rhythm labels.
+4. A third-party service may be used only with explicit permission to upload the audio and after disclosing account, credit, privacy, and licensing implications.
+5. Otherwise offer one of the aggregate-guitar approximations and clearly state what additional guitar content it removes or preserves.
 
 Never label a mid/side or EQ heuristic as exact semantic separation.
 

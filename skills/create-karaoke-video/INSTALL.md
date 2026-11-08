@@ -5,6 +5,22 @@ subfolders together. No files from another skill or the repository root are
 required to use it. Runtime tools, Python/Node packages, model downloads and
 authenticated services are separate prerequisites described in [SKILL.md](SKILL.md).
 
+Rendering does not require a separator. For optional vocal separation, install
+one selected backend in an isolated Python 3.10+ environment:
+
+```powershell
+# Existing Demucs backend
+python -m pip install "demucs>=4.1,<5"
+
+# Registered MelBand Roformer adapter (exactly pinned)
+python -m pip install -r "scripts/requirements-audio-separator.txt"
+```
+
+The second command installs software only. Its first inference can download
+model/config files into the external `--model-dir`; neither is in this package.
+Review [backend, hash, rights, and download details](references/vocal-separation.md)
+before installing or running it.
+
 Keep [LICENSE](LICENSE), [PROVENANCE.md](PROVENANCE.md), and
 [THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md) with the folder. The skill's MIT
 license does not replace the terms of separately installed tools, models, or fonts.

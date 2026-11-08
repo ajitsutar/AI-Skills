@@ -9,6 +9,11 @@ The default mixer uses authorized supplied stems and does not download models.
 Install `scripts/requirements.txt` and external FFmpeg/ffprobe. The optional local
 separator needs `scripts/requirements-separator.txt`, local model/config files and
 reviewed rights evidence; see [backend requirements](references/modes-and-backends.md).
+Experimental role separation has its own
+[lead/rhythm setup](references/experimental-lead-rhythm.md); prompted separation
+has a separate [SAM Audio setup](references/sam-audio.md). Neither is installed
+or enabled by the base requirements. Keep their runtimes and model caches outside
+the skill folder.
 The [MIT license](LICENSE) covers the repository owner's licensable contributions;
 [third-party notices](THIRD-PARTY-NOTICES.md) and [provenance](PROVENANCE.md) describe
 dependencies and rights limits. No model, music, image, font, or external binary is

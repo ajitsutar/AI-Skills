@@ -4,8 +4,8 @@ Reusable Agent Skills in self-contained folders. Download any one folder under `
 
 ## Included Skills
 
-- `create-karaoke-video`: Create karaoke videos from supplied audio and lyrics, with timing, ASS subtitles and MP4 rendering. Optional vocal separation requires a model-specific rights record for the actual intended use.
-- `create-guitar-karaoke`: Create guitar-muted practice mixes and still-image videos from verified supplied stems, with whole-song and selected-window modes. Optional model separation uses local assets with recorded weight permissions; model downloads are not automatic.
+- `create-karaoke-video`: Create karaoke videos from supplied audio and lyrics, with timing, ASS subtitles and MP4 rendering. Optional Demucs or pinned MelBand Roformer vocal separation requires a model-specific rights record for the actual intended use.
+- `create-guitar-karaoke`: Create guitar-muted practice mixes and still-image videos from verified supplied stems, with whole-song and selected-window modes. Optional aggregate separation uses audio-separator 0.48.0; experimental lead/rhythm and SAM Audio prompted adapters have separate model-permission/runtime requirements. These options do not promise artifact-free guitar-role isolation.
 - `concert-ticket-checkout`: Assist with browser-based concert ticket searches, seat comparison, cart setup, checkout review, and user-supervised purchasing boundaries.
 - `deal-watch-alerts`: Build configurable deal-watch automations that verify selected variants, condition rules, thresholds, duplicate memory, and optional chat/email/SMS alerts.
 - `linkedin-knowledge-digest`: Filter LinkedIn feed and inbox activity into concise knowledge-bearing digests with clickable source links while excluding career milestones, hiring posts, self-promotion, and low-value outreach.
