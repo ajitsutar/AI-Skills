@@ -1,5 +1,16 @@
 #!/usr/bin/env python3
-"""Rank manually collected, same-currency travel offers by total value."""
+"""Rank eligible, same-currency travel offers by their supplied actual totals.
+
+Input is an offers array or an object with an offers array. Eligibility requires
+literal JSON qualifies: true, verification: "verified", a nonblank verified_at
+string, an HTTP(S) URL, a known total, explicitly false/zero unknown_fees (existing
+false forms accepted), and no hard_fail_reason. Missing or blank unknown_fees
+leaves fee completeness unconfirmed.
+Totals may use total_price or the existing price components; priced offers need
+one shared three-letter currency. Missing verification metadata is unverified.
+Verification metadata is caller-supplied; this helper does not verify websites
+or assess the freshness of the supplied verification timestamp.
+"""
 
 from __future__ import annotations
 
@@ -58,7 +69,7 @@ def offer_total(offer: dict[str, Any]) -> float | None:
         amount = money(offer.get(key), field=key)
         if amount is not None:
             components.append(amount)
-    return sum(components) if components else None
+    return money(sum(components), field="component total") if components else None
 
 
 def boolean_value(value: Any) -> bool | None:
@@ -75,9 +86,12 @@ def boolean_value(value: Any) -> bool | None:
     raise ValueError(f"Expected a boolean value, got {value!r}.")
 
 
-def unknown_fee_details(offer: dict[str, Any]) -> tuple[bool, float | None]:
+def unknown_fee_details(offer: dict[str, Any]) -> tuple[bool | None, float | None]:
+    """Return fee presence and estimate; None means completeness is unconfirmed."""
     raw = offer.get("unknown_fees")
-    if raw is None or raw == "" or raw is False:
+    if raw is None or raw == "":
+        return None, None
+    if raw is False:
         return False, None
     if raw is True:
         return True, None
@@ -88,7 +102,9 @@ def unknown_fee_details(offer: dict[str, Any]) -> tuple[bool, float | None]:
         if normalized in FALSE_STRINGS:
             return False, None
     amount = money(raw, field="unknown_fees")
-    if amount in (None, 0.0):
+    if amount is None:
+        return None, None
+    if amount == 0.0:
         return False, None
     return True, amount
 
@@ -125,31 +141,39 @@ def validate_comparison(offers: list[dict[str, Any]]) -> str | None:
     return next(iter(currencies), None)
 
 
-def penalty(offer: dict[str, Any]) -> float:
-    value = 0.0
-    if not offer.get("url"):
-        value += 25
-    if boolean_value(offer.get("cancellable")) is False:
-        value += 50
-    if boolean_value(offer.get("refundable")) is False:
-        value += 50
-    has_unknown_fees, estimated_unknown_fees = unknown_fee_details(offer)
-    if estimated_unknown_fees is not None:
-        value += estimated_unknown_fees
-    elif has_unknown_fees:
-        value += 100
-    if boolean_value(offer.get("split_ticket")) is True:
-        value += 75
-    if boolean_value(offer.get("poor_location")) is True:
-        value += 75
-    return value
-
-
 def qualifies(offer: dict[str, Any]) -> bool:
-    explicit = boolean_value(offer.get("qualifies"))
-    if explicit is False or offer.get("hard_fail_reason"):
-        return False
-    return True
+    return offer.get("qualifies") is True and not offer.get("hard_fail_reason")
+
+
+def has_url(offer: dict[str, Any]) -> bool:
+    raw = offer.get("url")
+    return bool(raw) and bool(str(raw).strip())
+
+
+def eligibility_reasons(offer: dict[str, Any]) -> list[str]:
+    """Return all ranking blockers, without treating metadata as live evidence."""
+    reasons: list[str] = []
+    if offer.get("qualifies") is not True:
+        reasons.append("qualifies is not explicitly true")
+    if offer.get("hard_fail_reason"):
+        reasons.append(f"hard constraint failed: {offer['hard_fail_reason']}")
+    if offer.get("verification") != "verified":
+        reasons.append("verification is not verified")
+    verified_at = offer.get("verified_at")
+    if not isinstance(verified_at, str) or not verified_at.strip():
+        reasons.append("missing verified_at")
+    if not has_url(offer):
+        reasons.append("missing source URL")
+    else:
+        markdown_link_target(offer["url"])
+    if offer_total(offer) is None:
+        reasons.append("unknown total")
+    has_unknown_fees, _ = unknown_fee_details(offer)
+    if has_unknown_fees is None:
+        reasons.append("fee completeness unconfirmed")
+    elif has_unknown_fees:
+        reasons.append("unknown fees")
+    return reasons
 
 
 def load_offers(path: str) -> list[dict[str, Any]]:
@@ -199,7 +223,7 @@ def risk_notes(offer: dict[str, Any]) -> str:
         notes.append(str(offer["hard_fail_reason"]))
     if offer.get("notes"):
         notes.append(str(offer["notes"]))
-    if not offer.get("url"):
+    if not has_url(offer):
         notes.append("missing source URL")
     if boolean_value(offer.get("cancellable")) is False:
         notes.append("noncancellable")
@@ -213,36 +237,42 @@ def risk_notes(offer: dict[str, Any]) -> str:
 
 
 def sort_key(offer: dict[str, Any]) -> tuple[Any, ...]:
+    if eligibility_reasons(offer):
+        # Keep unranked offers in input order, without implying price priority.
+        return (True, math.inf, "")
     total = offer_total(offer)
-    score = total + penalty(offer) if total is not None else math.inf
-    return (
-        not qualifies(offer),
-        total is None,
-        score,
-        total if total is not None else math.inf,
-        str(offer.get("title", "")),
-    )
+    return (False, total, str(offer.get("title", "")))
 
 
 def markdown_table(offers: list[dict[str, Any]]) -> str:
     validate_comparison(offers)
     ranked = sorted(offers, key=sort_key)
     rows = [
-        "| Rank | Qualifies | Source | Deal | Total | Unknown fees | Adjusted score | Notes |",
-        "|---:|---|---|---|---:|---|---:|---|",
+        "Verification metadata is caller-supplied; this helper does not independently "
+        "verify live websites or verification freshness.",
+        "",
+        "| Rank | Qualifies | Verification | Verified at | Source | Deal | Total | Unknown fees | Unranked reason | Notes |",
+        "|---:|---|---|---|---|---|---:|---|---|---|",
     ]
-    for index, offer in enumerate(ranked, start=1):
+    rank = 0
+    for offer in ranked:
+        reasons = eligibility_reasons(offer)
+        if reasons:
+            rank_text = "Unranked"
+        else:
+            rank += 1
+            rank_text = str(rank)
         total = offer_total(offer)
         currency = offer_currency(offer)
         has_unknown_fees, estimated_unknown_fees = unknown_fee_details(offer)
         if total is None:
             total_text = "Unknown"
-            score_text = "Unknown"
         else:
             assert currency is not None
             total_text = f"{currency} {total:,.2f}"
-            score_text = f"{currency} {total + penalty(offer):,.2f}"
-        if not has_unknown_fees:
+        if has_unknown_fees is None:
+            unknown_fee_text = "unconfirmed"
+        elif not has_unknown_fees:
             unknown_fee_text = "no"
         elif estimated_unknown_fees is None:
             unknown_fee_text = "yes (amount unknown)"
@@ -252,12 +282,15 @@ def markdown_table(offers: list[dict[str, Any]]) -> str:
 
         source = markdown_escape(offer.get("source", ""))
         title = markdown_escape(offer.get("title", ""))
-        if offer.get("url"):
+        if has_url(offer):
             target = markdown_link_target(offer["url"])
             title = f"[{title}](<{target}>)"
         rows.append(
-            f"| {index} | {'yes' if qualifies(offer) else 'no'} | {source} | "
-            f"{title} | {total_text} | {unknown_fee_text} | {score_text} | "
+            f"| {rank_text} | {'yes' if qualifies(offer) else 'no'} | "
+            f"{markdown_escape(offer.get('verification') or 'unverified')} | "
+            f"{markdown_escape(offer.get('verified_at') or '')} | {source} | "
+            f"{title} | {total_text} | {unknown_fee_text} | "
+            f"{markdown_escape('; '.join(reasons))} | "
             f"{risk_notes(offer)} |"
         )
     return "\n".join(rows)
