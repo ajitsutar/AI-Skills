@@ -1,0 +1,25 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-01T14:31:00Z",
+  "records": [],
+  "profile_status": "EXAMPLE_TEMPLATE_NOT_ACTIVE_POLICY",
+  "pilot": {
+    "id": "event-research-pilot",
+    "research_question": "Assess whether event-driven U.S.-listed equity research including flow and squeeze evidence improves a declared paper decision workflow.",
+    "universe": {
+      "mode": "us_listed_full"
+    },
+    "horizon": null,
+    "reviewer": null,
+    "study": null
+  },
+  "intended_data_uses": [
+    "private research; confirm actual source terms before reuse"
+  ],
+  "notes": [
+    "Replace as_of with the actual decision cutoff and supply dated records.",
+    "Horizon, reviewer, live portfolio and prospective study choices are explicit inputs; this template imposes no personal mandate.",
+    "Full U.S.-listed discovery is requested scope, not demonstrated live coverage.",
+    "No recurring task, paid subscription, entitlement or broker connection is created."
+  ]
+}

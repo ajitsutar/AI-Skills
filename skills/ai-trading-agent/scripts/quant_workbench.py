@@ -65,6 +65,9 @@ import experiment_registry
 import release_acceptance
 import portfolio_follower
 import portfolio_disclosures
+import market_sources
+import market_flow
+import institutional_research
 from quant_common import digest, require
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -220,6 +223,18 @@ FOLLOWER_OPERATIONS = {
     'follower.rebalance': portfolio_follower.rebalance,
 }
 OPERATIONS.update(FOLLOWER_OPERATIONS)
+MARKET_RESEARCH_OPERATIONS = {
+    'market.normalize': market_sources.normalize,
+    'market.parse': market_sources.parse,
+    'market.flow': market_flow.analyze,
+    'market.positioning': market_flow.positioning,
+    'market.squeeze': market_flow.squeeze,
+    'institutional.plan': institutional_research.plan,
+    'institutional.brief': institutional_research.brief,
+    'institutional.evaluate': institutional_research.evaluate,
+}
+# Acquisition and journal mutation remain explicit CLI actions, outside replay.
+OPERATIONS.update(MARKET_RESEARCH_OPERATIONS)
 MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'quant_portfolio.py', 'multi_asset_risk.py', 'investment_ops.py',
            'primary_financial_data.py', 'price_audit.py', 'financial_normalize.py',
@@ -239,7 +254,8 @@ MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
                'research_contracts.py', 'quant_data_contracts.py', 'research_readiness.py', 'source_strategy_readiness.py', 'security_master.py',
                'price_refresh.py', 'holdings_ledger.py', 'analyst_adapter.py',
                'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py',
-               'portfolio_follower.py', 'portfolio_disclosures.py')
+               'portfolio_follower.py', 'portfolio_disclosures.py',
+               'market_sources.py', 'market_flow.py', 'institutional_research.py')
 
 
 def implementation_hash():
@@ -248,6 +264,8 @@ def implementation_hash():
     sources['report-facts-v2.json'] = (ROOT/'profiles/report-facts-v2.json').read_text(encoding='utf-8')
     for name in ('vqm-fundamental-v1.json', 'public-vqm-discovery-v1.json'):
         sources[name] = (ROOT/'profiles'/name).read_text(encoding='utf-8')
+    sources['event-research-pilot.json'] = (ROOT/'profiles/event-research-pilot.json').read_text(encoding='utf-8')
+    sources['market-source-catalog.json'] = (ROOT/'references/market-source-catalog.json').read_text(encoding='utf-8')
     return digest(sources)
 
 
@@ -304,6 +322,11 @@ def run(document):
         require(isinstance(job['inputs'], dict), 'JOB_INPUT_OBJECT_REQUIRED')
         try:
             inputs = resolved_inputs(job['operation'], job['inputs'])
+            if job['operation'] in MARKET_RESEARCH_OPERATIONS:
+                payload = inputs['document']
+                require(timestamp(payload['as_of']) <= timestamp(contract['as_of']), 'FUTURE_MARKET_RESEARCH_CUTOFF')
+                if 'currency' in payload:
+                    require(payload['currency'] == contract['base_currency'], 'MARKET_RESEARCH_CURRENCY_MISMATCH')
             if job['operation'] in FOLLOWER_OPERATIONS:
                 payload = inputs['document']
                 decision = payload['target_document'] if job['operation'] == 'follower.rebalance' else payload

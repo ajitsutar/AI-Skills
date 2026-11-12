@@ -1,6 +1,6 @@
 # Institutional research readiness backlog
 
-Updated November 2, 2026. Publication baseline: `robinhood-ai-trading-agent` **5.4.1**.
+Updated November 11, 2026. Software baseline: `ai-trading-agent` **5.7.0**.
 
 The first target is a supervised U.S.-equity research and portfolio-risk assistant.
 A portfolio manager owns investment decisions, sizing and portfolio outcomes;
@@ -45,8 +45,13 @@ responses and local review ledgers are not distributed with this repository.
 - **P1:** Demonstrate dependable recurring use and challenge the selected methods.
 - **P2:** Extend to the specific institution's operational deployment.
 
-All items below are **planned, not started** unless an external dependency is
-explicitly marked. Existing software is reused; a planned integration or pilot
+The event-driven U.S.-stock paper-research software is implemented for all ten
+items through a configurable protocol, public-source intake, dated flow/squeeze
+diagnostics, decision brief, portfolio/cost context, immutable journal and
+descriptive evaluation. The user selected this first workflow. The shipped
+profile remains an inactive template; no actual study protocol, recurrence or
+live order is adopted by that choice. **Real-world acceptance for HF-01–HF-10
+remains NOT_ESTABLISHED.** The original acceptance criteria below still apply. Existing software is reused; a planned integration or pilot
 does not mean the underlying helper is missing. Start in order within each tier,
 subject to dependencies. HF-09 review should run alongside HF-05 evaluation;
 the ranking does not justify postponing independent challenge until after results.
@@ -60,7 +65,7 @@ the ranking does not justify postponing independent challenge until after result
 | 5 / HF-05 | P1 | Run a prospective usefulness study | Preserve first briefs/weights, revisions and outcomes. Measure research time, factual errors, overlooked risks and reviewer usefulness against the declared baseline. Assess forward returns separately with comparable benchmarks and realistic costs. No fixed calendar duration automatically establishes alpha. | HF-03, HF-04; HF-09 reviewed design; elapsed observations; pilot owner |
 | 6 / HF-06 | P1 | Validate costs, liquidity and capacity | Compare fees, slippage, turnover and impact assumptions with observed evidence for the chosen strategy and size. Long/short scope additionally requires borrow availability/cost, financing, recall, margin and squeeze scenarios. Report unavailable inputs instead of zero costs. | HF-01, HF-02; relevant market/broker evidence; execution + risk lead |
 | 7 / HF-07 | P1 | Make recurring operation dependable | Demonstrate freshness alerts, bounded retries, overlap prevention, checkpoint recovery, duplicate suppression and reconciliation after partial failure. Measure actual acquisition time, transferred bytes, retries and retained storage. Verify full-versus-incremental equality on revisions and exercise full-refresh fallback. | HF-02, HF-04; data/platform engineer |
-| 8 / HF-08 | P1 | Complete claimed host/platform acceptance | Execute identical frozen cases in each claimed environment; retain first responses, errors, date/scope mismatches and disagreements. Separately test installed-package access and deterministic replay. Update capability claims only from actual evidence. | **Access-dependent:** Muse/Claude fixtures remain unsubmitted after private-session inspection was blocked; separate inspection authorization is still required. Other OS environments need actual tests. Validation lead |
+| 8 / HF-08 | P1 | Complete claimed host/platform acceptance | Execute identical frozen cases in each claimed environment; retain first responses, errors, date/scope mismatches and disagreements. Separately test installed-package access and deterministic replay. Update capability claims only from actual evidence. | **Access-dependent:** only actually retained version-bound host responses and environment runs establish acceptance. A local software demo does not establish Muse/Claude agreement or another OS. Do not inspect private sessions without authorization. Validation lead |
 | 9 / HF-09 | P1 | Independently challenge the chosen methodology | Review conceptual assumptions, leakage, survivor/selection bias, untouched evaluation, negative controls, simple benchmarks and sensitivity. Preserve all trials and revisions; assess multiple testing under justified assumptions. Separate arithmetic correctness, risk forecasting and predictive returns. | HF-01, HF-02; independent reviewer; begin before HF-05 results are examined |
 | 10 / HF-10 | P2 | Implement the target deployment's operations and integrations | Define the deployment first, then test access controls, secrets isolation, private-data retention, incident recovery and version rollback. Any execution integration needs idempotent instructions, partial/rejected-fill handling, broker reconciliation and observed results. Validate support and recovery expectations appropriate to the deployment. | Pilot findings, target architecture and relevant permissions; platform/security/operations leads |
 
@@ -86,3 +91,29 @@ before implementation. Keep failed attempts and changed assumptions visible.
 Mark completion only against the acceptance criteria, and label external blockers
 explicitly. Keep confidential evidence outside the public repository and publish
 only appropriately reviewed summaries and portable regressions.
+
+## Implemented event-research workflow
+
+Read [institutional research](../skills/ai-trading-agent/references/institutional-research.md),
+[market sources](../skills/ai-trading-agent/references/market-sources.md) and
+[flow and squeeze evidence](../skills/ai-trading-agent/references/market-flow.md).
+The bundled synthetic demo is runnable from an unrelated working directory and
+retains exact first-response bytes and recoverable journal entries. Its fictional
+outcomes are retrospective software checks, not a completed prospective study.
+Usefulness judgments and matched net-return comparisons remain separate.
+
+| Items | Implemented software | Remaining actual acceptance |
+|---|---|---|
+| HF-01–02 | Configurable event protocol, free source catalog, clock/revision eligibility and rights fields | Adopt actual reviewer, study dates, horizon and baselines; qualify coverage and intended-use rights |
+| HF-03–04 | Traceable event brief with competing hypotheses, invalidation, dated portfolio denominator and cost context | Supply and review the actual thesis, valuation, portfolio and unsupported risk dimensions |
+| HF-05–06 | First-response retention, roster checks, descriptive usefulness and matched net-return review; declared costs/liquidity | Collect prospective observations; validate actual spreads, slippage, capacity and short borrow assumptions |
+| HF-07 | Bounded public-file acquisition with exact receipts and retries; locked immutable journal, idempotency and crash recovery | Demonstrate required recurring freshness, full/incremental equality and operations under actual deployment conditions |
+| HF-08–09 | Host/readiness and challenge evidence retained with explicit unverified identity and independence | Perform actual permitted host tests and independently challenge the adopted method before outcomes |
+| HF-10 | Deployment/runbook/monitoring/rollback evidence checklist | Define and test the target installation, retention, controls and any separately authorized broker integration |
+
+Every subscription is optional across the skill. Start with relevant free
+sources; existing user-provided licensed access can improve coverage or freshness.
+The paid Unusual Whales adapter is skipped. Accessible public X posts are dated
+research leads and require primary verification for material claims; a public
+profile is neither a complete options tape nor an official short-position feed.
+No subscription, trial, account mutation, order or recurring monitor is created.

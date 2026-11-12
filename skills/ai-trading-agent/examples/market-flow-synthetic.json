@@ -1,0 +1,434 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-11-11T21:00:00Z",
+  "records": [
+    {
+      "id": "b1",
+      "kind": "bar",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "bar_type": "cumulative",
+        "feed_id": "feed-one",
+        "start_at": "2026-11-09T14:30:00Z",
+        "end_at": "2026-11-09T15:30:00Z",
+        "session_id": "2026-11-09",
+        "volume": "100",
+        "volume_unit": "shares",
+        "volume_basis": "unadjusted",
+        "currency": "USD",
+        "comparison_group": "regular_first_hour",
+        "role": "baseline",
+        "price_basis": "unadjusted_close"
+      }
+    },
+    {
+      "id": "b2",
+      "kind": "bar",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "bar_type": "cumulative",
+        "feed_id": "feed-one",
+        "start_at": "2026-11-10T14:30:00Z",
+        "end_at": "2026-11-10T15:30:00Z",
+        "session_id": "2026-11-10",
+        "volume": "200",
+        "volume_unit": "shares",
+        "volume_basis": "unadjusted",
+        "currency": "USD",
+        "comparison_group": "regular_first_hour",
+        "role": "baseline",
+        "price_basis": "unadjusted_close"
+      }
+    },
+    {
+      "id": "current",
+      "kind": "bar",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "bar_type": "cumulative",
+        "feed_id": "feed-one",
+        "start_at": "2026-11-11T14:30:00Z",
+        "end_at": "2026-11-11T15:30:00Z",
+        "session_id": "2026-11-11",
+        "volume": "900",
+        "volume_unit": "shares",
+        "volume_basis": "unadjusted",
+        "currency": "USD",
+        "comparison_group": "regular_first_hour",
+        "role": "current",
+        "price_basis": "unadjusted_close",
+        "start_price": "100",
+        "end_price": "106",
+        "benchmark_record_id": "benchmark"
+      }
+    },
+    {
+      "id": "benchmark",
+      "kind": "bar",
+      "ticker": "BENCH",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "bar_type": "cumulative",
+        "feed_id": "feed-one",
+        "start_at": "2026-11-11T14:30:00Z",
+        "end_at": "2026-11-11T15:30:00Z",
+        "session_id": "2026-11-11",
+        "volume": null,
+        "volume_unit": "shares",
+        "volume_basis": "unadjusted",
+        "currency": "USD",
+        "comparison_group": "regular_first_hour",
+        "role": "benchmark",
+        "price_basis": "unadjusted_close",
+        "start_price": "100",
+        "end_price": "101"
+      }
+    },
+    {
+      "id": "float",
+      "kind": "float",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "float_shares": "6000",
+        "effective_date": "2026-11-01",
+        "share_basis": "float",
+        "measure_basis": "vendor_estimate",
+        "adjustment_basis": "same_split_basis"
+      }
+    },
+    {
+      "id": "d1",
+      "kind": "bar",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "bar_type": "daily_volume",
+        "session_date": "2026-11-09",
+        "volume": "200",
+        "volume_unit": "shares",
+        "feed_id": "one-daily-feed",
+        "adjustment_basis": "same_split_basis"
+      }
+    },
+    {
+      "id": "d2",
+      "kind": "bar",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "bar_type": "daily_volume",
+        "session_date": "2026-11-10",
+        "volume": "400",
+        "volume_unit": "shares",
+        "feed_id": "one-daily-feed",
+        "adjustment_basis": "same_split_basis"
+      }
+    },
+    {
+      "id": "si",
+      "kind": "short_interest",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "settlement_date": "2026-11-10",
+        "short_interest_shares": "1200",
+        "measure_basis": "official_reported",
+        "measurement_scope": "same_reporting_population",
+        "adjustment_basis": "same_split_basis",
+        "float_record_id": "float",
+        "adv_record_ids": [
+          "d1",
+          "d2"
+        ],
+        "adv_window": {
+          "start_date": "2026-11-09",
+          "end_date": "2026-11-10",
+          "expected_sessions": [
+            "2026-11-09",
+            "2026-11-10"
+          ]
+        }
+      }
+    },
+    {
+      "id": "historical-100",
+      "kind": "trade",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "feed_id": "feed-one",
+        "trade_id": "historical-100",
+        "event_at": "2026-11-10T15:00:00Z",
+        "quantity": 100,
+        "price": "10",
+        "currency": "USD",
+        "quantity_unit": "shares",
+        "comparison_group": "regular_unadjusted_all_reported_prints",
+        "role": "baseline"
+      }
+    },
+    {
+      "id": "historical-200",
+      "kind": "trade",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "feed_id": "feed-one",
+        "trade_id": "historical-200",
+        "event_at": "2026-11-10T15:00:00Z",
+        "quantity": 200,
+        "price": "10",
+        "currency": "USD",
+        "quantity_unit": "shares",
+        "comparison_group": "regular_unadjusted_all_reported_prints",
+        "role": "baseline"
+      }
+    },
+    {
+      "id": "historical-400",
+      "kind": "trade",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "feed_id": "feed-one",
+        "trade_id": "historical-400",
+        "event_at": "2026-11-10T15:00:00Z",
+        "quantity": 400,
+        "price": "10",
+        "currency": "USD",
+        "quantity_unit": "shares",
+        "comparison_group": "regular_unadjusted_all_reported_prints",
+        "role": "baseline"
+      }
+    },
+    {
+      "id": "current-print",
+      "kind": "trade",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "feed_id": "feed-one",
+        "trade_id": "current-print",
+        "event_at": "2026-11-11T20:30:00Z",
+        "quantity": 300,
+        "price": "10",
+        "currency": "USD",
+        "quantity_unit": "shares",
+        "comparison_group": "regular_unadjusted_all_reported_prints",
+        "role": "current",
+        "bid": "9.99",
+        "ask": "10.01",
+        "quote_at": "2026-11-11T20:29:59Z"
+      }
+    },
+    {
+      "id": "borrow-view",
+      "kind": "borrow",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "issuer_id": "fictional-issuer-1",
+        "share_class": "A",
+        "observed_at": "2026-11-11T20:00:00Z",
+        "provider": "fictional-lender",
+        "provider_scope": "one-fictional-account-view",
+        "fee_rate_annual_percent": 12,
+        "shares_available": 0,
+        "utilization_percent": 90
+      }
+    },
+    {
+      "id": "daily-short-volume",
+      "kind": "short_sale_volume",
+      "ticker": "DEMO",
+      "available_at": "2026-11-11T21:00:00Z",
+      "source": {
+        "id": "synthetic-source",
+        "url": "https://example.org/synthetic",
+        "retrieved_at": "2026-11-11T21:00:00Z",
+        "published_at": null,
+        "observed_at": "2026-11-11T21:00:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture"
+      },
+      "payload": {
+        "trade_date": "2026-11-10",
+        "short_volume": "30.5",
+        "short_exempt_volume": "5.5",
+        "total_volume": "100",
+        "volume_unit": "shares",
+        "market": "fictional-facility",
+        "coverage": "fictional-reported-subset"
+      }
+    }
+  ],
+  "settings": {
+    "squeeze_criteria": {
+      "min_short_interest_percent_float": 20,
+      "min_days_to_cover": 4,
+      "min_relative_volume": 3,
+      "min_benchmark_relative_return_percent": 2
+    },
+    "print_percentile_threshold": 90,
+    "max_quote_age_seconds": 5
+  }
+}

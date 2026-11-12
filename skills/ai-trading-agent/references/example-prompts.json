@@ -3,6 +3,74 @@
   "title": "Example prompts: learning, investing, trading and quantitative research",
   "sections": [
     {
+      "id": "institutional-event-pilot",
+      "title": "Event-driven institutional paper research",
+      "audience": "Research analysts, portfolio managers and reviewers",
+      "guides": [
+        "references/institutional-research.md",
+        "references/source-bound-workflow.md",
+        "references/costed-bar-replay.md"
+      ],
+      "prompts": [
+        {
+          "title": "Configure the event research pilot",
+          "prompt": "Use the institutional pilot template to propose an event-driven U.S.-stock research workflow with flow and squeeze evidence. Retain my actual universe, horizon and constraints; list missing reviewer, dates, baselines and usefulness criterion for adoption. Use free sources first and paper research. Do not turn template choices into my preferences or start a recurring task."
+        },
+        {
+          "title": "Prepare a source-bound event decision brief",
+          "prompt": "For [EVENT AND DATED EVIDENCE], prepare a brief at [CUTOFF] with competing hypotheses, catalyst, contrary evidence, invalidation conditions and review timing. Include flow and squeeze diagnostics where supported, actual supplied portfolio exposure and explicit costs/liquidity. Keep unsupported valuation, correlations, borrow and executable sizing unresolved."
+        },
+        {
+          "title": "Run the retained synthetic paper example",
+          "prompt": "Run the bundled institutional-paper-demo.py from an unrelated working directory into [PRIVATE OUTPUT ROOT]. Verify first-response byte hashes, idempotent journal writes, recovery and separate usefulness/net-return summaries. Explain that fictional retrospective examples do not establish a completed prospective pilot or investment performance."
+        },
+        {
+          "title": "Evaluate pilot usefulness separately from returns",
+          "prompt": "Review [REGISTERED PROTOCOL, IMMUTABLE FIRST RESPONSES, CASE ROSTER AND OUTCOMES] at [CUTOFF]. Check pre-decision evidence, delayed outcomes, missing cases, fixed reviewer criterion and separate baselines. Report descriptive usefulness and matched net return differences without compounding overlapping events, annualizing them or claiming causal time savings or alpha."
+        },
+        {
+          "title": "Challenge a proposed event strategy",
+          "prompt": "Challenge [FROZEN EVENT RESEARCH DESIGN] for source availability, revisions, survivor and selection bias, threshold tuning, cost/borrow assumptions, multiple trials, negative controls and simple baselines. Retain objections and dispositions before outcomes. Different reviewer names and passing software tests do not establish independent host acceptance or predictive performance."
+        }
+      ]
+    },
+    {
+      "id": "market-evidence",
+      "title": "Public flow, positions and squeeze evidence",
+      "audience": "Event-driven researchers and day traders",
+      "guides": [
+        "references/market-sources.md",
+        "references/market-flow.md",
+        "references/source-access.md"
+      ],
+      "prompts": [
+        {
+          "title": "Investigate an unusual print",
+          "prompt": "Using [RETAINED PRINTS AND EARLIER COMPARABLE BASELINE], analyze [TICKER] at [EXACT CUTOFF]. Keep feed scope, print revisions, empirical rank, quote age and spread explicit. Do not infer an investor identity, aggressor, opening trade or future return from size alone."
+        },
+        {
+          "title": "Use free flow sources before optional subscriptions",
+          "prompt": "For [RESEARCH QUESTION], start with relevant accessible free sources in the market-source catalog. Preserve raw bytes, retrieval and publication clocks and missing coverage. Existing subscriptions for any tool category are optional; explain a useful freshness or coverage improvement before using access I provide. Do not purchase or start a trial."
+        },
+        {
+          "title": "Review an Unusual Whales public post",
+          "prompt": "Treat [CANONICAL UNUSUAL WHALES X POST URL OR SUPPLIED POST] as a dated lead. Retain accessible text, timestamp, capture and any truncation. Verify material claims with primary evidence, preserve access failures, and do not claim that this is a full options tape, official position record or paid API integration."
+        },
+        {
+          "title": "Separate short positions from short-sale flow",
+          "prompt": "For [TICKER] at [CUTOFF], compare official reported short interest, separately labeled estimates, dated float, supplied daily-volume window, provider borrow snapshots, FINRA daily short volume and SEC FTD balances. Keep measurement and availability clocks, issuer/class and adjustment basis. Never use daily short volume as outstanding short interest or add FTD balances across dates."
+        },
+        {
+          "title": "Triage possible squeeze pressure",
+          "prompt": "Using [SOURCE-BOUND RECORDS] and [MY DECLARED SQUEEZE CRITERIA], evaluate dated positioning and matched-window volume and benchmark-relative price evidence for [TICKER]. Keep missing float, incomplete ADV and absent borrow data unknown. Report heuristic states and evidence ages without a squeeze probability, causal confirmation, gamma-position inference or automatic trading trigger."
+        },
+        {
+          "title": "Replay a later print correction",
+          "prompt": "At [DECISION CUTOFF], reconstruct [FEED-SCOPED TRADE RECORDS] with only then-available replacements and cancellations. Retain originals and later revisions, reject cross-feed identity changes, and show how a later correction changes a later replay without rewriting the earlier research."
+        }
+      ]
+    },
+    {
       "id": "quant-research-assurance",
       "title": "Research quality and reproducible releases",
       "audience": "Quantitative researchers and maintainers",

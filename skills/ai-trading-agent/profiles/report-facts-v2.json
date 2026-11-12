@@ -659,6 +659,12 @@
         "metric": "cash and receivable conservation residual",
         "unit": "input_currency_amount"
       },
+      "conclusion_facts/unresolved_tax_amount_known": {
+        "basis": "Same-scenario missing tax information only; declared balance zero does not establish missing amount.",
+        "denominator": null,
+        "metric": "unresolved tax amount known",
+        "unit": "boolean"
+      },
       "final/cash_available_after_tax_reserve": {
         "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
         "denominator": null,
@@ -737,6 +743,60 @@
         "metric": "source authenticity verified",
         "unit": "boolean"
       },
+      "tax_evidence/actual_tax_liability_amount": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "actual tax liability amount",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/declared_accrual_total": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "declared accrual total",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/declared_liability_remaining": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "declared liability remaining",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/declared_payment_total": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "declared payment total",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/events/*/amount": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "events * declared amount",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/events/*/derived_inputs/realized_gain": {
+        "basis": "Computed same-scenario realized gain, not an independently observed tax liability.",
+        "denominator": null,
+        "metric": "declared scenario realized gain",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/opening_declared_liability/amount": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "opening declared liability amount",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/total_scenario_liability_remaining": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "total scenario liability remaining",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/unresolved_scenario_liability_amount": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "unresolved scenario liability amount",
+        "unit": "input_currency_amount"
+      },
       "tax_law_verified": {
         "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
         "denominator": null,
@@ -813,66 +873,6 @@
         "basis": "Declared single-currency unadjusted-price holdings ledger, including settlement receivables and explicit tax assumptions; not investment performance or verified tax law.",
         "denominator": null,
         "metric": "transaction costs",
-        "unit": "input_currency_amount"
-      },
-      "tax_evidence/opening_declared_liability/amount": {
-        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
-        "denominator": null,
-        "metric": "opening declared liability amount",
-        "unit": "input_currency_amount"
-      },
-      "tax_evidence/declared_accrual_total": {
-        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
-        "denominator": null,
-        "metric": "declared accrual total",
-        "unit": "input_currency_amount"
-      },
-      "tax_evidence/declared_payment_total": {
-        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
-        "denominator": null,
-        "metric": "declared payment total",
-        "unit": "input_currency_amount"
-      },
-      "tax_evidence/declared_liability_remaining": {
-        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
-        "denominator": null,
-        "metric": "declared liability remaining",
-        "unit": "input_currency_amount"
-      },
-      "tax_evidence/unresolved_scenario_liability_amount": {
-        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
-        "denominator": null,
-        "metric": "unresolved scenario liability amount",
-        "unit": "input_currency_amount"
-      },
-      "tax_evidence/total_scenario_liability_remaining": {
-        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
-        "denominator": null,
-        "metric": "total scenario liability remaining",
-        "unit": "input_currency_amount"
-      },
-      "tax_evidence/actual_tax_liability_amount": {
-        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
-        "denominator": null,
-        "metric": "actual tax liability amount",
-        "unit": "input_currency_amount"
-      },
-      "conclusion_facts/unresolved_tax_amount_known": {
-        "basis": "Same-scenario missing tax information only; declared balance zero does not establish missing amount.",
-        "denominator": null,
-        "metric": "unresolved tax amount known",
-        "unit": "boolean"
-      },
-      "tax_evidence/events/*/amount": {
-        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
-        "denominator": null,
-        "metric": "events * declared amount",
-        "unit": "input_currency_amount"
-      },
-      "tax_evidence/events/*/derived_inputs/realized_gain": {
-        "basis": "Computed same-scenario realized gain, not an independently observed tax liability.",
-        "denominator": null,
-        "metric": "declared scenario realized gain",
         "unit": "input_currency_amount"
       }
     },
@@ -1114,6 +1114,104 @@
         "denominator": null,
         "metric": "source pointer checks passed",
         "unit": "boolean"
+      }
+    },
+    "data.source_strategy_readiness": {
+      "declared_policy_grid_complete": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "declared policy grid complete",
+        "unit": "boolean"
+      },
+      "grid_status_counts/*": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "grid status counts *",
+        "unit": "count"
+      },
+      "historical_universe_completeness_certified": {
+        "basis": "Declared source-bound study only; no historical completeness or source authenticity certification.",
+        "denominator": null,
+        "metric": "historical universe completeness certified",
+        "unit": "boolean"
+      },
+      "required_grid_rows": {
+        "basis": "Declared source-bound study only; no historical completeness or source authenticity certification.",
+        "denominator": null,
+        "metric": "required grid rows",
+        "unit": "count"
+      },
+      "source_authenticity_verified": {
+        "basis": "Declared source-bound study only; no historical completeness or source authenticity certification.",
+        "denominator": null,
+        "metric": "source authenticity verified",
+        "unit": "boolean"
+      },
+      "status": {
+        "basis": "Conservative aggregate of per-study readiness; source completeness and authenticity are not certified.",
+        "denominator": null,
+        "metric": "source study readiness",
+        "unit": "status"
+      },
+      "strict_observed_grid_complete": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "strict observed grid complete",
+        "unit": "boolean"
+      },
+      "studies/*/declared_policy_grid_complete": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "declared policy grid complete",
+        "unit": "boolean"
+      },
+      "studies/*/grid/*/observation_status": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "grid * observation status",
+        "unit": "status"
+      },
+      "studies/*/grid/*/usable_for_declared_purpose": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "grid * usable for declared purpose",
+        "unit": "boolean"
+      },
+      "studies/*/grid_status_counts/*": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "grid status counts *",
+        "unit": "count"
+      },
+      "studies/*/required_grid_rows": {
+        "basis": "Declared source-bound study only; no historical completeness or source authenticity certification.",
+        "denominator": null,
+        "metric": "required grid rows",
+        "unit": "count"
+      },
+      "studies/*/strict_observed_grid_complete": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "strict observed grid complete",
+        "unit": "boolean"
+      },
+      "studies/*/universe_mode": {
+        "basis": "Current-roster history is survivor-conditioned; declared historical membership still requires substantive source review.",
+        "denominator": null,
+        "metric": "Declared universe membership convention",
+        "unit": "status"
+      },
+      "studies/*/unusable_requirements": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "unusable requirements",
+        "unit": "count"
+      },
+      "unusable_requirements": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "unusable requirements",
+        "unit": "count"
       }
     },
     "data.strategy_readiness": {
@@ -2460,6 +2558,847 @@
         "denominator": "total account NAV",
         "metric": "Proposed follower security weight",
         "unit": "weight_fraction"
+      }
+    },
+    "institutional.brief": {
+      "cost_liquidity_review/costs/advisory_only": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "advisory_only",
+        "unit": "boolean"
+      },
+      "cost_liquidity_review/costs/affordable_cash_debit": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "affordable_cash_debit",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/costs/applied_cost_phase": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "applied_cost_phase",
+        "unit": "status"
+      },
+      "cost_liquidity_review/costs/budget_remainder": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "budget_remainder",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/costs/entry_cash_debit": {
+        "basis": "quantity * entry price + explicit entry costs",
+        "denominator": null,
+        "metric": "entry_cash_debit",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/costs/entry_cost": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "entry_cost",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/costs/exact_fractional_quantity_for_required_proceeds": {
+        "basis": "required net proceeds plus fixed charge divided by price net of per-share charges",
+        "denominator": null,
+        "metric": "exact_fractional_quantity_for_required_proceeds",
+        "unit": "shares"
+      },
+      "cost_liquidity_review/costs/exit_cost": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "exit_cost",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/costs/exit_net_proceeds": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "exit_net_proceeds",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/costs/gross_notional": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "gross_notional",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/costs/gross_pnl": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "gross_pnl",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/costs/max_affordable_quantity": {
+        "basis": "budget net of explicitly declared variable/fixed transaction charges",
+        "denominator": null,
+        "metric": "max_affordable_quantity",
+        "unit": "shares"
+      },
+      "cost_liquidity_review/costs/minimum_quantity_at_increment": {
+        "basis": "Declared or cost-aware quantity at explicit increment.",
+        "denominator": null,
+        "metric": "minimum_quantity_at_increment",
+        "unit": "shares"
+      },
+      "cost_liquidity_review/costs/net_pnl": {
+        "basis": "exit proceeds - entry debit, including both cost phases",
+        "denominator": null,
+        "metric": "net_pnl",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/costs/quantity": {
+        "basis": "Declared or cost-aware quantity at explicit increment.",
+        "denominator": null,
+        "metric": "quantity",
+        "unit": "shares"
+      },
+      "cost_liquidity_review/costs/quantity_step": {
+        "basis": "Declared analytical share increment for budget or required-proceeds sizing; not a currency amount or verified broker increment.",
+        "denominator": null,
+        "metric": "quantity_step",
+        "unit": "shares"
+      },
+      "cost_liquidity_review/costs/quantity_step_unit": {
+        "basis": "Unit of the analytical quantity increment; monetary results retain input currency units.",
+        "denominator": null,
+        "metric": "quantity_step_unit",
+        "unit": "unit_label"
+      },
+      "cost_liquidity_review/costs/quantity_unit": {
+        "basis": "Declared quantity domain of this share-based trade-cost helper.",
+        "denominator": null,
+        "metric": "quantity_unit",
+        "unit": "unit_label"
+      },
+      "cost_liquidity_review/costs/quoted_quantity_meets_proceeds": {
+        "basis": "Arithmetic against supplied budget or proceeds requirement; not broker availability.",
+        "denominator": null,
+        "metric": "quoted_quantity_meets_proceeds",
+        "unit": "boolean"
+      },
+      "cost_liquidity_review/costs/quoted_quantity_within_budget": {
+        "basis": "Arithmetic against supplied budget or proceeds requirement; not broker availability.",
+        "denominator": null,
+        "metric": "quoted_quantity_within_budget",
+        "unit": "boolean"
+      },
+      "cost_liquidity_review/costs/sale_net_proceeds": {
+        "basis": "quantity * sale price - explicit selected-phase costs",
+        "denominator": null,
+        "metric": "sale_net_proceeds",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/costs/sized_net_proceeds": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "sized_net_proceeds",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/costs/source_authenticity_verified": {
+        "basis": "Research output declaration only; source authentication and broker permissions are not established.",
+        "denominator": null,
+        "metric": "source_authenticity_verified",
+        "unit": "boolean"
+      },
+      "cost_liquidity_review/costs/status": {
+        "basis": "Explicit helper result; supplied inputs are not independently authenticated.",
+        "denominator": null,
+        "metric": "status",
+        "unit": "status"
+      },
+      "cost_liquidity_review/costs/total_cost": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "total_cost",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/costs/transaction_cost": {
+        "basis": "Explicit quantity/price and applicable fixed or variable cost phase; no currency conversion or inferred charges.",
+        "denominator": null,
+        "metric": "transaction_cost",
+        "unit": "input_currency_amount"
+      },
+      "cost_liquidity_review/order_to_declared_adv": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "supplied average daily dollar volume; not executable capacity",
+        "metric": "Order notional divided by declared daily dollar volume",
+        "unit": "fraction"
+      },
+      "cost_liquidity_review/spread_bps": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Declared liquidity spread",
+        "unit": "basis_points"
+      },
+      "flow/cumulative_bars/*/baseline_mean_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Mean comparable baseline volume",
+        "unit": "shares"
+      },
+      "flow/cumulative_bars/*/baseline_sessions": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Comparable supplied baseline sessions",
+        "unit": "count"
+      },
+      "flow/cumulative_bars/*/benchmark_relative_return_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "difference of same-window percent returns",
+        "metric": "Price return minus matched benchmark",
+        "unit": "percentage_points"
+      },
+      "flow/cumulative_bars/*/benchmark_return_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "benchmark interval starting price",
+        "metric": "Matched benchmark price return",
+        "unit": "percent"
+      },
+      "flow/cumulative_bars/*/elapsed_seconds": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Completed interval length",
+        "unit": "seconds"
+      },
+      "flow/cumulative_bars/*/relative_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "mean comparable prior-session cumulative volume",
+        "metric": "Same-window relative volume",
+        "unit": "ratio"
+      },
+      "flow/cumulative_bars/*/return_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "interval starting price",
+        "metric": "Supplied interval price return",
+        "unit": "percent"
+      },
+      "flow/cumulative_bars/*/volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Cumulative volume",
+        "unit": "shares"
+      },
+      "flow/prints/*/baseline_count": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Comparable prior print count",
+        "unit": "count"
+      },
+      "flow/prints/*/notional": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Print notional",
+        "unit": "record_currency_amount"
+      },
+      "flow/prints/*/notional_percentile": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "supplied earlier comparable print count",
+        "metric": "Inclusive empirical notional rank",
+        "unit": "percent"
+      },
+      "flow/prints/*/price": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Print price",
+        "unit": "record_currency_per_share"
+      },
+      "flow/prints/*/quantity": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Print share quantity",
+        "unit": "shares"
+      },
+      "flow/prints/*/quantity_percentile": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "supplied earlier comparable print count",
+        "metric": "Inclusive empirical share-quantity rank",
+        "unit": "percent"
+      },
+      "flow/prints/*/quote_context/quote_age_seconds": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Quote age at print",
+        "unit": "seconds"
+      },
+      "flow/prints/*/quote_context/spread": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Quoted spread",
+        "unit": "record_currency_per_share"
+      },
+      "flow/prints/*/quote_context/spread_bps": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "bid/ask midpoint",
+        "metric": "Quoted spread",
+        "unit": "basis_points"
+      },
+      "flow/summary/eligible_bar_count": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Eligible bar records",
+        "unit": "count"
+      },
+      "flow/summary/eligible_trade_count": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Eligible trade records",
+        "unit": "count"
+      },
+      "flow/summary/feed_count": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Distinct supplied feeds",
+        "unit": "count"
+      },
+      "portfolio_impact/after_nav_fraction": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "full supplied NAV; fixed marks and declared notional",
+        "metric": "Event position after as fraction of NAV",
+        "unit": "fraction"
+      },
+      "portfolio_impact/after_signed_market_value": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Event position signed value after scenario",
+        "unit": "USD"
+      },
+      "portfolio_impact/before_nav_fraction": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "full supplied NAV",
+        "metric": "Event position before as fraction of NAV",
+        "unit": "fraction"
+      },
+      "portfolio_impact/before_signed_market_value": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Event position signed value before scenario",
+        "unit": "USD"
+      },
+      "portfolio_impact/supplied_gross_exposure_after": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "full supplied NAV; partial holdings remain partial",
+        "metric": "Known gross exposure after as fraction of NAV",
+        "unit": "fraction"
+      },
+      "portfolio_impact/supplied_gross_exposure_before": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "full supplied NAV; partial holdings remain partial",
+        "metric": "Known gross exposure before as fraction of NAV",
+        "unit": "fraction"
+      },
+      "portfolio_impact/total_value_denominator": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Supplied portfolio NAV",
+        "unit": "USD"
+      },
+      "positioning/borrow/*/fee_rate_annual_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "provider-declared scope and convention",
+        "metric": "Provider annual borrow fee or rebate",
+        "unit": "percent_per_year"
+      },
+      "positioning/borrow/*/shares_available": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Provider-reported available shares",
+        "unit": "shares"
+      },
+      "positioning/borrow/*/utilization_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "provider-declared lending population",
+        "metric": "Provider-reported utilization",
+        "unit": "percent"
+      },
+      "positioning/failures_to_deliver/*/quantity": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Dated outstanding failures balance",
+        "unit": "shares"
+      },
+      "positioning/short_interest/*/adv/average_daily_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Mean supplied daily share volume",
+        "unit": "shares_per_supplied_session"
+      },
+      "positioning/short_interest/*/adv/conditional_days_to_cover": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "arithmetic mean supplied share volume; declared completeness unresolved",
+        "metric": "Conditional days to cover over supplied sessions",
+        "unit": "sessions"
+      },
+      "positioning/short_interest/*/adv/days_to_cover": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "arithmetic mean share volume over exact declared sessions",
+        "metric": "Dated short shares divided by declared-complete ADV",
+        "unit": "sessions"
+      },
+      "positioning/short_interest/*/adv/sessions_observed": {
+        "basis": "Unique supplied session dates over declared window.",
+        "denominator": null,
+        "metric": "Supplied daily share-volume sessions",
+        "unit": "count"
+      },
+      "positioning/short_interest/*/adv/share_adjustment_comparability": {
+        "basis": "Declared matching nonempty share-adjustment labels; not independent corporate-action validation.",
+        "denominator": null,
+        "metric": "Declared daily-volume versus short-share basis comparability",
+        "unit": "status"
+      },
+      "positioning/short_interest/*/adv/window_coverage": {
+        "basis": "Exact equality against caller-supplied expected sessions; calendar is not independently validated.",
+        "denominator": null,
+        "metric": "Declared daily-volume session coverage",
+        "unit": "status"
+      },
+      "positioning/short_interest/*/float_shares": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Explicit linked dated float",
+        "unit": "shares"
+      },
+      "positioning/short_interest/*/measurement_age_days": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Age of dated short-interest measurement",
+        "unit": "calendar_days"
+      },
+      "positioning/short_interest/*/provider_reported_average_daily_volume": {
+        "basis": "Unrecomputed provider field; observation window and adjustment conventions are not inferred.",
+        "denominator": null,
+        "metric": "Provider-reported average daily share volume",
+        "unit": "provider_reported_shares_per_day"
+      },
+      "positioning/short_interest/*/provider_reported_days_to_cover": {
+        "basis": "Unrecomputed source display; supplied source definitions may differ from explicit-window calculation.",
+        "denominator": "source-defined displayed ADV convention",
+        "metric": "Provider-displayed days to cover",
+        "unit": "provider_reported_days"
+      },
+      "positioning/short_interest/*/short_interest_percent_float": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "explicit linked same-issuer/class dated float shares",
+        "metric": "Dated short interest as percent of linked float",
+        "unit": "percent"
+      },
+      "positioning/short_interest/*/short_interest_shares": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Dated short-interest shares",
+        "unit": "shares"
+      },
+      "positioning/short_sale_volume/*/reported_short_volume_ratio": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "same record reported total volume; not open short interest",
+        "metric": "Reported daily short-sale-volume ratio",
+        "unit": "fraction"
+      },
+      "positioning/short_sale_volume/*/short_exempt_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Short-exempt subset already included in short volume",
+        "unit": "shares"
+      },
+      "positioning/short_sale_volume/*/short_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Reported daily short-sale volume",
+        "unit": "shares"
+      },
+      "positioning/short_sale_volume/*/total_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Reported facility daily total volume",
+        "unit": "shares"
+      },
+      "squeeze/assessments/*/flow_contexts/*/benchmark_relative_return_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Price return minus matched benchmark",
+        "unit": "percentage_points"
+      },
+      "squeeze/assessments/*/flow_contexts/*/relative_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "mean comparable prior-session cumulative volume",
+        "metric": "Same-window relative volume",
+        "unit": "ratio"
+      },
+      "squeeze/assessments/*/measurement_age_days": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Age of positioning measurement",
+        "unit": "calendar_days"
+      },
+      "squeeze/assessments/*/state": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Declared squeeze evidence heuristic",
+        "unit": "status"
+      },
+      "squeeze/reported_covering/*/classification": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Typed source-reported covering classification",
+        "unit": "status"
+      },
+      "squeeze/reported_covering/*/source_reported_covered_shares": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Source-asserted covered shares",
+        "unit": "shares"
+      },
+      "squeeze/retrospective_short_interest_changes/*/classification": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Dated net-position change classification",
+        "unit": "status"
+      },
+      "squeeze/retrospective_short_interest_changes/*/net_short_share_change": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Comparable dated net short-interest change",
+        "unit": "shares"
+      }
+    },
+    "institutional.evaluate": {
+      "cases/*/descriptive_excess_return_decimal": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "same-period declared simple net return minus prespecified benchmark",
+        "metric": "Descriptive net event excess return",
+        "unit": "return_fraction"
+      },
+      "returns/included_cases": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Included matched net event return comparisons",
+        "unit": "count"
+      },
+      "returns/mean_descriptive_excess_return_decimal": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "included matched-period simple net return differences; not compounded or annualized",
+        "metric": "Mean descriptive net event excess return",
+        "unit": "return_fraction"
+      },
+      "usefulness/declared_useful_count": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Declared useful judgments",
+        "unit": "count"
+      },
+      "usefulness/declared_useful_fraction": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "included declared usefulness judgments",
+        "metric": "Fraction of included judgments declared useful",
+        "unit": "fraction"
+      },
+      "usefulness/included_cases": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Included declared usefulness judgments",
+        "unit": "count"
+      },
+      "usefulness/mean_declared_minutes_saved": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "included comparable declared timing judgments; not causal attribution",
+        "metric": "Mean declared baseline minutes minus assisted minutes",
+        "unit": "minutes"
+      }
+    },
+    "institutional.plan": {},
+    "market.flow": {
+      "cumulative_bars/*/baseline_mean_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Mean comparable baseline volume",
+        "unit": "shares"
+      },
+      "cumulative_bars/*/baseline_sessions": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Comparable supplied baseline sessions",
+        "unit": "count"
+      },
+      "cumulative_bars/*/benchmark_relative_return_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "difference of same-window percent returns",
+        "metric": "Price return minus matched benchmark",
+        "unit": "percentage_points"
+      },
+      "cumulative_bars/*/benchmark_return_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "benchmark interval starting price",
+        "metric": "Matched benchmark price return",
+        "unit": "percent"
+      },
+      "cumulative_bars/*/elapsed_seconds": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Completed interval length",
+        "unit": "seconds"
+      },
+      "cumulative_bars/*/relative_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "mean comparable prior-session cumulative volume",
+        "metric": "Same-window relative volume",
+        "unit": "ratio"
+      },
+      "cumulative_bars/*/return_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "interval starting price",
+        "metric": "Supplied interval price return",
+        "unit": "percent"
+      },
+      "cumulative_bars/*/volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Cumulative volume",
+        "unit": "shares"
+      },
+      "prints/*/baseline_count": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Comparable prior print count",
+        "unit": "count"
+      },
+      "prints/*/notional": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Print notional",
+        "unit": "record_currency_amount"
+      },
+      "prints/*/notional_percentile": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "supplied earlier comparable print count",
+        "metric": "Inclusive empirical notional rank",
+        "unit": "percent"
+      },
+      "prints/*/price": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Print price",
+        "unit": "record_currency_per_share"
+      },
+      "prints/*/quantity": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Print share quantity",
+        "unit": "shares"
+      },
+      "prints/*/quantity_percentile": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "supplied earlier comparable print count",
+        "metric": "Inclusive empirical share-quantity rank",
+        "unit": "percent"
+      },
+      "prints/*/quote_context/quote_age_seconds": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Quote age at print",
+        "unit": "seconds"
+      },
+      "prints/*/quote_context/spread": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Quoted spread",
+        "unit": "record_currency_per_share"
+      },
+      "prints/*/quote_context/spread_bps": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "bid/ask midpoint",
+        "metric": "Quoted spread",
+        "unit": "basis_points"
+      },
+      "summary/eligible_bar_count": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Eligible bar records",
+        "unit": "count"
+      },
+      "summary/eligible_trade_count": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Eligible trade records",
+        "unit": "count"
+      },
+      "summary/feed_count": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Distinct supplied feeds",
+        "unit": "count"
+      }
+    },
+    "market.normalize": {},
+    "market.parse": {},
+    "market.positioning": {
+      "borrow/*/fee_rate_annual_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "provider-declared scope and convention",
+        "metric": "Provider annual borrow fee or rebate",
+        "unit": "percent_per_year"
+      },
+      "borrow/*/shares_available": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Provider-reported available shares",
+        "unit": "shares"
+      },
+      "borrow/*/utilization_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "provider-declared lending population",
+        "metric": "Provider-reported utilization",
+        "unit": "percent"
+      },
+      "failures_to_deliver/*/quantity": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Dated outstanding failures balance",
+        "unit": "shares"
+      },
+      "short_interest/*/adv/average_daily_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Mean supplied daily share volume",
+        "unit": "shares_per_supplied_session"
+      },
+      "short_interest/*/adv/conditional_days_to_cover": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "arithmetic mean supplied share volume; declared completeness unresolved",
+        "metric": "Conditional days to cover over supplied sessions",
+        "unit": "sessions"
+      },
+      "short_interest/*/adv/days_to_cover": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "arithmetic mean share volume over exact declared sessions",
+        "metric": "Dated short shares divided by declared-complete ADV",
+        "unit": "sessions"
+      },
+      "short_interest/*/adv/sessions_observed": {
+        "basis": "Unique supplied session dates over declared window.",
+        "denominator": null,
+        "metric": "Supplied daily share-volume sessions",
+        "unit": "count"
+      },
+      "short_interest/*/adv/share_adjustment_comparability": {
+        "basis": "Declared matching nonempty share-adjustment labels; not independent corporate-action validation.",
+        "denominator": null,
+        "metric": "Declared daily-volume versus short-share basis comparability",
+        "unit": "status"
+      },
+      "short_interest/*/adv/window_coverage": {
+        "basis": "Exact equality against caller-supplied expected sessions; calendar is not independently validated.",
+        "denominator": null,
+        "metric": "Declared daily-volume session coverage",
+        "unit": "status"
+      },
+      "short_interest/*/float_shares": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Explicit linked dated float",
+        "unit": "shares"
+      },
+      "short_interest/*/measurement_age_days": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Age of dated short-interest measurement",
+        "unit": "calendar_days"
+      },
+      "short_interest/*/provider_reported_average_daily_volume": {
+        "basis": "Unrecomputed provider field; observation window and adjustment conventions are not inferred.",
+        "denominator": null,
+        "metric": "Provider-reported average daily share volume",
+        "unit": "provider_reported_shares_per_day"
+      },
+      "short_interest/*/provider_reported_days_to_cover": {
+        "basis": "Unrecomputed source display; supplied source definitions may differ from explicit-window calculation.",
+        "denominator": "source-defined displayed ADV convention",
+        "metric": "Provider-displayed days to cover",
+        "unit": "provider_reported_days"
+      },
+      "short_interest/*/short_interest_percent_float": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "explicit linked same-issuer/class dated float shares",
+        "metric": "Dated short interest as percent of linked float",
+        "unit": "percent"
+      },
+      "short_interest/*/short_interest_shares": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Dated short-interest shares",
+        "unit": "shares"
+      },
+      "short_sale_volume/*/reported_short_volume_ratio": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "same record reported total volume; not open short interest",
+        "metric": "Reported daily short-sale-volume ratio",
+        "unit": "fraction"
+      },
+      "short_sale_volume/*/short_exempt_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Short-exempt subset already included in short volume",
+        "unit": "shares"
+      },
+      "short_sale_volume/*/short_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Reported daily short-sale volume",
+        "unit": "shares"
+      },
+      "short_sale_volume/*/total_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Reported facility daily total volume",
+        "unit": "shares"
+      }
+    },
+    "market.squeeze": {
+      "assessments/*/flow_contexts/*/benchmark_relative_return_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Price return minus matched benchmark",
+        "unit": "percentage_points"
+      },
+      "assessments/*/flow_contexts/*/relative_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "mean comparable prior-session cumulative volume",
+        "metric": "Same-window relative volume",
+        "unit": "ratio"
+      },
+      "assessments/*/measurement_age_days": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Age of positioning measurement",
+        "unit": "calendar_days"
+      },
+      "assessments/*/state": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Declared squeeze evidence heuristic",
+        "unit": "status"
+      },
+      "reported_covering/*/classification": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Typed source-reported covering classification",
+        "unit": "status"
+      },
+      "reported_covering/*/source_reported_covered_shares": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Source-asserted covered shares",
+        "unit": "shares"
+      },
+      "retrospective_short_interest_changes/*/classification": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Dated net-position change classification",
+        "unit": "status"
+      },
+      "retrospective_short_interest_changes/*/net_short_share_change": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Comparable dated net short-interest change",
+        "unit": "shares"
       }
     },
     "planning.allocate": {
@@ -6727,11 +7666,29 @@
       }
     },
     "risk.conditional_portfolio": {
+      "actual_available_cash": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "actual available cash",
+        "unit": "input_currency_amount"
+      },
+      "available_variance_periods": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "available variance periods",
+        "unit": "count"
+      },
       "calibration_established": {
         "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
         "denominator": null,
         "metric": "calibration established",
         "unit": "boolean"
+      },
+      "cash_weight_assumed_zero_shock": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": "supplied notional",
+        "metric": "cash weight assumed zero shock",
+        "unit": "fraction"
       },
       "cross_basis_approximation": {
         "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
@@ -6769,6 +7726,18 @@
         "metric": "horizons * periods",
         "unit": "count"
       },
+      "invested_weight": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": "supplied notional",
+        "metric": "invested weight",
+        "unit": "fraction"
+      },
+      "modeled_cash_notional": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "modeled cash notional",
+        "unit": "input_currency_amount"
+      },
       "notional": {
         "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
         "denominator": null,
@@ -6781,70 +7750,16 @@
         "metric": "periods per year",
         "unit": "count"
       },
-      "variance_per_period_decimal_squared/*": {
-        "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
-        "denominator": null,
-        "metric": "variance per period decimal squared *",
-        "unit": "decimal_return_squared"
-      },
-      "invested_weight": {
-        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
-        "denominator": "supplied notional",
-        "metric": "invested weight",
-        "unit": "fraction"
-      },
-      "cash_weight_assumed_zero_shock": {
-        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
-        "denominator": "supplied notional",
-        "metric": "cash weight assumed zero shock",
-        "unit": "fraction"
-      },
-      "modeled_cash_notional": {
+      "spending_goal/actual_available_cash": {
         "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
         "denominator": null,
-        "metric": "modeled cash notional",
+        "metric": "spending goal actual available cash",
         "unit": "input_currency_amount"
-      },
-      "actual_available_cash": {
-        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
-        "denominator": null,
-        "metric": "actual available cash",
-        "unit": "input_currency_amount"
-      },
-      "available_variance_periods": {
-        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
-        "denominator": null,
-        "metric": "available variance periods",
-        "unit": "count"
       },
       "spending_goal/amount": {
         "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
         "denominator": null,
         "metric": "spending goal amount",
-        "unit": "input_currency_amount"
-      },
-      "spending_goal/horizon_periods": {
-        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
-        "denominator": null,
-        "metric": "spending goal horizon periods",
-        "unit": "count"
-      },
-      "spending_goal/target_fraction_of_notional": {
-        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
-        "denominator": "supplied notional",
-        "metric": "spending goal target fraction of notional",
-        "unit": "fraction"
-      },
-      "spending_goal/goal_horizon_within_variance_path": {
-        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
-        "denominator": null,
-        "metric": "spending goal goal horizon within variance path",
-        "unit": "boolean"
-      },
-      "spending_goal/cash_only_sensitivity/cash_before_withdrawal": {
-        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
-        "denominator": null,
-        "metric": "spending goal cash only sensitivity cash before withdrawal",
         "unit": "input_currency_amount"
       },
       "spending_goal/cash_only_sensitivity/cash_after_withdrawal": {
@@ -6853,10 +7768,10 @@
         "metric": "spending goal cash only sensitivity cash after withdrawal",
         "unit": "input_currency_amount"
       },
-      "spending_goal/cash_only_sensitivity/shortfall": {
+      "spending_goal/cash_only_sensitivity/cash_before_withdrawal": {
         "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
         "denominator": null,
-        "metric": "spending goal cash only sensitivity shortfall",
+        "metric": "spending goal cash only sensitivity cash before withdrawal",
         "unit": "input_currency_amount"
       },
       "spending_goal/cash_only_sensitivity/covered_under_assumptions": {
@@ -6865,10 +7780,10 @@
         "metric": "spending goal cash only sensitivity covered under assumptions",
         "unit": "boolean"
       },
-      "spending_goal/actual_available_cash": {
+      "spending_goal/cash_only_sensitivity/shortfall": {
         "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
         "denominator": null,
-        "metric": "spending goal actual available cash",
+        "metric": "spending goal cash only sensitivity shortfall",
         "unit": "input_currency_amount"
       },
       "spending_goal/funding_established": {
@@ -6877,11 +7792,35 @@
         "metric": "spending goal funding established",
         "unit": "boolean"
       },
+      "spending_goal/goal_horizon_within_variance_path": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "spending goal goal horizon within variance path",
+        "unit": "boolean"
+      },
+      "spending_goal/horizon_periods": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "spending goal horizon periods",
+        "unit": "count"
+      },
       "spending_goal/probability": {
         "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
         "denominator": null,
         "metric": "spending goal probability",
         "unit": "fraction"
+      },
+      "spending_goal/target_fraction_of_notional": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": "supplied notional",
+        "metric": "spending goal target fraction of notional",
+        "unit": "fraction"
+      },
+      "variance_per_period_decimal_squared/*": {
+        "basis": "Supplied marginal variance paths and fixed correlations; assumes zero cross-period innovation covariance. Sigma is not a loss bound or goal probability.",
+        "denominator": null,
+        "metric": "variance per period decimal squared *",
+        "unit": "decimal_return_squared"
       }
     },
     "risk.empirical_tail": {
@@ -7211,104 +8150,6 @@
         "basis": "Supplied observation count or declared threshold, with no independence or authenticity inference.",
         "denominator": null,
         "metric": "supplied_observations",
-        "unit": "count"
-      }
-    },
-    "data.source_strategy_readiness": {
-      "studies/*/declared_policy_grid_complete": {
-        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
-        "denominator": null,
-        "metric": "declared policy grid complete",
-        "unit": "boolean"
-      },
-      "studies/*/grid/*/observation_status": {
-        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
-        "denominator": null,
-        "metric": "grid * observation status",
-        "unit": "status"
-      },
-      "studies/*/grid/*/usable_for_declared_purpose": {
-        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
-        "denominator": null,
-        "metric": "grid * usable for declared purpose",
-        "unit": "boolean"
-      },
-      "studies/*/grid_status_counts/*": {
-        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
-        "denominator": null,
-        "metric": "grid status counts *",
-        "unit": "count"
-      },
-      "studies/*/strict_observed_grid_complete": {
-        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
-        "denominator": null,
-        "metric": "strict observed grid complete",
-        "unit": "boolean"
-      },
-      "studies/*/universe_mode": {
-        "basis": "Current-roster history is survivor-conditioned; declared historical membership still requires substantive source review.",
-        "denominator": null,
-        "metric": "Declared universe membership convention",
-        "unit": "status"
-      },
-      "studies/*/unusable_requirements": {
-        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
-        "denominator": null,
-        "metric": "unusable requirements",
-        "unit": "count"
-      },
-      "required_grid_rows": {
-        "basis": "Declared source-bound study only; no historical completeness or source authenticity certification.",
-        "denominator": null,
-        "metric": "required grid rows",
-        "unit": "count"
-      },
-      "source_authenticity_verified": {
-        "basis": "Declared source-bound study only; no historical completeness or source authenticity certification.",
-        "denominator": null,
-        "metric": "source authenticity verified",
-        "unit": "boolean"
-      },
-      "historical_universe_completeness_certified": {
-        "basis": "Declared source-bound study only; no historical completeness or source authenticity certification.",
-        "denominator": null,
-        "metric": "historical universe completeness certified",
-        "unit": "boolean"
-      },
-      "status": {
-        "basis": "Conservative aggregate of per-study readiness; source completeness and authenticity are not certified.",
-        "denominator": null,
-        "metric": "source study readiness",
-        "unit": "status"
-      },
-      "grid_status_counts/*": {
-        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
-        "denominator": null,
-        "metric": "grid status counts *",
-        "unit": "count"
-      },
-      "unusable_requirements": {
-        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
-        "denominator": null,
-        "metric": "unusable requirements",
-        "unit": "count"
-      },
-      "declared_policy_grid_complete": {
-        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
-        "denominator": null,
-        "metric": "declared policy grid complete",
-        "unit": "boolean"
-      },
-      "strict_observed_grid_complete": {
-        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
-        "denominator": null,
-        "metric": "strict observed grid complete",
-        "unit": "boolean"
-      },
-      "studies/*/required_grid_rows": {
-        "basis": "Declared source-bound study only; no historical completeness or source authenticity certification.",
-        "denominator": null,
-        "metric": "required grid rows",
         "unit": "count"
       }
     }

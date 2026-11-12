@@ -1,0 +1,127 @@
+{
+  "schema_version": 1,
+  "documentation_checked_on": "2026-11-11",
+  "scope": "Free-first US equity event and positioning evidence",
+  "execution_authorized": false,
+  "public_access_is_not_redistribution_permission": true,
+  "live_provider_connection_certified": false,
+  "sources": [
+    {
+      "id": "sec_submissions",
+      "adapter": "sec_submissions",
+      "access": "public_no_api_key",
+      "official_url": "https://www.sec.gov/search-filings/edgar-application-programming-interfaces",
+      "file_url_template": "https://data.sec.gov/submissions/CIK##########.json",
+      "acquisition": "explicit_bounded_get",
+      "coverage": "Recent filer submission metadata; older filenames retained but never automatically crawled",
+      "timing": "Updated as filings are disseminated; reporting, acceptance and first-observed clocks differ",
+      "limits": ["Filer CIK/tickers may not identify each transaction issuer", "13D/G labels are metadata, not parsed ownership percentages", "An amendment label does not identify an exact superseded record", "Use a configured research-client contact, never discovered personal credentials"],
+      "rights": "Retain SEC website and filing-content terms; parser does not establish rights"
+    },
+    {
+      "id": "sec_ownership",
+      "adapter": "sec_form4_xml",
+      "access": "public",
+      "official_url": "https://www.sec.gov/files/info/edgar/ownershipxmltechspec-v3.pdf",
+      "example_official_document": "https://www.sec.gov/Archives/edgar/data/931148/000114036123060303/form4.xml",
+      "acquisition": "selected_raw_archive_document_or_user_file",
+      "coverage": "Raw ownership XML transaction codes, acquired/disposed flags, amounts, owners and footnotes",
+      "timing": "Transaction dates are reporting facts, not intraday public availability",
+      "limits": ["A disposal is not automatically a discretionary sale or short position", "Review derivative terms, ownership capacity, footnotes and amendments"],
+      "rights": "unknown_until_reviewed"
+    },
+    {
+      "id": "sec_13f",
+      "adapter": "sec_13f_xml",
+      "access": "public",
+      "official_url": "https://www.sec.gov/rules-regulations/staff-guidance/frequently-asked-questions-about-form-13f",
+      "format_url": "https://www.sec.gov/files/form_13f_readme.pdf",
+      "acquisition": "selected_raw_information_table_or_user_file",
+      "coverage": "Reported holdings with CUSIP, class, put/call, quantity type and original value",
+      "timing": "Quarterly reported positions with filing lag, generally due within 45 days after quarter end",
+      "limits": ["Short equity/options positions are omitted; a reported put is not a short stock position", "No current trade time, complete hedge exposure or purchase cost", "Value units changed in January 2023; explicitly declare USD or USD_thousands, otherwise unknown", "No automatic CUSIP-to-ticker mapping"],
+      "rights": "unknown_until_reviewed"
+    },
+    {
+      "id": "finra_daily_short_volume",
+      "adapter": "finra_short_volume",
+      "access": "public",
+      "official_url": "https://www.finra.org/finra-data/browse-catalog/short-sale-volume-data/daily-short-sale-volume-files",
+      "format_url": "https://www.finra.org/sites/default/files/2021-07/DailyShortSaleVolumeFileLayout.pdf",
+      "observed_file_url": "https://cdn.finra.org/equity/regsho/daily/CNMSshvol20261111.txt",
+      "acquisition": "explicit_bounded_get",
+      "coverage": "Selected TRF/ADF/ORF regular-hours public volume file, not all-market positions",
+      "timing": "FINRA states posting by 18:00 ET on trade date; updates can appear later. Never infer actual availability from this schedule",
+      "limits": ["ShortVolume already includes short-exempt volume", "Not short interest, net position change or aggressor intent", "Consolidated and facility files overlap", "November 2026 file visibly includes fractional shares despite older integer-only layout text", "Numeric trailer must reconcile or parsed rows are ineligible"],
+      "rights": "FINRA terms apply; public readability does not establish commercial redistribution rights"
+    },
+    {
+      "id": "finra_equity_short_interest",
+      "adapter": "finra_short_interest_csv",
+      "access": "public_view_or_user_supplied_official_export",
+      "official_url": "https://www.finra.org/finra-data/browse-catalog/equity-short-interest",
+      "format_url": "https://www.finra.org/finra-data/browse-catalog/equity-short-interest/glossary",
+      "acquisition": "user_supplied_csv_no_finra_api_entitlement_claim",
+      "coverage": "Dated reported short shares, source-provided average volume and displayed days to cover",
+      "timing": "Twice-monthly settlement snapshots; publication and retrieval occur later",
+      "limits": ["Not live short positions or borrow inventory", "Displayed days-to-cover conventions differ from an unrounded newly calculated ratio", "Float, share-class, adjustment and ADV-window compatibility must be supplied", "Unknown export headers remain explicit parse gaps"],
+      "rights": "Review FINRA terms and API/export entitlements"
+    },
+    {
+      "id": "cboe_short_interest",
+      "adapter": "finra_short_interest_csv",
+      "access": "public_listing_and_csv",
+      "official_url": "https://www.cboe.com/markets/us/equities/market-statistics/short-interest/",
+      "observed_file_url": "https://cdn.cboe.com/resources/us/equities/market-statistics/short-interest/Bats_Listed_Short_Interest-finra-20261111.csv",
+      "acquisition": "explicit_bounded_get",
+      "coverage": "Cboe-listed securities only",
+      "timing": "Use settlement fields and actual retrieval; filename date is not position availability",
+      "limits": ["Listing/link observed; documentation browser could not parse the binary CSV response", "Columns must match supported aliases or return gaps; no end-to-end live CSV adapter claim"],
+      "rights": "Cboe terms apply; free access is not an unrestricted license"
+    },
+    {
+      "id": "sec_ftd",
+      "adapter": "sec_ftd",
+      "access": "public",
+      "official_url": "https://www.sec.gov/data-research/sec-markets-data/fails-deliver-data",
+      "acquisition": "selected_public_zip_or_user_file_with_explicit_member",
+      "coverage": "NSCC aggregate outstanding fail balances by settlement date/security",
+      "timing": "Half-month files posted with lag; SEC does not guarantee a posting date",
+      "limits": ["Do not sum daily balances as new fails or infer their age", "Fails can arise from long or short sales and do not prove abusive short selling", "Price is prior-day close or unavailable; a dot is unknown", "Missing rows are not automatically filled with zero"],
+      "rights": "Retain SEC qualifications and applicable content terms"
+    },
+    {
+      "id": "finra_venue_aggregates",
+      "adapter": "venue_csv",
+      "access": "public_view_or_user_supplied_permitted_export",
+      "official_url": "https://www.finra.org/finra-data/browse-catalog/otc-transparency",
+      "format_url": "https://www.finra.org/sites/default/files/OTC-Transparency-Data-File-Download-API-v04.pdf",
+      "acquisition": "user_supplied_export_with_explicit_column_mapping",
+      "coverage": "Declared weekly venue/security shares and trade counts",
+      "timing": "Delayed aggregates; retain actual publication and revision metadata",
+      "limits": ["No individual dark-pool prints, side or beneficial-owner identity", "Downloads/history/API may have separate terms or entitlement", "No authenticated FINRA API is implemented"],
+      "rights": "unknown_until_source_and_export_terms_reviewed"
+    },
+    {
+      "id": "x_public_leads",
+      "adapter": "social_leads",
+      "access": "on_demand_browser_or_user_supplied_posts",
+      "official_url": "https://x.com/",
+      "acquisition": "no_network_adapter",
+      "coverage": "Retained URL, author, stated date/text and availability metadata",
+      "timing": "Session-specific observation; existing signed-in browser may be needed",
+      "limits": ["No anonymous-access, complete-timeline, full-text or continuous-monitoring promise", "Cards can be truncated; retain exact visible scope", "Claims remain lead-only until primary verification", "No login transfer, follow actions, paid API or subscription trial"],
+      "rights": "Platform and post-content terms apply"
+    },
+    {
+      "id": "unusual_whales",
+      "adapter": null,
+      "access": "optional_paid_user_entitlement",
+      "official_url": "https://unusualwhales.com/",
+      "acquisition": "SKIP_NOT_IMPLEMENTED",
+      "coverage": null,
+      "limits": ["No REST/WebSocket adapter, key discovery, live feed or entitlement implemented", "Continue supported free research without a subscription"],
+      "rights": "Future use requires an existing user entitlement and reviewed terms"
+    }
+  ]
+}

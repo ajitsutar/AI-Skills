@@ -8,6 +8,9 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITY_FILES = {
+    'free_market_evidence': ['scripts/market_sources.py', 'references/market-source-catalog.json', 'references/market-sources.md'],
+    'market_flow_and_positioning': ['scripts/market_flow.py', 'references/market-flow.md'],
+    'institutional_event_pilot': ['scripts/institutional_research.py', 'references/institutional-research.md', 'profiles/event-research-pilot.json'],
     'execution_policy': ['scripts/execution_policy.py', 'scripts/execution_mode.py',
                          'templates/execution-policy.example.json',
                          'references/execution-modes.md'],
@@ -131,6 +134,9 @@ def check():
     available = lambda names: all(dependencies[n]['status'] == 'IMPORTABLE' for n in names)
     integrity = package_integrity()
     return {'skill_version': (ROOT / 'VERSION').read_text(encoding='utf-8').strip(),
+            'free_market_evidence': 'AVAILABLE_PUBLIC_OR_SUPPLIED_INPUTS_ACCESS_NOT_CERTIFIED' if integrity['status'] == 'VERIFIED' and not missing_by_capability['free_market_evidence'] else 'UNAVAILABLE',
+            'market_flow_and_positioning': 'AVAILABLE_SUPPLIED_DATED_INPUTS_NO_CAUSAL_SQUEEZE_CONFIRMATION' if integrity['status'] == 'VERIFIED' and not missing_by_capability['market_flow_and_positioning'] else 'UNAVAILABLE',
+            'institutional_event_pilot': 'AVAILABLE_PAPER_SOFTWARE_REAL_ACCEPTANCE_NOT_ESTABLISHED' if integrity['status'] == 'VERIFIED' and not missing_by_capability['institutional_event_pilot'] and available(['numpy', 'scipy']) else 'UNAVAILABLE',
             'quant_research_assurance': 'AVAILABLE_SUPPLIED_INPUTS_NOT_EXTERNAL_VALIDATION' if integrity['status'] == 'VERIFIED' and not missing_by_capability['quant_research_assurance'] and available(['numpy', 'scipy']) else 'UNAVAILABLE',
             'package_integrity': integrity,
             'historical_data_storage': 'AVAILABLE_REQUIRES_EXPLICIT_ROOT' if integrity['status'] == 'VERIFIED' and not missing_by_capability['historical_data_storage'] else 'UNAVAILABLE',

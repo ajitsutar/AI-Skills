@@ -42,6 +42,8 @@ STATUSES = {'COMPUTED', 'REJECTED_INPUT', 'CALCULATION_FAILED', 'RESEARCH_QUEUE_
 STATUSES.update({'DECLARED_STRICT_GRID_COMPLETE', 'RESEARCH_GAPS_REMAIN', 'NONPOSITIVE_OR_UNKNOWN_EPS', 'REDUCED_LONG_ONLY_ZERO_COST_ATTEMPT', 'COMPUTED_CURRENT_WEIGHT_SHOCK_DISTRIBUTION', 'CONDITIONAL_MINIMUM_CERTIFIED', 'COMPUTED_EXPLICIT_BASIS', 'FIXTURE_MATCH', 'DECLARED_EVIDENCE_CURRENT', 'unavailable', 'FULL_FETCH_REQUIRED', 'INCOMPATIBLE_WITH_QUOTE', 'NO_SUPPORTED_TABLE', 'DECLARED_CONTRACT_VALID', 'CONDITIONAL_RISK_SCENARIO', 'LINEAR_FEASIBILITY_FAILED', 'UNGRADABLE_RESPONSE', 'NO_REQUIREMENTS_IN_DECLARED_SCOPE', 'UNRESOLVED_BASIS', 'UNRESOLVED_OR_RESTRICTED', 'EXTRACTED', 'modeled', 'RECONCILED_FULL', 'RECONCILED_INCREMENTAL', 'FIXTURE_MISMATCH', 'COVARIANCE_SENSITIVITY_COMPARISON', 'reference', 'observed', 'CONFLICTS_PRESENT', 'DECLARED_SCENARIO_GRID_COMPLETE'})
 STATUSES.update({'REFERENCE_OR_MODEL_SCENARIO', 'CALLER_SUPPLIED_OBSERVED_MARKS', 'current_roster', 'historical_membership'})
 STATUSES.update({'proposed_targets_not_orders', 'proposals_only_no_orders_submitted', 'normalized', 'partial'})
+STATUSES.update(['ASSUMPTIONS_NOT_SUPPLIED', 'BEFORE_POSITION_UNKNOWN_PARTIAL_PORTFOLIO', 'BRIEF_FOR_REVIEW', 'CLOCK_UNUSABLE', 'COMPLETE_DECLARED_SESSIONS', 'CONFIGURATION_NEEDED', 'CONTEXT_NOT_SUPPLIED', 'DATED_POSITIONING_CANDIDATE', 'DECLARED_COSTS_COMPUTED', 'DECLARED_EXPOSURE_SCENARIO', 'DECLARED_PROTOCOL_READY_FOR_REVIEW', 'DECLARED_SCALE_CONTEXT', 'DECLARED_STUDY_WINDOW_ELAPSED', 'DEVELOPING_PRESSURE_HEURISTIC', 'INCOMPLETE_OR_INVALID_RETURN_CONTRACT', 'INCOMPLETE_OR_UNEXPECTED', 'INSUFFICIENT_ELIGIBLE_EVENT_EVIDENCE', 'INSUFFICIENT_EVIDENCE', 'MATCHED', 'MISSING_CLOCK_CRITERION_BASELINE_OR_PROSPECTIVE_EVIDENCE', 'NONMATCHING_OR_UNAVAILABLE_NET_RETURN_BASELINE', 'NO_REPORTED_NET_SHORT_REDUCTION', 'PORTFOLIO_CLOCK_UNUSABLE', 'PROSPECTIVE_PILOT_IN_PROGRESS', 'REPORTED_NET_SHORT_REDUCTION', 'RETROSPECTIVE_SOURCE_REPORTED_COVERING', 'SUPPLIED_CHALLENGE_NOT_AUTHENTICATED'])
+STATUSES.update({'MATCHED_DECLARED_SHARE_BASIS', 'MISMATCH', 'UNVERIFIED_SUPPLIED_SESSIONS_ONLY', 'INCOMPLETE_DECLARED_SESSIONS'})
 # The original workbench numerical modules and existing schemas were inspected
 # byte-for-text-identical before the additive operation extension. This identifies
 # a known historical schema, not a successful replay with the current code.
@@ -68,7 +70,8 @@ QUANT_FILES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
                'research_contracts.py', 'quant_data_contracts.py', 'research_readiness.py', 'source_strategy_readiness.py', 'security_master.py',
                'price_refresh.py', 'holdings_ledger.py', 'analyst_adapter.py',
                'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py',
-               'portfolio_follower.py', 'portfolio_disclosures.py')
+               'portfolio_follower.py', 'portfolio_disclosures.py',
+               'market_sources.py', 'market_flow.py', 'institutional_research.py')
 
 
 def digest(value):
@@ -86,6 +89,8 @@ def quant_hash():
     sources['report-facts-v2.json'] = (ROOT / 'profiles/report-facts-v2.json').read_text(encoding='utf-8')
     for name in ('vqm-fundamental-v1.json', 'public-vqm-discovery-v1.json'):
         sources[name] = (ROOT / 'profiles' / name).read_text(encoding='utf-8')
+    sources['event-research-pilot.json'] = (ROOT / 'profiles/event-research-pilot.json').read_text(encoding='utf-8')
+    sources['market-source-catalog.json'] = (ROOT / 'references/market-source-catalog.json').read_text(encoding='utf-8')
     return digest(sources)
 
 

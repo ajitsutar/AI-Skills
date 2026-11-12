@@ -205,3 +205,13 @@ tax returns, subscriptions/redemptions, valuation of illiquid/exotic assets, and
 resilient 24/7 execution infrastructure are not supplied by a skill. A successful
 unit test, paper simulation or model-agreement test cannot replace them. Do useful
 analysis within available scope and identify the concrete missing dependency.
+
+## Event-driven research software
+
+The [institutional event pilot](institutional-research.md) now implements an
+explicit protocol, source-bound brief, portfolio/cost context, immutable local
+journal and descriptive usefulness/return review. [Market sources](market-sources.md)
+and [flow diagnostics](market-flow.md) keep availability, coverage and positioning
+measures separate. The bundled end-to-end example is synthetic. HF01–HF10 real
+acceptance remains unestablished: elapsed prospective observations, actual data
+rights, another host and deployment evidence cannot be supplied by software tests.

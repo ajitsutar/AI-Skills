@@ -372,10 +372,13 @@ class ReplayTests(unittest.TestCase):
         self.assertEqual(set(workbench.ASSURANCE_OPERATIONS), assurance_operations)
         follower_operations = {'follower.normalize', 'follower.targets', 'follower.rebalance'}
         self.assertEqual(set(workbench.FOLLOWER_OPERATIONS), follower_operations)
+        market_operations = {'market.normalize', 'market.parse', 'market.flow', 'market.positioning',
+                             'market.squeeze', 'institutional.plan', 'institutional.brief', 'institutional.evaluate'}
+        self.assertEqual(set(workbench.MARKET_RESEARCH_OPERATIONS), market_operations)
         self.assertEqual({j['operation'] for j in doc['jobs']},
                          set(workbench.OPERATIONS) - source_operations - set(workbench.ANALYSIS_OPERATIONS)
                          - set(workbench.MULTIASSET_OPERATIONS) - portable_operations - monthly_operations
-                         - assurance_operations - follower_operations - {'data.vintage_eligibility', 'data.terminal_return_coverage'})
+                         - assurance_operations - follower_operations - market_operations - {'data.vintage_eligibility', 'data.terminal_return_coverage'})
 
     def fixture(self):
         return {'schema_version': 1, 'contract': {'prompt': 'Fictional risk review', 'purpose': 'compatibility',

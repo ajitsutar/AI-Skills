@@ -5,20 +5,17 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # AI Trading Agent
 
-Package version: **5.6.7 - November 11, 2026**.
-
+Package version: **5.7.0 - November 11, 2026**.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent
 policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
 `approval` or `autonomous`: respectively simulate only, require order approval,
 or carry out in-scope actions under standing authority on a permitted host.
-
 When evaluating supplied proposals, retain each exact payload and its provenance while assessing approval and permissible action separately. In approval mode,
 present the specific proposal for user approval when that approval is missing; missing approval does not erase the proposal, and analysis is not user consent.
 Clarify conflicting or incomplete terms while preserving the original proposal. Before claiming the report complete, reconcile every supplied proposal with its
 reported payload, approval facts and disposition. Apply only trigger conditions the user actually supplied or adopted; a calculated observation is not a trigger.
 See [proposal evaluation](references/execution-modes.md#evaluate-supplied-proposals).
-
 Only an explicit user request may change the policy. Ordinary prompts supply what to do, not which policy mode to use; ask clarifying questions where intent is missing.
 Re-read the task's file before each action. Initialize a new task's policy in paper; never inherit another task's mode or choose a bundled example as an active setting.
 An invalid, inaccessible or wrong-task policy is an error, never live authority.
@@ -32,6 +29,9 @@ research archives outside the installed package. Run `scripts/research_preflight
 when diagnosing research dependencies or package integrity. Missing components limit the calculations you can truthfully claim, not permission to execute.
 
 ## Start with the request and its evidence
+
+For public big-print, positioning and squeeze research, use [market sources](references/market-sources.md) and [market flow](references/market-flow.md).
+For a configurable event-driven U.S.-equity paper pilot, use [institutional research](references/institutional-research.md); real outcomes and host acceptance remain separate.
 
 For public investor portfolios, disclosure refreshes, or inverse recommendations, use the [portfolio-following subskill](subskills/portfolio-following/SKILL.md).
 It distinguishes public reported baskets from private or app-specific allocations, supports long-only inverse signals and source-aware rebalance proposals, and

@@ -1,0 +1,112 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-01T14:31:00Z",
+  "synthetic": true,
+  "records": [
+    {
+      "id": "fictional-catalyst-v1",
+      "kind": "catalyst",
+      "ticker": "DEMO",
+      "available_at": "2026-10-01T14:30:00Z",
+      "source": {
+        "id": "fictional-source",
+        "url": "https://example.org/fictional",
+        "retrieved_at": "2026-10-01T14:30:00Z",
+        "published_at": "2026-10-01T14:00:00Z",
+        "observed_at": "2026-10-01T14:30:00Z",
+        "availability_basis": "first_observed_snapshot",
+        "access": "public",
+        "rights": "synthetic_fixture_only"
+      },
+      "payload": {
+        "title": "Fictional product event",
+        "event_type": "fictional_product_event",
+        "event_at": "2026-10-01T14:00:00Z",
+        "unmapped_metadata": {
+          "retained": true
+        }
+      }
+    }
+  ],
+  "pilot": {
+    "id": "fictional-pilot",
+    "research_question": "Does this fictional event brief help review?",
+    "universe": {
+      "mode": "explicit_symbols",
+      "symbols": [
+        "DEMO"
+      ],
+      "synthetic": true
+    },
+    "horizon": {
+      "label": "fictional-two-session-review",
+      "entry_policy": "paper declaration only",
+      "exit_policy": "review at declared study end"
+    },
+    "reviewer": {
+      "id": "fictional-reviewer",
+      "role": "synthetic_operator"
+    },
+    "study": {
+      "registered_at": "2026-10-01T13:00:00Z",
+      "start_at": "2026-10-01T14:00:00Z",
+      "end_at": "2026-10-02T20:00:00Z",
+      "usefulness_criterion": "Identifies one checkable decision-relevant gap",
+      "workflow_baseline_id": "fictional-without-tool"
+    }
+  },
+  "event": {
+    "id": "fictional-event",
+    "ticker": "DEMO",
+    "decision_at": "2026-10-01T14:31:00Z",
+    "review_at": "2026-10-01T15:00:00Z"
+  },
+  "portfolio": {
+    "as_of": "2026-10-01T14:30:00Z",
+    "currency": "USD",
+    "total_value": "10000",
+    "positions": [
+      {
+        "ticker": "DEMO",
+        "market_value": "1000"
+      }
+    ],
+    "cash": "9000",
+    "completeness": "partial"
+  },
+  "proposed_trade": {
+    "ticker": "DEMO",
+    "side": "buy",
+    "notional": "1000",
+    "currency": "USD",
+    "role": "hypothetical_scenario"
+  },
+  "cost_contract": {
+    "currency": "USD",
+    "role": "user_assumption",
+    "side": "buy",
+    "price": "10",
+    "quantity": "100",
+    "entry_orders": 1,
+    "exit_orders": 1,
+    "exit_price": "11",
+    "costs": [
+      {
+        "id": "fictional-fee",
+        "unit": "bps_notional",
+        "phase": "each_side",
+        "amount": "10"
+      }
+    ]
+  },
+  "liquidity": {
+    "ticker": "DEMO",
+    "available_at": "2026-10-01T14:30:00Z",
+    "currency": "USD",
+    "average_daily_dollar_volume": "1000000",
+    "order_notional": "1000",
+    "spread_bps": "5",
+    "observed_window": "fictional prior sessions",
+    "role": "user_assumption"
+  }
+}

@@ -5,6 +5,9 @@ request. Browse [example prompts](../EXAMPLE-PROMPTS.md) to choose a workflow.
 
 | Task | Start here |
 |---|---|
+| Intake public SEC/FINRA evidence and source-ledger records | [Market sources](market-sources.md), [source catalog](market-source-catalog.json) |
+| Investigate unusual prints, positioning or possible squeezes | [Market flow](market-flow.md) |
+| Configure and retain an event-driven paper-research pilot | [Institutional research](institutional-research.md) |
 | Choose free sources or optional user-provided subscriptions | [Source access](source-access.md) |
 | Install and configure personal operation | [Personal setup](personal-setup.md), [runtime contract](runtime-contract.md) |
 | Define and run a stock-research campaign | [Research handoff](research-handoff.md), [research campaign](research-campaign.md) |

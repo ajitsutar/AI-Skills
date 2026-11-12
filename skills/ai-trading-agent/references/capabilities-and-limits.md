@@ -61,3 +61,13 @@ host behavior. Every new task defaults to paper, with no global policy. The poli
 must match the actual current task identity; only an explicit user request changes
 that task's mode, leaving other tasks unchanged.
 See [host integration](host-execution-integration.md).
+
+## Event-driven research software
+
+The [institutional event pilot](institutional-research.md) now implements an
+explicit protocol, source-bound brief, portfolio/cost context, immutable local
+journal and descriptive usefulness/return review. [Market sources](market-sources.md)
+and [flow diagnostics](market-flow.md) keep availability, coverage and positioning
+measures separate. The bundled end-to-end example is synthetic. HF01–HF10 real
+acceptance remains unestablished: elapsed prospective observations, actual data
+rights, another host and deployment evidence cannot be supplied by software tests.

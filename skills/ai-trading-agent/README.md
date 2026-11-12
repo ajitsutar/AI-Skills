@@ -1,5 +1,13 @@
 # AI Trading Agent
 
+Version **5.7.0** adds [public-source intake](references/market-sources.md),
+[flow, positioning and squeeze diagnostics](references/market-flow.md), and a
+[configurable event-driven U.S.-stock paper-research pilot](references/institutional-research.md).
+The runnable synthetic demo retains first responses and evaluates usefulness
+separately from descriptive net returns. Public X posts are research leads;
+this package includes no paid Unusual Whales adapter. Reported short interest,
+daily short volume, borrow snapshots and inferred squeeze pressure stay separate.
+
 Every paid subscription is optional across all skill tools and research workflows.
 Use relevant accessible free sources first; user-provided paid access can add
 fresher data or materially better coverage. Missing access leaves explicit gaps
