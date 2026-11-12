@@ -11,10 +11,12 @@ import quant_report
 from test_quant_assurance_integration import envelope
 from test_quant_data_contracts import readiness_fixture, change_observation
 from test_analyst_adapter import request
+from test_source_strategy_readiness import fixture as source_readiness_fixture
 
 
 def cases():
     result=[]
+    result.append(('data.source_strategy_readiness',source_readiness_fixture()))
     for name,op in [('readiness','data.strategy_readiness'),('security-master','data.security_snapshot'),('features','data.source_features'),('price-refresh','data.price_refresh')]:
         result.append((op,json.loads((ROOT/'examples/quant-data'/f'{name}.json').read_text())))
     attempt=json.loads((ROOT/'examples/experiment-attempt.json').read_text())
@@ -32,6 +34,7 @@ def cases():
 class AssuranceReportTests(unittest.TestCase):
     def project(self,op,doc):
         req=envelope(op,doc)
+        if op=='data.source_strategy_readiness':req['contract']['as_of']='2028-02-10T00:00:00Z'
         if op=='portfolio.sensitivity':req['contract']['horizon_id']=doc['base']['horizon_id']
         bundle=q.freeze(req)
         self.assertEqual(bundle['result']['results'][0]['status'],'COMPUTED',bundle['result'])

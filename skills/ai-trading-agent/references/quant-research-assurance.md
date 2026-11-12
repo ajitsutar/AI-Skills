@@ -37,6 +37,14 @@ receivables, settlement, tax reserves and dated withdrawals in
 unit reconciliation is not a time-weighted performance calculation; choose the
 return-accounting operation appropriate to the supplied cash-flow convention.
 
+Use the ledger's `tax_evidence` and `conclusion_facts` when comparing scenarios.
+A cash or declared-payment difference is conditional arithmetic; it does not
+identify another scenario's missing tax amount. Even a zero remaining declared
+balance leaves unresolved taxes unknown. Cite the event's supplied amount or
+rate-and-gain derivation for a tax figure, and retain null total liability and
+net-of-tax value when inputs are missing. Another scenario's explicit tax is not
+evidence of the missing amount in this scenario.
+
 [Risk diagnostics](risk-diagnostics.md) and [GARCH](garch-volatility.md) distinguish
 fit convergence, stationarity, residual failures, useful variance forecasting and
 tail sample size. Use `risk.empirical_tail`, `risk.conditional_portfolio`,

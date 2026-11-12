@@ -8,6 +8,24 @@ outside the repository and installed skill. Do not publish them or include them
 in standalone packages. Keep current usage guides, test code and licensing notices.
 Retain machine-readable versions in VERSION, package metadata and integrity records.
 
+## Review case coverage with every upgrade
+
+For every skill upgrade, review example prompts and the applicable P1, P2 and P3
+case definitions, fixtures, evaluation expectations and priority impact. Update
+them when behavior changes or new coverage is needed; otherwise record why each
+tier needs no change. A prose-only upgrade can still change expected research
+behavior. Do not mechanically change every case or rerun completed cases merely
+because the package version changed.
+
+Preserve frozen prompts, inputs, first responses, failures and historical verdicts.
+Create separately versioned case definitions or supplemental input-only packets;
+keep evaluator expectations separate from participant inputs. Record affected
+case IDs, source/candidate hashes and the review location in the project's mutable
+plan or case registry. An edited case is NOT_RUN until actually evaluated; old
+passes are not validation of changed behavior. Keep private case evidence outside
+the distributed skill, preserve approved priorities and daily limits, and do not
+start comparisons, schedules or publication merely to perform this review.
+
 ## Refresh the examples on every update
 
 1. Review the latest SKILL.md, helper interfaces, profiles and workflow references.

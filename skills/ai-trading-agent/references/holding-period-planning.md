@@ -15,6 +15,11 @@ nor block an order. Native host and broker tools own execution; the optional
 
 ## Set the clock before selecting names
 
+First use `research.route_horizon` to distinguish a date-only comparison,
+flexible review and an actual fixed exit. Retain a comparison date without
+session adjustment or an exit buffer. The hard-exit resolver below is for a
+declared deadline; it does not turn a flexible review into one.
+
 Record the as-of time, proposed entry, latest acceptable entry, horizon units,
 deadline mode, hard exit, early-exit policy and event policy. For an unspecified
 "90 days," disclose the working assumption of 90 calendar days from proposed
@@ -59,7 +64,7 @@ forced sale just because the user described themselves as a long-term investor.
   must be intact, disclose that an equity allocation cannot assure that outcome
   and compare cash/cash-equivalent alternatives under their own risks and terms.
 
-`scripts/horizon_review.py` resolves the proposed dates through the exchange
+`scripts/horizon_review.py` resolves hard-exit specifications through the exchange
 calendar, independently or through `screen_review.py`. It covers US equity
 research, not a settlement engine or execution scheduler. Units are `same_session`
 (value 1), `elapsed_minutes`, `elapsed_hours`, `calendar_days`, `calendar_weeks`,
@@ -281,3 +286,9 @@ and exact timestamp comparisons have different precision; supply explicit
 offsets only when supported, and retain unresolved mixed-precision diagnostics.
 The shared event policy is validated even for an empty candidate list. Put cadence,
 evidence and next_review_at under `horizon.review_schedule`, not event_policy.
+
+For an appropriately dated cash alternative, use the cash applicability fields in
+[the same-capital comparison contract](equity-cash-comparison.md). Rate observation
+time and freshness policy are distinct from projection endpoints and constant-rate
+assumptions. Keep undated cash numerically conditional and primary applicability
+unresolved; never borrow a calendar publication timestamp to date a rate.

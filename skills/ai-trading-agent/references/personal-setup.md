@@ -24,7 +24,11 @@ and before actions, with the current task ID checked each time. Prompts cannot
 silently override it. Changing one task does not change other tasks; copied
 schedules get their own paper policy. Wrong-task or malformed files are errors.
 
-Configure external tools through the host's supported settings. Robinhood's
+No paid subscription is required for any tool category to use the skill.
+Apply [source access](source-access.md) to optional user-provided accounts or
+keys: use relevant free evidence first, and continue supported work when paid
+access is absent or unavailable. Do not enroll, start a trial, upgrade or buy
+access as part of research. Configure external tools through the host's supported settings. Robinhood's
 [external-agent onboarding](https://robinhood.com/us/en/support/articles/agentic-trading-overview/)
 describes its connection. Actual host/account availability and approvals remain
 external. Installation or policy editing does not connect an account or start a job.

@@ -3,13 +3,112 @@ from copy import deepcopy
 from decimal import Decimal, localcontext
 import hashlib
 
+from cash_benchmark import review_cash_benchmark
 from financial_alignment import price_scenarios
 from planning_alignment import amount, cash_projection
 from quant_common import digest, require, timestamp
 from report_facts import pointer, strict_json
 
 
-def equity_cash_comparison(document):
+
+BENCHMARK_OBSERVATION_ROLES = frozenset({'supplied_observation', 'supplied_observations'})
+BENCHMARK_SOURCE_FIELDS = ('observed_at', 'rate_or_return', 'instrument', 'currency')
+BENCHMARK_PATHS = tuple('/document/cash_benchmark/' + name for name in BENCHMARK_SOURCE_FIELDS) + (
+    '/document/equity_document/currency', '/document/cash_document/currency')
+
+
+def benchmark_provenance(arguments, bindings):
+    """Retain actual workflow bindings, including ancestor source/assumption bindings.
+
+    Byte lineage is not authentication, publication timing, or assurance that an
+    upstream supplied record is itself an original observation.
+    """
+    records = []
+    for path in BENCHMARK_PATHS:
+        candidates = [b for b in bindings if path == b['target_pointer']
+                      or path.startswith(b['target_pointer'] + '/')]
+        binding = deepcopy(max(candidates, key=lambda b: len(b['target_pointer']))) if candidates else {'kind': 'UNBOUND'}
+        if binding['kind'] == 'SOURCE':
+            binding['effective_source_pointer'] = binding['source_pointer'] + path[len(binding['target_pointer']):]
+        records.append({'path': path, 'binding': binding})
+    return {'schema_version': 1, 'records': records}
+
+
+def cash_applicability(document, provenance):
+    """Keep source-date applicability separate from conditional money arithmetic."""
+    benchmark = document.get('cash_benchmark')
+    cash = document['cash_document']; equity = document['equity_document']
+    reasons = []
+    if not isinstance(benchmark, dict):
+        reasons.append('CASH_BENCHMARK_DATING_REQUIRED')
+        benchmark = {}
+    research_as_of = provenance.get('research_as_of') if isinstance(provenance, dict) else None
+    resolved = {'as_of': research_as_of or document.get('as_of'), 'entry_at': equity['entry_at'], 'exit_at': equity['exit_at']}
+    if research_as_of is not None:
+        try:
+            if timestamp(document.get('as_of')) != timestamp(research_as_of):
+                reasons.append('CASH_RESEARCH_CUTOFF_DIFFERS_FROM_WORKFLOW_CONTRACT')
+        except (ValueError, TypeError, AttributeError):
+            reasons.append('CASH_RESEARCH_CUTOFF_UNKNOWN_OR_INVALID')
+    if not benchmark.get('observed_at'):
+        reasons.append('CASH_RATE_OBSERVATION_DATE_UNKNOWN')
+    if not document.get('as_of'):
+        reasons.append('RESEARCH_AS_OF_UNKNOWN')
+    if benchmark.get('max_age_seconds') is None:
+        reasons.append('CASH_FRESHNESS_POLICY_UNASSESSED')
+    for field in ('instrument', 'methodology'):
+        if not isinstance(benchmark.get(field), str) or not benchmark[field].strip():
+            reasons.append('CASH_BENCHMARK_' + field.upper() + '_REQUIRED')
+    normalized = deepcopy(benchmark)
+    try:
+        if benchmark.get('rate_or_return') is not None:
+            normalized['rate_or_return'] = float(amount(benchmark['rate_or_return']))
+        if (benchmark.get('rate_or_return') is None or cash.get('annual_effective_rate') is None
+                or amount(benchmark['rate_or_return']) != amount(cash['annual_effective_rate'])):
+            reasons.append('CASH_BENCHMARK_RATE_DIFFERS_OR_UNKNOWN')
+    except (ValueError, TypeError, OverflowError):
+        reasons.append('CASH_BENCHMARK_RATE_INVALID')
+    if benchmark.get('basis') != 'annual_effective' or benchmark.get('day_count') != cash.get('day_count'):
+        reasons.append('CASH_BENCHMARK_BASIS_DIFFERS_OR_UNKNOWN')
+    if benchmark.get('currency') != cash.get('currency'):
+        reasons.append('CASH_BENCHMARK_CURRENCY_DIFFERS_OR_UNKNOWN')
+    try:
+        review = review_cash_benchmark(normalized, resolved)
+    except (AttributeError, TypeError, ValueError, OverflowError) as exc:
+        review = {'status': 'UNVERIFIED', 'holding_period_return': None,
+                  'reasons': ['CASH_BENCHMARK_UNVERIFIED: invalid or missing timestamp'],
+                  'inputs': normalized}
+    if review['status'] != 'CALCULATED_ASSUMPTION':
+        reasons.extend(review['reasons'])
+    require(provenance is None or (isinstance(provenance, dict) and provenance.get('schema_version') == 1),
+            'CASH_BENCHMARK_PROVENANCE_SCHEMA_REQUIRED')
+    records = provenance.get('records', []) if isinstance(provenance, dict) else []
+    require(isinstance(records, list), 'CASH_BENCHMARK_PROVENANCE_RECORDS_REQUIRED')
+    require(all(isinstance(r, dict) and r.get('path') in BENCHMARK_PATHS for r in records)
+            and len({r['path'] for r in records}) == len(records), 'CASH_BENCHMARK_PROVENANCE_PATHS_INVALID')
+    indexed = {r['path']: r['binding'] for r in records}
+    quote_records = []
+    for path in BENCHMARK_PATHS:
+        binding = indexed.get(path, {})
+        require(isinstance(binding, dict), 'CASH_BENCHMARK_PROVENANCE_BINDING_REQUIRED')
+        source_bound = (binding.get('kind') == 'SOURCE' and binding.get('source_role') in BENCHMARK_OBSERVATION_ROLES
+                        and binding.get('source_id') and binding.get('source_sha256')
+                        and isinstance(binding.get('effective_source_pointer'), str))
+        if not source_bound:
+            reasons.append('SOURCE_BOUND_CASH_METADATA_REQUIRED: ' + path)
+        elif path.startswith('/document/cash_benchmark/'):
+            quote_records.append((binding['source_id'], binding['source_sha256'],
+                                  binding['effective_source_pointer'].rsplit('/', 1)[0]))
+    if len(quote_records) == len(BENCHMARK_SOURCE_FIELDS) and len(set(quote_records)) != 1:
+        reasons.append('CASH_OBSERVATION_NOT_BOUND_TO_SAME_RATE_RECORD')
+    return {'status': 'UNRESOLVED' if reasons else 'SOURCE_BOUND_DATED_ASSUMPTION',
+            'reasons': reasons, 'benchmark_review': review, 'provenance': deepcopy(provenance),
+            'rate_observation_freshness_is_not_future_rate_guarantee': True,
+            'source_authenticity_verified': False, 'future_rate_guaranteed': False,
+            'limitation': 'Source bindings retain supplied record lineage only. A fresh rate observation does not guarantee the projected future rate; methodology and horizon adjustment remain explicit assumptions.'}
+
+
+def equity_cash_comparison(document, benchmark_provenance=None):
     """Compare one initial share's modeled outlay with hypothetical cash.
 
     Terminal prices without a source-bound matching timestamp and price bridge
@@ -122,17 +221,21 @@ def equity_cash_comparison(document):
                 'cash_return_percent': str(cash_return * 100) if cash_return is not None else None,
                 'excess_over_cash_percentage_points': str((equity_return-cash_return)*100) if cash_return is not None else None,
                 'terminal_dollar_difference': str(equity_terminal-cash_terminal) if cash_terminal is not None else None})
-    primary_resolved = not cash_unknown and all(r['status'] != 'UNRESOLVED' for r in applicability)
+    cash_dating = cash_applicability(document, benchmark_provenance)
+    primary_resolved = (not cash_unknown and cash_dating['status'] != 'UNRESOLVED'
+                        and all(r['status'] != 'UNRESOLVED' for r in applicability))
     return {'schema_version': 1, 'method': 'same-capital-equity-cash-comparison-1',
         'currency': equity['currency'], 'input_role': 'hypothetical_scenario', 'input_sha256': digest(document),
         'retained_input': deepcopy(document), 'capital_basis': 'one initial equity share including modeled entry cost',
         'entry_cash': entry_cash, 'cash_principal_role': 'hypothetical_scenario',
         'derived_cash_document': cash, 'equity_result': calculated_equity, 'cash_result': calculated_cash,
-        'source': source_info, 'terminal_applicability': applicability, 'cash_unresolved': cash_unknown,
+        'source': source_info, 'terminal_applicability': applicability,
+        'cash_calculation_unresolved': cash_unknown, 'cash_applicability': cash_dating,
+        'cash_unresolved': cash_unknown + cash_dating['reasons'],
         'status': 'SOURCE_BOUND_CONDITIONAL_COMPARISON' if primary_resolved else 'PRIMARY_APPLICABILITY_UNRESOLVED',
         'primary_comparison': {'rows': conditional_rows, 'role': 'hypothetical_scenario'} if primary_resolved else None,
         'conditional_price_sensitivity': {'rows': conditional_rows, 'role': 'hypothetical_scenario',
-            'assumption': 'Apply the supplied terminal prices at the requested exact exit solely as a conditional sensitivity; source timing is not repaired.'},
+            'assumption': 'Apply the supplied terminal prices at the requested exact exit solely as a conditional sensitivity; equity/cash source timing and currency assumptions are not repaired; the supplied cash rate is held constant only for this projection.'},
         'cash_principal_guarantee_established': False, 'source_authenticity_verified': False,
         'advisory_only': True, 'execution_permission_evaluated': False,
         'limitation': 'Existing helper arithmetic only. Same-capital cash is a counterfactual, never observed cash. Terminal scenario applicability, source authenticity, future outcome and cash guarantee are distinct; this adapter establishes no execution gate or selection.'}

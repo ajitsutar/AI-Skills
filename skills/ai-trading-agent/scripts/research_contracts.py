@@ -330,6 +330,51 @@ def clock_order(left, right):
     return (a > b) - (a < b)
 
 
+def horizon_capability_scope(document, coverage, issues, entry, comparison, hard_exit):
+    """Separate feasible descriptive work from claims this router cannot certify.
+
+    Calendar coverage is a declared time boundary, not an event-exclusion test,
+    forecast, or quantitative risk model. This projection creates no events,
+    review schedule, valuation inputs, or execution authority.
+    """
+    exclusion = document.get('event_exclusion_requirement', 'not_declared')
+    require(exclusion in ('not_declared', 'none', 'entry_only', 'full_hold'),
+            'EXPLICIT_EVENT_EXCLUSION_REQUIREMENT')
+    incomplete = coverage['status'] != 'DECLARED_THROUGH_COMPARISON'
+    return {
+        'kind': 'RESEARCH_CAPABILITY_SCOPE',
+        'entry_at': entry, 'comparison_at': comparison, 'hard_exit_at': hard_exit,
+        'horizon_dependent_work': 'RESOLVE_HORIZON_CONFLICT' if issues else 'REQUESTED_HORIZON_RETAINED',
+        'horizon_conflicts': copy.deepcopy(issues),
+        'feasible_work': [
+            {'scope': 'available_event_description', 'status': 'AVAILABLE_WITH_DISCLOSURES',
+             'requires': ['Available dated records, or explicit disclosure that dates are unavailable.'],
+             'boundary': 'Describe only supplied events and their uncertainty; unavailable future dates do not shorten the requested research horizon.'},
+            {'scope': 'qualitative_risk_review', 'status': 'AVAILABLE_WITH_DISCLOSURES',
+             'requires': ['Separate general risk mechanisms from issuer-specific supported facts.'],
+             'boundary': 'Discuss gap, liquidity and recurring-event exposure without inventing dates, probabilities or loss bounds.'}],
+        'event_exclusion_requirement': {
+            'scope': exclusion,
+            'status': ('DECLARED_UNCERTIFIED' if exclusion in ('entry_only', 'full_hold') else
+                       'DECLARED_NONE' if exclusion == 'none' else 'NOT_DECLARED_TO_THIS_ROUTER'),
+            'waived': False, 'other_event_policies_evaluated': False,
+            'boundary': 'Descriptive research does not satisfy an explicit event-exclusion requirement. Evaluate that requirement separately with applicable event evidence and policy.'},
+        'uncertified_claims': [
+            {'scope': 'event_free_hold', 'status': 'NOT_CERTIFIED_BY_ROUTING',
+             'reason': 'Even full declared calendar coverage does not establish absence of prohibited events.'},
+            {'scope': 'quantified_gap_risk', 'status': 'REQUIRES_SEPARATE_EVIDENCE',
+             'reason': 'Calendar dates do not supply a gap distribution, event probability or maximum loss bound.'},
+            {'scope': 'terminal_forecast_or_ranking', 'status': 'REQUIRES_SEPARATE_EVIDENCE',
+             'reason': 'Calendar coverage does not establish terminal assumptions, valuation applicability, ranking or sizing support. Explicit hypothetical sensitivities remain separate.'}],
+        'refresh': {'coverage_incomplete_or_uncertain': incomplete,
+                    'unknown_after': coverage.get('unknown_after'),
+                    'unknown_through': coverage.get('unknown_through'),
+                    'review_schedule_created': False, 'events_created': False,
+                    'boundary': 'Refresh available event disclosures during future research; any cadence is a separate explicit proposal, not an announced event or active automation.'},
+        'research_complete': 'NOT_ASSESSED',
+        'execution_authorized': False}
+
+
 def route_horizon(document, source_root=None):
     mode = document.get('mode')
     require(mode in ('fixed_exit', 'flexible_review', 'comparison'), 'EXPLICIT_HORIZON_MODE_REQUIRED')
@@ -369,7 +414,9 @@ def route_horizon(document, source_root=None):
                     'resolved_fixed_exit': resolved, 'event_coverage': coverage, 'chronology': chronology,
                     'planning_assumptions': assumptions, 'issues': issues,
                     'status': 'CONFLICT' if issues else 'ROUTED',
-                    'calendar_dates_authenticate_future_events': False})
+                    'calendar_dates_authenticate_future_events': False,
+                    'research_capability_scope': horizon_capability_scope(
+                        document, coverage, issues, entry, comparison, hard_exit)})
 
 
 def audit_ranking(document, source_root):
@@ -427,7 +474,9 @@ def schema():
             'inventory_extra_fields': ['as_of', 'expected_acquisition_receipt_ids', 'acquisition_coverage', 'checks'],
             'check_kinds': ['primary_source', 'primary_freshness', 'research_handoff', 'pe_claim', 'revision', 'scenario_checks'],
             'horizon_fields': ['mode', 'as_of', 'entry_at', 'comparison_at', 'fixed_spec (fixed_exit only)',
-                               'event_coverage: {through,basis}', 'planning_assumptions: [{label,value,basis}]'],
+                               'event_coverage: {through,basis}',
+                               'event_exclusion_requirement (optional): not_declared | none | entry_only | full_hold',
+                               'planning_assumptions: [{label,value,basis}]'],
             'ranking_fields': {'requested': ['profile_source_id', 'profile_id', 'profile_version', 'method', 'implementation_sha256'],
                                'observed': 'same fields as requested',
                                'optional': 'implementation_source_id binds the declared implementation hash to retained source bytes; no execution inferred'},

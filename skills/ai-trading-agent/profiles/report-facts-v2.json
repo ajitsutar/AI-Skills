@@ -814,6 +814,66 @@
         "denominator": null,
         "metric": "transaction costs",
         "unit": "input_currency_amount"
+      },
+      "tax_evidence/opening_declared_liability/amount": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "opening declared liability amount",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/declared_accrual_total": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "declared accrual total",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/declared_payment_total": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "declared payment total",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/declared_liability_remaining": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "declared liability remaining",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/unresolved_scenario_liability_amount": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "unresolved scenario liability amount",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/total_scenario_liability_remaining": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "total scenario liability remaining",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/actual_tax_liability_amount": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "actual tax liability amount",
+        "unit": "input_currency_amount"
+      },
+      "conclusion_facts/unresolved_tax_amount_known": {
+        "basis": "Same-scenario missing tax information only; declared balance zero does not establish missing amount.",
+        "denominator": null,
+        "metric": "unresolved tax amount known",
+        "unit": "boolean"
+      },
+      "tax_evidence/events/*/amount": {
+        "basis": "Declared single-scenario tax evidence only. Missing event liabilities remain unknown; a comparator cash/payment delta does not resolve them. Actual tax law/liability is not verified.",
+        "denominator": null,
+        "metric": "events * declared amount",
+        "unit": "input_currency_amount"
+      },
+      "tax_evidence/events/*/derived_inputs/realized_gain": {
+        "basis": "Computed same-scenario realized gain, not an independently observed tax liability.",
+        "denominator": null,
+        "metric": "declared scenario realized gain",
+        "unit": "input_currency_amount"
       }
     },
     "backtest.opening_range": {
@@ -6726,6 +6786,102 @@
         "denominator": null,
         "metric": "variance per period decimal squared *",
         "unit": "decimal_return_squared"
+      },
+      "invested_weight": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": "supplied notional",
+        "metric": "invested weight",
+        "unit": "fraction"
+      },
+      "cash_weight_assumed_zero_shock": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": "supplied notional",
+        "metric": "cash weight assumed zero shock",
+        "unit": "fraction"
+      },
+      "modeled_cash_notional": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "modeled cash notional",
+        "unit": "input_currency_amount"
+      },
+      "actual_available_cash": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "actual available cash",
+        "unit": "input_currency_amount"
+      },
+      "available_variance_periods": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "available variance periods",
+        "unit": "count"
+      },
+      "spending_goal/amount": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "spending goal amount",
+        "unit": "input_currency_amount"
+      },
+      "spending_goal/horizon_periods": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "spending goal horizon periods",
+        "unit": "count"
+      },
+      "spending_goal/target_fraction_of_notional": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": "supplied notional",
+        "metric": "spending goal target fraction of notional",
+        "unit": "fraction"
+      },
+      "spending_goal/goal_horizon_within_variance_path": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "spending goal goal horizon within variance path",
+        "unit": "boolean"
+      },
+      "spending_goal/cash_only_sensitivity/cash_before_withdrawal": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "spending goal cash only sensitivity cash before withdrawal",
+        "unit": "input_currency_amount"
+      },
+      "spending_goal/cash_only_sensitivity/cash_after_withdrawal": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "spending goal cash only sensitivity cash after withdrawal",
+        "unit": "input_currency_amount"
+      },
+      "spending_goal/cash_only_sensitivity/shortfall": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "spending goal cash only sensitivity shortfall",
+        "unit": "input_currency_amount"
+      },
+      "spending_goal/cash_only_sensitivity/covered_under_assumptions": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "spending goal cash only sensitivity covered under assumptions",
+        "unit": "boolean"
+      },
+      "spending_goal/actual_available_cash": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "spending goal actual available cash",
+        "unit": "input_currency_amount"
+      },
+      "spending_goal/funding_established": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "spending goal funding established",
+        "unit": "boolean"
+      },
+      "spending_goal/probability": {
+        "basis": "Full declared notional; cash-only sensitivity assumes unchanged accessible uncommitted cash and no intervening flows/costs/taxes. Actual availability and calibrated probability remain unknown.",
+        "denominator": null,
+        "metric": "spending goal probability",
+        "unit": "fraction"
       }
     },
     "risk.empirical_tail": {
@@ -7055,6 +7211,104 @@
         "basis": "Supplied observation count or declared threshold, with no independence or authenticity inference.",
         "denominator": null,
         "metric": "supplied_observations",
+        "unit": "count"
+      }
+    },
+    "data.source_strategy_readiness": {
+      "studies/*/declared_policy_grid_complete": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "declared policy grid complete",
+        "unit": "boolean"
+      },
+      "studies/*/grid/*/observation_status": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "grid * observation status",
+        "unit": "status"
+      },
+      "studies/*/grid/*/usable_for_declared_purpose": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "grid * usable for declared purpose",
+        "unit": "boolean"
+      },
+      "studies/*/grid_status_counts/*": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "grid status counts *",
+        "unit": "count"
+      },
+      "studies/*/strict_observed_grid_complete": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "strict observed grid complete",
+        "unit": "boolean"
+      },
+      "studies/*/universe_mode": {
+        "basis": "Current-roster history is survivor-conditioned; declared historical membership still requires substantive source review.",
+        "denominator": null,
+        "metric": "Declared universe membership convention",
+        "unit": "status"
+      },
+      "studies/*/unusable_requirements": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "unusable requirements",
+        "unit": "count"
+      },
+      "required_grid_rows": {
+        "basis": "Declared source-bound study only; no historical completeness or source authenticity certification.",
+        "denominator": null,
+        "metric": "required grid rows",
+        "unit": "count"
+      },
+      "source_authenticity_verified": {
+        "basis": "Declared source-bound study only; no historical completeness or source authenticity certification.",
+        "denominator": null,
+        "metric": "source authenticity verified",
+        "unit": "boolean"
+      },
+      "historical_universe_completeness_certified": {
+        "basis": "Declared source-bound study only; no historical completeness or source authenticity certification.",
+        "denominator": null,
+        "metric": "historical universe completeness certified",
+        "unit": "boolean"
+      },
+      "status": {
+        "basis": "Conservative aggregate of per-study readiness; source completeness and authenticity are not certified.",
+        "denominator": null,
+        "metric": "source study readiness",
+        "unit": "status"
+      },
+      "grid_status_counts/*": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "grid status counts *",
+        "unit": "count"
+      },
+      "unusable_requirements": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "unusable requirements",
+        "unit": "count"
+      },
+      "declared_policy_grid_complete": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "declared policy grid complete",
+        "unit": "boolean"
+      },
+      "strict_observed_grid_complete": {
+        "basis": "Declared strategy/security/session/field/purpose cells; a cell is not a stock or a complete historical universe. Reference/model cells remain separate from observed cells.",
+        "denominator": null,
+        "metric": "strict observed grid complete",
+        "unit": "boolean"
+      },
+      "studies/*/required_grid_rows": {
+        "basis": "Declared source-bound study only; no historical completeness or source authenticity certification.",
+        "denominator": null,
+        "metric": "required grid rows",
         "unit": "count"
       }
     }

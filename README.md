@@ -28,6 +28,13 @@ Offline run/report helpers connect explicit quant jobs and separate analyst coho
 to those reports, while advisory payload receipts expose order-instruction changes.
 Source selection and surrounding narrative still require review.
 
+The trading workflows use accessible free sources first; paid subscriptions are
+optional and existing user-provided access can improve freshness or coverage.
+Current helpers retain source-bound data readiness, tax and withdrawal
+uncertainty, dated cash-benchmark applicability, event-research capability limits
+and excerpt-based issuer diagnostics. Proposal evaluation preserves supplied
+terms and provenance separately from approval.
+
 Its [execution policy](skills/ai-trading-agent/references/execution-modes.md)
 is separate for each task, including each scheduled task, and defaults to `paper`.
 There is no global execution policy. Each private file binds the actual task ID;

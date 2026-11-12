@@ -5,6 +5,14 @@ failed and abandoned attempts, constraint revisions, prompt bytes, model context
 data vintages and actual result/error bytes. This is research evidence, never an
 execution gate or a claim that a strategy is profitable.
 
+For a requested local sequence, execute each mutation once in the supplied order,
+then audit read-only. Draft the result from the retained return values, errors,
+and journal transitions. Do not write an immutable answer predicting which
+operations will succeed before executing the sequence. A rejected call does not
+establish a recorded result or consume a result slot; inspect the actual journal
+before interpreting a later call. Keep a preliminary plan separate from the
+first delivered result. Preserve failed calls even when a later call succeeds.
+
 Create a new private directory outside the installed package. Register each
 attempt before running it. Record every result, including failures; a changed
 constraint, universe, prompt or selected method is a new attempt referring to its

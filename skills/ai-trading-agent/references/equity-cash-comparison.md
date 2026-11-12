@@ -34,6 +34,42 @@ instrument and other comparator metadata in the cash document; unknown guarantee
 insurance or counterparty terms remain unknown. A cash return model cannot
 establish principal assurance.
 
+Cash numerical computability and dated benchmark applicability are separate.
+Supply document `as_of` (matching the workflow contract cutoff) and `cash_benchmark` with `instrument`, `evidence` (a
+nonempty list of source descriptions), `observed_at`, explicit positive integer
+`max_age_seconds`, matching `entry_at`/`exit_at`, `rate_or_return`,
+`basis: "annual_effective"`, `day_count: "ACT/365F"`, `currency`, and `methodology`.
+The rate must match `cash_document.annual_effective_rate`. Existing
+`cash_benchmark.review_cash_benchmark` checks the observation against the research
+cutoff and caller's freshness policy, exact interval, maturity, and conversion
+assumptions. Missing freshness policy is unassessed; do not invent an age limit.
+Use `instrument_maturity_at` or explicit `horizon_adjustment_evidence` for a
+maturity mismatch, rollover, early sale, or floating cash. A fresh quote need not
+guarantee a future rate: constant-rate projection is an explicit assumption, not
+proof of a locked yield or a guarantee through the holding period.
+
+Use the source-bound research workflow for dated primary comparison. It derives
+`benchmark_provenance` from actual source/assumption bindings; do not supply that
+argument in a workflow plan. Primary metadata requires the explicit source role
+`supplied_observation` or `supplied_observations`; unknown, scenario or assumption
+roles remain conditional. These are source declarations, not authentication. Bind observation time, rate, instrument and currency
+to sibling fields in the same retained original quote record or explicit source
+bridge, and bind each comparison leg's currency to its supplied evidence. An
+exchange-calendar publication date, a research cutoff, assumed timestamp or
+assumed currency cannot establish source-confirmed quote applicability. Retain
+original source bytes; do not rewrite an undated rate into a newly dated record.
+Source bindings prove retained byte lineage, not authenticity or upstream truth.
+
+`cash_calculation_unresolved` concerns arithmetic; `cash_applicability` retains
+the separate review, source bindings and missing/stale/future/mismatched reasons.
+`cash_unresolved` includes both. Missing cash dates or assumed metadata leave
+`primary_comparison: null` even with valid terminal equity timing, while preserving
+`cash_result` and conditional rows whenever numerical conventions are complete.
+A direct helper call without workflow provenance also remains conditional.
+Explicitly report these limitations rather than describing an undated projection
+as an appropriately dated benchmark. A passing primary row is still a conditional
+scenario comparison, never a forecast or guaranteed cash outcome.
+
 Terminal-price applicability is separate from arithmetic. Optional timing evidence
 uses the **complete original** `source_utf8`, its exact UTF-8 `source_sha256`,
 `source_ref`, and explicit `source_role`, plus `terminal_time_pointer` and

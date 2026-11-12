@@ -5,54 +5,50 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # AI Trading Agent
 
-Package version: **5.6.2 - November 6, 2026**.
+Package version: **5.6.7 - November 11, 2026**.
 
-This skill researches investments, explains evidence and prepares host actions.
-Every execution task, including each scheduled task, has its own private persistent
-policy bound to its stable `task_id`; there is no global execution policy. New
-task policies default to `paper`. Read that task's policy and verify its identity
-against the current host task before actions; see
-[execution modes](references/execution-modes.md). Its `mode` is `paper`,
+This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent
+policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
+against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
 `approval` or `autonomous`: respectively simulate only, require order approval,
 or carry out in-scope actions under standing authority on a permitted host.
-Only an explicit user request may change the policy. Ordinary prompts supply what
-to do, not which policy mode to use; ask clarifying questions where intent is missing.
-Re-read the task's file before each action. Initialize a new task's policy in paper;
-never inherit another task's mode or choose a bundled example as an active setting.
+
+When evaluating supplied proposals, retain each exact payload and its provenance while assessing approval and permissible action separately. In approval mode,
+present the specific proposal for user approval when that approval is missing; missing approval does not erase the proposal, and analysis is not user consent.
+Clarify conflicting or incomplete terms while preserving the original proposal. Before claiming the report complete, reconcile every supplied proposal with its
+reported payload, approval facts and disposition. Apply only trigger conditions the user actually supplied or adopted; a calculated observation is not a trigger.
+See [proposal evaluation](references/execution-modes.md#evaluate-supplied-proposals).
+
+Only an explicit user request may change the policy. Ordinary prompts supply what to do, not which policy mode to use; ask clarifying questions where intent is missing.
+Re-read the task's file before each action. Initialize a new task's policy in paper; never inherit another task's mode or choose a bundled example as an active setting.
 An invalid, inaccessible or wrong-task policy is an error, never live authority.
 
-Research and pure payload formatting require no policy or approval. Research risk
-findings remain advisory; no grant, ticket, strategy promotion, volatility clearance
-or new numerical execution gate is introduced. Host/platform/broker requirements
-still apply. A policy setting cannot grant permissions the host does not have.
-Use actual host results: a recommendation, formatter output or empty response is
-not a fill. Read [broker handoff](references/broker-integration.md) for that boundary.
+Research and pure payload formatting require no policy or approval. Research risk findings remain advisory; no grant, ticket, strategy promotion, volatility clearance
+or new numerical execution gate is introduced. Host/platform/broker requirements still apply. A policy setting cannot grant permissions the host does not have.
+Use actual host results: a recommendation, formatter output or empty response is not a fill. Read [broker handoff](references/broker-integration.md) for that boundary.
 
-Resolve all files relative to this SKILL.md. Keep the entire standalone folder;
-uploading only this file omits the implementation. Keep personal evidence and
+Resolve all files relative to this SKILL.md. Keep the entire standalone folder; uploading only this file omits the implementation. Keep personal evidence and
 research archives outside the installed package. Run `scripts/research_preflight.py`
-when diagnosing research dependencies or package integrity. Missing components
-limit the calculations you can truthfully claim, not permission to execute.
+when diagnosing research dependencies or package integrity. Missing components limit the calculations you can truthfully claim, not permission to execute.
 
 ## Start with the request and its evidence
 
-For public investor portfolios, disclosure refreshes, or inverse recommendations,
-use the [portfolio-following subskill](subskills/portfolio-following/SKILL.md).
-It distinguishes public reported baskets from private or app-specific allocations,
-supports long-only inverse signals and source-aware rebalance proposals, and
+For public investor portfolios, disclosure refreshes, or inverse recommendations, use the [portfolio-following subskill](subskills/portfolio-following/SKILL.md).
+It distinguishes public reported baskets from private or app-specific allocations, supports long-only inverse signals and source-aware rebalance proposals, and
 refreshes on demand unless the user explicitly requests recurring monitoring.
 
-For backtesting, portfolio optimization, historical-data readiness or release
-quality, use [quantitative research assurance](references/quant-research-assurance.md).
-It routes to source-bound identity/readiness and optional price refresh, holdings
-and tax/settlement accounting, Student-t GARCH and tail diagnostics, independent
-allocation checks, durable experiment records and reproducible release evidence.
-Carry strategy readiness and unresolved data qualifications into every reported
-headline; never turn modeled valuation coverage into observed historical coverage.
-These checks substantiate research claims and add no execution gates.
+For backtesting, portfolio optimization, historical-data readiness or release quality, use [quantitative research assurance](references/quant-research-assurance.md).
+It routes to source-bound identity/readiness and optional price refresh, holdings and tax/settlement accounting, Student-t GARCH and tail diagnostics, independent
+allocation checks, durable experiment records and reproducible release evidence. Carry strategy readiness and unresolved data qualifications into every reported
+headline; never turn modeled valuation coverage into observed historical coverage. These checks substantiate research claims and add no execution gates.
 
-Before authoring a final answer, follow the
-[final claims and scenario review](references/evidence-semantics.md#final-claims-and-scenario-review).
+When raw source-bound security episodes, feature revisions, observation status and a study request are supplied, use `data.source_strategy_readiness` to compose
+them through the existing readiness assessor. Keep historical membership fixed at the signal session for each decision; prelisting lookback cells remain required
+gaps. Preserve separate signal, valuation and execution cutoffs and usability. Use holdings-ledger tax evidence to distinguish declared payment differences from
+unresolved tax liabilities. For a withdrawal goal, include conditional cash-only coverage alongside volatility; `risk.conditional_portfolio` accepts a declared
+`spending_goal` without inferring a calibrated probability or actual cash access.
+
+Before authoring a final answer, follow the [final claims and scenario review](references/evidence-semantics.md#final-claims-and-scenario-review).
 Retain source/result pointers, audit conditional claims and funding alternatives,
 and bind source opening conventions and event scope before scenario projections.
 
@@ -286,12 +282,15 @@ For peer valuation, also verify the [numerator and cash-flow basis](references/f
 Preserve EPS period/numerator basis and comparator provenance; do not infer SBC issuance or covenant definitions. Use supported `fundamental.calculate` ratios and raw opening/closing or gross-profit operands.
 Derived observations are executed calculations, not assumptions. Retain source bindings and derived results, and reconcile intermediate inputs and every final narrative metric. Historical trend claims need a separate same-metric current/prior evidence row, including in the conclusion.
 
-Sources are open: SEC, issuer filings and releases, accessible finance publishers,
-market-data providers and configured paid services. Yahoo is one adapter, not a
-restriction. Dynamically discover material news, between-quarter guidance and
+Use relevant free sources first; every paid subscription is optional across this
+skill. Follow [source access](references/source-access.md) for user-provided paid
+enhancements, free fallbacks and evidence limits. Dynamically discover material news, between-quarter guidance and
 analyst evidence using [news-and-guidance.md](references/news-and-guidance.md) and
 [analyst-research.md](references/analyst-research.md). Disclose actual access;
 headlines, full reports, paywalls and inaccessible sources are different coverage.
+For a retained discovery/access ledger, use the [discovery check](references/news-and-guidance.md#check-a-retained-discovery-ledger)
+without requiring sentiment scoring. Keep excerpt-supported text candidates
+separate from configured issuer scope; lexical matches do not certify relevance.
 Forward targets are analyst opinions, distinct from past 52-week ranges and
 intrinsic value. Social posts supply research leads, not authoritative facts.
 Use the analyst helper's population-scoped provenance when explaining dependence:
@@ -330,6 +329,8 @@ supported operation, then compare the explanation with retained facts. Use
 `research_contracts.py` for source/role, horizon and ranking-method receipts;
 do not substitute sample constraints, unrelated record dates or a different strategy.
 Receipts disclose uncertainty and do not infer the user's intent or authenticate sources.
+For partial event calendars, use the router's [research capability scope](references/research-capability-scope.md)
+to distinguish feasible descriptive work from uncertified forecasts or exclusions.
 For retained model-run reviews, follow [original-request fidelity](references/research-alignment.md#review-retained-model-runs-against-the-original-request):
 compare every run with the authoritative requested input separately from its own
 internal consistency and numerical replay.

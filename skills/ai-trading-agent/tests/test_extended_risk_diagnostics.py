@@ -1,6 +1,8 @@
 """Fictional numerical identities and adverse cases, not market validation."""
 import copy
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 from types import SimpleNamespace
@@ -167,6 +169,113 @@ class DistributionDiagnostics(unittest.TestCase):
         for k,v in [('correlation',[[1,1.2],[1.2,1]]),('variance_units','percent_squared'),('horizons',[3])]:
             d=conditional_input();d[k]=v
             with self.assertRaises(ValueError):risk.conditional_portfolio(d)
+
+
+class ConditionalSpendingGoal(unittest.TestCase):
+    def request(self, amount=250, horizon=8):
+        document = conditional_input()
+        document.update(notional=2000, weights={'A': .3, 'B': .4})
+        document['spending_goal'] = {'kind': 'withdrawal', 'amount': amount,
+                                    'currency': 'USD', 'horizon_periods': horizon,
+                                    'period_label': document['period_label'],
+                                    'withdrawal_timing': 'end_of_horizon'}
+        return document
+
+    def test_cash_denominator_and_goal_beyond_path(self):
+        document = self.request(); before = copy.deepcopy(document)
+        out = risk.conditional_portfolio(document); goal = out['spending_goal']
+        self.assertEqual(document, before)
+        self.assertEqual((out['invested_weight'], out['cash_weight_assumed_zero_shock']), (.7, .3))
+        self.assertEqual(out['modeled_cash_notional'], 600)
+        self.assertIsNone(out['actual_available_cash'])
+        self.assertEqual(out['available_variance_periods'], 2)
+        self.assertFalse(goal['goal_horizon_within_variance_path'])
+        self.assertEqual([h['periods'] for h in out['horizons']], [1, 2])
+        cash = goal['cash_only_sensitivity']
+        self.assertEqual((cash['cash_before_withdrawal'], cash['cash_after_withdrawal'], cash['shortfall']), (600, 350, 0))
+        self.assertTrue(cash['covered_under_assumptions'])
+        self.assertEqual(goal['target_fraction_of_notional'], .125)
+        self.assertEqual(len(cash['assumptions']), 3)
+        self.assertIsNone(goal['actual_available_cash'])
+        self.assertIsNone(goal['probability'])
+        self.assertFalse(goal['funding_established'])
+
+    def test_equal_zero_and_shortfall_boundaries(self):
+        for amount, remaining, covered in [(0, 600, True), (600, 0, True), (750, -150, False)]:
+            with self.subTest(amount=amount):
+                cash = risk.conditional_portfolio(self.request(amount))['spending_goal']['cash_only_sensitivity']
+                self.assertEqual(cash['cash_after_withdrawal'], remaining)
+                self.assertEqual(cash['shortfall'], max(0, -remaining))
+                self.assertEqual(cash['covered_under_assumptions'], covered)
+        for weights, cash in [({'A': 1, 'B': 0}, 0), ({'A': 0, 'B': 0}, 2000)]:
+            document = self.request(); document['weights'] = weights
+            self.assertEqual(risk.conditional_portfolio(document)['modeled_cash_notional'], cash)
+        document = self.request(200); document['weights'] = {'A': .6, 'B': .3}
+        self.assertEqual(risk.conditional_portfolio(document)['spending_goal']['cash_only_sensitivity']['cash_after_withdrawal'], 0)
+
+    def test_optional_goal_does_not_change_risk_or_rehabilitate_models(self):
+        document = self.request(horizon=1)
+        legacy = copy.deepcopy(document); del legacy['spending_goal']
+        a, b = risk.conditional_portfolio(document), risk.conditional_portfolio(legacy)
+        self.assertNotIn('spending_goal', b)
+        self.assertEqual(a['horizons'], b['horizons'])
+        self.assertEqual(a['variance_per_period_decimal_squared'], b['variance_per_period_decimal_squared'])
+        self.assertEqual(a['retained_model_flags'], document['model_flags'])
+        self.assertFalse(a['calibration_established'])
+        self.assertTrue(a['spending_goal']['goal_horizon_within_variance_path'])
+        self.assertIsNone(a['spending_goal']['probability'])
+        self.assertFalse(a['execution_authorized'])
+        document['variance_basis'] = 'log_return_decimal'
+        with self.assertRaisesRegex(ValueError, 'CROSS_BASIS_APPROXIMATION_NOT_DECLARED'):
+            risk.conditional_portfolio(document)
+        document['cross_basis_approximation_acknowledged'] = True
+        self.assertTrue(risk.conditional_portfolio(document)['cross_basis_approximation'])
+        document['correlation_ids'] = ['B', 'A']
+        with self.assertRaisesRegex(ValueError, 'CORRELATION_ORDER_REQUIRED'):
+            risk.conditional_portfolio(document)
+
+    def test_goal_schema_units_and_finite_arithmetic(self):
+        invalid = [('amount', True), ('amount', -1), ('amount', float('inf')),
+                   ('amount', float('nan')), ('horizon_periods', 0), ('horizon_periods', True),
+                   ('horizon_periods', 1.5), ('currency', 'EUR'), ('period_label', 'calendar_day'),
+                   ('kind', 'investment_profit'), ('withdrawal_timing', 'start_of_horizon'),
+                   ('unsupported_extra', 1)]
+        for field, value in invalid:
+            with self.subTest(field=field, value=value):
+                document = self.request(); document['spending_goal'][field] = value
+                with self.assertRaises(ValueError): risk.conditional_portfolio(document)
+        for goal in (None, [], {}, {'amount': 1}):
+            document = self.request(); document['spending_goal'] = goal
+            with self.assertRaises(ValueError): risk.conditional_portfolio(document)
+        document = self.request(1e308); document['notional'] = 1e-12
+        with self.assertRaisesRegex(ValueError, 'NONFINITE_SPENDING_GOAL_AGGREGATE'):
+            risk.conditional_portfolio(document)
+
+    def test_source_bound_workflow_retains_goal_and_replays(self):
+        import quant_report
+        import research_workflow as workflow
+        document = self.request(); raw = quant_report.encoded(document)
+        plan = {'schema_version': 1, 'network_mode': 'offline',
+                'contract': {'prompt': 'Assess this fictional withdrawal and conditional risk.',
+                             'purpose': 'offline test', 'base_currency': 'USD',
+                             'horizon_id': 'P8TRADINGD', 'as_of': document['as_of']},
+                'sources': [{'id': 'request', 'path': 'request.json', 'sha256': workflow.sha(raw),
+                             'format': 'json', 'role': 'supplied_risk_and_spending_request'}],
+                'jobs': [{'id': 'risk', 'operation': 'risk.conditional_portfolio',
+                          'arguments': {'document': {'$source': {'id': 'request', 'pointer': ''}}}}],
+                'claims': [], 'requirements': []}
+        artifacts = workflow.build(quant_report.encoded(plan), {'request.json': raw}.__getitem__)
+        arguments = json.loads(artifacts['jobs/0000/arguments.json'])
+        self.assertEqual(arguments['document'], document)
+        result = json.loads(artifacts['result.json'])['jobs'][0]['result']
+        self.assertEqual(result['spending_goal']['cash_only_sensitivity']['cash_after_withdrawal'], 350)
+        self.assertEqual(result['input_sha256'], risk.digest(document))
+        with tempfile.TemporaryDirectory() as directory:
+            folder = Path(directory)
+            for name, content in artifacts.items():
+                target = folder / name; target.parent.mkdir(parents=True, exist_ok=True)
+                target.write_bytes(content)
+            self.assertEqual(workflow.verify(folder)['status'], 'WORKFLOW_REPLAY_AND_REPORT_MATCH')
 
 
 class AllocationDiagnostics(unittest.TestCase):

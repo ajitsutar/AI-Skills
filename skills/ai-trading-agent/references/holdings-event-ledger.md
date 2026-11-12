@@ -64,6 +64,31 @@ after supplied selling costs and basis. No automatic loss benefit, wash-sale,
 holding-period classification or state-tax rule is inferred. Other taxable events
 still need explicit amounts. Unknown inputs remain in `unresolved_tax_events`.
 
+The additive `tax_evidence` output retains each tax-relevant event's input pointer,
+caller source, treatment, amount (or null), source-field pointers and missing inputs.
+Pointers are relative to the input document identified by `input_sha256`; a
+rate-based sale tax also identifies the computed realized gain with a separate
+result pointer. An explicit zero remains a supplied zero. An omitted opening
+`tax_liability` uses the documented zero default and is labeled as a default,
+not an observed source fact.
+
+`declared_accrual_total` excludes the opening balance; that opening balance plus
+accruals minus `declared_payment_total` equals `declared_liability_remaining`.
+`total_scenario_liability_remaining` and `unresolved_scenario_liability_amount`
+remain null while any tax is unresolved, including unmodeled taxes. Paying all
+declared liability does not resolve a missing amount. When the supplied model has
+no unresolved taxes, the latter field is zero and the former is the declared
+balance; neither verifies actual tax law. `actual_tax_liability_amount` is always
+null because this operation never establishes actual tax liability.
+
+Carry `conclusion_facts` into narrative comparisons: a numeric difference in cash
+or declared payments across scenarios is a scenario difference, not the amount of
+an unresolved liability. Do not describe that difference as unpaid tax merely
+because a comparator supplies a tax amount. Identifying missing tax requires
+evidence for that same scenario; retain its unknown amount and net-of-tax value
+until then. These facts support review of prose but do not automatically validate
+arbitrary narrative claims.
+
 The tax reserve remains part of gross cash; the liability is subtracted once to
 derive net NAV and available cash. Paying it reduces both cash and liability.
 The returned cash/receivable conservation residual must be zero. The timeline

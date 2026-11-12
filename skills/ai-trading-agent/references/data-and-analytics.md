@@ -1,7 +1,9 @@
 # Data acquisition and quantitative research
 
 Broker tools supply current quotes, tradability, account state and official order
-evidence. Public feeds supply research context; paid data are configurable.
+evidence. Follow [skill-wide source access](source-access.md): relevant free
+sources are the default, and every paid service is an optional user-provided
+enhancement when it improves the evidence needed for this task.
 Discover actual schemas for quote/history/financials/SEC/scanner/earnings/analyst
 tools. Robinhood's [tool guide](https://robinhood.com/us/en/support/articles/trading-with-your-agent/)
 is a discovery aid, not a schema contract. Observe tool batch limits and coverage.

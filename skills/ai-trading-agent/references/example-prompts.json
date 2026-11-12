@@ -9,7 +9,9 @@
       "guides": [
         "references/quant-research-assurance.md",
         "references/quant-data-contracts.md",
-        "references/release-acceptance.md"
+        "references/release-acceptance.md",
+        "references/maintaining-the-skill.md",
+        "references/research-capability-scope.md"
       ],
       "prompts": [
         {
@@ -47,6 +49,14 @@
         {
           "title": "Check financial freshness with the correct test",
           "prompt": "Review [FINANCIAL PERIODS, PUBLICATION EVIDENCE AND PRICE TIMESTAMPS] at [INFORMATION CUTOFF]. Report measured financial age, any applicable age threshold, and latest-public-release verification separately. Identify the evidence for each stale classification; an earlier financial period than the price date alone is not enough. Keep unknown freshness and missing source documents explicit."
+        },
+        {
+          "title": "Review examples and case impact for an upgrade",
+          "prompt": "For [SKILL UPGRADE AND PROJECT CASE REGISTRY], review all example workflows and P1/P2/P3 case impact. Update applicable prompts, fixtures, evaluation criteria or supplemental case versions; record no-change reasons where appropriate. Preserve frozen inputs, first responses and historical verdicts, separate evaluator expectations from input-only participant packets, and mark new coverage NOT_RUN. Link the review in the mutable project plan. Do not start participant runs, reopen completed cases, change approved quotas or publish anything as part of this maintenance review."
+        },
+        {
+          "title": "Review a flexible horizon with partial calendars",
+          "prompt": "Review [ISSUERS] over [HORIZON] with a flexible exit. Use the research capability scope to describe known events and qualitative risk, retain later unknown dates, and keep unsupported quantified risks and terminal forecasts separate. Preserve any explicit event-exclusion requirement without inventing one."
         }
       ]
     },
@@ -107,6 +117,10 @@
         {
           "title": "Keep two tasks independent",
           "prompt": "Offline only, create separate fictional policies for task-A and task-B, both initially paper. Explicitly change task-A to autonomous and verify task-B remains paper. Reject running task-B with task-A's file, even if its prompt asks for autonomy. Confirm a new cloned task-C starts in paper and repeated initialization preserves task-A's saved mode. Use no live tools and change no real policies."
+        },
+        {
+          "title": "Evaluate an existing analysis proposal",
+          "prompt": "For task [ACTUAL TASK ID], read its own selected policy at [TASK PRIVATE POLICY PATH] without changing it. Evaluate [EXISTING ANALYSIS PROPOSAL AND ITS SOURCE] against [MY CURRENT TASK INSTRUCTIONS AND ANY SPECIFIC ORDER APPROVAL]. Retain the exact original proposal and provenance, distinguish any suggested revision, and report approval facts separately from the saved mode and permissible action. If the mode requires order approval and I have not supplied it, present the specific proposal for my approval; the analysis is not my consent. Apply only conditions I actually supplied or adopted. In paper mode keep the result simulated even if I approved exact terms. Clarify material gaps without inventing terms or changing policy."
         }
       ]
     },
@@ -292,7 +306,8 @@
       "audience": "Intermediate",
       "guides": [
         "references/holding-period-planning.md",
-        "references/screening-and-value-traps.md"
+        "references/screening-and-value-traps.md",
+        "references/equity-cash-comparison.md"
       ],
       "prompts": [
         {
@@ -313,7 +328,7 @@
         },
         {
           "title": "Compare cash at the same horizon",
-          "prompt": "Compare this proposal [RESEARCH RECORD] with an appropriately dated cash or Treasury benchmark over the same holding period, using consistent return, fee and tax assumptions."
+          "prompt": "Compare [RESEARCH RECORD] with cash or Treasury over the same exact holding interval and after-entry-cost capital. Retain the original rate observation date, instrument, currency, research cutoff and declared freshness policy, separately from the constant-rate projection and any maturity/rollover assumption. Use the source-bound equity/cash workflow and show numeric computability and dated applicability separately. If dates, source bridges or currencies are assumed or absent, retain conditional arithmetic and leave primary applicability unresolved; do not substitute a calendar timestamp for a cash quote date."
         },
         {
           "title": "Challenge a short-horizon target claim",
@@ -364,6 +379,10 @@
         {
           "title": "Complete an evidence-backed sentiment review",
           "prompt": "Review sentiment for [COMPANY] over [WINDOW] at [CUTOFF]. Preserve deterministic triage labels, record qualitative interpretations with sources using sentiment_review, disclose news, analyst, price/volume, positioning and social coverage, and show contrary evidence without treating unscored language as neutral or a buy signal."
+        },
+        {
+          "title": "Audit issuer support in a discovery ledger",
+          "prompt": "Audit [RETAINED BULLETIN LEDGER] using the discovery check and [SAVED SOURCE DIRECTORY]. Verify the source hashes and exact accessible excerpts. Separate textual issuer candidates from the configured watchlist and declared industry context; keep unsupported assignments unknown. Explain whether each proposed attribution is supported by the content, retaining ambiguous aliases and limited access without treating a lexical match as semantic verification. This is a discovery/access review, not a sentiment-scoring request."
         }
       ]
     },
@@ -629,7 +648,8 @@
         "references/data-and-analytics.md",
         "references/financial-normalization.md",
         "references/quant-workbench.md",
-        "references/quant-data-contracts.md"
+        "references/quant-data-contracts.md",
+        "references/source-access.md"
       ],
       "prompts": [
         {
@@ -675,6 +695,10 @@
         {
           "title": "Reconcile revised price snapshots",
           "prompt": "Compare [PREVIOUS PRICE SNAPSHOT] with [CURRENT PRICE SNAPSHOT] under the same security, provider and adjustment contract. Report changed, added and removed sessions and invalidate the declared affected calculations. Reuse an unchanged prefix only with my explicit opt-in and current provider evidence; otherwise require a full refresh. Do not describe this supplied-data reconciliation as a completed download or measured speedup."
+        },
+        {
+          "title": "Research with optional subscriptions across every tool",
+          "prompt": "Research [REQUEST] using relevant accessible free sources by default across market data, fundamentals, news, analysts, options, macro, portfolio/risk and historical/backtest tools. I may provide existing paid access through the host. Use it only where it adds useful freshness, fields or coverage, preserving primary-source attribution and actual entitlement. If paid access is missing, expired or capped, continue supported free research and calculations and report the exact remaining gaps. Do not require a purchase, start a trial, infer a working API from a dashboard subscription or label delayed data live. Preserve any explicit offline or source-exclusive contract."
         }
       ]
     },
@@ -1773,6 +1797,35 @@
         {
           "title": "Prepare a cash-funded follower rebalance",
           "prompt": "Turn [FOLLOWER TARGETS] into proposals using [RECONCILED HOLDINGS], dated unadjusted quotes, settled cash, pending receivables, fees and quantity increments. Propose selling only shares attributed to the follower scope, including when I own unrelated shares of the same ticker. Fund buys only from spendable settled cash; show deferred trades, rounding cash and estimated unsettled sale proceeds without treating proposals as orders."
+        }
+      ]
+    },
+    {
+      "id": "source-study-and-withdrawal-evidence",
+      "title": "Source study and withdrawal evidence",
+      "audience": "Researchers working from supplied offline data",
+      "guides": [
+        "references/quant-data-contracts.md",
+        "references/holdings-event-ledger.md",
+        "references/risk-diagnostics.md",
+        "references/experiment-registry.md"
+      ],
+      "prompts": [
+        {
+          "title": "Compose historical study readiness",
+          "prompt": "Use [STUDY REQUEST], [SOURCE-BOUND SECURITY EPISODES], [FEATURE CONTRACT] and [OBSERVATION ARCHIVE] to assess historical and current-roster readiness. Retain required lookback gaps, revision cutoffs, held valuations and purpose usability; show the selected source records."
+        },
+        {
+          "title": "Explain unresolved tax and cash differences",
+          "prompt": "Replay these supplied holdings scenarios. Separate declared accruals and payments from unresolved event taxes, and explain cash differences without turning a comparator amount into an unknown liability."
+        },
+        {
+          "title": "Assess cash for a withdrawal goal",
+          "prompt": "Using [CONDITIONAL VARIANCE PATHS], [FULL-NOTIONAL WEIGHTS] and [WITHDRAWAL GOAL], show conditional cash-only coverage and supported risk horizons. Retain model diagnostics and distinguish modeled cash from verified availability and a calibrated funding probability."
+        },
+        {
+          "title": "Retain executed experiment outcomes",
+          "prompt": "Run this isolated local experiment sequence once, preserve failures and journal transitions, then write the result from captured outcomes. Keep plans separate from executed results and audit retained evidence without repeating stateful mutations."
         }
       ]
     }

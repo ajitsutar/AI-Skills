@@ -45,6 +45,8 @@ def replay(document):
     cash = dec(d['opening']['cash'], 'cash', Decimal(0))
     floor = dec(d.get('cash_floor','0'), 'floor', Decimal(0))
     tax_due = dec(d['opening'].get('tax_liability','0'), 'tax_liability', Decimal(0))
+    opening_tax = tax_due
+    tax_evidence_events = []; tax_accruals = Decimal(0)
     lots, marks, pending, seen_lots = {}, {}, [], set()
     mark_not_before = {}
     unknown_tax = []; realized = []; trace = []; external = Decimal(0); fees = Decimal(0)
@@ -139,21 +141,42 @@ def replay(document):
         require(remaining==0,'INSUFFICIENT_SELECTED_LOTS')
         return basis,details
 
+    def record_tax(event, treatment, amount, fields=(), missing=(), derived=None):
+        # Pointers are relative to the hashed input document; derived values have
+        # separate result pointers, so computed gains cannot masquerade as inputs.
+        pointer = '/events/'+str(event_index)
+        tax_evidence_events.append({'event_id':event['id'],'event_type':event['type'],
+            'event_pointer':pointer,'source':event['source'],'tax_treatment':treatment,
+            'amount':amount,'source_pointers':[pointer+'/'+field for field in fields],
+            'missing_inputs':list(missing),'derived_inputs':derived or {}})
+
     def accrue(event, gain=None, sale=False):
-        nonlocal tax_due
-        if d['tax_mode']=='unmodeled': return
+        nonlocal tax_due, tax_accruals
+        if d['tax_mode']=='unmodeled':
+            record_tax(event,'UNMODELED',None,missing=['tax_model']); return
         if 'tax_amount' in event:
-            tax_due+=dec(event['tax_amount'],'tax_amount',Decimal(0)); return
+            amount=dec(event['tax_amount'],'tax_amount',Decimal(0))
+            tax_due+=amount; tax_accruals+=amount
+            record_tax(event,'EXPLICIT_EVENT_AMOUNT',amount,['tax_amount']); return
         if d['tax_mode']=='positive_sale_gains' and sale:
             if event.get('tax_rate') is not None and gain is not None:
                 rate=dec(event['tax_rate'],'tax_rate',Decimal(0));require(rate<=1,'TAX_RATE_RANGE')
-                tax_due+=max(Decimal(0),gain)*rate; return
+                amount=max(Decimal(0),gain)*rate
+                tax_due+=amount; tax_accruals+=amount
+                record_tax(event,'POSITIVE_GAIN_RATE_SCENARIO',amount,['tax_rate'],
+                    derived={'realized_gain':gain,'result_pointer':'/realizations/'+str(len(realized))+'/realized_gain',
+                             'formula':'max(0, realized_gain) * tax_rate'}); return
+            missing=[name for name, absent in [('tax_rate',event.get('tax_rate') is None),
+                                               ('realized_gain',gain is None)] if absent]
+        else: missing=['tax_amount']
         unknown_tax.append(event['id'])
+        record_tax(event,'UNRESOLVED',None,
+                   ['tax_rate'] if d['tax_mode']=='positive_sale_gains' and sale and event.get('tax_rate') is not None else [],missing)
 
     trace.append(snapshot(d['opening']['at'],'opening'))
     events=d['events'];require(len({e['id'] for e in events})==len(events),'UNIQUE_EVENT_IDS')
     previous=start
-    for e in events:
+    for event_index, e in enumerate(events):
         now=timestamp(e['at']);require(previous<=now<=end,'EVENT_ORDER_OR_CUTOFF');previous=now
         require(e.get('source'),'EVENT_SOURCE_REQUIRED')
         require(e.get('currency',d['currency'])==d['currency'],'FX_NOT_MODELED')
@@ -226,11 +249,14 @@ def replay(document):
             invalidate_mark(e['security_id'],now)
             if ratio: invalidate_mark(e['child_security_id'],now)
             detail={'removed_units':total_qty,'cash_entitlement':total_qty*per,'child_ratio':ratio,'tax_treatment':'Explicit supplied event tax only; merger/reorganization tax law is not inferred.'}
-        elif kind=='tax_accrual': tax_due+=dec(e['amount'],'tax_amount',Decimal(0))
+        elif kind=='tax_accrual':
+            amount=dec(e['amount'],'tax_amount',Decimal(0));tax_due+=amount;tax_accruals+=amount
+            record_tax(e,'EXPLICIT_ACCRUAL',amount,['amount'])
         elif kind=='tax_payment':
             amount=dec(e['amount'],'tax_payment',Decimal(0))
             require(amount<=tax_due and amount<=cash,'TAX_PAYMENT_EXCEEDS_LIABILITY_OR_CASH')
             cash-=amount;tax_due-=amount;tax_payments+=amount
+            record_tax(e,'DECLARED_LIABILITY_PAYMENT',amount,['amount'])
         elif kind=='settlement': pass
         else: raise ValueError('UNSUPPORTED_EVENT:'+str(kind))
         settled+=settle(now)
@@ -244,6 +270,25 @@ def replay(document):
             'final':final,'lots':clean(list(lots.values())),'pending_receipts':clean(pending),'timeline':trace,
             'realizations':clean(realized),'net_external_cash_flows':str(external),'transaction_costs':str(fees),
             'cash_and_receivable_conservation_residual':str(cash_identity),
+            'tax_evidence':clean({'scope':'SUPPLIED_SCENARIO_NOT_VERIFIED_ACTUAL_TAX',
+                'input_sha256':digest(document),'mode':d['tax_mode'],
+                'opening_declared_liability':{'amount':opening_tax,
+                    'source_pointer':'/opening/tax_liability' if 'tax_liability' in d['opening'] else None,
+                    'basis':'SUPPLIED' if 'tax_liability' in d['opening'] else 'DOCUMENTED_ZERO_DEFAULT'},
+                'events':tax_evidence_events,'declared_accrual_total':tax_accruals,
+                'declared_payment_total':tax_payments,'declared_liability_remaining':tax_due,
+                'unresolved_event_ids':list(unknown_tax),
+                'unresolved_scenario_liability_amount':None if unknown_tax else Decimal(0),
+                'total_scenario_liability_remaining':None if unknown_tax else tax_due,
+                'actual_tax_liability_amount':None}),
+            'conclusion_facts':{
+                'tax_scope':'Declared amounts and supplied rate scenarios only; actual tax liability is not verified.',
+                'cash_scope':'Settled cash reflects declared tax payments; the reserve covers declared liability only.',
+                'unresolved_tax_amount_known':False if unknown_tax else None,
+                'unresolved_tax':('Missing tax amounts remain unknown even when all declared liability is paid.'
+                                  if unknown_tax else 'No unresolved tax inputs within the supplied model.'),
+                'scenario_comparison':'A cross-scenario cash or declared-payment delta does not identify an unresolved tax liability. '
+                    'Report the numeric delta with its scenario scope; identifying missing tax requires evidence for that same scenario.'},
             'execution_authorized':False,'tax_law_verified':False,'source_authenticity_verified':False,
             'limitations':['Explicit supplied lots/events/prices only; not native fills or broker buying power.',
               'Tax rates/accruals are supplied scenarios; no wash-sale, state, holding-period or reorganization tax inference.',

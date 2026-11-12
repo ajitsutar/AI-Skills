@@ -112,6 +112,26 @@ material missing intent. Compare compatible split/corporate-action price bases.
 A repeatedly satisfied condition is not automatically a new event. Apply the
 user's once-only, daily or reset/rearm rule and the host's retained outcomes.
 
+## Evaluate supplied proposals
+
+When asked to evaluate an existing proposal for possible dispatch, retain its
+exact supplied payload and provenance even when dispatch authority is missing.
+A prior analysis proposal is not user approval. Assess its terms against the
+actual instructions; do not silently replace supplied terms with missing values,
+invent new terms, or erase the proposal because it cannot yet be submitted.
+In approval mode, present the specific proposal for user approval when that
+approval is absent. If terms are unclear or conflict with the instructions,
+retain the original proposal and ask about the relevant issue before approval.
+Keep any proposed revision distinct from the original, with its reason.
+
+Report specific-order approval separately from the effective policy mode and
+final action. An exact user-approved order can still be paper-only; a paper
+policy does not make the approval fact false. Unknown approval stays unknown,
+and a proposal's claimed approval must be supported by the user's instructions.
+Assess a trigger or threshold only if the governing instructions actually supply
+or adopt it. A computed price change is not itself a user-specified trigger.
+These distinctions preserve evidence; they create no new execution gate.
+
 ## Host workflow on Muse or another permitted platform
 
 1. At each run, resolve the current task identity and its own selected policy.

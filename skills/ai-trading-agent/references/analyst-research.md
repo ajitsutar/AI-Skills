@@ -20,6 +20,11 @@ source pointers. It does not acquire missing reports or pool provider estimates.
 
 ## Discover sources for the actual issuer
 
+Apply [skill-wide source access](source-access.md): search relevant free original
+reports and public evidence first. User-provided subscription access can enrich
+material gaps; it is never required to use the analyst workflow. Preserve access
+limits and do not present an excerpt as a full report.
+
 Build a dated source map for each issuer advanced to this review. Identify the
 legal entity, exchange, share class, CIK where applicable, trading currency and
 ADR ratio before matching names or targets. A whole-market discovery screen does

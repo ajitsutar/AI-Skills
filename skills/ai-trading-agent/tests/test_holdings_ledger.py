@@ -48,6 +48,78 @@ class HoldingsLedgerTests(unittest.TestCase):
         d=base();d['tax_mode']='positive_sale_gains';d['events']=[event('sell',security_id='P',quantity='1',price='100',cost='0',lots=['a'],execution_price_basis='observed',settles_at=T2)]
         r=replay(d);self.assertIsNone(r['final']['net_nav_after_declared_tax']);self.assertEqual(r['status'],'UNRESOLVED')
 
+    def test_tax_evidence_missing_versus_explicit_zero(self):
+        d=base();d['events']=[event('sell',security_id='P',quantity='1',price='100',cost='0',lots=['a'],execution_price_basis='observed',settles_at=T2)]
+        original=copy.deepcopy(d);unknown=replay(d)
+        self.assertEqual(d,original)
+        row=unknown['tax_evidence']['events'][0]
+        self.assertEqual(row['event_pointer'],'/events/0')
+        self.assertEqual(row['missing_inputs'],['tax_amount'])
+        self.assertEqual(row['source_pointers'],[])
+        self.assertIsNone(row['amount'])
+        self.assertIsNone(unknown['tax_evidence']['total_scenario_liability_remaining'])
+        d['events'][0]['tax_amount']='0';known=replay(d)
+        row=known['tax_evidence']['events'][0]
+        self.assertEqual(row['amount'],'0')
+        self.assertEqual(row['tax_treatment'],'EXPLICIT_EVENT_AMOUNT')
+        self.assertEqual(row['source_pointers'],['/events/0/tax_amount'])
+        self.assertEqual(known['tax_evidence']['total_scenario_liability_remaining'],'0')
+        self.assertIsNone(known['tax_evidence']['actual_tax_liability_amount'])
+        self.assertEqual(unknown['final']['settled_cash'],known['final']['settled_cash'])
+        self.assertIsNone(unknown['final']['net_nav_after_declared_tax'])
+        self.assertIsNotNone(known['final']['net_nav_after_declared_tax'])
+
+    def test_paid_declared_tax_and_comparator_deltas_do_not_resolve_missing_tax(self):
+        d=base();d['opening']['tax_liability']='7'
+        d['events']=[event('sell',security_id='P',quantity='1',price='100',cost='0',lots=['a'],execution_price_basis='observed',settles_at=T2),
+                     event('tax_accrual',amount='4'),dict(event('tax_payment',amount='11'),at=T2)]
+        target=replay(d);tax=target['tax_evidence']
+        self.assertEqual(tax['opening_declared_liability'],{'amount':'7','source_pointer':'/opening/tax_liability','basis':'SUPPLIED'})
+        self.assertEqual(tax['declared_accrual_total'],'4')
+        self.assertEqual(tax['declared_payment_total'],'11')
+        self.assertEqual(tax['declared_liability_remaining'],'0')
+        self.assertEqual(tax['unresolved_event_ids'],['sell'])
+        self.assertIsNone(tax['unresolved_scenario_liability_amount'])
+        self.assertIsNone(tax['total_scenario_liability_remaining'])
+        self.assertFalse(target['conclusion_facts']['unresolved_tax_amount_known'])
+        self.assertIsNone(target['final']['net_nav_after_declared_tax'])
+        for supplied_tax in ('13','29'):
+            comparator=copy.deepcopy(d)
+            comparator['events'][0]['tax_amount']=supplied_tax
+            comparator['events'][2]['amount']=str(Decimal('11')+Decimal(supplied_tax))
+            compared=replay(comparator)
+            self.assertEqual(Decimal(target['final']['settled_cash'])-Decimal(compared['final']['settled_cash']),Decimal(supplied_tax))
+            self.assertEqual(Decimal(compared['tax_evidence']['declared_payment_total'])-Decimal(tax['declared_payment_total']),Decimal(supplied_tax))
+            self.assertEqual(replay(d)['tax_evidence'],tax)
+            self.assertIsNone(tax['events'][0]['amount'])
+
+    def test_rate_tax_evidence_and_missing_inputs(self):
+        d=base();d['tax_mode']='positive_sale_gains'
+        d['events']=[event('sell',security_id='P',quantity='1',price='100',cost='0',lots=['a'],execution_price_basis='observed',settles_at=T2,tax_rate='.3')]
+        result=replay(d);row=result['tax_evidence']['events'][0]
+        self.assertEqual(Decimal(row['amount']),Decimal('15'))
+        self.assertEqual(row['tax_treatment'],'POSITIVE_GAIN_RATE_SCENARIO')
+        self.assertEqual(row['source_pointers'],['/events/0/tax_rate'])
+        self.assertEqual(row['derived_inputs']['result_pointer'],'/realizations/0/realized_gain')
+        self.assertEqual(row['derived_inputs']['realized_gain'],result['realizations'][0]['realized_gain'])
+        self.assertEqual(result['tax_evidence']['opening_declared_liability']['basis'],'DOCUMENTED_ZERO_DEFAULT')
+        self.assertIsNone(result['tax_evidence']['opening_declared_liability']['source_pointer'])
+        d['opening']['lots'][0]['basis']=None
+        row=replay(d)['tax_evidence']['events'][0]
+        self.assertEqual(row['missing_inputs'],['realized_gain']);self.assertIsNone(row['amount'])
+        del d['events'][0]['tax_rate']
+        self.assertEqual(replay(d)['tax_evidence']['events'][0]['missing_inputs'],['tax_rate','realized_gain'])
+
+    def test_unmodeled_tax_evidence_does_not_promote_supplied_amount(self):
+        d=base();d['tax_mode']='unmodeled'
+        d['events']=[event('sell',security_id='P',quantity='1',price='100',cost='0',lots=['a'],execution_price_basis='observed',settles_at=T2,tax_amount='19')]
+        r=replay(d);tax=r['tax_evidence']
+        self.assertEqual(tax['events'][0]['tax_treatment'],'UNMODELED')
+        self.assertIsNone(tax['events'][0]['amount'])
+        self.assertEqual(tax['declared_accrual_total'],'0')
+        self.assertEqual(tax['unresolved_event_ids'],['TAXES_NOT_MODELED'])
+        self.assertIsNone(tax['total_scenario_liability_remaining'])
+
     def test_cash_stock_merger_and_terminal_zero(self):
         d=base();d['events']=[event('merger',security_id='P',child_security_id='C',child_ratio='2',cash_per_unit='5',settles_at=T2,terminal_outcome_confirmed=True,child_basis_by_parent_lot={'a':'450'},tax_amount='0'),dict(event('mark'),**mark('C',45,T1))]
         r=replay(d);self.assertEqual(r['final']['settled_cash'],'150');self.assertEqual(r['final']['positions']['C']['quantity'],'20');self.assertEqual(r['final']['gross_nav'],'1050')

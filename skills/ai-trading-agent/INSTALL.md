@@ -2,8 +2,11 @@
 
 This folder is the complete skill source package. Keep `SKILL.md` and all its
 subfolders together. No files from another skill or the repository root are
-required to use it. Runtime tools, Python/Node packages, model downloads and
-authenticated services are separate prerequisites described in [SKILL.md](SKILL.md).
+required to use it. Runtime tools and Python/Node packages depend on the
+helpers used. No paid subscription is required to use this skill. External
+services and model downloads are optional, feature-specific capabilities;
+missing data or dependencies can limit a particular analysis. See
+[source access](references/source-access.md) and [SKILL.md](SKILL.md).
 
 For a reproducible Windows/CPython 3.12 research environment, use the complete
 artifact-hashed profiles in `environments/windows-cp312-core/` or

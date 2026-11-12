@@ -55,6 +55,7 @@ import terminal_return_coverage
 import costed_bar_replay
 import monthly_experiment
 import research_readiness
+import source_strategy_readiness
 import security_master
 import price_refresh
 import holdings_ledger
@@ -195,6 +196,7 @@ MONTHLY_OPERATIONS = {
 OPERATIONS.update(MONTHLY_OPERATIONS)
 ASSURANCE_OPERATIONS = {
     'data.strategy_readiness': research_readiness.assess,
+    'data.source_strategy_readiness': source_strategy_readiness.assess,
     'data.security_snapshot': security_master.snapshot,
     'data.source_features': security_master.adapt_records,
     'data.price_refresh': price_refresh.reconcile,
@@ -234,7 +236,7 @@ MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'fundamental_toolkit.py', 'sentiment_toolkit.py', 'factor_research.py',
            'derivatives_toolkit.py', 'paper_exchange.py', 'platform_readiness.py', 'time_series_toolkit.py',
                'portable_quant.py', 'point_in_time_data.py', 'vintage_eligibility.py', 'terminal_return_coverage.py', 'costed_bar_replay.py', 'monthly_experiment.py',
-               'research_contracts.py', 'quant_data_contracts.py', 'research_readiness.py', 'security_master.py',
+               'research_contracts.py', 'quant_data_contracts.py', 'research_readiness.py', 'source_strategy_readiness.py', 'security_master.py',
                'price_refresh.py', 'holdings_ledger.py', 'analyst_adapter.py',
                'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py',
                'portfolio_follower.py', 'portfolio_disclosures.py')
@@ -314,6 +316,13 @@ def run(document):
                     for decision in payload['decisions']:
                         require(all(timestamp(decision[key]) <= timestamp(contract['as_of'])
                                     for key in ('decision_at', 'valuation_at', 'execution_at')), 'FUTURE_READINESS_CLOCK')
+                if job['operation'] == 'data.source_strategy_readiness':
+                    study = payload['study_request']
+                    for decision in study['decisions']:
+                        require(all(timestamp(decision[key]) <= timestamp(contract['as_of'])
+                                    for key in ('decision_at', 'valuation_at', 'execution_at')), 'FUTURE_READINESS_CLOCK')
+                    for query in study.get('symbol_queries', []):
+                        require(timestamp(query['as_of']) <= timestamp(contract['as_of']), 'FUTURE_READINESS_CLOCK')
                 if 'as_of' in payload:
                     require(timestamp(payload['as_of']) <= timestamp(contract['as_of']), 'FUTURE_ASSURANCE_CUTOFF')
                 if 'currency' in payload:

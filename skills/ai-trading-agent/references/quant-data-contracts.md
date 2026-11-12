@@ -5,6 +5,11 @@ data, grant redistribution rights, certify a historical universe, authorize an
 order or create a broker approval step. Existing storage and PIT APIs remain
 unchanged. Start with the small fictional examples in `examples/quant-data/`.
 
+Use [skill-wide source access](source-access.md) for optional data vendors.
+A missing subscription does not stop supported research, but unavailable data
+remain unavailable for the specific strategy claim. Free or delayed inputs must
+not be relabeled as live or historically point-in-time complete.
+
 ## Actual strategy requirements, rather than a generic completion flag
 
 `research_readiness.assess(document)` expands the requested strategy into a grid
@@ -66,6 +71,67 @@ counts without changing the requested scope. Do not shorten lookbacks or drop
 securities to fit the bound. Source archives stay outside the skill package.
 
 ## Source-bound security episodes and historical feature revisions
+
+### Compose a daily study directly from its original source documents
+
+When the supplied study has security episodes, feature revisions and a separate
+observation-status archive, use `data.source_strategy_readiness` (or
+`source_strategy_readiness.assess(document)`) before writing the conclusion.
+It calls the existing identity, point-in-time and readiness operations; do not
+replace its required-field grid with a model-written per-session membership loop.
+In particular, eligibility is fixed at each decision's signal session. Earlier
+lookback rows for a newly listed eligible security remain required gaps. A name
+that left before the decision does not become a signal requirement merely because
+it was a member on an earlier lookback date. Held valuation has separate scope.
+
+The exact outer object contains `schema_version: 1`, `study_request`,
+`security_contract`, `feature_contract`, and `observation_archive`. Bind each
+whole original document through the source-bound workflow rather than selecting
+only favorable observations. The adapter never changes the source documents.
+
+- `study_request` supplies `schema_version: 1`, `strategy_id`, `sessions`,
+  `requirements`, `valuation_policy` and `decisions` using the readiness fields
+  above. It also supplies unique `study_modes` (`historical_membership` and/or
+  `current_roster`), exact `current_roster_security_ids`, and `index_value` naming
+  the source membership episodes to use. Optional `symbol_queries` contain
+  `symbol`, `on` and `as_of`; supplied prose/assembly notes remain original
+  evidence, not an executable substitute for these explicit fields.
+- `security_contract` and `feature_contract` use the source-pointer contracts
+  below. The adapter selects security episode revisions at each `decision_at`,
+  retains all selected intervals including ended ones, and selects feature
+  revisions independently at each purpose's cutoff. Any existing `as_of`/`on`
+  in those copied contracts is replaced by the study's explicit clocks; the
+  original documents remain hashed and unchanged.
+- `observation_archive` contains exactly `source`, a standard source object whose
+  `body` is an array of daily observation records. Each record carries
+  `security_id`, `session`, `field`, `revision_id`, `value`, `status`,
+  `available_at`, `unit`, `currency`, and optionally boolean `executable`.
+  Numeric feature revisions must join one-to-one on security, UTC event date,
+  field and revision. Value, currency, unit and availability must match; status
+  and executability come from these original source rows, never from the price.
+  Explicit unavailable records may lack numeric features. Missing observations
+  remain unavailable. Ambiguous intraday records, unmatched numeric revisions,
+  duplicate observations and conflicting source IDs are errors, not silent drops.
+
+The result provides `studies` by decision/mode, each with its actual `grid`,
+selected values/revisions and source pointers, `unusable_requirements`, readiness
+status, warnings, and underlying assessor receipts. Identity and feature
+snapshots retain the mappings and excluded revisions. Headline readiness across
+the requested studies preserves every gap; value-present counts cannot replace
+purpose usability. A modeled mark can yield scenario coverage but never observed
+signal or fill coverage. The wrapper's current-roster subset does not remove held
+positions from separate valuation requirements.
+
+This is a daily UTC-date bridge, not an intraday-session inference engine. It is
+bounded to 1,000 decisions, 100 requirements and two million total grid cells;
+split larger requests without shortening their scope. It does not certify that
+supplied episode history is exhaustive or that missing episodes prove historical
+absence. Current-roster history remains survivor-conditioned.
+
+```text
+python scripts/source_strategy_readiness.py supplied-source-study.json --output new-readiness.json
+python -m unittest discover -s tests -p test_source_strategy_readiness.py -v
+```
 
 `security_master.snapshot(document)` resolves identities and episodes from actual
 JSON pointers into supplied source bodies. Each source has `id`, `uri`,

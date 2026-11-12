@@ -1,9 +1,10 @@
 """Deterministic news triage and reviewed guidance arithmetic; never a trading signal."""
 import argparse
+from copy import deepcopy
 from datetime import date, timedelta
 import json
 import math
-from pathlib import Path
+from pathlib import Path, PureWindowsPath
 import re
 from news_sources import digest, stamp, iso, save_json
 
@@ -202,6 +203,117 @@ def guidance_change(request, source_root):
     return result
 
 
+def discovery_ledger(request, source_root):
+    """Check retained excerpts for issuer candidates; never certify subject identity.
+
+    This deliberately does not fetch, score sentiment, infer timestamps or turn
+    caller-configured source scope into textual evidence. Invalid source bindings
+    remain visible in the output rather than being silently omitted.
+    """
+    def strings(value, label):
+        if not isinstance(value, list) or any(not isinstance(s, str) or not s.strip() for s in value):
+            raise ValueError(label + ' must be a list of nonempty strings')
+        if len(set(value)) != len(value):
+            raise ValueError(label + ' must not contain duplicates')
+        return value
+
+    if not isinstance(request, dict) or type(request.get('schema_version')) is not int or request['schema_version'] != 1:
+        raise ValueError('Discovery schema_version must be 1')
+    aliases = request.get('issuer_aliases')
+    if not isinstance(aliases, dict):
+        raise ValueError('issuer_aliases must be a dictionary of caller-reviewed aliases')
+    for ticker, names in aliases.items():
+        if not isinstance(ticker, str) or not ticker.strip():
+            raise ValueError('Issuer IDs must be nonempty strings')
+        strings(names, 'issuer_aliases entries')
+    records = request.get('records')
+    if not isinstance(records, list) or not records:
+        raise ValueError('Nonempty discovery records required')
+    base = Path(source_root).resolve()
+    if not base.is_dir():
+        raise ValueError('Source root must be an existing directory')
+    checked, seen = [], set()
+    for row in records:
+        if not isinstance(row, dict) or not isinstance(row.get('id'), str) or not row['id'].strip():
+            raise ValueError('Each discovery record requires a nonempty id')
+        if row['id'] in seen:
+            raise ValueError('Duplicate discovery record id')
+        seen.add(row['id'])
+        if row.get('source_kind') not in ('issuer', 'sec', 'exchange', 'macro', 'wire', 'publisher', 'aggregator'):
+            raise ValueError('Unknown discovery source_kind')
+        if not isinstance(row.get('access_tier'), str) or not row['access_tier'].strip():
+            raise ValueError('Caller-declared access_tier required')
+        if 'industry_context' in row and not isinstance(row['industry_context'], str):
+            raise ValueError('industry_context must be a caller-declared string')
+        claims = strings(row.get('claimed_issuers', []), 'claimed_issuers')
+        scopes = strings(row.get('scope_issuers', []), 'scope_issuers')
+        ref = row.get('source')
+        if not isinstance(ref, dict):
+            raise ValueError('Each discovery record requires source path, sha256 and excerpt')
+        if not isinstance(ref.get('path'), str) or not ref['path'].strip():
+            raise ValueError('Source path required')
+        if not isinstance(ref.get('sha256'), str) or not re.fullmatch('[0-9a-fA-F]{64}', ref['sha256']):
+            raise ValueError('Source sha256 must be 64 hexadecimal characters')
+        if not isinstance(ref.get('excerpt'), str) or not ref['excerpt'].strip():
+            raise ValueError('Nonempty exact accessible excerpt required')
+        binding = {'status': 'INVALID', 'path': ref['path'], 'declared_sha256': ref['sha256'].lower(),
+                   'diagnostic': None}
+        candidates = []
+        try:
+            relative = Path(ref['path'])
+            # Reject foreign absolute paths too, so a Windows path cannot become
+            # an innocuous-looking relative filename on a POSIX participant.
+            if relative.is_absolute() or PureWindowsPath(ref['path']).drive or PureWindowsPath(ref['path']).root:
+                raise ValueError('SOURCE_PATH_NOT_RELATIVE')
+            path = (base / relative).resolve()
+            if base not in path.parents or not path.is_file():
+                raise ValueError('SOURCE_PATH_OUTSIDE_ROOT_OR_MISSING')
+            raw = path.read_bytes()
+            binding['actual_sha256'] = digest(raw)
+            if binding['actual_sha256'] != ref['sha256'].lower():
+                raise ValueError('SOURCE_HASH_MISMATCH')
+            text = raw.decode('utf-8-sig')
+            if ref['excerpt'] not in text:
+                raise ValueError('EXCERPT_NOT_IN_SOURCE')
+            binding['status'] = 'VERIFIED_BYTES_AND_EXCERPT'
+            binding['excerpt_sha256'] = digest(ref['excerpt'].encode('utf-8'))
+            # Reuse the maintained matcher; neither configured feed scope nor
+            # caller-declared exchange fields are observations in this excerpt.
+            candidates = issuers({'title': ref['excerpt'], 'source_kind': row['source_kind'],
+                                  'scope_issuers': []}, aliases)
+        except (OSError, UnicodeError, ValueError) as exc:
+            binding['diagnostic'] = str(exc)
+        diagnostics = [{'issuer': claim,
+                        'status': ('UNRESOLVED_INVALID_PROVENANCE' if binding['status'] == 'INVALID'
+                                   else 'SUPPORTED_TEXT_CANDIDATE' if claim in candidates
+                                   else 'NO_MATCHING_TEXT_CANDIDATE')}
+                       for claim in claims]
+        checked.append({'id': row['id'], 'source_kind': row['source_kind'],
+                        'declared_access_tier': row['access_tier'], 'source_binding': binding,
+                        'text_candidates': candidates, 'declared_scope_issuers': list(scopes),
+                        'declared_industry_context': row.get('industry_context'),
+                        'claim_diagnostics': diagnostics,
+                        'text_support_status': ('INVALID_PROVENANCE' if binding['status'] == 'INVALID'
+                                                else 'CANDIDATES_PRESENT' if candidates else 'NO_TEXT_CANDIDATE'),
+                        'issuer_relevance': 'UNRESOLVED', 'semantic_identity_verified': False,
+                        'source_authenticity_verified': False, 'requires_semantic_review': True})
+    has_diagnostics = any(r['source_binding']['status'] == 'INVALID' or
+                          any(c['status'] != 'SUPPORTED_TEXT_CANDIDATE' for c in r['claim_diagnostics'])
+                          for r in checked)
+    return {'schema_version': 1, 'method': 'news-discovery-ledger-1.0.0',
+            'status': 'DIAGNOSTICS_PRESENT' if has_diagnostics else 'REVIEW_REQUIRED',
+            'declared_input': deepcopy(request), 'records': checked,
+            'input_sha256': digest(json.dumps(request, sort_keys=True, allow_nan=False)),
+            'implementation_sha256': digest(Path(__file__).read_bytes()),
+            'scope': 'Retained accessible excerpts only; no acquisition, freshness or completeness verification.',
+            'limitations': ['Aliases and source scope are caller-declared, not authenticated.',
+                            'Text candidates do not establish subject identity, relevance, independence or truth; review negation, name collisions and multiple entities.',
+                            'An exact excerpt match does not resolve repeated occurrences or missing surrounding context.',
+                            'No detected candidate does not prove irrelevance; industry context can remain useful without an issuer assignment.',
+                            'Declared access tiers and industry context are preserved, not independently verified.'],
+            'execution_authorized': False}
+
+
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     subs = p.add_subparsers(dest='mode', required=True)
@@ -210,10 +322,16 @@ def main():
     n.add_argument('--lookback-hours', type=float, default=72)
     g = subs.add_parser('guidance')
     g.add_argument('input'); g.add_argument('source_root'); g.add_argument('output')
+    d = subs.add_parser('discovery')
+    d.add_argument('input'); d.add_argument('source_root'); d.add_argument('output')
     a = p.parse_args()
     read = lambda path: json.loads(Path(path).read_text(encoding='utf-8'))
-    result = (analyze(read(a.news), read(a.config), a.as_of, a.lookback_hours) if a.mode == 'triage'
-              else guidance_change(read(a.input), a.source_root))
+    if a.mode == 'triage':
+        result = analyze(read(a.news), read(a.config), a.as_of, a.lookback_hours)
+    elif a.mode == 'guidance':
+        result = guidance_change(read(a.input), a.source_root)
+    else:
+        result = discovery_ledger(read(a.input), a.source_root)
     save_json(a.output, result)
     print(json.dumps({k: v for k, v in result.items() if k != 'records'}, indent=2))
 

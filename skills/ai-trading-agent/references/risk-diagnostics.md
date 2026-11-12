@@ -68,6 +68,58 @@ linear approximation, particularly weak for large moves. Sigma is not a loss cap
 or confidence band. Model diagnostic failures are not repaired by taking the
 maximum of models or averaging forecasts; such an envelope is a separate scenario.
 
+Every conditional result also reports `invested_weight`,
+`cash_weight_assumed_zero_shock`, `modeled_cash_notional` and
+`available_variance_periods`. Residual cash is one minus the supplied invested
+weights, measured on the entire supplied notional. Invested weights are never
+renormalized to exclude cash. `actual_available_cash` remains null: this model
+convention does not verify a settled, accessible or uncommitted balance.
+
+### An optional withdrawal goal
+
+The existing `risk.conditional_portfolio` operation accepts an optional
+`spending_goal` object with exactly these fields:
+
+```json
+{
+  "kind": "withdrawal",
+  "amount": 250,
+  "currency": "USD",
+  "horizon_periods": 8,
+  "period_label": "one_trading_day",
+  "withdrawal_timing": "end_of_horizon"
+}
+```
+
+The amount must be finite and nonnegative; the horizon must be a positive integer.
+Currency and period label must exactly match the risk input. Only an end-of-horizon
+withdrawal is supported; a profit target is a different question. Map these fields
+from the original source while retaining its bytes and source pointers. Do not
+silently invent a goal, convert its period units, or change the original risk inputs.
+
+The result separates a `cash_only_sensitivity` from unknown actual funding and
+probability. For a fictional notional of 2,000 with invested weights 0.3 and 0.4,
+the modeled cash is 600. A withdrawal of 250 leaves 350 **if that residual cash
+remains unchanged, accessible and uncommitted**, with no intervening flows,
+costs, taxes or cash yield. No positive investment return is needed for this
+arithmetic. Exact coverage gives a zero remainder; a negative remainder is a
+shortfall, not permitted borrowing or an instruction to sell an asset.
+
+`funding_established` remains false, `actual_available_cash` and `probability`
+remain null, and `probability_status` is `NOT_ESTABLISHED`. These fields do not
+erase the conditional cash result. A variance path alone supplies no calibrated
+terminal distribution or goal probability, even when it covers the goal horizon.
+`goal_horizon_within_variance_path` explicitly identifies longer goals: the cash
+sensitivity is still available, but no additional risk periods or probabilities
+are extrapolated. Unknown yield or return distribution does not make the bounded
+cash arithmetic unavailable.
+
+All existing risk validation and model flags still apply. A spending goal does
+not turn a rejected risk input into a successful risk result, repair diagnostics,
+verify liquidity or authorize execution. For actual dated funding with intervening
+events, use the separately source-bound cash/holdings tools with their required
+dates, rates and settlement evidence instead of stretching this sensitivity.
+
 ## Numerically robust constrained allocation
 
 `quant_portfolio.construct(document)` preserves its input contract. For long-only,

@@ -34,8 +34,14 @@ Before selecting names, save a JSON object with `prompt`, `universe`, `hold`,
 `allowed_statuses`, and `custom_filters`. Preserve supplied `count`, `capital`,
 `risk_posture`, `early_exit_policy`, and `earnings_policy`; do not invent them.
 
-Resolve the analytical comparison clock through horizon_review.py first. Timestamp
-fields must include timezones. `count` is optional: omitted or null means no output
+Resolve intent with `research.route_horizon` first. A flexible or comparison date
+retains its supplied precision, even on a non-session day. Use `horizon_review.py`
+to resolve an actual hard-exit specification. This ranking adapter still requires
+exact timestamp comparisons; when only a date is supplied, preserve the date and
+disclose the adapter limitation rather than inventing a sale time or buffer to
+satisfy it. A separately justified analytical timestamp must remain a declared
+assumption, not replace the user's original clock. Timestamp fields must include
+timezones. `count` is optional: omitted or null means no output
 quota, and the entire finite research queue must be reviewed for final completion.
 A supplied positive count is a requested target, not a guarantee of that many
 supported choices. `capital` is optional for `research_intent: ranking` (the default)

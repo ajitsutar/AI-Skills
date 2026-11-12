@@ -1,5 +1,20 @@
 # AI Trading Agent
 
+Every paid subscription is optional across all skill tools and research workflows.
+Use relevant accessible free sources first; user-provided paid access can add
+fresher data or materially better coverage. Missing access leaves explicit gaps
+while supported research continues. See [source access](references/source-access.md).
+
+Each upgrade also reviews example prompts and P1/P2/P3 case impact, updating
+applicable coverage while preserving frozen evidence. See
+[documentation and case maintenance](references/maintaining-the-skill.md).
+
+Dated cash benchmarks retain source applicability separately from computable
+projections. Partial event calendars preserve feasible descriptive research
+and explicit forecast limits. Retained news ledgers can check excerpt-supported
+issuer candidates while keeping semantic attribution unresolved. Existing
+proposals retain their exact terms and provenance through approval review.
+
 [Execution policy](references/execution-modes.md) selects `paper`, `approval` or
 `autonomous` in a separate persistent JSON file for each task, including each
 scheduled task. New task policies default to `paper`; no global policy applies.
@@ -30,6 +45,14 @@ diagnostics, independently checked constrained allocation, retained experiment
 history, semantic analyst extraction and artifact-locked release verification.
 Its capability claims distinguish implemented calculations, tested environments,
 actual host responses, external data coverage and future investment outcomes.
+
+Source study composition joins supplied security episodes, feature vintages and
+observation status through the readiness assessor, retaining purpose-specific
+cutoffs and historical lookback gaps. Holdings results expose declared tax sources
+and unresolved amounts separately. Conditional portfolio risk can include a
+withdrawal goal and an explicit cash-only sensitivity without inferring actual
+cash access or a probability from variance alone. Experiment results are written
+after execution and retain rejected calls alongside successful state changes.
 
 The [vintage eligibility audit](references/vintage-eligibility.md) separates a
 value's first publication, supersession and applicable share/metric basis.

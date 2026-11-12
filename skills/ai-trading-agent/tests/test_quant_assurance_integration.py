@@ -89,7 +89,7 @@ class AssuranceIntegrationTests(unittest.TestCase):
         for name in ['research_contracts.py', 'garch_volatility.py', 'holdings_ledger.py',
                      'analyst_adapter.py', 'release_acceptance.py', 'experiment_registry.py']:
             self.assertIn(name, q.MODULES)
-        self.assertEqual(len(q.ASSURANCE_OPERATIONS), 14)
+        self.assertEqual(len(q.ASSURANCE_OPERATIONS), 15)
 
     def test_readiness_all_clocks_bound_to_outer_cutoff(self):
         doc = json.loads((ROOT / 'examples/quant-data/readiness.json').read_text())

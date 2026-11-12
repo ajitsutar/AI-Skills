@@ -363,7 +363,7 @@ class ReplayTests(unittest.TestCase):
         monthly_operations = {'portfolio.capped_inverse_volatility', 'backtest.monthly_targets',
                               'experiment.freeze', 'experiment.rank_stage'}
         self.assertEqual(set(workbench.MONTHLY_OPERATIONS), monthly_operations)
-        assurance_operations = {'data.strategy_readiness', 'data.security_snapshot',
+        assurance_operations = {'data.strategy_readiness', 'data.source_strategy_readiness', 'data.security_snapshot',
             'data.source_features', 'data.price_refresh', 'backtest.holdings_ledger',
             'analyst.extract_table', 'analyst.earnings_basis', 'risk.empirical_tail',
             'risk.conditional_portfolio', 'portfolio.sensitivity',

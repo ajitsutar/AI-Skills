@@ -34,7 +34,77 @@ Finance websites can redistribute the same report; website count is not independ
 corroboration. Public access is not a redistribution license. Do not bypass access
 controls or enroll the user in trials/newsletters/subscriptions to get a report.
 
+## Check a retained discovery ledger
+
+Discovery/access review does not require sentiment scoring. Use this local route
+when auditing saved headlines or excerpts and their proposed issuer assignments:
+
+```text
+python scripts/news_analysis.py discovery discovery.json source-directory discovery-review.json
+```
+
+The request separates claims and configured scope from the exact accessible text:
+
+```json
+{
+  "schema_version": 1,
+  "issuer_aliases": {"EXAMPLE": ["Example Fabrication"]},
+  "records": [{
+    "id": "bulletin-1",
+    "source_kind": "publisher",
+    "access_tier": "HEADLINE_ONLY",
+    "source": {
+      "path": "bulletin-headline.txt",
+      "sha256": "ACTUAL_SHA256",
+      "excerpt": "EXACT ACCESSIBLE TEXT FROM THE SAVED SOURCE"
+    },
+    "claimed_issuers": ["EXAMPLE"],
+    "scope_issuers": ["EXAMPLE"],
+    "industry_context": "Caller-declared manufacturing context"
+  }]
+}
+```
+
+This is a fictional schema example. Use reviewed aliases, actual retained bytes
+and their SHA256, and the exact accessible excerpt. Keep the full source/access
+ledger alongside this narrow check; it does not discover URLs, fetch articles,
+require or invent timestamps, score sentiment, or certify industry relevance.
+An inaccessible lead with no retained excerpt stays in the wider missing-coverage
+ledger or backlog; do not fabricate text to create an audit row for this helper.
+`records` must be nonempty. `claimed_issuers` and `scope_issuers` may be omitted
+and default to empty lists; `industry_context` is optional declared text.
+
+The helper verifies that each source hash and excerpt agree with the saved UTF-8
+source. Exact substring presence does not resolve repeated occurrences or missing
+context. Failed source bindings remain explicit per record, with no text candidates.
+For a verified binding, `text_candidates` come only from the accessible excerpt.
+`declared_scope_issuers` records intended coverage; putting a company in a watchlist,
+feed configuration or scope field supplies no evidence that the excerpt names it.
+Likewise, a publisher's usual beat or a general industry story does not establish
+an issuer-specific development. Keep a proposed issuer assignment unknown when
+the available text does not support it; retain the item as a broader research lead
+when useful without silently attributing it to that issuer.
+
+`SUPPORTED_TEXT_CANDIDATE` is a lexical diagnostic, not verified identity or
+relevance. Aliases can collide, negated names can still appear, and multi-company
+stories can concern a different subject. `NO_MATCHING_TEXT_CANDIDATE` means
+the matcher found no candidate for the claim in this excerpt; it is not proof
+that the excerpt or full article cannot concern the issuer. Review other identity
+evidence and alias gaps separately. `UNRESOLVED_INVALID_PROVENANCE` identifies an unusable
+source binding. Read and evaluate the actual accessible content before attributing
+claims; if needed and permitted, acquire fuller evidence as a separate observation.
+
+All results keep `issuer_relevance: UNRESOLVED`,
+`semantic_identity_verified: false` and `source_authenticity_verified: false`.
+Overall `REVIEW_REQUIRED` or `DIAGNOSTICS_PRESENT` never means a semantic pass.
+Report mechanical source verification separately from the analyst's supported
+interpretation, preserving access limits, unsupported claims and declared context.
+
 ## Free and conditional routes
+
+Apply [skill-wide source access](source-access.md): free routes are the default.
+A user-provided paid wire, report or API is optional enrichment when it adds
+needed freshness, fields or coverage. Missing access does not stop other research.
 
 `profiles/news-sources-v1.json` is a starter catalog with official references and
 access categories. Actual runtime receipts determine availability, not catalog

@@ -5,6 +5,7 @@ request. Browse [example prompts](../EXAMPLE-PROMPTS.md) to choose a workflow.
 
 | Task | Start here |
 |---|---|
+| Choose free sources or optional user-provided subscriptions | [Source access](source-access.md) |
 | Install and configure personal operation | [Personal setup](personal-setup.md), [runtime contract](runtime-contract.md) |
 | Define and run a stock-research campaign | [Research handoff](research-handoff.md), [research campaign](research-campaign.md) |
 | Review fundamentals and accounting | [Screening and value traps](screening-and-value-traps.md), [normalization](financial-normalization.md) |
@@ -21,7 +22,7 @@ request. Browse [example prompts](../EXAMPLE-PROMPTS.md) to choose a workflow.
 | Prepare a requested broker handoff | [Execution handoff](execution-handoff.md), [broker integration](broker-integration.md) |
 | Save, refresh or compare research | [Research memory](research-memory.md), [model-independent research](model-independent-research.md) |
 | Review institutional capability and remaining work | [Manager workflow](institutional-manager.md), [capabilities and limits](capabilities-and-limits.md) |
-| Maintain the README and generated prompt catalog | [Documentation maintenance](maintaining-the-skill.md) |
+| Maintain examples and applicable P1/P2/P3 upgrade coverage | [Documentation maintenance](maintaining-the-skill.md) |
 
 Method origins and dependency notices are maintained in
 [SOURCES.md](../SOURCES.md), [PROVENANCE.md](../PROVENANCE.md) and

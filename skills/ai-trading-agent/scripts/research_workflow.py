@@ -447,8 +447,15 @@ def build(raw, reader, artifact_writer=None, compact_evidence=False):
                 row['arguments_sha256'] = quant_workbench.digest(args)
                 artifacts[f'jobs/{index:04d}/arguments.json'] = encode(args)
                 if op in quant_workbench.OPERATIONS:
+                    execution_args = args
+                    if op == 'financial.equity_cash_comparison':
+                        import equity_cash_comparison
+                        require('benchmark_provenance' not in args, 'CASH_BENCHMARK_PROVENANCE_IS_WORKFLOW_DERIVED')
+                        execution_args = copy.deepcopy(args)
+                        execution_args['benchmark_provenance'] = equity_cash_comparison.benchmark_provenance(args, job_bindings)
+                        execution_args['benchmark_provenance']['research_as_of'] = contract['as_of']
                     request = {'schema_version': 1, 'contract': contract,
-                               'jobs': [{'id': job['id'], 'operation': op, 'inputs': args}]}
+                               'jobs': [{'id': job['id'], 'operation': op, 'inputs': execution_args}]}
                     output = quant_report.build(encode(request), lambda *_: None, compact_evidence=compact_evidence)
                     for name, data in output.items():
                         artifacts[f'jobs/{index:04d}/quant/{name}'] = data
