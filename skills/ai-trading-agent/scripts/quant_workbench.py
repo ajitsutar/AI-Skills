@@ -327,6 +327,32 @@ def run(document):
                 require(timestamp(payload['as_of']) <= timestamp(contract['as_of']), 'FUTURE_MARKET_RESEARCH_CUTOFF')
                 if 'currency' in payload:
                     require(payload['currency'] == contract['base_currency'], 'MARKET_RESEARCH_CURRENCY_MISMATCH')
+                if job['operation'].startswith('institutional.'):
+                    # These helpers do not convert currency. Reconcile nested
+                    # monetary and return declarations even without a top-level
+                    # document currency. Missing fields stay with the helper's
+                    # own partial-input diagnostics.
+                    currencies = []
+                    for key in ('portfolio', 'proposed_trade', 'cost_contract', 'liquidity'):
+                        item = payload.get(key)
+                        if isinstance(item, dict) and item.get('currency') is not None:
+                            currencies.append(item['currency'])
+                    portfolio = payload.get('portfolio')
+                    if isinstance(portfolio, dict) and isinstance(portfolio.get('positions'), list):
+                        currencies += [p['currency'] for p in portfolio['positions']
+                                       if isinstance(p, dict) and p.get('currency') is not None]
+                    evaluation = payload.get('evaluation')
+                    if isinstance(evaluation, dict) and isinstance(evaluation.get('cases'), list):
+                        for case in evaluation['cases']:
+                            returns = case.get('paper_return') if isinstance(case, dict) else None
+                            if isinstance(returns, dict):
+                                if returns.get('currency') is not None:
+                                    currencies.append(returns['currency'])
+                                benchmark = returns.get('benchmark')
+                                if isinstance(benchmark, dict) and benchmark.get('currency') is not None:
+                                    currencies.append(benchmark['currency'])
+                    require(all(currency == contract['base_currency'] for currency in currencies),
+                            'INSTITUTIONAL_CURRENCY_MISMATCH_NO_FX_MODEL')
             if job['operation'] in FOLLOWER_OPERATIONS:
                 payload = inputs['document']
                 decision = payload['target_document'] if job['operation'] == 'follower.rebalance' else payload

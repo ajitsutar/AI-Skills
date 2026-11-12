@@ -28,6 +28,8 @@ def main(argv=None):
         research._publish(root / name, research._bytes(value) + b'\n')
     response = (root / 'brief-first.json').read_bytes()
     evaluation_input = json.loads((package / 'examples/institutional-evaluation-input.json').read_text(encoding='utf-8'))
+    if evaluation_input.get('pilot') != document['pilot']:
+        raise ValueError('SYNTHETIC_PILOT_PROTOCOL_MISMATCH')
     retained = evaluation_input['evaluation']['cases'][0]['first_response']
     retained.update(text=response.decode('utf-8'), sha256=hashlib.sha256(response).hexdigest())
     evaluation = research.evaluate(evaluation_input)
@@ -52,6 +54,9 @@ def main(argv=None):
                'flow_kind': first['flow']['kind'], 'squeeze_kind': first['squeeze']['kind'],
                'usefulness_cases': evaluation['usefulness']['included_cases'],
                'paper_return_cases': evaluation['returns']['included_cases'],
+               'declared_pilot_sha256': protocol['pilot_sha256'],
+               'evaluation_pilot_sha256': evaluation['protocol_reconciliation']['pilot_sha256'],
+               'protocol_reconciliation_status': evaluation['protocol_reconciliation']['status'],
                'real_prospective_pilot_completed': False, 'profitability_established': False,
                'execution_authorized': False,
                'limitation': 'Fictitious October clocks and outcomes exercise software retrospectively; actual journal timestamps show this later demo execution.'}

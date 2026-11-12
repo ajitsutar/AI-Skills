@@ -159,7 +159,7 @@ def plan(document):
     result = _base(document, 'INSTITUTIONAL_EVENT_PLAN')
     pilot, universe, missing = _configuration(document)
     result.update(status='CONFIGURATION_NEEDED' if missing else 'DECLARED_PROTOCOL_READY_FOR_REVIEW',
-                  pilot=pilot, requested_discovery_universe=universe,
+                  pilot=pilot, pilot_sha256=_digest(pilot), requested_discovery_universe=universe,
                   actual_coverage='SUPPLIED_RECORDS_ONLY', exhaustive_us_universe_verified=False,
                   missing_configuration=missing, readiness=_readiness(document, missing),
                   protocol={
@@ -319,6 +319,91 @@ def _challenge(challenge, cutoff):
             'limitation': 'Reviewer identity, external invocation and independence are not authenticated by this helper.'}
 
 
+def _evaluation_protocol(document, evaluation, has_returns):
+    """Reconcile declarations in this input; never authenticate registration."""
+    fields = {'registered_at': 'registered_at', 'start_at': 'study_start', 'end_at': 'study_end',
+              'usefulness_criterion': 'usefulness_criterion', 'workflow_baseline_id': 'workflow_baseline_id'}
+    supplied = 'pilot' in document
+    result = {'status': 'DECLARATION_ONLY_NO_PILOT', 'pilot_present': supplied,
+              'declared_pilot': deepcopy(document.get('pilot')), 'pilot_sha256': None,
+              'declared_evaluation_protocol': {k: deepcopy(v) for k, v in evaluation.items() if k != 'cases'},
+              'conflicts': [], 'missing_configuration': [], 'registration_authenticated': False,
+              'limitation': 'Reconciliation checks supplied declarations only; retain the actual adopted protocol and journal separately.'}
+    if not supplied:
+        return result, None, [], []
+    pilot, universe, missing = _configuration(document)
+    result.update(pilot_sha256=_digest(pilot), missing_configuration=list(missing))
+    common, return_reasons = [], []
+    if missing:
+        common.append('SUPPLIED_PILOT_CONFIGURATION_INCOMPLETE')
+
+    def conflict(field, pilot_value, evaluation_value, target):
+        result['conflicts'].append({'field': field, 'pilot_value': deepcopy(pilot_value),
+                                    'evaluation_value': deepcopy(evaluation_value), 'scope': 'protocol'})
+        target.append('PILOT_EVALUATION_PROTOCOL_CONFLICT:' + field)
+
+    study = pilot.get('study') or {}
+    for field, counterpart in fields.items():
+        if field not in study:
+            continue  # Already reported as missing by the pilot configuration review.
+        left, right = study[field], evaluation.get(counterpart)
+        equal = _stamp(left) == _stamp(right) if field in {'registered_at', 'start_at', 'end_at'} and left and right else left == right
+        if not equal:
+            conflict('study.' + field, left, right, common)
+    for field, actual in (('pilot_id', pilot.get('id')), ('pilot_sha256', result['pilot_sha256'])):
+        if field in evaluation and evaluation[field] != actual:
+            conflict(field, actual, evaluation[field], common)
+    if 'expected_case_ids' in study and study['expected_case_ids'] != evaluation.get('expected_case_ids'):
+        # Roster order is immaterial, but every declared membership must agree.
+        left, right = study['expected_case_ids'], evaluation.get('expected_case_ids')
+        _require(isinstance(left, list) and all(isinstance(x, str) for x in left)
+                 and len(left) == len(set(left)), 'UNIQUE_PILOT_EXPECTED_CASE_IDS_REQUIRED')
+        if not isinstance(right, list) or set(left) != set(right):
+            conflict('study.expected_case_ids', left, right, common)
+    if has_returns:
+        baseline = study.get('return_baseline_id')
+        if not baseline:
+            result['missing_configuration'].append('study.return_baseline_id')
+            return_reasons.append('PILOT_RETURN_BASELINE_NOT_PRESPECIFIED')
+        elif baseline != evaluation.get('return_baseline_id'):
+            conflict('study.return_baseline_id', baseline, evaluation.get('return_baseline_id'), return_reasons)
+    result['status'] = ('PROTOCOL_CONFLICT' if result['conflicts'] else 'PROTOCOL_CONFIGURATION_INCOMPLETE'
+                        if result['missing_configuration'] else 'MATCHED_DECLARED_PROTOCOL')
+    return result, universe, common, return_reasons
+
+
+def _input_ids(value, label):
+    _require(isinstance(value, list) and len(value) <= MAX_RECORDS
+             and all(isinstance(x, str) and x for x in value) and len(value) == len(set(value)),
+             'UNIQUE_' + label + '_RECORD_IDS_REQUIRED')
+    return value
+
+
+def _case_scope(document, case, ids, universe):
+    """Infer only the target declaration; benchmark/dependency tickers are not targets."""
+    ticker, basis = case.get('ticker'), 'CASE_TICKER'
+    if ticker is None:
+        event = document.get('event')
+        ticker = event.get('ticker') if isinstance(event, dict) else None
+        basis = 'DOCUMENT_EVENT_TICKER'
+    if ticker is None:
+        candidates = {r.get('ticker') for r in document['records'] if isinstance(r, dict) and r.get('id') in ids
+                      and isinstance(r.get('ticker'), str) and r['ticker'] and isinstance(r.get('payload'), dict)
+                      and r['payload'].get('role') != 'benchmark'}
+        if len(candidates) == 1:
+            ticker, basis = next(iter(candidates)), 'UNIQUE_NONBENCHMARK_INPUT_TICKER'
+        else:
+            basis = 'TARGET_TICKER_UNRESOLVED'
+    _require(ticker is None or isinstance(ticker, str) and ticker, 'CASE_TICKER_REQUIRED_IF_SUPPLIED')
+    if universe is None:
+        status = 'NO_SUPPLIED_PILOT_UNIVERSE'
+    elif universe['mode'] == 'us_listed_full':
+        status = 'REQUESTED_US_LISTED_SCOPE_NOT_CERTIFIED'
+    else:
+        status = 'TARGET_TICKER_UNRESOLVED' if ticker is None else 'DECLARED_SCOPE_MATCH' if ticker in universe['symbols'] else 'TARGET_OUTSIDE_DECLARED_SCOPE'
+    return {'ticker': ticker, 'basis': basis, 'status': status}
+
+
 def evaluate(document):
     """Evaluate prospective usefulness separately from descriptive paper returns."""
     result = _base(document, 'INSTITUTIONAL_EVENT_EVALUATION')
@@ -332,10 +417,13 @@ def evaluate(document):
     _require(isinstance(evaluation.get('workflow_baseline_id'), str) and evaluation['workflow_baseline_id'], 'PRESPECIFIED_WORKFLOW_BASELINE_REQUIRED')
     cases = evaluation.get('cases')
     _require(isinstance(cases, list) and len({c['id'] for c in cases}) == len(cases), 'UNIQUE_EVALUATION_CASES_REQUIRED')
+    protocol, universe, protocol_reasons, protocol_return_reasons = _evaluation_protocol(
+        document, evaluation, any(c.get('paper_return') is not None for c in cases))
     rows, useful, saved, excess = [], [], [], []
     import market_sources
     for case in cases:
-        reasons = []
+        reasons = list(protocol_reasons)
+        useful_reasons, return_reasons = [], list(protocol_return_reasons)
         decision = _stamp(case['decision_at'])
         first = case.get('first_response', {})
         first_at = _stamp(first['captured_at']) if first.get('captured_at') else None
@@ -345,22 +433,54 @@ def evaluate(document):
         verified_first = isinstance(text, str) and isinstance(first.get('sha256'), str) and hashlib.sha256(text.encode('utf-8')).hexdigest() == first['sha256']
         if not verified_first or first_at is None or not registered <= first_at <= decision:
             reasons.append('FIRST_RESPONSE_BYTES_HASH_OR_PREDECISION_CLOCK_UNESTABLISHED')
-        ids = case.get('input_record_ids', [])
-        _require(isinstance(ids, list) and len(ids) == len(set(ids)), 'UNIQUE_INPUT_RECORD_IDS_REQUIRED')
+        ids = _input_ids(case.get('input_record_ids', []), 'INPUT')
         evidence = market_sources.normalize({'schema_version': 1, 'as_of': case['decision_at'], 'records': deepcopy(document.get('records', []))})
         available_ids = {r['id'] for r in evidence['records'] if r.get('eligible')}
         if not ids or not set(ids) <= available_ids:
             reasons.append('DECISION_INPUTS_MISSING_OR_UNAVAILABLE_AT_CUTOFF')
+        explicit_response_ids = 'input_record_ids' in first
+        response_ids = _input_ids(first.get('input_record_ids', ids), 'FIRST_RESPONSE_INPUT')
+        response_available = set()
+        if first_at is not None:
+            response_evidence = market_sources.normalize({'schema_version': 1, 'as_of': first['captured_at'],
+                                                          'records': deepcopy(document['records'])})
+            response_available = {r['id'] for r in response_evidence['records'] if r.get('eligible')}
+        response_missing = sorted(set(response_ids) - response_available)
+        if not response_ids or response_missing:
+            reasons.append('FIRST_RESPONSE_INPUTS_MISSING_OR_UNAVAILABLE_AT_CAPTURE')
+        scope = _case_scope(document, case, set(ids) & available_ids, universe)
+        if scope['status'] in {'TARGET_TICKER_UNRESOLVED', 'TARGET_OUTSIDE_DECLARED_SCOPE'} and universe is not None:
+            reasons.append(scope['status'])
+            protocol['conflicts'].append({'field': 'universe', 'scope': 'case', 'case_id': case['id'],
+                                          'pilot_value': deepcopy(universe), 'evaluation_value': deepcopy(scope)})
+        record_hashes = {r['id']: _digest(r) for r in document['records']
+                         if r.get('id') in response_ids and r.get('id') in response_available}
+        response_review = {'status': 'MATCHED_DECLARED_RESPONSE_INPUTS' if response_ids and not response_missing else 'RESPONSE_INPUTS_UNAVAILABLE',
+                           'binding_mode': 'EXPLICIT_RESPONSE_INPUTS' if explicit_response_ids else 'LEGACY_COMMON_INPUTS_CHECKED_AT_CAPTURE',
+                           'captured_at': first.get('captured_at'), 'response_input_record_ids': deepcopy(response_ids),
+                           'decision_input_record_ids': deepcopy(ids), 'unavailable_response_input_record_ids': response_missing,
+                           'later_decision_input_record_ids': sorted(set(ids) - set(response_ids)),
+                           'response_record_sha256': record_hashes, 'record_hash_basis': 'CANONICAL_JSON_RECORD_VALUES',
+                           'input_manifest_sha256': _digest({'captured_at': first.get('captured_at'), 'record_ids': response_ids,
+                                                           'record_sha256': record_hashes}),
+                           'actual_response_consumption_verified': False}
         row = {'id': case['id'], 'declared_case': deepcopy(case), 'prospective_exclusion_reasons': reasons,
                'first_response_bytes_hash_verified': verified_first, 'usefulness_included': False,
-               'returns_included': False}
+                'returns_included': False, 'response_input_review': response_review, 'scope_review': scope,
+                'usefulness_exclusion_reasons': useful_reasons, 'return_exclusion_reasons': return_reasons}
         outcome = case.get('usefulness')
         if outcome is not None:
+            if protocol['pilot_present']:
+                reviewer = (document['pilot'].get('reviewer') or {}).get('id')
+                if outcome.get('reviewer_id') != reviewer:
+                    useful_reasons.append('PILOT_REVIEWER_MISMATCH')
+                    protocol['conflicts'].append({'field': 'reviewer.id', 'scope': 'case_usefulness', 'case_id': case['id'],
+                                                  'pilot_value': reviewer, 'evaluation_value': outcome.get('reviewer_id')})
             valid = (outcome.get('available_at') is not None and decision <= _stamp(outcome['available_at']) <= at
                      and outcome.get('criterion') == evaluation['usefulness_criterion']
                      and type(outcome.get('useful')) is bool and bool(outcome.get('reviewer_id'))
                      and outcome.get('baseline_id') == evaluation['workflow_baseline_id'])
-            if valid and not reasons:
+            if valid and not reasons and not useful_reasons:
                 assisted = _number(outcome['assisted_minutes'], 0)
                 baseline = _number(outcome['baseline_minutes'], 0)
                 useful.append(outcome['useful']); saved.append(baseline - assisted)
@@ -380,7 +500,7 @@ def evaluate(document):
                          and returns.get('net_costs_included') is True and benchmark.get('net_costs_included') is True
                          and bool(evaluation.get('return_baseline_id'))
                          and benchmark.get('id') == evaluation['return_baseline_id'] and hi <= _stamp(benchmark['available_at']) <= at)
-                if valid and not reasons:
+                if valid and not reasons and not return_reasons:
                     delta = _number(returns['return_decimal'], -1) - _number(benchmark['return_decimal'], -1)
                     excess.append(delta)
                     row.update(returns_included=True, descriptive_excess_return_decimal=str(delta))
@@ -389,12 +509,14 @@ def evaluate(document):
             except (KeyError, ValueError, TypeError):
                 row['returns_status'] = 'INCOMPLETE_OR_INVALID_RETURN_CONTRACT'
         rows.append(row)
+    if protocol['conflicts']:
+        protocol['status'] = 'PROTOCOL_CONFLICT'
     expected = evaluation.get('expected_case_ids')
     if expected is not None:
         _require(isinstance(expected, list) and len(expected) == len(set(expected)), 'UNIQUE_EXPECTED_CASE_IDS_REQUIRED')
     present = {c['id'] for c in cases}
     result.update(status='DECLARED_STUDY_WINDOW_ELAPSED' if end <= at else 'PROSPECTIVE_PILOT_IN_PROGRESS',
-                  evaluation_contract=evaluation, cases=rows,
+                  evaluation_contract=evaluation, protocol_reconciliation=protocol, cases=rows,
                   roster={'status': 'UNKNOWN' if expected is None else 'MATCHED' if set(expected) == present else 'INCOMPLETE_OR_UNEXPECTED',
                           'missing': [] if expected is None else sorted(set(expected) - present),
                           'unexpected': [] if expected is None else sorted(present - set(expected))},

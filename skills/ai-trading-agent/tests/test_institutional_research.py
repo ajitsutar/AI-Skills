@@ -31,7 +31,7 @@ def fixture():
                       'reviewer': {'id': 'fictional-reviewer', 'role': 'synthetic_operator'},
                       'study': {'registered_at': '2026-10-01T13:00:00Z', 'start_at': '2026-10-01T14:00:00Z',
                                 'end_at': '2026-10-02T20:00:00Z', 'usefulness_criterion': 'Identifies one checkable decision-relevant gap',
-                                'workflow_baseline_id': 'fictional-without-tool'}},
+                                'workflow_baseline_id': 'fictional-without-tool', 'return_baseline_id': 'fictional-cash'}},
             'event': {'id': 'fictional-event', 'ticker': 'DEMO', 'decision_at': '2026-10-01T14:31:00Z',
                       'review_at': '2026-10-01T15:00:00Z'},
             'portfolio': {'as_of': '2026-10-01T14:30:00Z', 'currency': 'USD', 'total_value': '10000',
@@ -248,6 +248,179 @@ class InstitutionalPureTests(unittest.TestCase):
         self.assertEqual(result['roster']['missing'], ['abstained-case'])
         self.assertFalse(result['challenge']['independence_verified'])
         self.assertEqual(result['challenge']['findings'][0]['disposition'], 'unresolved')
+
+    def test_matching_protocol_and_standalone_evaluation_remain_descriptive(self):
+        document = evaluated()
+        result = research.evaluate(document)
+        protocol = result['protocol_reconciliation']
+        self.assertEqual(protocol['status'], 'MATCHED_DECLARED_PROTOCOL')
+        self.assertEqual(protocol['declared_pilot'], document['pilot'])
+        self.assertEqual(protocol['pilot_sha256'], research._digest(document['pilot']))
+        self.assertFalse(protocol['registration_authenticated'])
+        self.assertEqual(result['usefulness']['included_cases'], 1)
+        self.assertEqual(result['returns']['included_cases'], 1)
+        document.pop('pilot')
+        standalone = research.evaluate(document)
+        self.assertEqual(standalone['protocol_reconciliation']['status'], 'DECLARATION_ONLY_NO_PILOT')
+        self.assertEqual(standalone['returns']['mean_descriptive_excess_return_decimal'], '0.019')
+        self.assertFalse(standalone['actual_elapsed_operation_verified'])
+
+    def test_shipped_demo_protocol_matches_its_evaluation_declaration(self):
+        package = Path(__file__).resolve().parents[1]
+        brief_input = json.loads((package / 'examples/institutional-event-input.json').read_text(encoding='utf-8'))
+        evaluation_input = json.loads((package / 'examples/institutional-evaluation-input.json').read_text(encoding='utf-8'))
+        protocol = research.plan(brief_input)
+        result = research.evaluate(evaluation_input)
+        self.assertEqual(brief_input['pilot'], evaluation_input['pilot'])
+        self.assertEqual(protocol['pilot_sha256'], result['protocol_reconciliation']['pilot_sha256'])
+        self.assertEqual(result['protocol_reconciliation']['status'], 'MATCHED_DECLARED_PROTOCOL')
+        self.assertEqual(result['usefulness']['included_cases'], 1)
+        self.assertEqual(result['returns']['included_cases'], 1)
+
+    def test_supplied_post_outcome_pilot_registration_is_not_ignored(self):
+        document = evaluated()
+        document['pilot']['study'].update(registered_at='2026-10-04T13:00:00Z',
+                                           start_at='2026-10-04T14:00:00Z', end_at='2026-10-05T20:00:00Z')
+        before = deepcopy(document)
+        result = research.evaluate(document)
+        self.assertEqual(document, before)
+        self.assertEqual(result['evaluation_contract'], document['evaluation'])
+        self.assertEqual(result['protocol_reconciliation']['declared_pilot'], document['pilot'])
+        self.assertEqual(result['protocol_reconciliation']['status'], 'PROTOCOL_CONFLICT')
+        self.assertEqual(result['usefulness']['included_cases'], 0)
+        self.assertEqual(result['returns']['included_cases'], 0)
+        self.assertIn('PILOT_EVALUATION_PROTOCOL_CONFLICT:study.registered_at',
+                      result['cases'][0]['prospective_exclusion_reasons'])
+
+    def test_matching_rewritten_evaluation_and_outcome_cannot_override_pilot(self):
+        for field, replacement in (('usefulness_criterion', 'post-outcome criterion'),
+                                   ('workflow_baseline_id', 'post-outcome baseline')):
+            with self.subTest(field=field):
+                document = evaluated()
+                document['evaluation'][field] = replacement
+                outcome = document['evaluation']['cases'][0]['usefulness']
+                outcome['criterion' if field == 'usefulness_criterion' else 'baseline_id'] = replacement
+                result = research.evaluate(document)
+                self.assertEqual(result['usefulness']['included_cases'], 0)
+                self.assertEqual(result['returns']['included_cases'], 0)
+                self.assertEqual(result['protocol_reconciliation']['conflicts'][0]['field'], 'study.' + field)
+
+    def test_return_baseline_and_reviewer_conflicts_affect_their_own_metrics(self):
+        document = evaluated()
+        document['evaluation']['return_baseline_id'] = 'easier-posthoc-baseline'
+        document['evaluation']['cases'][0]['paper_return']['benchmark']['id'] = 'easier-posthoc-baseline'
+        result = research.evaluate(document)
+        self.assertEqual(result['usefulness']['included_cases'], 1)
+        self.assertEqual(result['returns']['included_cases'], 0)
+        self.assertIn('PILOT_EVALUATION_PROTOCOL_CONFLICT:study.return_baseline_id',
+                      result['cases'][0]['return_exclusion_reasons'])
+        document = evaluated()
+        document['evaluation']['cases'][0]['usefulness']['reviewer_id'] = 'unadopted-reviewer'
+        result = research.evaluate(document)
+        self.assertEqual(result['usefulness']['included_cases'], 0)
+        self.assertEqual(result['returns']['included_cases'], 1)
+        self.assertEqual(result['cases'][0]['usefulness_exclusion_reasons'], ['PILOT_REVIEWER_MISMATCH'])
+        document = evaluated()
+        document['pilot']['study'].pop('return_baseline_id')
+        result = research.evaluate(document)
+        self.assertEqual(result['usefulness']['included_cases'], 1)
+        self.assertEqual(result['returns']['included_cases'], 0)
+        self.assertEqual(result['protocol_reconciliation']['status'], 'PROTOCOL_CONFIGURATION_INCOMPLETE')
+
+    def test_declared_case_universe_checked_without_rejecting_dependency_tickers(self):
+        document = evaluated()
+        document['pilot']['universe']['symbols'] = ['OTHER']
+        result = research.evaluate(document)
+        self.assertEqual(result['cases'][0]['scope_review']['ticker'], 'DEMO')
+        self.assertIn('TARGET_OUTSIDE_DECLARED_SCOPE', result['cases'][0]['prospective_exclusion_reasons'])
+        self.assertEqual(result['returns']['included_cases'], 0)
+        document = evaluated()
+        # Explicit target identity is separate from cross-ticker evidence.
+        document['evaluation']['cases'][0]['ticker'] = 'DEMO'
+        related = deepcopy(document['records'][0]); related.update(id='related-issuer', ticker='RELATED')
+        document['records'].append(related)
+        document['evaluation']['cases'][0]['input_record_ids'].append('related-issuer')
+        result = research.evaluate(document)
+        self.assertEqual(result['usefulness']['included_cases'], 1)
+        self.assertEqual(result['returns']['included_cases'], 1)
+
+    def test_optional_protocol_identity_and_roster_bindings_check_retained_values(self):
+        document = evaluated()
+        document['evaluation']['pilot_sha256'] = '0' * 64
+        self.assertEqual(research.evaluate(document)['returns']['included_cases'], 0)
+        document = evaluated()
+        document['pilot']['study']['expected_case_ids'] = ['fictional-case', 'retained-failure']
+        result = research.evaluate(document)
+        self.assertEqual(result['returns']['included_cases'], 0)
+        self.assertIn('PILOT_EVALUATION_PROTOCOL_CONFLICT:study.expected_case_ids',
+                      result['cases'][0]['prospective_exclusion_reasons'])
+        document = evaluated()
+        document['pilot']['study']['registered_at'] = '2026-10-01T06:00:00-07:00'
+        self.assertEqual(research.evaluate(document)['returns']['included_cases'], 1)
+
+    def test_scope_inference_ignores_unusable_event_and_unrelated_malformed_payload(self):
+        document = evaluated()
+        document['event'] = None
+        malformed = deepcopy(document['records'][0]); malformed.update(id='malformed-unrelated', ticker='OTHER', payload=None)
+        document['records'].append(malformed)
+        before = deepcopy(document)
+        result = research.evaluate(document)
+        self.assertEqual(document, before)
+        self.assertEqual(result['cases'][0]['scope_review']['ticker'], 'DEMO')
+        self.assertEqual(result['cases'][0]['scope_review']['basis'], 'UNIQUE_NONBENCHMARK_INPUT_TICKER')
+        self.assertEqual(result['returns']['included_cases'], 1)
+
+    def test_first_response_cannot_use_later_input_even_if_decision_can(self):
+        document = evaluated()
+        document['evaluation']['cases'][0]['first_response']['captured_at'] = '2026-10-01T13:01:00Z'
+        result = research.evaluate(document)
+        row = result['cases'][0]
+        self.assertIn('FIRST_RESPONSE_INPUTS_MISSING_OR_UNAVAILABLE_AT_CAPTURE', row['prospective_exclusion_reasons'])
+        self.assertEqual(row['response_input_review']['unavailable_response_input_record_ids'], ['fictional-catalyst-v1'])
+        self.assertEqual(result['usefulness']['included_cases'], 0)
+        self.assertEqual(result['returns']['included_cases'], 0)
+
+    def test_explicit_response_inputs_distinguish_later_decision_inputs(self):
+        document = evaluated()
+        case = document['evaluation']['cases'][0]
+        case['decision_at'] = '2026-10-01T14:35:00Z'
+        case['paper_return']['period_start'] = case['paper_return']['benchmark']['period_start'] = case['decision_at']
+        late = deepcopy(document['records'][0]); late.update(id='later-decision-input', available_at='2026-10-01T14:33:00Z')
+        late['source'].update(published_at='2026-10-01T14:32:00Z', retrieved_at='2026-10-01T14:33:00Z',
+                              observed_at='2026-10-01T14:33:00Z')
+        document['records'].append(late)
+        case['input_record_ids'].append(late['id'])
+        case['first_response']['input_record_ids'] = ['fictional-catalyst-v1']
+        before = deepcopy(document)
+        result = research.evaluate(document)
+        self.assertEqual(document, before)
+        row = result['cases'][0]
+        self.assertEqual(row['response_input_review']['binding_mode'], 'EXPLICIT_RESPONSE_INPUTS')
+        self.assertEqual(row['response_input_review']['later_decision_input_record_ids'], [late['id']])
+        self.assertEqual(result['usefulness']['included_cases'], 1)
+        self.assertEqual(result['returns']['included_cases'], 1)
+        # Omitting the explicit response set means common inputs, all checked at capture.
+        case['first_response'].pop('input_record_ids')
+        legacy = research.evaluate(document)
+        self.assertEqual(legacy['returns']['included_cases'], 0)
+        self.assertEqual(legacy['cases'][0]['response_input_review']['binding_mode'], 'LEGACY_COMMON_INPUTS_CHECKED_AT_CAPTURE')
+
+    def test_response_and_decision_can_bind_different_revision_vintages(self):
+        document = evaluated()
+        case = document['evaluation']['cases'][0]
+        revised = deepcopy(document['records'][0])
+        revised.update(id='catalyst-revision', supersedes='fictional-catalyst-v1', available_at='2026-10-01T14:33:00Z')
+        revised['source'].update(published_at='2026-10-01T14:32:00Z', retrieved_at='2026-10-01T14:33:00Z',
+                                 observed_at='2026-10-01T14:33:00Z')
+        document['records'].append(revised)
+        case['first_response']['input_record_ids'] = ['fictional-catalyst-v1']
+        case['input_record_ids'] = ['catalyst-revision']
+        case['decision_at'] = '2026-10-01T14:35:00Z'
+        case['paper_return']['period_start'] = case['paper_return']['benchmark']['period_start'] = case['decision_at']
+        result = research.evaluate(document)
+        self.assertEqual(result['returns']['included_cases'], 1)
+        hashes = result['cases'][0]['response_input_review']['response_record_sha256']
+        self.assertEqual(hashes, {'fictional-catalyst-v1': research._digest(document['records'][0])})
 
     def test_no_pure_operation_writes_files(self):
         with patch.object(Path, 'open', side_effect=AssertionError('pure operation attempted file IO')):

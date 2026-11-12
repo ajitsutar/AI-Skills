@@ -90,16 +90,31 @@ fields; those declarations are retained without inventing missing context.
 | social_leads | Supplied JSON list | Syntactic canonical X URL, author and retained text/date; lead-only. |
 
 Malformed delimited rows retain raw_fields plus parse_error and are ineligible.
-Missing/inconsistent FINRA trailer excludes parsed rows. Ambiguous headers and
-unsupported structures fail explicitly. XML DTD/entity declarations are refused.
+Missing/inconsistent FINRA trailer excludes parsed rows. Every supported alias
+for a field is reconciled, including differently punctuated headings that
+normalize to the same name. Conflicting values make the row ineligible with a
+parse error and preserve all original columns in raw_fields; no alias has silent
+priority. Redundant aliases are usable when their parsed numbers or dates agree
+exactly (or their trimmed text agrees). Unknown optional numeric values remain
+unknown; they do not reconcile with a reported number. Identical literal headers
+fail before parsing because a dictionary could discard one value. Unsupported
+structures fail explicitly. XML DTD/entity declarations are refused.
 Retain the whole raw source alongside per-transaction XML snippets.
 
-Short-interest aliases include Settlement Date/settlementDate,
-Symbol/Issue Symbol/issueSymbolIdentifier,
-Current Short/currentShortPositionQuantity/Short Interest,
-Avg Daily Volume/averageDailyVolumeQuantity and
-Days to Cover/daysToCoverQuantity. Unknown headers are gaps. The separate
+Short-interest aliases include Settlement Date/settlementDate/Cycle Settlement Date,
+Symbol/Issue Symbol/issueSymbolIdentifier/BATS-Symbol,
+Current Short/currentShortPositionQuantity/Short Interest/# Shares Net Short Current Cycle,
+Avg Daily Volume/averageDailyVolumeQuantity/Cycle Avg Daily Trade Vol and
+Days to Cover/daysToCoverQuantity/Min # of Trade Days To Cover Shorts.
+Issue Name/issueName/Security Name preserve the reported name. ISO and YYYYMMDD
+settlement dates are accepted. Unknown headers are gaps. The separate
 reported_days_to_cover field preserves the source's display convention.
+Cboe cycle ADV and minimum trade-days display carry explicit source-reported
+semantics; the minimum is never replaced by a newly divided ratio. Previous-cycle
+shares, changes, split and manual-revision indicators remain intact in raw_fields.
+Those indicators do not supply an adjustment basis, exact revision target or
+ADV session window. Neither a settlement date nor a filename establishes when
+the observation was published; retain unknown publication and actual retrieval.
 No float, borrow inventory, share-class mapping or ADV-window compatibility is
 manufactured. The flow module needs those inputs before comparable ratios.
 
@@ -146,8 +161,9 @@ not a same-day execution price.
 are delayed summaries, not a real-time dark-pool tape. This module uses supplied
 permitted exports and implements no authenticated FINRA API.
 [Cboe's free listing](https://www.cboe.com/markets/us/equities/market-statistics/short-interest/)
-covers Cboe-listed securities. Its exact binary CSV schema still needs an
-observed acquisition check before claiming end-to-end adapter availability.
+covers Cboe-listed securities. Its observed cycle CSV headings are supported by
+the short-interest adapter; an observed file verifies only that retained vintage,
+not continuous availability or complete coverage of other listings.
 Public readability does not establish commercial redistribution rights.
 
 For X, use on-demand isolated browser access or supplied canonical posts. The

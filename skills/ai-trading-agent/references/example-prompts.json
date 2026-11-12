@@ -18,7 +18,7 @@
         },
         {
           "title": "Prepare a source-bound event decision brief",
-          "prompt": "For [EVENT AND DATED EVIDENCE], prepare a brief at [CUTOFF] with competing hypotheses, catalyst, contrary evidence, invalidation conditions and review timing. Include flow and squeeze diagnostics where supported, actual supplied portfolio exposure and explicit costs/liquidity. Keep unsupported valuation, correlations, borrow and executable sizing unresolved."
+          "prompt": "For [EVENT AND DATED EVIDENCE], prepare a brief at [CUTOFF] with competing hypotheses, catalyst, contrary evidence, invalidation conditions and review timing. Include flow and squeeze diagnostics where supported, actual supplied portfolio exposure and explicit costs/liquidity. Keep unsupported valuation, correlations, borrow and executable sizing unresolved. Reconcile the outer research currency with supplied portfolio, trade, cost, liquidity and return currencies; do not infer FX conversion."
         },
         {
           "title": "Run the retained synthetic paper example",
@@ -26,7 +26,7 @@
         },
         {
           "title": "Evaluate pilot usefulness separately from returns",
-          "prompt": "Review [REGISTERED PROTOCOL, IMMUTABLE FIRST RESPONSES, CASE ROSTER AND OUTCOMES] at [CUTOFF]. Check pre-decision evidence, delayed outcomes, missing cases, fixed reviewer criterion and separate baselines. Report descriptive usefulness and matched net return differences without compounding overlapping events, annualizing them or claiming causal time savings or alpha."
+          "prompt": "Review [REGISTERED PROTOCOL, IMMUTABLE FIRST RESPONSES, CASE ROSTER AND OUTCOMES] at [CUTOFF]. Check pre-decision evidence, delayed outcomes, missing cases, fixed reviewer criterion and separate baselines. Report descriptive usefulness and matched net return differences without compounding overlapping events, annualizing them or claiming causal time savings or alpha. Reconcile any supplied pilot protocol with the evaluation dates, criterion, baselines, reviewer and target universe. Bind first-response input vintages at capture time and distinguish later decision inputs; preserve mismatches instead of counting them silently."
         },
         {
           "title": "Challenge a proposed event strategy",
@@ -46,7 +46,7 @@
       "prompts": [
         {
           "title": "Investigate an unusual print",
-          "prompt": "Using [RETAINED PRINTS AND EARLIER COMPARABLE BASELINE], analyze [TICKER] at [EXACT CUTOFF]. Keep feed scope, print revisions, empirical rank, quote age and spread explicit. Do not infer an investor identity, aggressor, opening trade or future return from size alone."
+          "prompt": "Using [RETAINED PRINTS AND EARLIER COMPARABLE BASELINE], analyze [TICKER] at [EXACT CUTOFF]. Keep feed scope, print revisions, empirical rank, quote age and spread explicit. Do not infer an investor identity, aggressor, opening trade or future return from size alone. Require declared compatible volume/adjustment bases before relative-volume comparisons; keep supported price context when volume comparability is unknown."
         },
         {
           "title": "Use free flow sources before optional subscriptions",
@@ -67,6 +67,10 @@
         {
           "title": "Replay a later print correction",
           "prompt": "At [DECISION CUTOFF], reconstruct [FEED-SCOPED TRADE RECORDS] with only then-available replacements and cancellations. Retain originals and later revisions, reject cross-feed identity changes, and show how a later correction changes a later replay without rewriting the earlier research."
+        },
+        {
+          "title": "Reconcile conflicting public export columns",
+          "prompt": "Parse [RETAINED PUBLIC SHORT-INTEREST CSV] at [CUTOFF]. Compare all supported headings that map to each date, symbol or quantity. Retain the original fields, diagnose conflicting aliases or normalized-header collisions, and keep ambiguous rows unusable. Do not silently choose a preferred value. Check the actual provider schema and preserve source-reported days-to-cover separately from recomputed ADV."
         }
       ]
     },

@@ -166,6 +166,58 @@ class BarTests(unittest.TestCase):
         self.assertEqual(row['relative_volume'], float(Fraction(900, 150)))
         expected = (Fraction(106, 100) - Fraction(101, 100)) * 100
         self.assertEqual(row['benchmark_relative_return_percent'], float(expected))
+        self.assertEqual(row['relative_volume_status'], 'COMPUTED_FROM_MATCHED_DECLARED_BASIS')
+
+    def test_unknown_volume_basis_withholds_rvol_and_pressure_but_retains_price_context(self):
+        for value in [None, '', '   ', 'UNKNOWN', 'unresolved', 'n/a', {'basis': 'unadjusted'}]:
+            with self.subTest(basis=value):
+                d = pressure_document()
+                for x in d['records'][:3]:
+                    if value is None:
+                        x['payload'].pop('volume_basis')
+                    else:
+                        x['payload']['volume_basis'] = value
+                out = market_flow.analyze(d)
+                row = next(x for x in out['cumulative_bars'] if x['record_id'] == 'current')
+                self.assertIsNone(row['relative_volume'])
+                self.assertIsNone(row['baseline_mean_volume'])
+                self.assertEqual(row['baseline_record_ids'], [])
+                self.assertEqual(row['relative_volume_status'], 'VOLUME_BASIS_UNKNOWN_OR_UNRESOLVED')
+                self.assertEqual(row['volume'], 900)
+                self.assertEqual(row['return_percent'], 6)
+                self.assertEqual(row['benchmark_return_percent'], 1)
+                self.assertEqual(row['benchmark_relative_return_percent'], 5)
+                self.assertTrue(any(issue.get('record_id') == 'current' and
+                                    issue['code'] == 'RELATIVE_VOLUME_BASIS_UNKNOWN_OR_UNRESOLVED'
+                                    for issue in out['issues']))
+                self.assertEqual(market_flow.squeeze(d)['assessments'][0]['state'], 'DATED_POSITIONING_CANDIDATE')
+
+    def test_unknown_baselines_cannot_establish_comparability_for_known_current_basis(self):
+        d = pressure_document()
+        for x in d['records'][:2]:
+            x['payload'].pop('volume_basis')
+        row = next(x for x in market_flow.analyze(d)['cumulative_bars'] if x['record_id'] == 'current')
+        self.assertIsNone(row['relative_volume'])
+        self.assertEqual(row['relative_volume_status'], 'NO_COMPARABLE_BASELINE')
+        self.assertEqual(row['benchmark_relative_return_percent'], 5)
+
+    def test_unknown_or_different_basis_does_not_discard_supported_matching_baseline(self):
+        for basis in [None, 'split_adjusted']:
+            d = pressure_document(); d['records'][0]['payload']['volume_basis'] = basis
+            row = next(x for x in market_flow.analyze(d)['cumulative_bars'] if x['record_id'] == 'current')
+            self.assertEqual(row['baseline_record_ids'], ['b2'])
+            self.assertEqual(row['relative_volume'], 4.5)
+            self.assertEqual(market_flow.squeeze(d)['assessments'][0]['state'], 'DEVELOPING_PRESSURE_HEURISTIC')
+
+    def test_matching_volume_basis_does_not_pool_another_feed(self):
+        d = pressure_document()
+        for x in d['records'][:2]:
+            x['payload']['feed_id'] = 'other-overlapping-feed'
+        row = next(x for x in market_flow.analyze(d)['cumulative_bars'] if x['record_id'] == 'current')
+        self.assertIsNone(row['relative_volume'])
+        self.assertEqual(row['baseline_record_ids'], [])
+        self.assertEqual(row['benchmark_relative_return_percent'], 5)
+        self.assertEqual(market_flow.squeeze(d)['assessments'][0]['state'], 'DATED_POSITIONING_CANDIDATE')
 
     def test_other_elapsed_window_cannot_fill_baseline(self):
         d = pressure_document(); d['records'][0]['payload']['end_at'] = '2026-11-09T16:30:00Z'

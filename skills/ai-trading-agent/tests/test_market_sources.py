@@ -158,9 +158,79 @@ class ParsingTests(unittest.TestCase):
             self.assertIn("raw_fields", result["records"][0]["payload"])
         self.assertEqual(ms.parse(parse_doc("finra_short_volume", VOLUME.splitlines()[0] + "\n0\n"))["records"], [])
 
-    def test_ambiguous_header_aliases_are_rejected(self):
+    def test_identical_literal_headers_are_rejected_before_dictreader_data_loss(self):
         with self.assertRaisesRegex(ValueError, "duplicate"):
-            ms.parse(parse_doc("finra_short_interest_csv", "Symbol,ShortVolume,Short Volume\nD,1,2"))
+            ms.parse(parse_doc("finra_short_interest_csv",
+                              "Settlement Date,Symbol,Current Short,Current Short\n2026-10-30,DEMO,1200,1300\n"))
+
+    def test_conflicting_supported_aliases_retain_the_row_as_unusable(self):
+        for header, values in [
+            ("Current Short,Short Interest", "1200,1800"),
+            ("Short Interest,Current Short", "1800,1200"),
+            ("Current Short,Current-Short", "1200,1800"),
+            ("Current Short,Short Interest", "1200,1200.00000000000000001"),
+            ("Current Short,Days to Cover,daysToCoverQuantity", "1200,2.4,3"),
+            ("Current Short,Avg Daily Volume,averageDailyVolumeQuantity", "1200,500,N/A"),
+        ]:
+            with self.subTest(header=header, values=values):
+                text = "Settlement Date,Symbol," + header + "\n2026-10-30,DEMO," + values + "\n"
+                source = parse_doc("finra_short_interest_csv", text)
+                before = copy.deepcopy(source)
+                result = ms.parse(source)
+                row = result["records"][0]
+                self.assertFalse(row["eligible"])
+                self.assertIn("PARSE_ERROR", row["exclusion_reasons"])
+                self.assertIn("Conflicting source field aliases", row["parse_error"])
+                self.assertNotIn("short_interest_shares", row["payload"])
+                self.assertEqual(len(row["payload"]["raw_fields"]), len(header.split(",")) + 2)
+                self.assertTrue(any(issue["code"] == "ROW_PARSE_ERROR" for issue in result["issues"]))
+                self.assertEqual(source, before)
+
+    def test_conflicting_symbol_and_normalized_date_aliases_are_not_selected(self):
+        for text in [
+            "Settlement Date,Symbol,Issue Symbol,Current Short\n2026-10-30,DEMO,OTHER,1200\n",
+            "Settlement Date,settlementDate,Symbol,Current Short\n2026-10-30,2026-11-10,DEMO,1200\n",
+        ]:
+            row = ms.parse(parse_doc("finra_short_interest_csv", text))["records"][0]
+            self.assertFalse(row["eligible"])
+            self.assertIn("Conflicting source field aliases", row["parse_error"])
+            self.assertEqual(len(row["payload"]["raw_fields"]), 4)
+
+    def test_equal_redundant_aliases_use_exact_numeric_and_date_meaning(self):
+        text = ("Settlement Date,settlementDate,Symbol,Issue Symbol,Current Short,Current-Short,Short Interest,"
+                "Avg Daily Volume,averageDailyVolumeQuantity,Days to Cover,daysToCoverQuantity\n"
+                '20261030,2026-10-30,DEMO,DEMO,"1,200",1200.00,1200,500,500.0,2.40,2.4\n')
+        result = ms.parse(parse_doc("finra_short_interest_csv", text))
+        row = result["records"][0]
+        self.assertTrue(row["eligible"])
+        self.assertEqual(row["ticker"], "DEMO")
+        self.assertEqual(row["payload"]["settlement_date"], "2026-10-30")
+        self.assertEqual(row["payload"]["short_interest_shares"], 1200)
+        self.assertEqual(row["payload"]["average_daily_volume"], 500)
+        self.assertEqual(row["payload"]["reported_days_to_cover"], 2.4)
+        self.assertEqual(row["payload"]["raw_fields"]["Current Short"], "1,200")
+        self.assertEqual(row["payload"]["raw_fields"]["Current-Short"], "1200.00")
+        self.assertEqual(result["issues"], [])
+
+    def test_optional_redundant_unknowns_remain_unknown(self):
+        text = ("Settlement Date,Symbol,Current Short,Days to Cover,daysToCoverQuantity\n"
+                "2026-10-30,DEMO,1200,N/A,.\n")
+        row = ms.parse(parse_doc("finra_short_interest_csv", text))["records"][0]
+        self.assertTrue(row["eligible"])
+        self.assertIsNone(row["payload"]["reported_days_to_cover"])
+
+    def test_finra_volume_normalized_aliases_require_equal_values(self):
+        for second, eligible in [("20.1250", True), ("21", False)]:
+            text = ("Date|Symbol|ShortVolume|Short Volume|ShortExemptVolume|TotalVolume|Market\n"
+                    "20261110|DEMO|20.125|" + second + "|3|50.5|B,Q,N\n1\n")
+            result = ms.parse(parse_doc("finra_short_volume", text))
+            row = result["records"][0]
+            self.assertEqual(row["eligible"], eligible)
+            self.assertEqual(row["payload"]["raw_fields"]["Short Volume"], second)
+            if eligible:
+                self.assertEqual(row["payload"]["short_volume"], 20.125)
+            else:
+                self.assertIn("Conflicting source field aliases", row["parse_error"])
 
     def test_official_short_interest_is_a_separate_dated_measure(self):
         text = "Settlement Date,Symbol,Current Short,Avg Daily Volume,Days to Cover,Issue Name\n2026-10-30,DEMO,1200,500,2.40,Demo Inc\n"
@@ -171,6 +241,46 @@ class ParsingTests(unittest.TestCase):
         self.assertEqual(row["payload"]["reported_days_to_cover"], 2.4)
         self.assertNotIn("float_shares", row["payload"])
         self.assertEqual(row["available_at"], SOURCE["retrieved_at"])
+
+    def test_cboe_cycle_export_preserves_dated_current_shares_and_reported_fields(self):
+        text = ('Cycle Settlement Date,BATS-Symbol,Security Name,# Shares Net Short Current Cycle,'
+                '# Shares Net Short Previous Cycle,Cycle Avg Daily Trade Vol,Min # of Trade Days To Cover Shorts,'
+                'Split Indicator ("S" or null),Manual Revision Indicator ("R" or null),'
+                'Percent Change in Short Position,Change in Short Position From Previous\n'
+                '20261030,DEMO,Fictional Company,1200,1500,500,3,S,R,-20,-300\n')
+        result = ms.parse(parse_doc("finra_short_interest_csv", text))
+        row = result["records"][0]; payload = row["payload"]
+        self.assertTrue(row["eligible"])
+        self.assertEqual(row["ticker"], "DEMO")
+        self.assertEqual(payload["settlement_date"], "2026-10-30")
+        self.assertEqual(payload["short_interest_shares"], 1200)
+        self.assertEqual(payload["average_daily_volume"], 500)
+        # Preserve the reported minimum display instead of recomputing 1200/500.
+        self.assertEqual(payload["reported_days_to_cover"], 3)
+        self.assertEqual(payload["reported_days_to_cover_semantics"], "source_reported_minimum_trade_days_to_cover")
+        self.assertEqual(payload["average_daily_volume_semantics"], "source_reported_cycle_average_daily_trade_volume")
+        self.assertEqual(payload["security_name"], "Fictional Company")
+        self.assertEqual(payload["raw_fields"]["# Shares Net Short Previous Cycle"], "1500")
+        self.assertEqual(payload["raw_fields"]['Split Indicator ("S" or null)'], "S")
+        self.assertEqual(payload["raw_fields"]['Manual Revision Indicator ("R" or null)'], "R")
+        self.assertEqual(payload["raw_fields"]["Change in Short Position From Previous"], "-300")
+        self.assertEqual(len(payload["raw_fields"]), 11)
+        self.assertEqual(row["available_at"], SOURCE["retrieved_at"])
+        self.assertIsNone(row["source"]["published_at"])
+        for field in ('adjustment_basis', 'float_shares', 'adv_window', 'issuer_id', 'share_class'):
+            self.assertNotIn(field, payload)
+        self.assertEqual(result["issues"], [])
+
+    def test_cboe_alias_cannot_silently_override_a_conflicting_finra_field(self):
+        for header, values in [
+            ("Current Short,# Shares Net Short Current Cycle", "1200,1500"),
+            ("Current Short,Days to Cover,Min # of Trade Days To Cover Shorts", "1200,2.4,3"),
+        ]:
+            text = "Cycle Settlement Date,BATS-Symbol," + header + "\n20261030,DEMO," + values + "\n"
+            row = ms.parse(parse_doc("finra_short_interest_csv", text))["records"][0]
+            self.assertFalse(row["eligible"])
+            self.assertIn("Conflicting source field aliases", row["parse_error"])
+            self.assertIn("raw_fields", row["payload"])
 
     def test_ftd_balance_and_unknown_price_are_never_daily_new_fails(self):
         text = "SETTLEMENT DATE|CUSIP|SYMBOL|QUANTITY (FAILS)|DESCRIPTION|PRICE\n20261015|012345678|DEMO|100|Demo Inc|.\n"

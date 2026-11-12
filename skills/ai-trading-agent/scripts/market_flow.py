@@ -79,6 +79,15 @@ def _text(value):
     return value
 
 
+def _volume_basis(value):
+    """An absent or explicitly unresolved declaration cannot establish a match."""
+    if not isinstance(value, str) or not value.strip():
+        return None
+    if value.strip().casefold() in {'unknown', 'unresolved', 'unspecified', 'n/a', 'na', '--', '?'}:
+        return None
+    return value
+
+
 def _identity(record):
     p = record['payload']
     return (record.get('ticker'), p.get('issuer_id'), p.get('share_class'))
@@ -236,8 +245,11 @@ def analyze(document):
             volume = _number(p['volume'], 0) if p.get('volume') is not None else None
             if p['role'] != 'benchmark' and (volume is None or p.get('volume_unit') != 'shares'):
                 raise ValueError('SHARE_VOLUME_REQUIRED')
+            basis = _volume_basis(p.get('volume_basis'))
+            if p['role'] != 'benchmark' and basis is None:
+                _issue(out['issues'], record, 'RELATIVE_VOLUME_BASIS_UNKNOWN_OR_UNRESOLVED')
             key = (_identity(record), p['feed_id'], currency, group, p.get('volume_unit'),
-                   p.get('volume_basis'), (end - start).total_seconds(),
+                   basis, (end - start).total_seconds(),
                    start.timetz().isoformat(), end.timetz().isoformat())
             bars.append((record, key, start, end, volume))
         except (ValueError, TypeError, OverflowError) as exc:
@@ -246,7 +258,8 @@ def analyze(document):
     out['cumulative_bars'] = []
     for record, key, start, end, volume in bars:
         p = record['payload']
-        baseline = [x for x in bars if x[1] == key and x[0]['payload']['role'] == 'baseline'
+        basis = _volume_basis(p.get('volume_basis'))
+        baseline = [x for x in bars if basis is not None and x[1] == key and x[0]['payload']['role'] == 'baseline'
                     and x[3] < start and x[0]['payload']['session_id'] != p['session_id']]
         sessions = [x[0]['payload']['session_id'] for x in baseline]
         if len(set(sessions)) != len(sessions):
@@ -254,6 +267,11 @@ def analyze(document):
             baseline = []
         mean = sum((x[4] for x in baseline), Decimal(0)) / len(baseline) if baseline else None
         rvol = volume / mean if p['role'] == 'current' and volume is not None and mean is not None and mean > 0 else None
+        rvol_status = ('NOT_CURRENT' if p['role'] != 'current' else
+                       'VOLUME_BASIS_UNKNOWN_OR_UNRESOLVED' if basis is None else
+                       'NO_COMPARABLE_BASELINE' if mean is None else
+                       'ZERO_BASELINE_VOLUME' if mean == 0 else
+                       'COMPUTED_FROM_MATCHED_DECLARED_BASIS')
         own_return, benchmark_return, relative_return = None, None, None
         benchmark_id = p.get('benchmark_record_id')
         try:
@@ -277,10 +295,12 @@ def analyze(document):
             'share_class': p.get('share_class'), 'feed_id': p['feed_id'], 'role': p['role'],
             'start_at': p['start_at'], 'end_at': p['end_at'], 'elapsed_seconds': (end - start).total_seconds(),
             'volume': _value(volume), 'volume_unit': p.get('volume_unit'),
+            'volume_basis': deepcopy(p.get('volume_basis')),
             'baseline_record_ids': [x[0]['id'] for x in baseline] if p['role'] == 'current' else [],
             'baseline_sessions': len(baseline) if p['role'] == 'current' else 0,
             'baseline_mean_volume': _value(mean) if p['role'] == 'current' else None,
-            'relative_volume': _value(rvol), 'return_percent': _value(own_return),
+            'relative_volume': _value(rvol), 'relative_volume_status': rvol_status,
+            'return_percent': _value(own_return),
             'benchmark_record_id': benchmark_id, 'benchmark_return_percent': _value(benchmark_return),
             'benchmark_relative_return_percent': _value(relative_return),
         })
@@ -290,7 +310,7 @@ def analyze(document):
     out['limitations'] += [
         'comparison_group declares a comparable print filter/market/session and adjustment convention; it is not independently certified.',
         'Empirical ranks describe only retained prior baseline prints, not the whole market or a calibrated tail probability.',
-        'Relative volume uses the arithmetic mean of supplied prior sessions at exactly the same elapsed window; no full-day extrapolation.',
+        'Relative volume requires an explicit resolved matching volume basis and uses supplied prior sessions at exactly the same elapsed window; no full-day extrapolation.',
         'Benchmark-relative return is a difference in percentage points over identical windows, not causal alpha.',
     ]
     return out

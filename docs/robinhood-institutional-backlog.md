@@ -1,6 +1,6 @@
 # Institutional research readiness backlog
 
-Updated November 11, 2026. Software baseline: `ai-trading-agent` **5.7.0**.
+Updated November 12, 2026. Software baseline: `ai-trading-agent` **5.7.1**.
 
 The first target is a supervised U.S.-equity research and portfolio-risk assistant.
 A portfolio manager owns investment decisions, sizing and portfolio outcomes;
@@ -117,3 +117,9 @@ The paid Unusual Whales adapter is skipped. Accessible public X posts are dated
 research leads and require primary verification for material claims; a public
 profile is neither a complete options tape nor an official short-position feed.
 No subscription, trial, account mutation, order or recurring monitor is created.
+
+The 5.7.1 repairs diagnose conflicting source aliases, support the observed Cboe
+CSV format, withhold RVOL when volume bases are unknown, and reconcile supplied
+pilot/evaluation protocols, first-response input clocks and nested currency
+contracts. These checks establish bounded software/data consistency; actual
+HF01–HF10 acceptance and a prospective study remain separate.

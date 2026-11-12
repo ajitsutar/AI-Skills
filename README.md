@@ -30,10 +30,11 @@ Source selection and surrounding narrative still require review.
 
 The trading workflows use accessible free sources first; paid subscriptions are
 optional and existing user-provided access can improve freshness or coverage.
-Version **5.7.0** adds free public-source intake, dated flow/positioning and
-squeeze diagnostics, plus an event-driven U.S.-stock paper-research protocol,
-brief, immutable journal and descriptive evaluation. Public X posts are leads;
-the paid Unusual Whales adapter is skipped. See the updated institutional backlog.
+Version **5.7.1** includes free public-source intake and dated flow/squeeze
+research. Repairs diagnose ambiguous columns and unknown volume bases, bind
+paper evaluation to supplied protocol/response clocks, and reconcile nested
+currency contracts. Public X posts remain leads; the paid Unusual Whales
+adapter is skipped. See the updated institutional backlog.
 Current helpers retain source-bound data readiness, tax and withdrawal
 uncertainty, dated cash-benchmark applicability, event-research capability limits
 and excerpt-based issuer diagnostics. Proposal evaluation preserves supplied

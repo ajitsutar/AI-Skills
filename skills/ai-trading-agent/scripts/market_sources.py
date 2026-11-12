@@ -68,7 +68,7 @@ def _url(value):
         return False
 
 
-def _number(value, optional=False):
+def _number(value, optional=False, exact=False):
     if optional and (value is None or str(value).strip() in ("", ".", "N/A", "NA", "--")):
         return None
     _require(type(value) in (str, int, float, Decimal) and type(value) is not bool, "Numeric value required")
@@ -79,6 +79,8 @@ def _number(value, optional=False):
     _require(result.is_finite() and result >= 0, "Finite nonnegative number required")
     converted = float(result)
     _require(math.isfinite(converted), "Number exceeds finite output range")
+    if exact:
+        return result
     return int(result) if result == result.to_integral_value() else converted
 
 
@@ -243,7 +245,10 @@ def _table(text, delimiter=None):
         delimiter = "|" if "|" in lines[0] else ","
     _require(delimiter in (",", "|", "\t"), "Unsupported delimiter")
     reader = csv.DictReader(io.StringIO("\n".join(lines)), delimiter=delimiter)
-    _require(reader.fieldnames and len(set(_key(field) for field in reader.fieldnames)) == len(reader.fieldnames),
+    # DictReader would silently discard one value for an identical literal
+    # heading. Distinct spellings stay intact for field-level alias comparison.
+    _require(reader.fieldnames and all(_key(field) for field in reader.fieldnames)
+             and len(set(reader.fieldnames)) == len(reader.fieldnames),
              "Missing or duplicate header fields")
     rows = []
     for row in reader:
@@ -256,11 +261,16 @@ def _key(value):
     return re.sub(r"[^a-z0-9]", "", value.lower())
 
 
-def _field(row, *names, required=True):
-    mapped = {_key(key): value for key, value in row.items() if key is not None}
-    for name in names:
-        if _key(name) in mapped:
-            return mapped[_key(name)]
+def _field(row, *names, required=True, compare=None):
+    keys = {_key(name) for name in names}
+    matches = [(key, value) for key, value in row.items() if key is not None and _key(key) in keys]
+    if matches:
+        # Include normalized-heading collisions and every supported semantic
+        # alias. A returned field is never selected ahead of a conflicting one.
+        comparable = [compare(value) if compare else value.strip() for _, value in matches]
+        _require(all(value == comparable[0] for value in comparable),
+                 "Conflicting source field aliases: " + ", ".join(key for key, _ in matches))
+        return matches[0][1]
     if required:
         raise ValueError("Missing source field: " + names[0])
     return None
@@ -418,28 +428,32 @@ def parse(document):
             ticker = None
             try:
                 _require(None not in row and all(value is not None for value in row.values()), "Malformed delimited row")
-                ticker = _field(row, "Symbol", "Issue Symbol", "issueSymbolIdentifier")
+                ticker = _field(row, "Symbol", "Issue Symbol", "issueSymbolIdentifier", "BATS-Symbol")
                 if adapter == "finra_short_volume":
-                    payload = {"trade_date": _day(_field(row, "Date")),
-                               "short_volume": _number(_field(row, "ShortVolume")),
-                               "short_exempt_volume": _number(_field(row, "ShortExemptVolume", "Short Exempt Volume")),
-                               "total_volume": _number(_field(row, "TotalVolume")),
+                    payload = {"trade_date": _day(_field(row, "Date", compare=_day)),
+                               "short_volume": _number(_field(row, "ShortVolume", compare=lambda v: _number(v, exact=True))),
+                               "short_exempt_volume": _number(_field(row, "ShortExemptVolume", "Short Exempt Volume", compare=lambda v: _number(v, exact=True))),
+                               "total_volume": _number(_field(row, "TotalVolume", compare=lambda v: _number(v, exact=True))),
                                "market": _field(row, "Market"), "volume_unit": "shares",
                                "coverage": "FINRA_reported_subset", "short_volume_includes_exempt": True}
                     _require(payload["short_exempt_volume"] <= payload["short_volume"] <= payload["total_volume"],
                              "Inconsistent short-sale volume components")
                 elif adapter == "finra_short_interest_csv":
-                    payload = {"settlement_date": _day(_field(row, "Settlement Date", "settlementDate")),
-                               "short_interest_shares": _number(_field(row, "Current Short", "currentShortPositionQuantity", "Short Interest")),
-                               "average_daily_volume": _number(_field(row, "Avg Daily Volume", "averageDailyVolumeQuantity", required=False), optional=True),
-                               "reported_days_to_cover": _number(_field(row, "Days to Cover", "daysToCoverQuantity", required=False), optional=True),
-                               "security_name": _field(row, "Issue Name", "issueName", required=False),
+                    payload = {"settlement_date": _day(_field(row, "Settlement Date", "settlementDate", "Cycle Settlement Date", compare=_day)),
+                               "short_interest_shares": _number(_field(row, "Current Short", "currentShortPositionQuantity", "Short Interest", "# Shares Net Short Current Cycle", compare=lambda v: _number(v, exact=True))),
+                               "average_daily_volume": _number(_field(row, "Avg Daily Volume", "averageDailyVolumeQuantity", "Cycle Avg Daily Trade Vol", required=False, compare=lambda v: _number(v, optional=True, exact=True)), optional=True),
+                               "reported_days_to_cover": _number(_field(row, "Days to Cover", "daysToCoverQuantity", "Min # of Trade Days To Cover Shorts", required=False, compare=lambda v: _number(v, optional=True, exact=True)), optional=True),
+                               "security_name": _field(row, "Issue Name", "issueName", "Security Name", required=False),
                                "measure_basis": "official_reported", "volume_unit": "shares",
                                "source_authenticity": "not_verified_by_parser"}
+                    if any(_key(key) == _key("Min # of Trade Days To Cover Shorts") for key in row):
+                        payload["reported_days_to_cover_semantics"] = "source_reported_minimum_trade_days_to_cover"
+                    if any(_key(key) == _key("Cycle Avg Daily Trade Vol") for key in row):
+                        payload["average_daily_volume_semantics"] = "source_reported_cycle_average_daily_trade_volume"
                 elif adapter == "sec_ftd":
-                    payload = {"settlement_date": _day(_field(row, "SETTLEMENT DATE")),
-                               "cusip": _field(row, "CUSIP"), "quantity": _number(_field(row, "QUANTITY (FAILS)")),
-                               "price": _number(_field(row, "PRICE"), optional=True),
+                    payload = {"settlement_date": _day(_field(row, "SETTLEMENT DATE", compare=_day)),
+                               "cusip": _field(row, "CUSIP"), "quantity": _number(_field(row, "QUANTITY (FAILS)", compare=lambda v: _number(v, exact=True))),
+                               "price": _number(_field(row, "PRICE", compare=lambda v: _number(v, optional=True, exact=True)), optional=True),
                                "description": _field(row, "DESCRIPTION"), "quantity_unit": "shares",
                                "balance_semantics": "aggregate_outstanding_fails",
                                "price_semantics": "reported_prior_day_close_or_unavailable"}

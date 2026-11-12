@@ -96,6 +96,12 @@ with the same feed, identity, currency, volume unit,
 volume basis and comparison group. Keep baseline IDs/session count. Ambiguous
 duplicate sessions are not pooled. A zero baseline denominator leaves the ratio
 unknown; no full-day volume is extrapolated from an intraday interval.
+The volume basis must be explicitly declared and resolved on both sides.
+Absent, blank or explicitly unknown/unresolved bases cannot establish a match.
+Such bars retain their reported volume and supported own/benchmark price returns,
+while relative volume stays unknown and cannot promote squeeze pressure.
+Inspect relative_volume_status and the per-record basis issue; a known current
+basis does not make an unknown baseline comparable. Other feeds remain separate.
 Supply cumulative intervals from the actual declared session origin, not rolling
 windows. Matching duration alone is insufficient. Across timezone/DST changes,
 unmatched clock representations stay outside the baseline; this helper does not

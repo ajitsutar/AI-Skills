@@ -2765,6 +2765,12 @@
         "metric": "Same-window relative volume",
         "unit": "ratio"
       },
+      "flow/cumulative_bars/*/relative_volume_status": {
+        "basis": "Explicit resolved volume basis and comparable prior-session observations; unknown basis cannot support a pressure flag.",
+        "denominator": null,
+        "metric": "Relative-volume comparability qualification",
+        "unit": "status"
+      },
       "flow/cumulative_bars/*/return_percent": {
         "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
         "denominator": "interval starting price",
@@ -3067,6 +3073,30 @@
         "metric": "Descriptive net event excess return",
         "unit": "return_fraction"
       },
+      "cases/*/response_input_review/actual_response_consumption_verified": {
+        "basis": "Checks declarations in this document only; hashes/replay do not authenticate an external protocol, reviewer or actual consumption.",
+        "denominator": null,
+        "metric": "Actual response-input consumption verified",
+        "unit": "boolean"
+      },
+      "cases/*/response_input_review/binding_mode": {
+        "basis": "Explicit response record IDs or documented common-input shortcut checked at capture time; later decision inputs remain separate.",
+        "denominator": null,
+        "metric": "Declared first-response input binding mode",
+        "unit": "status"
+      },
+      "protocol_reconciliation/pilot_present": {
+        "basis": "Checks declarations in this document only; hashes/replay do not authenticate an external protocol, reviewer or actual consumption.",
+        "denominator": null,
+        "metric": "Supplied pilot protocol present",
+        "unit": "boolean"
+      },
+      "protocol_reconciliation/registration_authenticated": {
+        "basis": "Checks declarations in this document only; hashes/replay do not authenticate an external protocol, reviewer or actual consumption.",
+        "denominator": null,
+        "metric": "Protocol registration authenticated",
+        "unit": "boolean"
+      },
       "returns/included_cases": {
         "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
         "denominator": null,
@@ -3141,6 +3171,12 @@
         "denominator": "mean comparable prior-session cumulative volume",
         "metric": "Same-window relative volume",
         "unit": "ratio"
+      },
+      "cumulative_bars/*/relative_volume_status": {
+        "basis": "Explicit resolved volume basis and comparable prior-session observations; unknown basis cannot support a pressure flag.",
+        "denominator": null,
+        "metric": "Relative-volume comparability qualification",
+        "unit": "status"
       },
       "cumulative_bars/*/return_percent": {
         "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",

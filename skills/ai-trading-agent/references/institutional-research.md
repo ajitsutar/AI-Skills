@@ -26,8 +26,10 @@ preferences or mandatory trading rules.
 `pilot` contains `id`, `research_question`, `universe`,
 `horizon: {label, entry_policy, exit_policy}`, `reviewer: {id, role}` and
 `study: {registered_at, start_at, end_at, usefulness_criterion,
-workflow_baseline_id}`. `return_baseline_id` may also be supplied for the separate
-return comparison. Keep the registered protocol and its exact hash before the
+workflow_baseline_id}`. Supply `study.return_baseline_id` when evaluating returns
+under that pilot. Optional `study.expected_case_ids` binds the registered roster.
+The plan emits `pilot_sha256`, a canonical hash of the supplied `pilot` object.
+Keep the registered protocol and its exact hash before the
 first decision; a later revised protocol gets a new retained ID and parent link.
 Missing choices produce `CONFIGURATION_NEEDED`, not invented user preferences.
 Registration and time declarations are not authenticated by a pure helper.
@@ -85,6 +87,9 @@ partial holdings. Future portfolio snapshots are unusable. Cash accessibility,
 settlement, margin, issuer overlap, correlations and risk reduction remain
 unestablished; this arithmetic is not executable sizing. Supply the actual
 portfolio when relevant instead of silently adopting the fictional example.
+In the source-bound workbench, declared nested portfolio, trade, cost, liquidity
+and return currencies must agree with the outer contract's `base_currency`;
+omitting a top-level currency does not authorize implicit FX conversion.
 
 `cost_contract` is the existing explicit
 [trade-cost contract](portfolio-decision-calculations.md); this module calls
@@ -143,12 +148,47 @@ in these records.
 `evaluation` has `registered_at`, `study_start`, `study_end`,
 `usefulness_criterion`, `workflow_baseline_id`, optional `return_baseline_id`,
 `expected_case_ids` and `cases`. Each case retains `id`, `decision_at`,
-`input_record_ids`, and `first_response: {text, sha256, captured_at}`. The helper
-checks exact UTF-8 response bytes/hash, declared pre-decision capture and input
-eligibility at that decision. For a real prospective study, also reconcile those
-declarations to the actual immutable journal and timestamps. Pure evaluation
+`input_record_ids`, and `first_response: {text, sha256, captured_at,
+input_record_ids?}`. Case-level input IDs describe the decision. Explicit
+first-response input IDs describe the records used for that earlier response;
+they may differ when new evidence or a revision arrives before the decision.
+Both sets must be nonempty and available at their own declared cutoff. For
+compatible older inputs that omit the response list, the helper treats the
+case-level list as common inputs and checks every record at capture time as well
+as decision time. A record published after capture cannot support the first
+response merely because it was available by the later decision.
+
+Each case emits `response_input_review` with its binding mode, both input lists,
+later decision IDs, unavailable response IDs and a declared response-input hash
+manifest. This manifest binds canonical supplied record values and the capture declaration;
+it does not prove that the response actually consumed them. The helper also
+checks exact UTF-8 response bytes/hash and declared pre-decision capture. For a
+real prospective study, reconcile these declarations and input manifests to the
+actual immutable journal and timestamps. Pure evaluation
 cannot independently verify an external journal, an honest system clock or an
 unseen original answer.
+
+When a `pilot` is supplied, `protocol_reconciliation` retains it and the evaluation
+declarations, compares registration/start/end instants, criterion, workflow
+baseline and any registered roster, and exposes every conflict. Optional
+`evaluation.pilot_id` and `evaluation.pilot_sha256` must match the supplied pilot
+and the hash emitted by its plan. Shared protocol conflicts exclude affected
+cases from both metrics. A case's target must match an explicit pilot universe;
+use `case.ticker` for mixed-event studies. Otherwise the document's event ticker,
+or a unique eligible nonbenchmark input ticker, supplies that declared identity. Related
+evidence and benchmark tickers are not themselves target selections. Full
+U.S.-listed scope remains requested coverage, not certified listing membership.
+
+The declared pilot reviewer must match each included usefulness reviewer.
+A missing or conflicting pilot return baseline excludes returns while preserving
+otherwise compatible usefulness judgments; a reviewer mismatch excludes usefulness
+while leaving independently compatible return comparisons available. The case
+exposes shared `prospective_exclusion_reasons`, `usefulness_exclusion_reasons`
+and `return_exclusion_reasons` separately. Reconciliation status is
+`MATCHED_DECLARED_PROTOCOL`, `PROTOCOL_CONFLICT` or
+`PROTOCOL_CONFIGURATION_INCOMPLETE`. With no pilot, standalone evaluation is
+explicitly `DECLARATION_ONLY_NO_PILOT`. None of these statuses authenticates a
+registration or closes institutional acceptance.
 
 `usefulness` contains `available_at`, `reviewer_id`, `criterion`, `useful` boolean,
 `assisted_minutes`, `baseline_minutes` and the prespecified `baseline_id`.

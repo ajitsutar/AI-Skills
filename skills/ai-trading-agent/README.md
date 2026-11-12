@@ -1,9 +1,12 @@
 # AI Trading Agent
 
-Version **5.7.0** adds [public-source intake](references/market-sources.md),
+Version **5.7.1** includes [public-source intake](references/market-sources.md),
 [flow, positioning and squeeze diagnostics](references/market-flow.md), and a
 [configurable event-driven U.S.-stock paper-research pilot](references/institutional-research.md).
-The runnable synthetic demo retains first responses and evaluates usefulness
+Intake diagnoses conflicting source columns; volume comparisons require an
+explicit comparable basis. Pilot evaluation reconciles supplied protocol and
+first-response input clocks, while workbench composition checks nested currency
+against its declared contract. The runnable synthetic demo retains first responses and evaluates usefulness
 separately from descriptive net returns. Public X posts are research leads;
 this package includes no paid Unusual Whales adapter. Reported short interest,
 daily short volume, borrow snapshots and inferred squeeze pressure stay separate.

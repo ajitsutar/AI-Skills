@@ -52,7 +52,9 @@
       "start_at": "2026-10-01T14:00:00Z",
       "end_at": "2026-10-02T20:00:00Z",
       "usefulness_criterion": "Identifies one checkable decision-relevant gap",
-      "workflow_baseline_id": "fictional-without-tool"
+      "workflow_baseline_id": "fictional-without-tool",
+      "return_baseline_id": "fictional-cash",
+      "expected_case_ids": ["fictional-case"]
     }
   },
   "event": {
@@ -122,11 +124,13 @@
     "cases": [
       {
         "id": "fictional-case",
+        "ticker": "DEMO",
         "decision_at": "2026-10-01T14:31:00Z",
         "first_response": {
           "text": "Fictional first response: verify the catalyst and avoid inferring intent from prints.",
           "sha256": "97e1f5da692daa4a2b0da459802e58714a8402673b82ae5f48c3bad8e06a7e53",
-          "captured_at": "2026-10-01T14:31:00Z"
+          "captured_at": "2026-10-01T14:31:00Z",
+          "input_record_ids": ["fictional-catalyst-v1"]
         },
         "input_record_ids": [
           "fictional-catalyst-v1"

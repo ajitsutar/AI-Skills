@@ -130,6 +130,74 @@ class MarketInstitutionalIntegrationTests(unittest.TestCase):
         self.assertFalse(replay['production_qualified'])
         self.assertEqual(qw.verify(bundle)['status'], 'REPLAY_MATCH')
 
+    def test_nested_institutional_currency_cannot_bypass_outer_contract(self):
+        for operation, name in [('institutional.brief', 'institutional-event-input.json'),
+                                ('institutional.evaluate', 'institutional-evaluation-input.json')]:
+            document = fixture(name)
+            request = {'schema_version': 1, 'contract': contract(document['as_of']),
+                       'jobs': [{'id': 'currency', 'operation': operation, 'inputs': {'document': document}}]}
+            self.assertNotIn('currency', document)
+            with self.subTest(operation=operation):
+                positive = qw.run(request)['results'][0]
+                self.assertEqual(positive['status'], 'COMPUTED')
+                request['contract']['base_currency'] = 'EUR'
+                negative = qw.run(request)['results'][0]
+                self.assertEqual(negative['status'], 'REJECTED_INPUT')
+                self.assertIn('INSTITUTIONAL_CURRENCY_MISMATCH_NO_FX_MODEL', negative['reason'])
+
+    def test_cost_only_and_benchmark_currency_conflicts_are_detected(self):
+        document = fixture('institutional-event-input.json')
+        document.pop('portfolio'); document.pop('proposed_trade'); document.pop('liquidity')
+        document['cost_contract']['currency'] = 'EUR'
+        request = {'schema_version': 1, 'contract': contract(document['as_of']),
+                   'jobs': [{'id': 'cost', 'operation': 'institutional.brief', 'inputs': {'document': document}}]}
+        self.assertIn('INSTITUTIONAL_CURRENCY_MISMATCH_NO_FX_MODEL', qw.run(request)['results'][0]['reason'])
+        document = fixture('institutional-evaluation-input.json')
+        document['evaluation']['cases'][0]['paper_return']['benchmark']['currency'] = 'EUR'
+        request['contract'] = contract(document['as_of'])
+        request['jobs'][0].update(operation='institutional.evaluate', inputs={'document': document})
+        self.assertIn('INSTITUTIONAL_CURRENCY_MISMATCH_NO_FX_MODEL', qw.run(request)['results'][0]['reason'])
+
+    def test_plan_without_monetary_inputs_does_not_invent_a_currency_requirement(self):
+        document = fixture('institutional-event-input.json')
+        for key in ('portfolio', 'proposed_trade', 'cost_contract', 'liquidity'):
+            document.pop(key, None)
+        request = {'schema_version': 1, 'contract': dict(contract(document['as_of']), base_currency='EUR'),
+                   'jobs': [{'id': 'plan', 'operation': 'institutional.plan', 'inputs': {'document': document}}]}
+        self.assertEqual(qw.run(request)['results'][0]['status'], 'COMPUTED')
+
+    def test_report_keeps_unknown_volume_basis_and_independent_price_context(self):
+        document = fixture('market-flow-synthetic.json')
+        for record in document['records']:
+            if record['kind'] == 'bar':
+                record['payload'].pop('volume_basis', None)
+        request = {'schema_version': 1, 'contract': contract(document['as_of']),
+                   'jobs': [{'id': 'basis', 'operation': 'market.flow', 'inputs': {'document': document}}]}
+        facts = rf.project(json.dumps(qw.freeze(request)).encode(), 'quant')['facts']
+        qualifier = next(x for x in facts if x['metric'] == 'Relative-volume comparability qualification'
+                         and x['value'] == 'VOLUME_BASIS_UNKNOWN_OR_UNRESOLVED')
+        self.assertEqual(qualifier['unit'], 'status')
+        ratio = next(x for x in facts if x['metric'] == 'Same-window relative volume')
+        self.assertIsNone(ratio['value'])
+        self.assertTrue(any(x['metric'] == 'Price return minus matched benchmark' and x['value'] is not None for x in facts))
+
+    def test_report_keeps_protocol_conflict_and_zero_included_cases(self):
+        document = fixture('institutional-evaluation-input.json')
+        document['pilot']['study']['usefulness_criterion'] = 'Different frozen fictional criterion'
+        request = {'schema_version': 1, 'contract': contract(document['as_of']),
+                   'jobs': [{'id': 'protocol', 'operation': 'institutional.evaluate', 'inputs': {'document': document}}]}
+        bundle = qw.freeze(request)
+        self.assertEqual(bundle['result']['results'][0]['status'], 'COMPUTED')
+        result = bundle['result']['results'][0]['result']
+        self.assertEqual(result['protocol_reconciliation']['status'], 'PROTOCOL_CONFLICT')
+        self.assertEqual(result['usefulness']['included_cases'], 0)
+        self.assertEqual(result['returns']['included_cases'], 0)
+        facts = rf.project(json.dumps(bundle).encode(), 'quant')['facts']
+        status = next(x for x in facts if x['source']['pointer'].endswith('/protocol_reconciliation/status'))
+        self.assertEqual(status['value'], 'PROTOCOL_CONFLICT')
+        self.assertEqual(status['unit'], 'status')
+        self.assertTrue(any(x['metric'] == 'Included declared usefulness judgments' and x['value'] == 0 for x in facts))
+
 
 if __name__ == '__main__':
     unittest.main()
