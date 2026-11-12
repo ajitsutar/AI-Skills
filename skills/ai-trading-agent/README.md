@@ -1,6 +1,6 @@
 # AI Trading Agent
 
-Version **5.7.4** includes [public-source intake](references/market-sources.md),
+Version **5.7.8** includes [public-source intake](references/market-sources.md),
 [flow, positioning and squeeze diagnostics](references/market-flow.md), and a
 [configurable event-driven U.S.-stock paper-research pilot](references/institutional-research.md).
 Intake diagnoses conflicting source columns; volume comparisons require an
@@ -462,3 +462,5 @@ exercise. The [derivatives toolkit](references/derivatives-toolkit.md) separatel
 supports bounded vanilla American CRR valuation with explicit grid, rate/dividend
 conventions and source metadata. Missing inputs stay unresolved; do not substitute
 a European price or import example assumptions.
+
+[Original-source REIT research](references/supplied-research.md) binds monetary operands and preserves source-known property meaning with unknown scope. [Final report composition](references/final-report.md) replays the REIT producer and exact saved answer; extra prose stays unaudited. Finite Decimal inputs retain precision through normalized calculation hashing while original bytes remain separately pinned. [Final news-ledger provenance](references/news-and-guidance.md#audit-provenance-in-the-final-ledger) checks retained declarations without certifying authenticity.

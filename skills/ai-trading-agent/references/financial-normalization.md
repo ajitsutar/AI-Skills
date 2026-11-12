@@ -133,6 +133,10 @@ real research. Fictional declarations remain fictional even when replay succeeds
   amortized-cost loans before allowance, with matching scope. It is not NPA/loans.
 - Equity REIT FFO is unadjusted Nareit FFO attributable to common, not normalized,
   adjusted, diluted or AFFO. Confirm the issuer's definition and reconciliation.
+  For FFO/AFFO/CFO reporting comparisons, use the separate
+  [REIT reconciliation helper](reit-reconciliation.md). A numerical difference
+  does not identify recurring capex within gross-capex categories; that helper
+  preserves missing overlap mapping without changing normalization policy.
 
 Policy changes require a new version, hash and complete rerun. Missing fields
 remain missing; the package does not infer zero from absence of a tag.

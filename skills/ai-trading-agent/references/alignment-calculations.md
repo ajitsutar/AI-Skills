@@ -394,3 +394,7 @@ incomparability even if raw arithmetic is true. Optional `absolute_tolerance`
 (default 1e-8) and `relative_tolerance` (default 1e-7) apply to equality only;
 inequalities use exact boundaries. This checks declared operands and metadata,
 not arbitrary prose, authentic sources or causality.
+
+## REIT measure reconciliation
+
+Use `financial.reit_reconciliation` for declared FFO/AFFO/CFO component arithmetic and unresolved recurring-to-gross-capex mapping. [Original operand binding](reit-reconciliation.md) is required before primary source-record comparability. Direct, workbench and workflow calls retain conditional arithmetic; matching caller metadata or SOURCE roles cannot establish original accounting scope. [Property facts](reit-sources.md) preserve source-known meaning independently of unbound requested rows.

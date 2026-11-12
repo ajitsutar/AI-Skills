@@ -464,6 +464,10 @@
         {
           "title": "Audit reported helper labels",
           "prompt": "Compare [CLAIMED LABELS AND VALUES] with exact JSON pointers in [SAVED HELPER RESULT]. Retain unsupported claims and actual values without changing the result, rerunning the original analysis or treating the audit as source authentication."
+        },
+        {
+          "title": "Audit publication and original-source fields in the final ledger",
+          "prompt": "Audit [FINAL SOURCE LEDGER JSON] against [ORIGINAL SOURCE INGRESS MANIFEST] and [EXTERNALLY FROZEN SHA256] using the provenance audit. Bind the actual final artifact and its field pointers, distinguish publication links from explicit original-source declarations, and show inconsistent, ambiguous and unaudited fields. Preserve original artifacts when correcting the ledger, re-audit changed bytes, and keep source authenticity, live access and independence unverified unless separate evidence establishes them."
         }
       ]
     },
@@ -701,7 +705,7 @@
         },
         {
           "title": "Estimate historical tail losses",
-          "prompt": "Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps. If applying current weights to aligned asset returns, label the result a current-weight shock distribution rather than a historical strategy backtest. Report the supplied notional denominator, effective tail sample mass and sparse-sample warnings; do not scale a short sample into a guaranteed future loss limit. Calculate drawdown only from a supplied realized portfolio or strategy return path; do not infer historical strategy drawdown from today’s weights."
+          "prompt": "Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps. If applying current weights to aligned asset returns, label the result a current-weight shock distribution rather than a historical strategy backtest. Report the supplied notional denominator, effective tail sample mass and sparse-sample warnings; do not scale a short sample into a guaranteed future loss limit. Calculate drawdown only from a supplied realized portfolio or strategy return path; do not infer historical strategy drawdown from today\u2019s weights."
         },
         {
           "title": "Run portfolio stress scenarios",
@@ -1907,6 +1911,32 @@
         {
           "title": "Retain executed experiment outcomes",
           "prompt": "Run this isolated local experiment sequence once, preserve failures and journal transitions, then write the result from captured outcomes. Keep plans separate from executed results and audit retained evidence without repeating stateful mutations."
+        }
+      ]
+    },
+    {
+      "id": "original-source-reit-research",
+      "title": "Original-source REIT research and final reports",
+      "audience": "Researchers reviewing supplied REIT disclosures",
+      "guides": [
+        "references/supplied-research.md",
+        "references/reit-reconciliation.md",
+        "references/reit-sources.md",
+        "references/final-report.md",
+        "references/original-source-lineage.md"
+      ],
+      "prompts": [
+        {
+          "title": "Bind REIT operands and preserve property meaning",
+          "prompt": "Use the complete supplied original-source manifest and its external hash to bind REIT monetary operands, reconcile FFO/AFFO/CFO and keep unknown capex overlap conditional. Preserve source-known property fraction meaning and unresolved denominator scope/time. Generate and replay the source report."
+        },
+        {
+          "title": "Compose the exact final REIT response",
+          "prompt": "Compose the final REIT response from complete supported source reports. Verify the exact saved first-response bytes against retained originals and review any visibly unaudited prose separately."
+        },
+        {
+          "title": "Audit original metadata identity",
+          "prompt": "Audit explicit scalar metadata mappings against this externally pinned original corpus. Retain declared values alongside unknown or conflicting lineage, without treating matching values as proof of accounting scope."
         }
       ]
     }

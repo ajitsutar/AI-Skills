@@ -101,3 +101,5 @@ collection separately. A correct manual result is not proof the required workflo
 ran. A skipped participant is not agreement. These tools reduce avoidable variation
 without guaranteeing that every model follows the workflow or makes identical
 future judgments.
+
+For REIT comparisons supplied as an original-source corpus, use [integrated source research](supplied-research.md) and [final artifact composition](final-report.md). Bind supported original records, calculate, retain unknown metadata, and replay the saved report. Caller-created metadata is not original-source evidence.

@@ -378,7 +378,7 @@ class ReplayTests(unittest.TestCase):
         self.assertEqual({j['operation'] for j in doc['jobs']},
                          set(workbench.OPERATIONS) - source_operations - set(workbench.ANALYSIS_OPERATIONS)
                          - set(workbench.MULTIASSET_OPERATIONS) - portable_operations - monthly_operations
-                         - assurance_operations - follower_operations - market_operations - {'data.vintage_eligibility', 'data.terminal_return_coverage'})
+                         - assurance_operations - follower_operations - market_operations - {'data.vintage_eligibility', 'data.terminal_return_coverage', 'financial.reit_reconciliation'})  # Dedicated REIT fixture coverage.
 
     def fixture(self):
         return {'schema_version': 1, 'contract': {'prompt': 'Fictional risk review', 'purpose': 'compatibility',

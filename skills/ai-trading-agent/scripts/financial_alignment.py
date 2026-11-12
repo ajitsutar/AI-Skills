@@ -229,3 +229,152 @@ def corporate_action_return(document):
                   missing=['terminal_mark_at_requested_end'] if requested>end else [],
                   denominator='one initial old share at start_raw_price',measurement_period={'start':document['start_mark_on'],'end':document['end_mark_on']},
                   limitation='No dividend reinvestment, tax or missing terminal-price assumption; provider EPS vintages are not assigned publication dates from another security.')
+
+
+def _reit_basis(group):
+    fields=('amount_unit','period_start','period_end','holder_basis')
+    source={} if group.get('basis') is None else group['basis']
+    require(isinstance(source,dict),'REIT_BASIS_OBJECT_REQUIRED')
+    result={}
+    for key in fields:
+        value=source.get(key)
+        require(value is None or isinstance(value,str),'REIT_BASIS_TEXT_OR_NULL')
+        result[key]=value if isinstance(value,str) and value.strip() and value.strip().lower()!='unknown' else None
+    for key in ('period_start','period_end'):
+        if result[key] is not None:date.fromisoformat(result[key])
+    require(not result['period_start'] or not result['period_end'] or result['period_start']<=result['period_end'],'REIT_PERIOD_ORDER')
+    return result
+
+
+def _reit_compatibility(bases):
+    missing=[key for key in bases[0] if any(b[key] is None for b in bases)]
+    conflicts=[key for key in bases[0] if len({b[key] for b in bases if b[key] is not None})>1]
+    return {'status':'INCOMPATIBLE' if conflicts else 'UNKNOWN' if missing else 'COMPATIBLE',
+            'unknown_dimensions':missing,'conflicting_dimensions':conflicts,'declared_bases':deepcopy(bases)}
+
+
+def _reit_components(group,key,nonnegative=False):
+    rows=group.get(key)
+    if rows is None:return None
+    require(isinstance(rows,list),'REIT_COMPONENT_LIST_REQUIRED')
+    require(all(isinstance(r,dict) and isinstance(r.get('id'),str) and r['id'].strip() for r in rows),'REIT_COMPONENT_IDS_REQUIRED')
+    require(len({r['id'] for r in rows})==len(rows),'REIT_DUPLICATE_COMPONENT_IDS')
+    return [{'id':r['id'],'amount':amount(r['amount'],minimum=0 if nonnegative else None) if r.get('amount') is not None else None}
+            for r in rows]
+
+
+def _reit_declared_arithmetic(document):
+    """Private arithmetic kernel; public callers must classify source evidence."""
+    groups={key:{} if document.get(key) is None else document[key] for key in ('ffo_bridge','affo_bridge','cfo','gross_capex')}
+    require(all(isinstance(g,dict) for g in groups.values()),'REIT_GROUP_OBJECTS_REQUIRED')
+    bases={key:_reit_basis(g) for key,g in groups.items()}
+    ffo_rows=_reit_components(groups['ffo_bridge'],'components')
+    adjustments=_reit_components(groups['affo_bridge'],'adjustments')
+    capex_rows=_reit_components(groups['gross_capex'],'components',True)
+    def total(rows,empty_allowed=False):
+        return sum((r['amount'] for r in rows),Decimal(0)) if rows is not None and (rows or empty_allowed) and all(r['amount'] is not None for r in rows) else None
+    ffo=total(ffo_rows);other=total(adjustments,True);capex=total(capex_rows,True)
+    recurring=amount(groups['affo_bridge']['recurring_capex'],minimum=0) if groups['affo_bridge'].get('recurring_capex') is not None else None
+    cfo=amount(groups['cfo']['amount']) if groups['cfo'].get('amount') is not None else None
+    metrics={}
+    def metric(identifier,terms,group_ids,formula,definition):
+        checked=_reit_compatibility([bases[key] for key in group_ids])
+        missing=[row['id'] for row in terms if row['amount'] is None]
+        value=None if missing else sum((row['coefficient']*row['amount'] for row in terms),Decimal(0))
+        cross=len(group_ids)>1
+        primary=value if not cross or checked['status']=='COMPATIBLE' else None
+        conditional=value if cross and checked['status']=='UNKNOWN' else None
+        result={'id':identifier,'formula':formula,'components':terms,'value':primary,
+                'conditional_same_basis_value':conditional,'basis_compatibility':checked,'definition':definition,
+                'missing_components':missing,'status':'MISSING_INPUT' if missing else 'UNRESOLVED_BASIS' if cross and checked['status']!='COMPATIBLE' else 'COMPUTED'}
+        if conditional is not None:result['conditional_assumption']='Amounts share the same unit, measurement period and holder basis; these unknown dimensions are not established by arithmetic.'
+        metrics[identifier]=result
+        return value
+    def term(identifier,value,coefficient=1):return {'id':identifier,'amount':value,'coefficient':coefficient}
+    metric('ffo',[term(r['id'],r['amount']) for r in ffo_rows] if ffo_rows else [term('ffo_bridge/components',None)],
+           ['ffo_bridge'],'sum(signed supplied FFO components)',groups['ffo_bridge'].get('definition'))
+    affo=metric('affo',[term('ffo',ffo),term('other_affo_adjustments',other),term('recurring_capex',recurring,-1)],
+        ['ffo_bridge','affo_bridge'],'ffo + sum(signed issuer AFFO adjustments) - recurring_capex',groups['affo_bridge'].get('definition'))
+    metric('cfo',[term('cfo',cfo)],['cfo'],'supplied CFO','Supplied operating cash flow')
+    metric('gross_capex',[term(r['id'],r['amount']) for r in capex_rows] if capex_rows is not None else [term('gross_capex/components',None)],
+        ['gross_capex'],'sum(supplied gross productive capex components)','Gross capex, without inferred recurring/growth allocation')
+    cash=metric('cfo_after_gross_capex',[term('cfo',cfo),term('gross_capex',capex,-1)],['cfo','gross_capex'],
+        'cfo - gross_capex','Cash after the declared gross capex components')
+    ffo_cfo=metric('ffo_minus_cfo',[term('ffo',ffo),term('cfo',cfo,-1)],['ffo_bridge','cfo'],
+        'ffo - cfo','Arithmetic difference; no itemized FFO-to-CFO causal bridge supplied by this helper')
+    difference=metric('affo_minus_cfo_after_gross_capex',[
+        term('ffo_minus_cfo',ffo_cfo),term('other_affo_adjustments',other),term('gross_capex',capex),term('recurring_capex',recurring,-1)],
+        list(groups),'(ffo - cfo) + sum(signed issuer AFFO adjustments) + (gross_capex - recurring_capex)',
+        'Arithmetic identity only; does not establish which capex components enter recurring capex')
+    metrics['affo_minus_cfo_after_gross_capex']['arithmetic_identity_residual']=affo-cash-difference if all(v is not None for v in (affo,cash,difference)) else None
+    mapping=document.get('recurring_capex_mapping')
+    overlap={'status':'UNKNOWN','reason':'No explicit same-scope recurring-to-gross-capex mapping supplied.',
+             'recurring_capex':recurring,'gross_capex_components':deepcopy(capex_rows),'allocations':None,
+             'growth_or_maintenance_classification':None}
+    if mapping is not None:
+        overlap['declared_mapping']=deepcopy(mapping)
+        try:
+            require(isinstance(mapping,dict),'REIT_MAPPING_OBJECT_REQUIRED')
+            require(mapping.get('recurring_is_subset_of_gross_capex') is True,'REIT_EXPLICIT_SUBSET_DECLARATION_REQUIRED')
+            require(isinstance(mapping.get('evidence'),str) and mapping['evidence'].strip(),'REIT_MAPPING_EVIDENCE_REQUIRED')
+            checked=_reit_compatibility([bases['affo_bridge'],bases['gross_capex'],_reit_basis(mapping)])
+            overlap['basis_compatibility']=checked
+            require(checked['status']=='COMPATIBLE','REIT_MAPPING_SAME_KNOWN_BASIS_REQUIRED')
+            require(recurring is not None and capex_rows is not None and all(r['amount'] is not None for r in capex_rows),'REIT_MAPPING_AMOUNTS_REQUIRED')
+            allocations=_reit_components(mapping,'allocations',True)
+            require(allocations is not None and {r['id'] for r in allocations}=={r['id'] for r in capex_rows},'REIT_MAPPING_EXACT_COMPONENT_IDS_REQUIRED')
+            require(all(r['amount'] is not None for r in allocations),'REIT_MAPPING_AMOUNTS_REQUIRED')
+            caps={r['id']:r['amount'] for r in capex_rows}
+            require(all(r['amount']<=caps[r['id']] for r in allocations),'REIT_MAPPING_COMPONENT_CAP_EXCEEDED')
+            require(total(allocations,True)==recurring,'REIT_MAPPING_SUM_MUST_EQUAL_RECURRING_CAPEX')
+            overlap.update(status='DECLARED_MAPPING_RECONCILED',reason='Arithmetic of the declared subset allocation reconciles; no source authentication or growth/maintenance classification.',
+                allocations=[{'component_id':r['id'],'recurring_amount':r['amount'],
+                              'not_allocated_to_recurring':caps[r['id']]-r['amount']} for r in allocations])
+        except (ValueError,TypeError,KeyError) as exc:
+            overlap.update(status='UNRESOLVED_MAPPING',reason=str(exc))
+    fractions=[]
+    property_rows=document.get('property_fractions')
+    require(property_rows is None or isinstance(property_rows,list),'PROPERTY_FRACTION_LIST_REQUIRED')
+    for row in property_rows or []:
+        require(isinstance(row,dict) and isinstance(row.get('id'),str) and row['id'].strip(),'PROPERTY_FRACTION_ID_REQUIRED')
+        value=fraction(row['value']) if row.get('value') is not None else None
+        metadata={}
+        for key in ('denominator','time_anchor'):
+            val=row.get(key)
+            require(val is None or isinstance(val,str),'PROPERTY_FRACTION_METADATA_TEXT_OR_NULL')
+            metadata[key]=val if isinstance(val,str) and val.strip() and val.strip().lower()!='unknown' else None
+        fractions.append({'id':row['id'],'fraction':value,**metadata,'source_record':deepcopy(row),
+            'unresolved_fields':[k for k,v in metadata.items() if v is None],
+            'interpretation':'No lease-count, rent, area or calendar-year denominator/anchor is inferred.'})
+    require(len({r['id'] for r in fractions})==len(fractions),'DUPLICATE_PROPERTY_FRACTION_IDS')
+    if document.get('distributions') is not None:
+        distributions=document['distributions'];require(isinstance(distributions,dict),'REIT_DISTRIBUTIONS_OBJECT_REQUIRED')
+        bases['distributions']=_reit_basis(distributions)
+        paid=amount(distributions['amount'],minimum=0) if distributions.get('amount') is not None else None
+        for key,denominator,scope in (('ffo',ffo,['ffo_bridge']),('affo',affo,['ffo_bridge','affo_bridge']),
+                                      ('cfo_after_gross_capex',cash,['cfo','gross_capex'])):
+            checked=_reit_compatibility([bases[k] for k in [*scope,'distributions']])
+            ratio=paid/denominator if paid is not None and denominator is not None and denominator>0 else None
+            metrics['distribution_payout_to_'+key]={'denominator_metric_id':key,'denominator':denominator,
+                'distribution_amount':paid,'formula':'distributions / '+key,
+                'value':ratio if checked['status']=='COMPATIBLE' else None,
+                'conditional_same_basis_value':ratio if checked['status']=='UNKNOWN' else None,
+                'basis_compatibility':checked,'status':'MISSING_INPUT' if paid is None or denominator is None else 'UNDEFINED_RATIO' if denominator<=0 else 'COMPUTED' if checked['status']=='COMPATIBLE' else 'UNRESOLVED_BASIS',
+                'missing_components':[k for k,v in (('distributions',paid),(key,denominator)) if v is None],
+                'interpretation':'Ratio to the named measure only; not distribution safety or funding verification.'}
+        metric('cash_after_gross_capex_and_distributions',[term('cfo_after_gross_capex',cash),term('distributions',paid,-1)],
+               ['cfo','gross_capex','distributions'],'cfo - gross_capex - distributions','Arithmetic cash residual only')
+    return finish(document,'reit-cross-measure-reconciliation',
+        status='PARTIAL' if overlap['status']!='DECLARED_MAPPING_RECONCILED' or any(m['status']!='COMPUTED' for m in metrics.values()) or any(r['unresolved_fields'] or r['fraction'] is None for r in fractions) else 'COMPUTED',
+        metric_ledger=metrics,affo_adjustment_components=adjustments,capex_overlap=overlap,property_fractions=fractions,
+        limitation='Supplied issuer bridge only, not a standardized FFO/AFFO definition. Labels or equal amounts do not establish component overlap, growth/maintenance allocation, causal cash-flow reconciliation or distribution safety. Normalization policy is unchanged.')
+
+
+def reit_reconciliation(document,metadata_provenance=None):
+    """Declared arithmetic only; original-record binding uses reit_sources.analyze.
+
+    A workflow SOURCE role or supplied_observation label cannot establish that
+    an accounting basis belongs to the corresponding original operand.
+    """
+    from reit_sources import declared
+    return declared(document, metadata_provenance)

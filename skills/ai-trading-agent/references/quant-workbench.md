@@ -74,6 +74,7 @@ zero. Inputs cannot supply code, imports, shell commands or executable callbacks
 | `planning.vest_reconciliation`, `planning.portfolio_reconciliation` | Grant/share/sale distinctions and declared equity versus identified assets in `document` |
 | `planning.cash_reconciliation`, `planning.trade_history_costs`, `planning.session_pnl` | Explicit ledger/P&L basis and timing in `document`; no buying-power or missing-session inference |
 | `financial.owner_cash_bridge`, `financial.acquisition_cash` | Explicit financial periods, tax/cash assumptions and cash-flow scope in `document` |
+| `financial.reit_reconciliation` | Supplied issuer FFO/AFFO/CFO bridges and optional capex allocation in `document`; [contract](reit-reconciliation.md) |
 | `financial.price_scenarios`, `financial.terminal_scenarios`, `financial.corporate_action_return` | Dated price scenarios, whole-year operating model, or split/dividend return contract in `document` |
 | `financial.equity_cash_comparison` | Matched exact interval and capital derived after equity entry costs; counterfactual cash role, explicit cash conventions and separately bound terminal timing; [contract](equity-cash-comparison.md) |
 | `planning.source_allocation_context` | Whole identity/fund/issuer source records merged before every selected gross-notional exposure; [source adapters](source-exposure.md); explicit denominator, no inferred selections |

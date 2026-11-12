@@ -1,0 +1,113 @@
+{
+  "schema_version": 1,
+  "contract": {
+    "prompt": "Reconcile fictional issuer measures without inferring capex overlap.",
+    "purpose": "synthetic arithmetic and scope demonstration",
+    "base_currency": "EUR",
+    "horizon_id": "P1Y",
+    "as_of": "2029-02-01T00:00:00Z"
+  },
+  "jobs": [
+    {
+      "id": "reit-bridge",
+      "operation": "financial.reit_reconciliation",
+      "inputs": {
+        "document": {
+          "currency": "EUR",
+          "role": "supplied_observation",
+          "ffo_bridge": {
+            "definition": "Illustrative supplied unadjusted common-holder FFO reconciliation; issuer classification is caller-declared",
+            "basis": {
+              "amount_unit": "EUR thousands",
+              "period_start": "2028-01-01",
+              "period_end": "2028-12-31",
+              "holder_basis": "attributable to common holders"
+            },
+            "components": [
+              {
+                "id": "net_income",
+                "amount": 48
+              },
+              {
+                "id": "real_estate_depreciation",
+                "amount": 28
+              },
+              {
+                "id": "property_sale_gains",
+                "amount": -7
+              },
+              {
+                "id": "preferred_distribution",
+                "amount": -4
+              }
+            ]
+          },
+          "affo_bridge": {
+            "definition": "Illustrative issuer AFFO: supplied FFO minus rent adjustment and recurring capex",
+            "basis": {
+              "amount_unit": "EUR thousands",
+              "period_start": "2028-01-01",
+              "period_end": "2028-12-31",
+              "holder_basis": "attributable to common holders"
+            },
+            "adjustments": [
+              {
+                "id": "straight_line_rent",
+                "amount": -6
+              }
+            ],
+            "recurring_capex": 23
+          },
+          "cfo": {
+            "basis": {
+              "amount_unit": "EUR thousands",
+              "period_start": "2028-01-01",
+              "period_end": "2028-12-31",
+              "holder_basis": "attributable to common holders"
+            },
+            "amount": 54
+          },
+          "gross_capex": {
+            "basis": {
+              "amount_unit": "EUR thousands",
+              "period_start": "2028-01-01",
+              "period_end": "2028-12-31",
+              "holder_basis": "attributable to common holders"
+            },
+            "components": [
+              {
+                "id": "purchases",
+                "amount": 10
+              },
+              {
+                "id": "development",
+                "amount": 16
+              },
+              {
+                "id": "other",
+                "amount": 5
+              }
+            ]
+          },
+          "distributions": {
+            "basis": {
+              "amount_unit": "EUR thousands",
+              "period_start": "2028-01-01",
+              "period_end": "2028-12-31",
+              "holder_basis": "attributable to common holders"
+            },
+            "amount": 30
+          },
+          "property_fractions": [
+            {
+              "id": "scheduled_rollover",
+              "value": 0.18,
+              "denominator": null,
+              "time_anchor": null
+            }
+          ]
+        }
+      }
+    }
+  ]
+}

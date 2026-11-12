@@ -2,10 +2,8 @@
 name: ai-trading-agent
 description: Investment recommendations, reproducible equity and multi-asset research, portfolio risk, derivatives calculations, paper-event replay and native broker handoff across holding periods. Use for investment decisions, quantitative strategy evaluation, research and paper testing, and assessing evidence for actual host capabilities.
 ---
-
 # AI Trading Agent
-
-Package version: **5.7.4 - November 12, 2026**.
+Package version: **5.7.8 - November 12, 2026**.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent
 policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
@@ -19,16 +17,15 @@ See [proposal evaluation](references/execution-modes.md#evaluate-supplied-propos
 Only an explicit user request may change the policy. Ordinary prompts supply what to do, not which policy mode to use; ask clarifying questions where intent is missing.
 Re-read the task's file before each action. Initialize a new task's policy in paper; never inherit another task's mode or choose a bundled example as an active setting.
 An invalid, inaccessible or wrong-task policy is an error, never live authority.
-
 Research and pure payload formatting require no policy or approval. Research risk findings remain advisory; no grant, ticket, strategy promotion, volatility clearance
 or new numerical execution gate is introduced. Host/platform/broker requirements still apply. A policy setting cannot grant permissions the host does not have.
 Use actual host results: a recommendation, formatter output or empty response is not a fill. Read [broker handoff](references/broker-integration.md) for that boundary.
-
 Resolve all files relative to this SKILL.md. Keep the entire standalone folder; uploading only this file omits the implementation. Keep personal evidence and
 research archives outside the installed package. Run `scripts/research_preflight.py`
 when diagnosing research dependencies or package integrity. Missing components limit the calculations you can truthfully claim, not permission to execute.
 
 ## Start with the request and its evidence
+For supplied original-source REIT comparisons, use [integrated source research](references/supplied-research.md) to bind operands and retain conditional arithmetic. Preserve [source-known property meaning](references/reit-sources.md) separately from unknown scope. Use [final artifact composition](references/final-report.md) for supported REIT reports, verify the exact saved response and deliver its unchanged bytes; additional prose remains visibly unaudited. Replay does not certify source truth, complete task coverage or arbitrary prose.
 
 For public big-print, positioning and squeeze research, use [market sources](references/market-sources.md) and [market flow](references/market-flow.md).
 For a configurable event-driven U.S.-equity paper pilot, use [institutional research](references/institutional-research.md); real outcomes and host acceptance remain separate.
@@ -278,6 +275,7 @@ explicitly with `data.normalize_flows` and [flow-normalization.md](references/fl
 Run the installed normalizer; do not treat a missing input envelope as missing
 financial evidence or create a separate model-written TTM calculation.
 For statement education/comparisons, follow the [financial evidence and derivation contract](references/fundamental-toolkit.md#financial-statement-evidence).
+Use [REIT reconciliation](references/reit-reconciliation.md) for FFO/AFFO/CFO differences and unknown capex overlap. With an externally pinned original corpus, [leaf lineage](references/original-source-lineage.md) distinguishes source identity from accounting scope.
 For peer valuation, also verify the [numerator and cash-flow basis](references/fundamental-toolkit.md#valuation-numerator-and-cash-flow-basis) before recommending a multiple, including custom arithmetic.
 Preserve EPS period/numerator basis and comparator provenance; do not infer SBC issuance or covenant definitions. Use supported `fundamental.calculate` ratios and raw opening/closing or gross-profit operands.
 Derived observations are executed calculations, not assumptions. Retain source bindings and derived results, and reconcile intermediate inputs and every final narrative metric. Historical trend claims need a separate same-metric current/prior evidence row, including in the conclusion.
@@ -291,6 +289,7 @@ headlines, full reports, paywalls and inaccessible sources are different coverag
 For guidance clock/basis gaps, revisions and tool-attributed labels, use [source-bound news checks](references/news-evidence.md), preserving unknowns and arithmetic-only results. For a retained discovery/access ledger, use the [discovery check](references/news-and-guidance.md#check-a-retained-discovery-ledger)
 without requiring sentiment scoring. Keep excerpt-supported text candidates
 separate from configured issuer scope; lexical matches do not certify relevance.
+For publication/original-source fields, [audit the actual final ledger](references/news-and-guidance.md#audit-provenance-in-the-final-ledger) against retained declarations; preserve ambiguity and distinguish consistency from authenticity.
 Forward targets are analyst opinions, distinct from past 52-week ranges and
 intrinsic value. Social posts supply research leads, not authoritative facts.
 Use the analyst helper's population-scoped provenance when explaining dependence:

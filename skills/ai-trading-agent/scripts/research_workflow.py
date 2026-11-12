@@ -454,6 +454,11 @@ def build(raw, reader, artifact_writer=None, compact_evidence=False):
                         execution_args = copy.deepcopy(args)
                         execution_args['benchmark_provenance'] = equity_cash_comparison.benchmark_provenance(args, job_bindings)
                         execution_args['benchmark_provenance']['research_as_of'] = contract['as_of']
+                    if op == 'financial.reit_reconciliation':
+                        import reit_provenance
+                        require('metadata_provenance' not in args, 'REIT_METADATA_PROVENANCE_IS_WORKFLOW_DERIVED')
+                        execution_args = copy.deepcopy(args)
+                        execution_args['metadata_provenance'] = reit_provenance.derive(args, job_bindings)
                     request = {'schema_version': 1, 'contract': contract,
                                'jobs': [{'id': job['id'], 'operation': op, 'inputs': execution_args}]}
                     output = quant_report.build(encode(request), lambda *_: None, compact_evidence=compact_evidence)
@@ -776,20 +781,48 @@ def execute(request, output, request_role, source_roles=None, compact_evidence=F
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('schema', 'prepare', 'run', 'verify', 'summary', 'execute'))
+    parser.add_argument('command', choices=('schema', 'prepare', 'run', 'verify', 'summary', 'execute', 'source-run', 'source-verify', 'final-compose', 'final-verify'))
     parser.add_argument('input', nargs='?')
     parser.add_argument('--private-output-dir')
     parser.add_argument('--request-role')
     parser.add_argument('--compact-evidence', action='store_true', help='Lossless gzip object store and bounded reports; unchanged calculations.')
     parser.add_argument('--source-role', nargs=2, action='append', metavar=('PATH', 'ROLE'))
+    parser.add_argument('--manifest')
+    parser.add_argument('--manifest-sha256')
+    parser.add_argument('--source-root')
+    parser.add_argument('--final-response')
     args = parser.parse_args()
     try:
         require(not args.compact_evidence or args.command in ('run', 'execute'), 'COMPACT_RUN_OR_EXECUTE_ONLY')
-        if args.command != 'execute':
+        if args.command not in ('execute', 'source-run', 'source-verify', 'final-compose', 'final-verify'):
             require(DEPENDENCY_FAILURE is None, 'DEPENDENCY_UNAVAILABLE')
+        if args.command not in ('source-run', 'final-compose'):
+            require(args.manifest is None and args.manifest_sha256 is None and args.source_root is None,
+                    'SOURCE_RUN_OPTIONS_ONLY')
+        require(args.final_response is None or args.command == 'final-verify', 'FINAL_VERIFY_OPTION_ONLY')
         if args.command not in ('prepare', 'execute'):
             require(args.request_role is None and args.source_role is None, 'PREPARE_OPTIONS_ONLY')
-        if args.command == 'schema':
+        if args.command == 'final-compose':
+            require(args.input and args.private_output_dir and args.manifest and args.manifest_sha256,
+                    'FINAL_PLAN_MANIFEST_PIN_AND_OUTPUT_REQUIRED')
+            import final_report
+            print(final_report.compose(args.input, args.private_output_dir, args.manifest,
+                                       args.manifest_sha256, args.source_root)['status'])
+        elif args.command == 'final-verify':
+            require(args.input and not args.private_output_dir, 'DIRECTORY_REQUIRED')
+            import final_report
+            print(final_report.verify(args.input, args.final_response)['status'])
+        elif args.command == 'source-run':
+            require(args.input and args.private_output_dir and args.manifest and args.manifest_sha256,
+                    'SOURCE_REQUEST_MANIFEST_PIN_AND_OUTPUT_REQUIRED')
+            import supplied_research
+            print(supplied_research.run(args.input, args.private_output_dir, args.manifest,
+                                       args.manifest_sha256, args.source_root)['status'])
+        elif args.command == 'source-verify':
+            require(args.input and not args.private_output_dir, 'DIRECTORY_REQUIRED')
+            import supplied_research
+            print(supplied_research.verify(args.input)['status'])
+        elif args.command == 'schema':
             print(encode(catalog()).decode(), end='')
         elif args.command in ('prepare', 'execute'):
             require(args.input and args.private_output_dir, 'REQUEST_AND_OUTPUT_REQUIRED')

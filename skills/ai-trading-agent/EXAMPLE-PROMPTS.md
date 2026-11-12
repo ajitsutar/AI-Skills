@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-341 examples across 45 workflows, from first-time investing to quantitative research.
+345 examples across 46 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -28,7 +28,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Stock discovery and reproducible ranking](#stock-discovery-and-reproducible-ranking) | Intermediate to quant | 7 |
 | [Business analysis, valuation and value traps](#business-analysis-valuation-and-value-traps) | Intermediate to expert | 8 |
 | [Holding periods, catalysts and event risk](#holding-periods-catalysts-and-event-risk) | Intermediate | 6 |
-| [News, sentiment and between-quarter guidance](#news-sentiment-and-between-quarter-guidance) | Intermediate to quant | 12 |
+| [News, sentiment and between-quarter guidance](#news-sentiment-and-between-quarter-guidance) | Intermediate to quant | 13 |
 | [Analyst reports, consensus and financial information](#analyst-reports-consensus-and-financial-information) | Intermediate to expert | 10 |
 | [Social hypotheses, ownership and disclosure context](#social-hypotheses-ownership-and-disclosure-context) | Intermediate | 5 |
 | [Portfolio planning and investor decisions](#portfolio-planning-and-investor-decisions) | Beginner to expert | 8 |
@@ -64,6 +64,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Historical identity and coverage recovery](#historical-identity-and-coverage-recovery) | Research users and quantitative analysts | 2 |
 | [Public portfolio following](#public-portfolio-following) | Investors comparing public disclosures and follower strategies | 6 |
 | [Source study and withdrawal evidence](#source-study-and-withdrawal-evidence) | Researchers working from supplied offline data | 4 |
+| [Original-source REIT research and final reports](#original-source-reit-research-and-final-reports) | Researchers reviewing supplied REIT disclosures | 3 |
 
 ## Event-driven institutional paper research
 
@@ -458,48 +459,52 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 > Compare [CLAIMED LABELS AND VALUES] with exact JSON pointers in [SAVED HELPER RESULT]. Retain unsupported claims and actual values without changing the result, rerunning the original analysis or treating the audit as source authentication.
 
+### 87. Audit publication and original-source fields in the final ledger
+
+> Audit [FINAL SOURCE LEDGER JSON] against [ORIGINAL SOURCE INGRESS MANIFEST] and [EXTERNALLY FROZEN SHA256] using the provenance audit. Bind the actual final artifact and its field pointers, distinguish publication links from explicit original-source declarations, and show inconsistent, ambiguous and unaudited fields. Preserve original artifacts when correcting the ledger, re-audit changed bytes, and keep source authenticity, live access and independence unverified unless separate evidence establishes them.
+
 
 ## Analyst reports, consensus and financial information
 
 **Audience:** Intermediate to expert. Guides: [analyst research](references/analyst-research.md), [analyst source adapter](references/analyst-source-adapter.md).
 
-### 87. Build a stock information map
+### 88. Build a stock information map
 
 > Build an information coverage map for [COMPANY]: financials, valuation, guidance, forecasts, catalysts, ownership, capital allocation and material risks. Dynamically find relevant finance sites and retain source dates, lineage and access gaps.
 
-### 88. Find accessible analyst research
+### 89. Find accessible analyst research
 
 > Locate publicly accessible analyst reports and attributed research excerpts for [COMPANY], including credible opposing views. Distinguish a full report, a quoted recommendation, commentary, a snippet and a paywall.
 
-### 89. Calculate forward target consensus
+### 90. Calculate forward target consensus
 
 > Review forward [52-WEEK OR 12-MONTH] analyst targets for [COMPANY]. Match horizon, currency, share basis and original issue dates, then calculate the observed cohort's mean, median, range and IQR with independent-firm counts.
 
-### 90. Reconcile different website targets
+### 91. Reconcile different website targets
 
 > Compare consensus targets reported by [PROVIDERS]. Trace upstream data sources, population, as-of dates and definitions. Keep overlapping provider pools separate rather than averaging their averages.
 
-### 91. Review analyst track records
+### 92. Review analyst track records
 
 > Assess the analysts covering [COMPANY]. Find sourced success rates, average returns, sample counts, periods, benchmarks and holding rules; report missing definitions and distinguish provider-reported records from independently reproduced performance.
 
-### 92. Assess reputation and incentives
+### 93. Assess reputation and incentives
 
 > Evaluate [ANALYST OR AUTHOR]'s role, sector expertise, methodology, corrections and disclosed conflicts. Distinguish verifiable experience from firm prestige, followers or a few visible winning calls.
 
-### 93. Compare revisions without mixing metrics
+### 94. Compare revisions without mixing metrics
 
 > Review dated rating changes, target changes and EPS/revenue estimate revisions for [COMPANY]. Match firms, fiscal periods, currency and accounting basis, and separate genuine revisions from initiations or changed coverage.
 
-### 94. Separate fair value from price targets
+### 95. Separate fair value from price targets
 
 > Compare [INTRINSIC FAIR-VALUE ESTIMATE], forward analyst targets and the historical 52-week trading range for [COMPANY]. Explain their different meanings and why none alone establishes a probability of achieving my desired return.
 
-### 95. Extract analyst rows from a retained table
+### 96. Extract analyst rows from a retained table
 
 > Extract analyst records from [RETAINED HTML OR MARKDOWN TABLE] for [ISSUER AND CUTOFF]. Match columns by their labels and retain every accepted, excluded and conflicting row with its source location. Preserve target horizon, currency, share basis and access level; an aggregate table is not a full report and ambiguous rows must not be silently averaged.
 
-### 96. Compare earnings multiples on compatible bases
+### 97. Compare earnings multiples on compatible bases
 
 > Using [DATED QUOTE] and [INDIVIDUALLY SOURCED EPS ESTIMATES], calculate separately labeled multiples only for compatible periods, currencies, accounting definitions and share bases. Keep fiscal-year adjusted and rolling GAAP estimates distinct, preserve publication cutoffs, and report missing or nonpositive EPS without manufacturing a comparable multiple.
 
@@ -508,23 +513,23 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate. Guides: [research methods](references/research-methods.md), [screening and value traps](references/screening-and-value-traps.md).
 
-### 97. Research competing public narratives
+### 98. Research competing public narratives
 
 > Investigate bullish and bearish arguments about [COMPANY] on Reddit and accessible X posts. Deduplicate repeated claims, identify promotional interests and verify material facts with primary sources.
 
-### 98. Interpret insider transactions
+### 99. Interpret insider transactions
 
 > Review [INSIDER FILINGS] for [COMPANY]. Distinguish discretionary purchases/sales from awards, option exercises and tax withholding, including filing footnotes, amendments and transaction versus disclosure dates.
 
-### 99. Assess ownership changes carefully
+### 100. Assess ownership changes carefully
 
 > Review [INSTITUTIONAL OWNERSHIP REPORTS] for [COMPANY]. Identify reporting periods, filing delays, amendments and entity scope, and explain what the data cannot establish about current positions.
 
-### 100. Challenge a political-trading claim
+### 101. Challenge a political-trading claim
 
 > Investigate [PUBLIC CLAIM ABOUT A DISCLOSED TRADE]. Verify the original disclosure, transaction range, timing and amendments, and distinguish evidence from speculation about motive or future returns.
 
-### 101. Review short-interest and options narratives
+### 102. Review short-interest and options narratives
 
 > Check [SHORT-SQUEEZE OR OPTIONS-FLOW THESIS] using accessible dated evidence. Distinguish short interest, borrow conditions and options activity, including delays and unknown positioning, without treating a popular narrative as an entry signal.
 
@@ -533,35 +538,35 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Beginner to expert. Guides: [portfolio management](references/portfolio-management.md), [institutional manager](references/institutional-manager.md), [portfolio decision calculations](references/portfolio-decision-calculations.md), [planning input roles](references/planning-input-roles.md), [portfolio projection](references/portfolio-projection.md), [planning comparison](references/planning-comparison.md).
 
-### 102. Critique my current investments
+### 103. Critique my current investments
 
 > Review [HOLDINGS, CASH AND RECURRING CONTRIBUTIONS] for [HORIZON]. Assess issuer, sector and theme concentration, overlapping funds, employer exposure and the effect of future contributions before proposing changes.
 
-### 103. Manage employer-stock concentration
+### 104. Manage employer-stock concentration
 
 > Review [CURRENT EMPLOYER STOCK] and [NET VESTING SCHEDULE] from [ORIGINAL PORTFOLIO CONTEXT]. Compare the fixed baseline-continuation references: retain, sell net new vests, and sell existing direct shares plus net new vests. Carry supplied obligations and withdrawals, keep unknown balances unknown, and separate employment exposure and tax shares from spendable cash. Keep independent opening or event scenarios separate from these references; do not choose a preferred trade without my priorities.
 
-### 104. Compare portfolio allocations
+### 105. Compare portfolio allocations
 
 > Compare core, swing, intraday and cash allocations for [CAPITAL AND OBJECTIVES]. Explain concentration and loss scenarios without imposing sample weights or approval requirements on my account.
 
-### 105. Rebalance with contributions
+### 106. Rebalance with contributions
 
 > Use [HOLDINGS], [TARGETS] and a new contribution of [AMOUNT] to propose a cash-first rebalance. Apply drift bands and show residual imbalances, turnover and transaction constraints.
 
-### 106. Plan a withdrawal
+### 107. Plan a withdrawal
 
 > I need [AMOUNT] on [DATE]. Compare ways to raise the cash given settlement, liquidity, tax lots, concentration and long-term allocation effects. Produce a proposal without placing orders.
 
-### 107. Look through funds and share classes
+### 108. Look through funds and share classes
 
 > Analyze the combined issuer, sector and theme exposures in [STOCKS AND FUNDS]. Include overlapping holdings, multiple share classes and missing holdings data, then identify the main concentration risks.
 
-### 108. Compare funds for a portfolio role
+### 109. Compare funds for a portfolio role
 
 > Compare [FUNDS] for [ROLE AND HORIZON]. Evaluate holdings, diversification, fees, liquidity, tracking, distribution and tax considerations using appropriate fund evidence.
 
-### 109. Review tax-aware sale alternatives
+### 110. Review tax-aware sale alternatives
 
 > Using [LOT RECORDS], compare lot-selection proposals for selling [POSITION]. Estimate gains/losses and flag possible wash-sale issues, including uncertainty from other accounts and future purchases.
 
@@ -570,27 +575,27 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Beginner to quant; execution depends on verified broker support. Guides: [fractional shares](references/fractional-shares.md), [portfolio management](references/portfolio-management.md), [execution handoff](references/execution-handoff.md), [portfolio decision calculations](references/portfolio-decision-calculations.md).
 
-### 110. Invest a small dollar budget
+### 111. Invest a small dollar budget
 
 > Prepare an allocation and host handoff for [SECURITIES] using the full [DOLLAR BUDGET]. Preserve native dollar instructions where supported; explain fractional quantities, estimated costs and final-debit uncertainty without imposing whole-share or template cash restrictions.
 
-### 111. Plan one recurring contribution
+### 112. Plan one recurring contribution
 
 > For [CONTRIBUTION OCCURRENCE], calculate [DOLLAR AMOUNTS PER SECURITY] using fractional shares. Show rounding and any user-requested reserve, but retain the original per-symbol dollar amounts for a supported native dollar handoff. Label quantity and cash-debit outputs as reference-price estimates, not guaranteed market spending or submitted orders. Keep supplied account, plan and occurrence context with a standalone handoff artifact, using companion context when the broker schema has no matching fields. Produce the requested handoff without creating an unrequested future schedule or a local approval ticket.
 
-### 112. Compare fractional and whole-share implementation
+### 113. Compare fractional and whole-share implementation
 
 > Apply [TARGET WEIGHTS] to [HOLDINGS AND NEW CASH] in fractional and whole-share planning modes. Compare allocation drift, fees, feasible trades and leftover cash. Clearly label any offline increment assumptions and identify the broker evidence still needed for execution.
 
-### 113. Validate fractional execution capabilities
+### 114. Validate fractional execution capabilities
 
 > Inspect actual connected schemas and symbol tradability for [FRACTIONAL PROPOSALS]. Explain precision, minimums, quantity/notional semantics and fill reporting. Preserve requested native dollar-market instructions where supported rather than silently changing the order basis.
 
-### 114. Interpret fractional partial fills
+### 115. Interpret fractional partial fills
 
 > Review [FRACTIONAL ORDER AND CUMULATIVE FILLS] against observed broker records. Preserve exact filled and remaining quantities, explain actual fees and residual cash, and distinguish cumulative updates from new fills.
 
-### 115. Analyze a small tactical position
+### 116. Analyze a small tactical position
 
 > Calculate hypothetical fractional sizes for [ENTRY, STOP, TARGET, CASH AND LOSS SCENARIOS]. Show sensitivity to gaps and costs. Treat the calculation as advice; do not require protective orders or a volatility model before the host handoff.
 
@@ -599,35 +604,35 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Quant. Guides: [quant workbench](references/quant-workbench.md), [institutional manager](references/institutional-manager.md).
 
-### 116. Construct a constrained allocation
+### 117. Construct a constrained allocation
 
 > Run the allocation helper on [ASSETS, COVARIANCE AND MANDATE]. Enforce issuer/group, gross/net, cash, turnover, liquidity, volatility and scenario limits; show binding constraints and compare with a simple baseline.
 
-### 117. Investigate infeasibility
+### 118. Investigate infeasibility
 
 > Diagnose why [ALLOCATION INPUT] is infeasible. Identify conflicting constraints and show possible policy changes for review without silently relaxing limits or reporting an invalid allocation.
 
-### 118. Validate a return calibration
+### 119. Validate a return calibration
 
 > Audit [EXPECTED-RETURN CALIBRATION] before using it in portfolio construction. Check matching horizon and return units, training/test chronology, retained evidence and all variants; reject factor scores or analyst upside substituted for expected returns. Distinguish observed time gaps and evidence age from declared coverage and recency rules, and assess each retained statistical ledger separately from evidence labels. Do not invent continuous-coverage requirements or treat a solver result as calibration validation. Apply the selected workflow's field semantics and inherited metadata; separate paired-outcome dependence from invalid reuse. Keep policy-dependent checks conditional in the final recommendations and missing-requirements list; distinguish absent labels from unverified provenance and aggregate rankings from elementwise comparisons.
 
-### 119. Stress covariance assumptions
+### 120. Stress covariance assumptions
 
 > Recompute [PORTFOLIO PROPOSAL] under declared alternative covariance and scenario inputs. Compare weight stability, concentration and risk sensitivity; distinguish supplied assumptions from estimated or validated parameters.
 
-### 120. Evaluate costs and capacity
+### 121. Evaluate costs and capacity
 
 > Construct or compare allocations using [TURNOVER COSTS, IMPACT ASSUMPTIONS AND CAPACITY LIMITS]. Show how proposed weights change and where the portfolio exceeds plausible tradable size.
 
-### 121. Translate weights into feasible proposals
+### 122. Translate weights into feasible proposals
 
 > Review [CONTINUOUS TARGET WEIGHTS] against capital, share sizes, current holdings, unsettled cash, tax lots and broker capabilities. Identify rounding and implementation gaps rather than treating solver weights as executable orders.
 
-### 122. Constrain benchmark tracking risk
+### 123. Constrain benchmark tracking risk
 
 > Construct [PORTFOLIO] with the declared benchmark weights and tracking-volatility constraint. Compare it with the minimum-risk proposal and identify which active exposures consume the risk budget.
 
-### 123. Evaluate signed research weights
+### 124. Evaluate signed research weights
 
 > Evaluate [RESEARCH ALLOCATION] with explicit signed bounds, gross/net limits and supplied borrow availability and costs. Flag missing evidence and keep the result separate from unsupported live short-selling execution.
 
@@ -636,35 +641,35 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Advanced to quant. Guides: [garch volatility](references/garch-volatility.md), [quant workbench](references/quant-workbench.md), [portfolio management](references/portfolio-management.md), [risk diagnostics](references/risk-diagnostics.md).
 
-### 124. Run evidenced GARCH
+### 125. Run evidenced GARCH
 
 > Run the bundled GARCH(1,1) workflow on audited prices for [SYMBOL], with the declared Gaussian or Student-t innovation choice. Report data counts, convergence, stationarity and residual diagnostics, Student-t degrees of freedom when applicable, training/holdout separation, QLIKE against the baseline, forecast horizon and actual sizing eligibility. Preserve failed diagnostics rather than treating a fitted model as a reliable forecast.
 
-### 125. Compare asymmetric volatility models
+### 126. Compare asymmetric volatility models
 
 > Compare GARCH, GJR-GARCH and supported EGARCH forecasts on the same audited data and holdout. Record all variants, respect forecast-horizon limitations and separate volatility forecasts from direction.
 
-### 126. Use volatility as advice
+### 127. Use volatility as advice
 
 > Explain how [VOLATILITY RESULT] changes the risk interpretation of [ALLOCATION]. Compare it with simpler realized-volatility and stress estimates, disclose missing evidence and keep every diagnostic advisory rather than an execution gate.
 
-### 127. Estimate historical tail losses
+### 128. Estimate historical tail losses
 
 > Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps. If applying current weights to aligned asset returns, label the result a current-weight shock distribution rather than a historical strategy backtest. Report the supplied notional denominator, effective tail sample mass and sparse-sample warnings; do not scale a short sample into a guaranteed future loss limit. Calculate drawdown only from a supplied realized portfolio or strategy return path; do not infer historical strategy drawdown from today’s weights.
 
-### 128. Run portfolio stress scenarios
+### 129. Run portfolio stress scenarios
 
 > Stress [PORTFOLIO] under market, sector, issuer, rate, volatility and currency shocks appropriate to its instruments. Include every position and report loss concentrations, assumptions and unsupported pricing cases. For each requested risk dimension, identify the supplied mapping and inputs, what was computed, and what remains unquantified. Separate direct price/FX scenarios from factor shocks; do not infer zero or inapplicable economic exposure from absent model parameters.
 
-### 129. Assess a risk-model breach
+### 130. Assess a risk-model breach
 
 > Apply the monitoring helper to [OBSERVATIONS] with limits fixed before the result. Review stale data, coverage, realized versus forecast risk, costs and reconciliation errors without automatically retuning models or raising limits.
 
-### 130. Estimate covariance and component risk
+### 131. Estimate covariance and component risk
 
 > Estimate aligned-return covariance and component risk for [PORTFOLIO]. Review sample coverage, asset ordering and documented shrinkage settings, then show sensitivity without claiming an unimplemented estimator was run.
 
-### 131. Combine conditional portfolio variance paths
+### 132. Combine conditional portfolio variance paths
 
 > Combine [MARGINAL VARIANCE FORECASTS] with [DATED CORRELATION MATRIX], [CURRENT WEIGHTS] and [NOTIONAL] over [HORIZONS]. Preserve each model diagnostic and return-unit convention; distinguish cumulative, average-period and annualized volatility. State the fixed-correlation and cross-period assumptions, and do not turn this conditional approximation into a fitted multivariate model, loss ceiling or spending-target probability.
 
@@ -673,51 +678,51 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Advanced to quant. Guides: [data and analytics](references/data-and-analytics.md), [financial normalization](references/financial-normalization.md), [quant workbench](references/quant-workbench.md), [quant data contracts](references/quant-data-contracts.md), [source access](references/source-access.md).
 
-### 132. Audit prices before modeling
+### 133. Audit prices before modeling
 
 > Audit [PRICE FILE] for timestamp order, duplicates, missing sessions, timezones, price basis and large jumps. Investigate splits, dividends and real event moves instead of deleting inconvenient returns.
 
-### 133. Check action and share-basis consistency
+### 134. Check action and share-basis consistency
 
 > Reconcile [PRICE AND CORPORATE-ACTION FILES] with share counts and financial per-share metrics. Identify adjusted versus execution prices, ADR ratios and action dates that could distort ranking or backtests.
 
-### 134. Extract cutoff-admissible SEC facts
+### 135. Extract cutoff-admissible SEC facts
 
 > Use verified CIKs and my configured SEC contact identity to obtain primary financial data for [COMPANIES]. Preserve source bytes and extract only facts admissible at [CUTOFF], retaining amendments and accounting context.
 
-### 135. Resolve normalization failures
+### 136. Resolve normalization failures
 
 > Run strict normalization on [EVIDENCE RECORDS]. Explain missing concepts, periods, units, entity scope or source acceptance, and prepare a precise recovery backlog instead of imputing favorable values.
 
-### 136. Compare alternative data providers
+### 137. Compare alternative data providers
 
 > Compare [PROVIDER SNAPSHOTS] for the same securities and cutoff. Reconcile field definitions, fiscal periods, timestamps, price adjustments and missingness, then document which differences could change the result.
 
-### 137. Design a historical-vintage audit
+### 138. Design a historical-vintage audit
 
 > Audit [HISTORICAL DATASET] for membership changes, delistings, restatements, estimate revisions and publication availability. Identify which dates can support point-in-time research and which remain exploratory.
 
-### 138. Reconstruct trailing financial flows
+### 139. Reconstruct trailing financial flows
 
 > Reconstruct [TTM METRICS] from dated annual and interim filings. Avoid double-counting YTD periods, check fiscal calendars and amendments, and retain the source and calculation for each normalized value.
 
-### 139. Audit earnings-yield arithmetic
+### 140. Audit earnings-yield arithmetic
 
 > Audit [VALUATION SNAPSHOT] for mismatched price/EPS dates, trailing versus forward definitions, negative earnings and inconsistent share counts. Show which comparisons remain valid and which require correction.
 
-### 140. Resolve historical security identities
+### 141. Resolve historical security identities
 
 > Using [RETAINED IDENTITY SOURCES], reconstruct the listing, ticker and index-membership episodes known by [CUTOFF] for [DATE]. Preserve issuer and share-class identities, publication times and revision lineage. Report ambiguous or reused tickers instead of merging different securities, and distinguish missing evidence from an observed absence.
 
-### 141. Preserve historical feature revisions
+### 142. Preserve historical feature revisions
 
 > Map [RETAINED FINANCIAL, ANALYST OR SENTIMENT RECORDS] into a point-in-time feature dataset at [CUTOFF]. Keep source-row pointers, event and first-availability times, units, currency and revision identity. Bind records to the supplied security identities, retain superseded vintages and flag missing availability rather than substituting a fiscal or retrieval date.
 
-### 142. Reconcile revised price snapshots
+### 143. Reconcile revised price snapshots
 
 > Compare [PREVIOUS PRICE SNAPSHOT] with [CURRENT PRICE SNAPSHOT] under the same security, provider and adjustment contract. Report changed, added and removed sessions and invalidate the declared affected calculations. Reuse an unchanged prefix only with my explicit opt-in and current provider evidence; otherwise require a full refresh. Do not describe this supplied-data reconciliation as a completed download or measured speedup.
 
-### 143. Research with optional subscriptions across every tool
+### 144. Research with optional subscriptions across every tool
 
 > Research [REQUEST] using relevant accessible free sources by default across market data, fundamentals, news, analysts, options, macro, portfolio/risk and historical/backtest tools. I may provide existing paid access through the host. Use it only where it adds useful freshness, fields or coverage, preserving primary-source attribution and actual entitlement. If paid access is missing, expired or capped, continue supported free research and calculations and report the exact remaining gaps. Do not require a purchase, start a trial, infer a working API from a dashboard subscription or label delayed data live. Preserve any explicit offline or source-exclusive contract.
 
@@ -726,47 +731,47 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Quant. Guides: [quant research](references/quant-research.md), [quant workbench](references/quant-workbench.md), [research methods](references/research-methods.md), [experiment registry](references/experiment-registry.md).
 
-### 144. Create causal validation folds
+### 145. Create causal validation folds
 
 > Build purged expanding-window folds from [SAMPLES WITH FEATURE-AVAILABILITY AND LABEL-END TIMES]. Specify training size, test size and embargo; verify that overlapping outcomes and future features do not leak across splits.
 
-### 145. Measure uncertainty with serial dependence
+### 146. Measure uncertainty with serial dependence
 
 > Run HAC inference and a seeded block bootstrap on [ALIGNED NET-EXCESS RETURNS]. Declare lag and block choices before evaluating results, and compare uncertainty with a naive independent-observation assumption.
 
-### 146. Control multiple testing
+### 147. Control multiple testing
 
 > Use the full trial registry [REGISTRY] to apply the supported multiple-testing and qualified Sharpe diagnostics. Report all attempted variants, their dependence assumptions and anything that prevents a valid adjusted claim.
 
-### 147. Attribute returns to factors
+### 148. Attribute returns to factors
 
 > Regress [EXCESS RETURNS] on [ALIGNED FACTORS] using the supported factor/HAC workflow. Show exposure, residual performance and uncertainty without interpreting correlation as a causal edge.
 
-### 148. Preregister a strategy experiment
+### 149. Preregister a strategy experiment
 
 > Write a research contract for [STRATEGY]: universe, horizon, signal, costs, benchmark, variants, untouched evaluation window and acceptance criteria. Identify data and statistical-design gaps before running it.
 
-### 149. Review strategy evidence
+### 150. Review strategy evidence
 
 > Evaluate [STRATEGY VERSION] using retained development, validation, untouched-test and forward observations. Recompute the chosen quantitative criteria, inspect data/code hashes and all variants, and explain confidence and limitations without creating a live-promotion requirement.
 
-### 150. Test sensitivity without hindsight
+### 151. Test sensitivity without hindsight
 
 > Evaluate [FROZEN STRATEGY] against prespecified neighboring parameters, delayed fills, missed trades and worse costs. Keep all outcomes and distinguish robustness analysis from selecting a new winner on the test set.
 
-### 151. Evaluate a challenger model
+### 152. Evaluate a challenger model
 
 > Compare [CHAMPION] and [CHALLENGER] on the same frozen contract and genuinely new paper observations. Separate implementation agreement, forecast calibration, net performance and operational changes before recommending replacement.
 
-### 152. Retain failed and revised experiment attempts
+### 153. Retain failed and revised experiment attempts
 
 > Create [PRIVATE EXPERIMENT REGISTRY] for [RESEARCH CAMPAIGN] and register the frozen prompt, data vintages, runtime, selection rule and accounting conventions before execution. Retain successful, failed and abandoned outcomes with their actual evidence. Record changed assumptions as linked new attempts; audit missing or modified artifacts without overwriting losing runs or claiming the local journal proves a complete research history.
 
-### 153. Audit overlapping experiment windows
+### 154. Audit overlapping experiment windows
 
 > Review [REGISTERED ATTEMPTS], including failed trials, for overlap between screening, training, labels and evaluation periods. Show which comparisons reuse selection information and which data arrived after the declared cutoff. Keep late registrations visible and distinguish an overlap diagnostic from a multiple-testing correction or proof that a holdout was globally untouched.
 
-### 154. Capture a prospective paper prediction
+### 155. Capture a prospective paper prediction
 
 > For [PREVIOUSLY REGISTERED PAPER ATTEMPT], retain [ACTUAL PREDICTION OR TARGET WEIGHTS] after its decision time and before its target time, with source cutoff and execution assumptions. Later attach the actual outcome, accounting and benchmark evidence. Preserve missed or duplicate capture failures; do not backdate historical results, send orders or create a recurring schedule.
 
@@ -775,31 +780,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Advanced to quant. Guides: [quant workbench](references/quant-workbench.md), [research methods](references/research-methods.md), [strategy playbook](references/strategy-playbook.md).
 
-### 155. Replay a period portfolio
+### 156. Replay a period portfolio
 
 > Run the portfolio simulator on [CAUSAL DECISIONS AND TOTAL RETURNS], including cash, benchmark, tradability, costs, impact and trade-value capacity. Verify that decisions precede returns and explain simulator limitations.
 
-### 156. Backtest the intraday baseline
+### 157. Backtest the intraday baseline
 
 > Replay the supported opening-range-breakout setup on [INTRADAY DATA]. Use completed-bar decisions, costs and conservative fills; disclose stop/target ordering ambiguity and facts the bars cannot establish.
 
-### 157. Compare daily and intraday engines
+### 158. Compare daily and intraday engines
 
 > Choose the appropriate bundled simulator for [STRATEGY AND DATA]. Explain which settlement, fill, latency and portfolio behaviors it models and which require separate paper observations.
 
-### 158. Compare after-cost benchmarks
+### 159. Compare after-cost benchmarks
 
 > Compare [BACKTEST] with cash and suitable passive benchmarks at comparable exposure. Report net returns, drawdowns, turnover and cost stress rather than choosing a winner solely by gross return or Sharpe.
 
-### 159. Design a forward-paper study
+### 160. Design a forward-paper study
 
 > Create a forward-paper protocol for [FROZEN STRATEGY]. Specify decision/quote/fill observations, performance and operational criteria, and the independent evidence needed before considering live use.
 
-### 160. Audit an impressive backtest
+### 161. Audit an impressive backtest
 
 > Review [BACKTEST BUNDLE] for survivor bias, revised data, look-ahead, trial selection, unrealistic fills, omitted costs and overlapping labels. Identify what can be reproduced and what cannot support the performance claim.
 
-### 161. Run the daily trend baseline
+### 162. Run the daily trend baseline
 
 > Run the bundled daily SMA research baseline on [AUDITED DAILY DATA]. Use its actual chronological rules and costs, compare it with a passive baseline and explain why a successful replay does not establish a profitable strategy.
 
@@ -808,39 +813,39 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Advanced to quant; research scope. Guides: [multi asset playbook](references/multi-asset-playbook.md), [quant workbench](references/quant-workbench.md).
 
-### 162. Choose the supported instrument route
+### 163. Choose the supported instrument route
 
 > Review [INSTRUMENT LIST] and map each position to the skill's supported research, pricing and risk functions. Identify required data and unsupported live execution rather than representing derivatives as shares.
 
-### 163. Price a European option scenario
+### 164. Price a European option scenario
 
 > Use the supported European option model with [SPOT, STRIKE, MATURITY, VOLATILITY, RATE AND DIVIDEND ASSUMPTIONS]. Calculate price and sensitivities, check parity where applicable and disclose model limitations.
 
-### 164. Identify unsupported option assumptions
+### 165. Identify unsupported option assumptions
 
 > Assess [OPTION OR HEDGE] for exercise style, payoff, settlement and volatility assumptions. Distinguish the European-only model from bounded vanilla American CRR support, identify the explicit inputs missing for that route, and state the limits for exotic payoffs and discrete dividends.
 
-### 165. Analyze a fixed bond
+### 166. Analyze a fixed bond
 
 > Price [NONCALLABLE FIXED CASH FLOWS] using the supplied zero curve and spread. Evaluate rate/spread scenarios and explain why callable, prepayable or credit-default features need additional models.
 
-### 166. Stress futures exposure
+### 167. Stress futures exposure
 
 > Evaluate [FUTURES POSITIONS] with explicit contract multipliers, currencies and price shocks, including negative-price cases when relevant. Separate scenario P&L from actual margin and settlement requirements.
 
-### 167. Stress foreign-currency exposure
+### 168. Stress foreign-currency exposure
 
 > Evaluate [POSITIONS AND FX SHOCKS] in [BASE CURRENCY]. Reconcile currency conversion, contract units and collateral assumptions, and identify missing exposures.
 
-### 168. Compare hedge scenarios
+### 169. Compare hedge scenarios
 
 > Compare [HEDGE CANDIDATES] under common portfolio shocks and stated costs. Show basis risk, scenario protection, residual exposure and pricing or execution capabilities that remain unavailable.
 
-### 169. Build a multi-asset mandate
+### 170. Build a multi-asset mandate
 
 > Draft a mandate for [ASSETS AND OBJECTIVES] with explicit permitted instruments, leverage, liquidity, collateral, risk budgets and benchmarks. Keep research capabilities separate from verified broker execution support.
 
-### 170. Stress illiquid commitments
+### 171. Stress illiquid commitments
 
 > Stress [PRIVATE-ASSET COMMITMENTS AND DISTRIBUTION ASSUMPTIONS] through the cash-ladder and cash-flow tools. Evaluate funding gaps and XIRR sensitivity while distinguishing assumed cash flows from an independently valued private asset.
 
@@ -849,27 +854,27 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate to quant. Guides: [settled cash planning](references/settled-cash-planning.md), [quant workbench](references/quant-workbench.md), [planning input roles](references/planning-input-roles.md), [portfolio projection](references/portfolio-projection.md), [planning comparison](references/planning-comparison.md).
 
-### 171. Compare a cash buffer
+### 172. Compare a cash buffer
 
 > Model [DAY-TRADING PLAN] with an optional reserve of [DOLLARS OR PERCENT OF EQUITY]. Compare settlement paths and available cash under observed account conventions; present the buffer as advice, not a skill-imposed trade gate.
 
-### 172. Plan staggered cash usage
+### 173. Plan staggered cash usage
 
 > Given [POSITIONS, EXPECTED TRADES AND CASH], compare settlement-aware trading schedules. Use current broker availability and calendars rather than assuming alternating groups of stocks automatically avoid funding gaps.
 
-### 173. Build a currency cash ladder
+### 174. Build a currency cash ladder
 
 > Run the cash-ladder helper on [SETTLED BALANCES, RESERVATIONS AND CONFIRMED EVENTS]. Enforce currency-specific floors and identify when liabilities exceed available funds.
 
-### 174. Analyze reservations and debits
+### 175. Analyze reservations and debits
 
 > Analyze [ORDER RESERVATIONS AND DEBITS] for double counting and account cash-flow differences. Match confirmed events, retain source evidence and explain unknown outcomes. This is accounting analysis, not a local execution lock.
 
-### 175. Review a funding shortfall
+### 176. Review a funding shortfall
 
 > Review [CASH-LADDER RESULT] for a settlement or collateral shortfall. Distinguish confirmed credits from expected sales and propose feasible timing or size changes without assuming unavailable cash can be spent.
 
-### 176. Check a withdrawal against trading
+### 177. Check a withdrawal against trading
 
 > Combine [WITHDRAWAL PLAN] and [TRADING PLAN] to assess settled-cash availability, reserved amounts and liquidity floors through [DATE]. Show conflicts before any order or withdrawal proposal.
 
@@ -878,35 +883,35 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate to quant. Guides: [portfolio management](references/portfolio-management.md), [quant workbench](references/quant-workbench.md), [portfolio decision calculations](references/portfolio-decision-calculations.md).
 
-### 177. Measure investment performance
+### 178. Measure investment performance
 
 > Calculate time-weighted performance from [VALUATIONS AND EXTERNAL FLOWS]. Separate deposits and withdrawals from investment P&L and disclose missing valuations or timing ambiguity.
 
-### 178. Calculate my money-weighted return
+### 179. Calculate my money-weighted return
 
 > Compute XIRR from [DATED CONTRIBUTIONS, DISTRIBUTIONS AND TERMINAL VALUE]. Check signs and whether the cash-flow pattern supports the conventional calculation; compare it with time-weighted return.
 
-### 179. Explain active return
+### 180. Explain active return
 
 > Run the supported Brinson attribution using [BEGINNING PORTFOLIO/BENCHMARK GROUP WEIGHTS AND RETURNS]. Include cash and reconcile allocation, selection and interaction effects to the active result.
 
-### 180. Measure execution shortfall
+### 181. Measure execution shortfall
 
 > Decompose [ORDER AND FILL RECORDS] using decision, arrival and terminal prices. Include fees, partial fills and unfilled opportunity cost, and compare buys and sells with the correct signs.
 
-### 181. Review results by sleeve
+### 182. Review results by sleeve
 
 > Compare core, swing and intraday performance from [JOURNAL]. Use appropriate benchmarks, flow treatment and net costs, and distinguish investment effects from execution problems or policy deviations.
 
-### 182. Challenge a win-rate claim
+### 183. Challenge a win-rate claim
 
 > Review [TRADE HISTORY] using average win/loss, expectancy, drawdown, costs, exposure and uncertainty. Explain why win rate alone does not establish a profitable or scalable strategy.
 
-### 183. Reconcile the cash ledger
+### 184. Reconcile the cash ledger
 
 > Reconcile [OPENING CASH, TRADES, DIVIDENDS, FEES AND EXTERNAL FLOWS] with [BROKER CASH]. Identify discrepancies and unconfirmed events before calculating spendable cash or investment performance.
 
-### 184. Compare tax-lot proposals
+### 185. Compare tax-lot proposals
 
 > Compare the supported FIFO, HIFO and specific-lot proposals for [SALE AND COST-BASIS RECORDS]. Show gain/loss differences and potential wash-sale flags, with unresolved outside-account information retained.
 
@@ -915,31 +920,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate to expert. Guides: [short term trading](references/short-term-trading.md), [strategy playbook](references/strategy-playbook.md), [portfolio decision calculations](references/portfolio-decision-calculations.md), [planning input roles](references/planning-input-roles.md).
 
-### 185. Prepare a session brief
+### 186. Prepare a session brief
 
 > Prepare an intraday brief for [WATCHLIST]. Verify session times, current catalysts, earnings, halts, liquidity, spreads and data freshness; disclose missing inputs before identifying setups.
 
-### 186. Build an intraday watchlist
+### 187. Build an intraday watchlist
 
 > Start from the configured stock universe and apply [PRICE, LIQUIDITY AND SPREAD FILTERS] to build a tactical watchlist. Separate membership, tradability and entry-signal qualification.
 
-### 187. Analyze an opening-range setup
+### 188. Analyze an opening-range setup
 
 > Evaluate the opening-range-breakout research example for [SYMBOL] using completed bars. Report range, trigger, invalidation, reference exits, costs and evidence limitations. The simulated rules are not execution conditions.
 
-### 188. Reject premature confirmation
+### 189. Reject premature confirmation
 
 > Review [CHART OR BAR DATA] for a possible breakout. Distinguish completed from unfinished candles, dated quotes and missing event evidence. Explain how these limitations affect the research conclusion without imposing an execution pause.
 
-### 189. Size a paper trade after costs
+### 190. Size a paper trade after costs
 
 > For [ENTRY, STOP, TARGET AND CAPITAL], calculate affordable whole-share size, planned loss and net reward/risk. Include pending exposure, spread/slippage assumptions and the possibility that valid size is zero.
 
-### 190. Run a supervised paper session
+### 191. Run a supervised paper session
 
 > Simulate a research session for [WATCHLIST] from available completed bars. Use declared setup rules, conservative fills and a journal. Report missing observations and the limits of the simulation without implying a background service or imposing execution conditions.
 
-### 191. Handle losses and closing risk
+### 192. Handle losses and closing risk
 
 > Review today's marked positions, trades and pending orders. Explain realized/unrealized losses, gap and closing risk, and possible responses as advice. Report the actual host/broker state without imposing a new-entry stop or requiring a monitoring lease.
 
@@ -948,39 +953,39 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** All levels; actual broker support and user authorization required. Guides: [execution handoff](references/execution-handoff.md), [fractional shares](references/fractional-shares.md), [allocation policy](references/allocation-policy.md), [portfolio decision calculations](references/portfolio-decision-calculations.md).
 
-### 192. Recommend and hand off one allocation
+### 193. Recommend and hand off one allocation
 
 > Research [UNIVERSE] for [HORIZON] and recommend how to invest the full [BUDGET]. I also instruct the connected host to place those purchases at market. Preserve that instruction without adding skill approvals, grants, tickets, volatility conditions or price-drift thresholds; state recommendation uncertainty honestly.
 
-### 193. Use my existing order instruction
+### 194. Use my existing order instruction
 
 > Prepare the host handoff for [EXISTING ORDER INSTRUCTION]. Preserve the requested amounts and order type without asking again because research prices or quote timestamps changed.
 
-### 194. Keep market-price uncertainty informational
+### 195. Keep market-price uncertainty informational
 
 > For [MARKET ORDER REQUEST], state the research as-of and explain possible market-price and fee differences. I accept that uncertainty; do not pause or request reapproval based on price movement, spreads or quote age.
 
-### 195. Preserve a native dollar amount
+### 196. Preserve a native dollar amount
 
 > Prepare [DOLLAR ALLOCATION] for a host that supports native dollar-market instructions. Preserve the amount and explain whether the broker estimates shares from a recent trade price, so final debit may differ. Do not silently round to whole shares.
 
-### 196. Preserve an explicit limit instruction
+### 197. Preserve an explicit limit instruction
 
 > Prepare a handoff for [SYMBOL, SIDE, QUANTITY AND USER-SPECIFIED LIMIT]. Preserve my supplied limit exactly; the skill should not replace it with a market order or invent a new price condition.
 
-### 197. Keep research findings advisory
+### 198. Keep research findings advisory
 
 > Explain the concentration, earnings, volatility, spread and liquidity risks of [ORDER REQUEST], then preserve my existing host instruction. Do not turn any research finding or sample allocation constraint into an execution veto.
 
-### 198. Compare stock choices for a small amount
+### 199. Compare stock choices for a small amount
 
 > Give me [NUMBER] alternative stocks, each suitable for investing the full [BUDGET] for [HORIZON]. Compare dated catalysts, valuation, evidence and downside. Treat them as alternatives rather than splitting the amount unless I ask.
 
-### 199. Handle a recurring request clearly
+### 200. Handle a recurring request clearly
 
 > Prepare the requested fractional contribution [AMOUNTS AND SECURITIES] and distinguish one occurrence from a broker-native recurring schedule. Preserve any scheduling instruction I actually gave; do not claim a local calculation installed a schedule.
 
-### 200. Explain a broker rejection
+### 201. Explain a broker rejection
 
 > Interpret [ACTUAL BROKER RESPONSE] and separate the broker or platform requirement from this skill. Report exactly what happened without inventing a local live policy or readiness checklist.
 
@@ -989,43 +994,43 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Expert; broker and authorization dependent. Guides: [execution handoff](references/execution-handoff.md), [host execution integration](references/host-execution-integration.md), [broker integration](references/broker-integration.md).
 
-### 201. Inspect actual connected tools
+### 202. Inspect actual connected tools
 
 > Inspect the available broker tool schemas for [REQUEST]. Explain supported market/share/dollar/limit inputs and actual broker requirements without creating a skill capability gate or inventing unavailable tools.
 
-### 202. Prepare a pure handoff
+### 203. Prepare a pure handoff
 
 > Pass [ORDER DETAILS] through execution_handoff.handoff or its CLI. Verify that it preserves the supplied order, needs no runtime policy, grants or evidence, and makes no broker network call.
 
-### 203. Compare exact payloads
+### 204. Compare exact payloads
 
 > Compare [REQUESTED ORDER PAYLOAD] with [HOST HANDOFF]. Identify changes to side, amount, quantity, type, account routing or time-in-force. Do not equate a correctly formatted payload with a submitted or filled order.
 
-### 204. Explain an empty connector response
+### 205. Explain an empty connector response
 
 > The connector returned an empty object for [ORDER]. Interpret available JSON-RPC errors, MCP isError, content and structured content without assuming acceptance or rejection. Keep credentials and private identifiers out of the report; actual broker reconciliation belongs to the host.
 
-### 205. Interpret known partial fills
+### 206. Interpret known partial fills
 
 > Explain [PARTIAL FILL RECORDS], including cumulative quantity, average price, actual fees, remaining quantity and total spent. Report unknowns without creating a local reservation gate or changing other requested orders.
 
-### 206. Review historical order evidence
+### 207. Review historical order evidence
 
 > Review [BROKER HISTORY EXPORT] for account/status/date scope, pagination and missing pages. Distinguish a lack of matching evidence from proof that no order exists. Make no broker writes for this review.
 
-### 207. Record observed outcomes privately
+### 208. Record observed outcomes privately
 
 > Create a private factual journal of [HOST/BROKER RESPONSES]. Distinguish requested, submitted, accepted, partially filled, filled and unknown outcomes; never fabricate broker status from a local identifier.
 
-### 208. Check handoff privacy
+### 209. Check handoff privacy
 
 > Test the handoff CLI using fictional account and authentication fields. Verify sensitive values are redacted in its display while the in-memory API preserves the host payload. Do not include actual credentials.
 
-### 209. Explain responsibilities
+### 210. Explain responsibilities
 
 > Explain which parts of [WORKFLOW] are research, optional payload formatting, host submission, broker acceptance, monitoring and accounting. Identify actual unsupported host features without describing them as skill policy restrictions.
 
-### 210. Audit legacy migration
+### 211. Audit legacy migration
 
 > Review [OLDER INSTALLATION] for conflicting execution instructions. Verify that current policy modes, selected-file loading and host guidance agree. Preserve private historical data, do not activate a sample policy, and do not change the user-selected mode without an explicit request.
 
@@ -1034,39 +1039,39 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** All levels. Guides: [research memory](references/research-memory.md), [research handoff](references/research-handoff.md).
 
-### 211. Save a reusable research campaign
+### 212. Save a reusable research campaign
 
 > Save [COMPLETED RESEARCH] in a local immutable library with source evidence, mandate, full-universe coverage, inputs, decisions and replay results. Keep private records outside the distributable skill.
 
-### 212. Refresh without repeating everything
+### 213. Refresh without repeating everything
 
 > Use optional partial fetch for [SUPPLIED PORTABLE CAMPAIGN BUNDLE] at [NEW CUTOFF]. Verify its manifest and current source-index evidence before reusing unchanged statements. Refresh membership, quotes, full history/actions, estimates, news and events; rerank the whole eligible universe. Fall back to fresh acquisition for missing or incompatible evidence and retain original retrieval times and parent hashes.
 
-### 213. Use the same optional partial fetch across models
+### 214. Use the same optional partial fetch across models
 
 > Have Codex, Muse or Claude use optional partial fetch with [EXPLICIT PORTABLE BUNDLE] and [CURRENT SOURCE CHECKS]. Use the same skill interface rather than relying on hidden model caches. Keep fresh acquisition as the default without opt-in, disclose fallbacks and label shared reuse as shared acquisition, not an independent research replication.
 
-### 214. Resume an incomplete full-market scan
+### 215. Resume an incomplete full-market scan
 
 > Resume [RESEARCH ARCHIVE] from its actual outstanding acquisition and evidence backlog. Preserve successful work, retry appropriately and report whether remaining gaps can change the research or final-selection result.
 
-### 215. Detect changed assumptions
+### 216. Detect changed assumptions
 
 > Compare the prior and current research inputs for [COMPANIES]. Identify changed facts, guidance, events, normalization assumptions and mandate settings, and explain which conclusions must be reconsidered.
 
-### 216. Preserve correction provenance
+### 217. Preserve correction provenance
 
 > Correct [KNOWN RESEARCH ERROR] with supporting source bytes and an explicit audit trail. Preserve the original snapshot and show the effect of rerunning the same calculation and decision contract.
 
-### 217. Create a clean research handoff
+### 218. Create a clean research handoff
 
 > Prepare a portable handoff for [CAMPAIGN] with the actual prompt, contract, data, evidence decisions, coverage and hashes. Keep broker credentials, account identifiers and copyrighted full reports out of the shared package.
 
-### 218. Distinguish archive integrity from source freshness
+### 219. Distinguish archive integrity from source freshness
 
 > Audit [SAVED CAMPAIGN] for reuse at [NEW CUTOFF]. Verify its archive bytes, then distinguish that result from actual issuer/release-index checks covering the cutoff. Preserve source_currentness NOT_ASSESSED and primary reuse UNKNOWN where current evidence is missing, even if snapshot values match. Run feasible historical diagnostics through the source-bound workflow with the retained scorer/profile and horizon. Do not describe unchanged primary evidence as revalidated without the check evidence.
 
-### 219. Save an honestly partial refresh
+### 220. Save an honestly partial refresh
 
 > Save the feasible work from [PARTIAL REFRESH] as a new archive linked to its parent manifest. Keep original source publication and retrieval times, separately record the archive time and any actual new checks, and retain gaps for primary-source currency, prices, news, membership and event coverage. Preserve the saved campaign method and holding period unless I change them. Do not relabel an archive timestamp or a successful historical rerank as fresh acquisition.
 
@@ -1075,31 +1080,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Advanced to quant. Guides: [model independent research](references/model-independent-research.md), [quant workbench](references/quant-workbench.md), [research handoff](references/research-handoff.md), [PROVENANCE](PROVENANCE.md), [SOURCES](SOURCES.md), [THIRD PARTY NOTICES](THIRD-PARTY-NOTICES.md).
 
-### 220. Replay a numerical research bundle
+### 221. Replay a numerical research bundle
 
 > Verify [BUNDLE] and rerun its computations from frozen code, profile, data and parameters. Compare actual outputs using the documented numeric tolerance and exact decision/status checks.
 
-### 221. Compare models on identical inputs
+### 222. Compare models on identical inputs
 
 > Prepare a blinded comparison of [MODEL A] and [MODEL B] using the same complete skill, contract and frozen data. Compare numerical results, exclusions and decisions separately from explanation quality.
 
-### 222. Explain different stock lists
+### 223. Explain different stock lists
 
 > Reconcile [RESULT A] and [RESULT B] across universe, cutoff, horizon, profile, data freshness, coverage, prior preferences and review decisions. Distinguish candidate overlap from buy-eligibility agreement.
 
-### 223. Compare independent data acquisition
+### 224. Compare independent data acquisition
 
 > Have each authorized research environment acquire fresh evidence for [SAME MANDATE]. Compare data lineage and coverage before comparing picks; do not label this the same experiment as frozen-input replay.
 
-### 224. Audit a final-selection claim
+### 225. Audit a final-selection claim
 
 > Run the handoff and report checks on [RESEARCH RESULT]. Verify saved release/index evidence, ranking-relevant acquisition failures, review order and unresolved primary or horizon requirements.
 
-### 225. Review method provenance
+### 226. Review method provenance
 
 > Review [METHOD OR SCRIPT] for its actual mathematical assumptions, implementation provenance, dependencies and attributed sources. Distinguish original integration code from imported libraries and data-use rights.
 
-### 226. Freeze calculation defaults
+### 227. Freeze calculation defaults
 
 > Reconcile [CURRENT REQUEST AND CASE CONTEXT] with [RAW QUANT INPUTS], retaining each material value, unit, frequency, horizon, cost and constraint with its provenance. Preserve explicit inputs even when a file omits them, expose conflicts, then use the helper's operation contract to materialize optional defaults and identify missing required inputs. Record the prepared-input hash and runtime, compute and verify the frozen bundle, and check that the explanation agrees with resolved inputs and actual outputs without inventing data.
 
@@ -1108,31 +1113,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Expert to quant. Guides: [institutional manager](references/institutional-manager.md), [capabilities and limits](references/capabilities-and-limits.md).
 
-### 227. Run a manager-style review
+### 228. Run a manager-style review
 
 > Review [PORTFOLIO AND MANDATE] across data quality, theses, construction, risk, costs, accounting and operations. Prioritize unresolved decisions and distinguish analysis support from custody or audited fund administration.
 
-### 228. Audit institutional readiness
+### 229. Audit institutional readiness
 
 > Assess this deployment against the skill's current capability inventory. Separate implemented/tested software, empirically validated investment effectiveness and available data or operational dependencies.
 
-### 229. Plan a point-in-time research database
+### 230. Plan a point-in-time research database
 
 > Design a coverage-first historical-data plan for [STRATEGY AND HORIZON]. Identify which public records can be reconstructed, which observations must be archived prospectively and which gaps may require licensed data.
 
-### 230. Design a sentiment validation study
+### 231. Design a sentiment validation study
 
 > Plan an adjudicated test of issuer matching, timestamp handling, negation and material-event classification for [NEWS DATA]. Separate extraction accuracy from a later causal, after-cost return study.
 
-### 231. Design an analyst-skill study
+### 232. Design an analyst-skill study
 
 > Specify the recommendation ledger, price history, entry/exit rules, benchmark and bias controls needed to measure analyst performance independently. Audit available data before trusting provider rankings or constructing weights.
 
-### 232. Review host operational evidence
+### 233. Review host operational evidence
 
 > Review a host-provided offline failure drill for empty responses, disconnects, partial fills and restarts. Distinguish observed behavior from untested claims. Do not create local execution gates or claim this skill controls the host.
 
-### 233. Maintain the documentation
+### 234. Maintain the documentation
 
 > Review the latest implemented capabilities, update the README as a current usage guide and refresh the example-prompt catalog without a fixed count. Regenerate the examples and run the documentation release check before packaging.
 
@@ -1141,15 +1146,15 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Investors, research authors and quantitative reviewers. Guides: [report facts](references/report-facts.md).
 
-### 234. Report facts from a quant bundle
+### 235. Report facts from a quant bundle
 
 > Create a private JSON facts artifact and a readable Markdown report from [QUANT BUNDLE]. Retain source hashes and pointers, computation and nested result status, supported units and denominators, and explicit missing or unknown metadata. Distinguish modeled portfolio equity drawdown from return-series drawdown, and report rejected jobs without stale numeric results. Explain what requires a separate calculation or source check.
 
-### 235. Explain a public VQM queue from retained facts
+### 236. Explain a public VQM queue from retained facts
 
 > Create a private report-facts table from [PUBLIC VQM BUNDLE] and render the supported facts in Markdown. Preserve the actual queue order, score ties, exact score strings, supported factor definitions, source pointers and coverage limitations. Distinguish research rank from investment eligibility and leave unsupported measurement metadata unknown.
 
-### 236. Add declared labels to selected source fields
+### 237. Add declared labels to selected source fields
 
 > Use [CUSTOM BINDINGS] to add selected exact source pointers from [BUNDLE] to a private report-facts artifact. Keep custom metric names, units, basis and horizon explicitly declared and unverified, preserve the built-in facts, and expose missing pointers. Render a readable report without treating custom labels as semantic proof or evaluating expressions.
 
@@ -1158,31 +1163,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Research authors, traders and quantitative reviewers. Guides: [run and report](references/run-and-report.md).
 
-### 237. Run and report explicit quant jobs
+### 238. Run and report explicit quant jobs
 
 > Use [WORKBENCH REQUEST] to compute supported jobs and produce a private quant_report bundle, facts and Markdown report. Retain the original request, actual defaults and computation outcomes, then verify numerical replay and canonical report regeneration. Preserve nested infeasibility or ambiguous-cashflow outcomes without calling them successful investment conclusions.
 
-### 238. Bind calculations to supplied source objects
+### 239. Bind calculations to supplied source objects
 
 > For the explicitly selected operations and fields in [REQUEST], bind each complete inputs object to its local file SHA-256 and JSON pointer, then run quant_report. Preserve explicit parameters and report source-selection conflicts. Do not treat a matching hash as proof that a model chose the right object.
 
-### 239. Explain a partially computable campaign
+### 240. Explain a partially computable campaign
 
 > Run [QUANT REQUEST] with its missing required fields left missing. Report each computed and noncomputed job, resolved optional defaults and retained facts. Distinguish partial calculation coverage from missing source evidence; do not invent observations or silently switch algorithms.
 
-### 240. Report separate analyst cohorts
+### 241. Report separate analyst cohorts
 
 > Use analyst_report on [STRUCTURED ANALYST RECORDS] and [LOCAL SOURCE ROOT]. Preserve distinct issuer, currency, price-basis and target-horizon cohorts, included and excluded records, provider pools and provider-reported track records. Render pointer-bound facts and state unresolved provider discrepancies without averaging incompatible pools.
 
-### 241. Separate targets from fair value and price history
+### 242. Separate targets from fair value and price history
 
 > Report [ANALYST REQUEST] with supplied fair-value estimates, historical price ranges and source-access records as typed supplemental evidence. Keep them outside forward-target calculations and retain missing fields and evidence limitations. Do not turn reported success rates into an unsupported analyst reputation weight.
 
-### 242. Inspect exact handoff preservation
+### 243. Inspect exact handoff preservation
 
 > Create a private advisory handoff_report from [SOURCE FILE], [SHA256] and [REQUEST POINTER]. Compare [PROPOSED PAYLOAD BINDING] and explain any differences in dollar versus share amounts, order type, time in force or routing. Preserve the selected original payload, omit private details from shared output, and add no execution gate or broker action.
 
-### 243. Distinguish reproducibility from model adherence
+### 244. Distinguish reproducibility from model adherence
 
 > Compare [MODEL OUTPUTS] against their retained quant or analyst reports. Report helper invocation, artifact completeness, numerical replay, source-selection fidelity and narrative agreement separately. Preserve old results and explicitly list missing acquisitions and unsupported custom algorithms instead of declaring them fixed by a successful helper test.
 
@@ -1191,79 +1196,79 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Investors, portfolio analysts and quantitative reviewers. Guides: [research alignment](references/research-alignment.md), [run and report](references/run-and-report.md), [portfolio decision calculations](references/portfolio-decision-calculations.md), [planning input roles](references/planning-input-roles.md), [portfolio projection](references/portfolio-projection.md), [planning comparison](references/planning-comparison.md), [flow normalization](references/flow-normalization.md).
 
-### 244. Audit selected and ignored inputs
+### 245. Audit selected and ignored inputs
 
 > Bind [REQUEST] to its allowed source files and JSON pointers. Distinguish actual account observations, the mandate, scenarios and sample policies; retain selected, unused and conflicting fields. Check record identity and metadata dates before calculating, and explain what the receipt cannot infer about my intent.
 
-### 245. Audit source availability and acquisition coverage
+### 246. Audit source availability and acquisition coverage
 
 > Inventory [SOURCE PACKET] against its allowlist and byte hashes. Keep missing bytes, unknown security types, confirmed exclusions, publication dates, retrieval dates and unavailable acquisition receipts distinct. Execute applicable retained-source and report checks; do not interpret absent failure records as a verified successful acquisition.
 
-### 246. Preserve a flexible review date
+### 247. Preserve a flexible review date
 
 > Review [HOLDING] until [COMPARISON DATE] as an intended horizon, not a forced sale. Use the horizon router, retain an existing entry date if supplied and report event coverage through its actual endpoint. Label any proposed planning deadlines without moving my review date to a prior trading session.
 
-### 247. Audit the requested scoring method
+### 248. Audit the requested scoring method
 
 > Compare the requested ranking profile and implementation with [OBSERVED RESEARCH]. Bind both profiles to retained bytes and show method or parameter mismatches. Run the requested supported scorer and preserve its queue; explain that method identity alone does not prove execution, undervaluation or a buy recommendation.
 
-### 248. Size a purchase after explicit costs
+### 249. Size a purchase after explicit costs
 
 > Use the trade-cost contract to calculate [ORDER] against [BUDGET] with the supplied quantity increment, slippage and fee units. Separate quoted notional from after-cost debit and both sides of a round trip. Treat the calculation as an estimate and add no execution permission requirement.
 
-### 249. Find the cash trough at actual withdrawal times
+### 250. Find the cash trough at actual withdrawal times
 
 > Use [DATED CASH EVENTS] to calculate the lowest modeled available balance and the largest gap to my planning floor. Preserve actual withdrawal demand times and trade settlement availability; keep future stock grants outside cash funding. Disclose missing confirmations and broker buying-power evidence.
 
-### 250. Project interest with an intermediate withdrawal
+### 251. Project interest with an intermediate withdrawal
 
 > Project [CASH PLAN] using the supplied annual-effective rate and exact event dates. Remove withdrawals when they occur, disclose the day-count basis and reconcile opening cash, flows, interest and ending cash. Do not infer borrowing after an unfunded cash shortfall.
 
-### 251. Reconcile gross vesting, taxes, shares and cash
+### 252. Reconcile gross vesting, taxes, shares and cash
 
 > Reconcile [RSU GRANTS] into gross shares, shares withheld, shares sold for taxes and net shares. Show future assumed values separately from observed settled sale proceeds, without pooling different dates into current portfolio concentration or treating tax withholding as the final tax liability.
 
-### 252. Reconcile portfolio denominators
+### 253. Reconcile portfolio denominators
 
 > Look through [POSITIONS AND FUNDS], compare declared account equity with identified assets and explicit cash, and show unexplained differences. Label concentration against each denominator. Model supplied contribution-only changes at explicit unchanged marks without assuming that a no-sales example makes concentration permanent.
 
-### 253. Separate session and lifetime performance
+### 254. Separate session and lifetime performance
 
 > Review [POSITIONS AND TRADES] for session P&L only where prior marks, flows, distributions, fees and session timing support it. Keep cost-basis unrealized P&L separate. Show gross and net trade statistics and decline unsupported attribution of losses to investment versus execution causes.
 
-### 254. Reconcile owner cash without unsupported addbacks
+### 255. Reconcile owner cash without unsupported addbacks
 
 > Build the explicit cash bridge for [FINANCIAL RECORDS]: reported CFO, all capex, maintenance-only cash, growth reinvestment, acquisitions, working capital and SBC treatment. Separate earnings adjustments from cash adjustments and retain missing cash timing or tax evidence as unresolved.
 
-### 255. Distinguish acquisition cash from deal value
+### 256. Distinguish acquisition cash from deal value
 
 > Model [ACQUISITION SCENARIOS] with stated synergy ramps, delays, integration cash and financing tax treatment. Calculate share dilution and incremental cash by year. Compute total deal NPV only from a separately complete acquisition cash-flow contract; do not equate negative interim synergy cash with destruction of deal value.
 
-### 256. Build terminal valuation and reinvestment sensitivities
+### 257. Build terminal valuation and reinvestment sensitivities
 
 > Run [VALUATION CONTRACT] with its explicit revenue, margin, shares, debt, exit multiples, capex and working-capital assumptions. Retain terminal share price, dividends, both-side costs, total return and present value as distinct fields. Calculate the declared sensitivities and expose missing interim cash flow or financing assumptions.
 
-### 257. Reconcile splits, dividends and return windows
+### 258. Reconcile splits, dividends and return windows
 
 > Calculate price and non-reinvested total returns from [CORPORATE ACTIONS AND MARKS]. Preserve old/new share basis and dividend dates, and do not claim a requested terminal return when its final mark is missing. Keep provider EPS publication dates attached to their own security and period.
 
-### 258. Test a causal dual moving-average strategy
+### 259. Test a causal dual moving-average strategy
 
 > Run the explicit dual-SMA long/cash strategy on [COMPLETED DAILY BARS] with my fast/slow windows, next-open delay, costs, capital fraction and terminal policy. Retain every declared variant, pending unfilled orders, both-side fees and marked equity. Check that later data changes cannot change earlier signals or fills.
 
-### 259. Preserve the opening-range baseline
+### 260. Preserve the opening-range baseline
 
 > Run the supported opening-range breakout on [COMPLETED INTRADAY BARS], retaining its strategy identity, opening-bar count, cadence, volume rule, next-open timing, sizing, stops, target and buffered exit. Report the exact parameters and input hash without substituting a different range or enabling shorts.
 
-### 260. Check whether a study contains forward observations
+### 261. Check whether a study contains forward observations
 
 > Assess [PAPER STUDY] against its protocol window, freeze time, decision/outcome availability, data kind and implementation evidence. Keep synthetic, retrospective and inadmissible rows out of the declared forward count. Compare supplied code identities and change records without claiming that matching prose proves fill agreement.
 
-### 261. Check risk and numerical explanations
+### 262. Check risk and numerical explanations
 
 > Compare [COVARIANCE MATRICES OR HEDGE SCENARIOS] using the supported arithmetic checks. Show individual variance multipliers, ratio changes, every option-expiry payoff and assumed residual hedge sensitivity. Use typed comparisons for numerical statements, retaining unknown units, exact inequality boundaries and declared floating-point tolerances. Distinguish supplied scenario rows from algebraically established payoff-model properties; state the price domain, hedge coverage and costs, and separate conditional model bounds from real-world guarantees.
 
-### 262. Verify complete model-alignment evidence
+### 263. Verify complete model-alignment evidence
 
 > Evaluate [TWO FROZEN MODEL RUNS] on request fidelity, helper invocation, complete artifacts, numerical replay and the final explanation separately. Keep original failed runs, review every new response against the allowed evidence and report remaining gaps. Do not present matching calculations as a guarantee of identical future investment decisions.
 
@@ -1272,43 +1277,43 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Investor to quant. Guides: [source bound workflow](references/source-bound-workflow.md), [evidence semantics](references/evidence-semantics.md), [ranking alignment](references/ranking-alignment.md).
 
-### 263. Run research from original fields
+### 264. Run research from original fields
 
 > Analyze these supplied files through the source-bound workflow. Bind the calculation inputs to exact source fields, identify unused material inputs, and return the generated report with assumptions and unresolved questions.
 
-### 264. Audit a report projection
+### 265. Audit a report projection
 
 > Verify whether this numeric report preserves every canonical fact from its source bundle, including rejections and unknowns. Show any altered, missing or added fields and preserve valid custom facts.
 
-### 265. Reconcile price and earnings identity
+### 266. Reconcile price and earnings identity
 
 > Before comparing these valuation multiples, check security identity, currency, fiscal period, accounting definition and split basis. Distinguish missing metadata from a demonstrated mismatch.
 
-### 266. Handle imprecise catalysts
+### 267. Handle imprecise catalysts
 
 > The contract renewal is known only to a year and the earnings event only to a month. Compare those ranges with my intended hold without inventing event dates.
 
-### 267. Separate facts from inferred states
+### 268. Separate facts from inferred states
 
 > Review the quoted borrow fee, review flag, proposed gold labels and performance residual. Tell me which states are evidenced and which availability, selection, adjudication or causal claims remain unknown.
 
-### 268. Replay the matching scorer
+### 269. Replay the matching scorer
 
 > Identify the scoring profile bound to this retained snapshot, replay only its compatible installed scorer, and distinguish the requested production route from a separately labeled historical diagnostic.
 
-### 269. Compare decisions without false agreement
+### 270. Compare decisions without false agreement
 
 > Compare these two ranked research outputs on candidates, scores, horizon, preferences and reviewed decisions. Treat dimensions missing on both sides as unknown, not agreement.
 
-### 270. Check numeric conclusions against artifacts
+### 271. Check numeric conclusions against artifacts
 
 > Use result pointers to verify these stated conclusions against the actual calculation outputs. Preserve the units, denominators, horizons and nested evidence states in the final answer.
 
-### 271. Review after the last cash event
+### 272. Review after the last cash event
 
 > Reconcile the complete cash path through every deferred purchase and withdrawal. Show unknown intraday settlement ordering and signed shortfalls rather than stopping at an earlier favorable balance.
 
-### 272. Respect an offline research scope
+### 273. Respect an offline research scope
 
 > Analyze only the attached frozen data, with no network acquisition. Run all supported calculations, retain missing source limitations, and separate that offline result from any proposed future data collection.
 
@@ -1317,23 +1322,23 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate to quant. Guides: [technical toolkit](references/technical-toolkit.md), [analysis contracts](references/analysis-contracts.md).
 
-### 273. Compute a declared indicator set
+### 274. Compute a declared indicator set
 
 > Analyze [TICKER] for a [HOLDING PERIOD] using my dated OHLCV file. Compute EMA, RSI, MACD, Bollinger bands, ATR, ADX, stochastic, OBV and Ichimoku with explicit periods, seed conventions, warmup nulls and price-adjustment basis. Retain the frozen calculation and distinguish observations from trade hypotheses.
 
-### 274. Compare session and anchored VWAP
+### 275. Compare session and anchored VWAP
 
 > Using these intraday bars and explicit exchange-session labels, compare session VWAP with VWAP anchored at [TIMESTAMP]. Explain the volume/price basis and do not reconstruct intraday VWAP from daily bars.
 
-### 275. Plot declared levels and candle patterns
+### 276. Plot declared levels and candle patterns
 
 > Render an SVG chart from my retained OHLCV bars with moving averages and Bollinger bands. Show the supplied Fibonacci swing and causal support/resistance, report candlestick rule definitions, and label bar-based volume profile as an approximation.
 
-### 276. Replay an indicator hypothesis after costs
+### 277. Replay an indicator hypothesis after costs
 
 > Freeze this indicator hypothesis and parameters before evaluation. Replay close-time signals at subsequent bar opens using supplied costs, preserve missing/warmup periods, and compare with buy-and-hold. Do not choose parameters using the evaluation period.
 
-### 277. Inspect supplied market depth
+### 278. Inspect supplied market depth
 
 > Calculate spread and size imbalance from this timestamped depth snapshot. Keep the result separate from historical OHLCV indicators and explain why the snapshot cannot establish executable liquidity or a durable signal.
 
@@ -1342,27 +1347,27 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate to expert. Guides: [fundamental toolkit](references/fundamental-toolkit.md), [analysis contracts](references/analysis-contracts.md).
 
-### 278. Compare accounting screen variants
+### 279. Compare accounting screen variants
 
 > Using attached comparable annual financials, calculate Piotroski, Altman and Beneish where applicable. Freeze the exact model variants and asset denominators, cite each source fact, and retain missing values and invalid domains instead of filling them.
 
-### 279. Reconcile operating forecasts and DCF
+### 280. Reconcile operating forecasts and DCF
 
 > Build a five-year annual forecast from my explicit operating and financing assumptions. Reconcile income, cash and balance sheets; calculate FCFF and FCFE valuations with the appropriate discount basis and an explicit equity bridge. Report omitted accounting items.
 
-### 280. Solve price-implied cash growth
+### 281. Solve price-implied cash growth
 
 > Use reverse DCF to solve the constant cash-flow growth implied by [PRICE] under my supplied assumptions. Preserve the growth bracket, terminal cash convention, discount rate and share basis; report failure if the target is outside the bracket.
 
-### 281. Compare three valuation approaches
+### 282. Compare three valuation approaches
 
 > Apply dividend discount, residual income and sum-of-parts to these supplied inputs. Keep enterprise value, total equity and per-share value distinct, and show where the business model or evidence makes a method inapplicable.
 
-### 282. Evaluate accounting ratios consistently
+### 283. Evaluate accounting ratios consistently
 
 > Compute ROIC, PEG, liquidity, interest coverage, margins and DuPont ROE from these statements. State growth units, average-versus-ending balance choices and reasons for any unavailable result.
 
-### 283. Simulate declared valuation assumptions
+### 284. Simulate declared valuation assumptions
 
 > Run a seeded Monte Carlo valuation using my explicit triangular discount-rate, terminal-growth and cash-flow-multiplier assumptions. Retain the distributions and seed; label the output as scenario quantiles rather than estimated probabilities.
 
@@ -1371,23 +1376,23 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate to quant. Guides: [sentiment toolkit](references/sentiment-toolkit.md), [analysis contracts](references/analysis-contracts.md).
 
-### 284. Separate sentiment by company and aspect
+### 285. Separate sentiment by company and aspect
 
 > Analyze these retained articles by company and by revenue, earnings, balance sheet, guidance and governance. Bind each score to its exact text span and timestamp; keep ambiguous targets, missing aspects and contradictory evidence visible.
 
-### 285. Measure dated sentiment changes
+### 286. Measure dated sentiment changes
 
 > Build a sentiment series at these declared cutoffs with explicit source weights, half-life and event deduplication. Use prior observations only for normalization, and keep unknown sentiment separate from neutral or balanced evidence.
 
-### 286. Use an optional local financial classifier
+### 287. Use an optional local financial classifier
 
 > Check whether my locally supplied, version-pinned sentiment model and runtime are available and permitted for my stated use. Verify model-file hashes and label mapping, infer on bound spans without downloads, and report unavailable components without substituting another model.
 
-### 287. Evaluate sentiment calibration and performance
+### 288. Evaluate sentiment calibration and performance
 
 > Evaluate supplied prediction probabilities against held-out labels, then replay a frozen long/cash sentiment rule over these subsequent return intervals with costs. Report calibration and incremental performance separately; do not infer profitability from classification accuracy.
 
-### 288. Combine declared research signals
+### 289. Combine declared research signals
 
 > Combine my normalized sentiment, technical and positioning observations using explicit fixed weights and information cutoffs. Report coverage and unavailable features; do not describe the composite as a trained or validated trading policy.
 
@@ -1396,19 +1401,19 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Quant. Guides: [factor toolkit](references/factor-toolkit.md), [analysis contracts](references/analysis-contracts.md).
 
-### 289. Normalize a dated sector cross-section
+### 290. Normalize a dated sector cross-section
 
 > Winsorize these point-in-time fundamental metrics within sectors at explicit quantiles and compute population z-scores. Preserve membership dates, missing data, small groups and constant features.
 
-### 290. Attribute returns to Fama French factors
+### 291. Attribute returns to Fama French factors
 
 > Fit FF3 and FF5 to my aligned decimal returns and factor observations. Preserve geography and frequency, report per-period alpha, exposures and residual variation, and avoid claiming in-sample attribution is predictive alpha.
 
-### 291. Measure generic style exposure risk
+### 292. Measure generic style exposure risk
 
 > Using supplied exposures, factor covariance and specific variances, decompose this portfolio variance and residualize scores against declared styles. Distinguish this generic implementation from proprietary Barra data and models.
 
-### 292. Explore fundamental structure without leakage
+### 293. Explore fundamental structure without leakage
 
 > Fit PCA and seeded k-means on this training-only fundamental matrix and apply the saved transformation to held-out rows. Report scaling, convergence and stability limitations before treating clusters as economic peers.
 
@@ -1417,23 +1422,23 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Quant. Guides: [derivatives toolkit](references/derivatives-toolkit.md), [multiasset platform](references/multiasset-platform.md).
 
-### 293. Value a vanilla American option
+### 294. Value a vanilla American option
 
 > Price this supplied vanilla option with explicit exercise style, continuous dividend yield, risk-free rate and CRR steps. Compare increasingly fine grids, retain residual differences, and state unsupported discrete dividends or deliverables.
 
-### 294. Recover model-implied volatility
+### 295. Recover model-implied volatility
 
 > Given this observed option premium per underlying unit, solve implied volatility under the supplied model, bracket and price tolerance. Preserve nonconvergence or nonidentifiability; do not substitute a price model or infer realized volatility.
 
-### 295. Separate FX forward from forecast
+### 296. Separate FX forward from forecast
 
 > Compute the covered-interest forward from these explicitly oriented currency rates and compounding assumptions. Show domestic-per-foreign units, forward points and omitted basis/costs; do not label it a spot forecast.
 
-### 296. Reconcile bond value and accrued interest
+### 297. Reconcile bond value and accrued interest
 
 > Value my supplied complete fixed noncallable bond cashflows using the explicit yield and ACT365F discount clock. Show dirty value, accrued interest and clean price; state when my actual market convention is unsupported.
 
-### 297. Reconcile futures variation and costs
+### 298. Reconcile futures variation and costs
 
 > Reconcile this linear futures settlement series using the exact multiplier, tick, contract count and currency rounding. Include negative prices and fees, and distinguish variation P&L from funded notional, margin and physical delivery.
 
@@ -1442,23 +1447,23 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Quant. Guides: [paper exchange](references/paper-exchange.md), [platform readiness](references/platform-readiness.md), [multiasset platform](references/multiasset-platform.md).
 
-### 298. Replay hypothetical multi-asset events
+### 299. Replay hypothetical multi-asset events
 
 > Replay this paper-only event packet containing equities, bonds, spot crypto, futures and funded FX. Reconcile cash, receivables, positions, fees and currency translation. Do not infer fills from price touches or present the scenario as a broker execution.
 
-### 299. Test cancellation and restart scenarios
+### 300. Test cancellation and restart scenarios
 
 > Use these fictional order/fill/cancellation events to test partial fills, cancellation races, duplicate delivery and deterministic full-journal restart. Preserve failures and explain which native-host recovery behaviors remain untested.
 
-### 300. Model explicit option exercise
+### 301. Model explicit option exercise
 
 > Replay my long vanilla option exercise/expiry scenario with exact strike, multiplier, exercise style and deliverable. Reconcile strike cash and underlying shares; do not infer automatic exercise or short assignment.
 
-### 301. Audit production scope by asset class
+### 302. Audit production scope by asset class
 
 > Assess the supplied evidence catalog for stocks/ETFs, options, futures, FX, bonds and crypto on my existing native host. Separate research, paper and live coverage. Retain missing and conflicting evidence and never equate mathematical support with broker support.
 
-### 302. Check actual native host support
+### 303. Check actual native host support
 
 > Inspect only available read-only native-host capabilities for my requested asset/order/session. Distinguish observed schemas from dated product documentation. Report unsupported or unverified scope without inventing another broker or placing trades.
 
@@ -1467,15 +1472,15 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Quant. Guides: [time series toolkit](references/time-series-toolkit.md).
 
-### 303. Simulate a declared GBM scenario
+### 304. Simulate a declared GBM scenario
 
 > Simulate these supplied GBM assumptions with explicit price basis, measure, drift, volatility, horizon, grid and seed. Distinguish real-world assumptions from risk-neutral pricing, preserve model units and show analytic versus sampled moments. Do not infer a calibrated forecast.
 
-### 304. Measure causal trend derivatives
+### 305. Measure causal trend derivatives
 
 > Calculate backward price velocity and acceleration on these irregular timestamps with explicit time and value units. Preserve warmup, availability and price-adjustment conventions; do not use future observations or describe finite differences as exact instantaneous derivatives.
 
-### 305. Normalize a fixed pair without leakage
+### 306. Normalize a fixed pair without leakage
 
 > Fit the supplied fixed-pair OLS relationship using only the frozen training window, then normalize the holdout spread using training residual dispersion. Retain conditioning failures and distinguish spread z-scores from cointegration, arbitrage or executable short trades.
 
@@ -1484,51 +1489,51 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Quantitative researcher. Guides: [portable quant](references/portable-quant.md), [costed bar replay](references/costed-bar-replay.md), [vintage eligibility](references/vintage-eligibility.md), [terminal return coverage](references/terminal-return-coverage.md).
 
-### 306. Inspect local capability
+### 307. Inspect local capability
 
 > Check this host with scripts/research_preflight.py and the existing workbench operation catalog. Distinguish bundled point-in-time selection and costed bar replay from optional statsmodels, QuantLib and VADER calculations. Report package integrity, actual installed versions and unavailable operations. Importability alone is not a completed calculation; use the local skill without a backend or service.
 
-### 307. Select historical revisions
+### 308. Select historical revisions
 
 > Use examples/point-in-time-data.json as the format for my supplied observations and run data.asof_snapshot at [AS_OF]. Retain instrument IDs, event and availability timestamps, revision IDs, units, currency and source declarations. Show selected revisions, exclusion counts and hashes; explain that recorded availability and licensing are supplied claims, not independently verified facts. Use this timestamp-only route only with source-supported timestamps and metadata; otherwise preserve missing inputs and use the vintage eligibility audit.
 
-### 308. Bound historical value eligibility without invented times
+### 309. Bound historical value eligibility without invented times
 
 > Audit these supplied historical values and revisions using data.vintage_eligibility. For each exact value and basis, retain its source pointer, first publication, next superseding publication, and any explicitly declared inclusive basis start and exclusive basis end. Show dates before first publication, publication and amendment boundary days, and the intervening conditional window. Preserve date-only precision and unknown same-day availability; do not invent timestamps, assume an estimate revision from incompatible provider rows, or certify complete point-in-time research from a conditional window.
 
-### 309. Include a delisting return exactly once
+### 310. Include a delisting return exactly once
 
 > Audit my supplied delisting event and price/return series with data.terminal_return_coverage. Preserve the terminal return, verify event-specific provider methodology or reconciliation evidence for whether the series already includes it, and separate embedded, not embedded and unknown coverage. Do not infer inclusion from the series ending on the delisting date. Apply the event once when absent, avoid reapplication when included, and leave missing values or unknown coverage unresolved without assuming zero or a total loss. Keep this condition explicit in the final report.
 
-### 310. Fit a forecast explicitly
+### 311. Fit a forecast explicitly
 
 > Use my frozen observations in the format of examples/portable-quant-arima.json and run portable.arima. Keep the declared as-of time, currency, units, frequency, [p,d,q], trend, forecast steps, maxiter, diagnostic_lags and alpha explicit, with input_basis set to caller_declared_frozen_inputs. Report convergence, residual diagnostics, model-conditional intervals and runtime versions. Preserve failure instead of emitting an unconverged forecast; distinguish fitting from held-out accuracy or profitability.
 
-### 311. Test cointegration
+### 312. Test cointegration
 
 > Run portable.cointegration on my frozen aligned series using examples/portable-quant-cointegration.json as the format. Preserve y0 as dependent and y1 as regressor, their units, frequency, as-of time and currency, and the explicit trend, maxlag, autolag and significance settings. Set input_basis to caller_declared_frozen_inputs. Explain the no-cointegration null, unverified I(1) assumption, directional normalization and multiple-pair testing limits; significance alone does not establish a profitable pairs strategy.
 
-### 312. Price a vanilla option
+### 313. Price a vanilla option
 
 > Run portable.european using examples/portable-quant-european.json as the template for my supplied European call or put. Preserve spot, strike, volatility, flat continuous interest and dividend yields, currency and exact dates; evaluation_date must match the UTC as-of date and day_count must be Actual365Fixed. Report the QuantLib version, value per underlying unit and Greek units, including vega and rho per 1.0 absolute change and theta per year. State the limits for American exercise and discrete dividends.
 
-### 313. Compare named sentiment baseline
+### 314. Compare named sentiment baseline
 
 > Run portable.vader on my supplied English texts using the format in examples/portable-quant-vader.json, with explicit as-of time and currency. Preserve input order and the original neg, neu, pos and compound scores, and record the actual local package version. Explain that lexical tone does not establish entity-specific sentiment, publication timing or a calibrated financial prediction. If VADER is unavailable, retain that failure.
 
-### 314. Paper-test with costs
+### 315. Paper-test with costs
 
 > Run backtest.costed_bars on my frozen document using examples/costed-bar-replay.json as the template. Preserve as_of, currency, asset class, initial cash, quantity step, all bar and signal availability times, spread/slippage/fee basis points, fixed fee, participation and carry-or-cancel policy. Fill only at opens strictly after both the source close and signal availability, using prior available volume as a liquidity proxy. Reconcile partial fills, fees, cash, held position and final pending quantity; do not invent final liquidation or observed liquidity.
 
-### 315. Replay all six portable examples
+### 316. Replay all six portable examples
 
 > Run the unchanged fictional examples/portable-workbench.json through scripts/quant_workbench.py prepare, run and verify. Preserve each job document and the shared contract; save prepared inputs and the first result bundle in new files outside the installed skill folder. Show the outcome of all six operations, hashes and runtime versions, retaining errors and unavailable dependencies. A replayed rejection is not a successful calculation. Explain the examples as method checks, not market history or investment-performance evidence.
 
-### 316. Compare models on the same frozen packet
+### 317. Compare models on the same frozen packet
 
 > Prepare examples/portable-workbench.json once and compare Codex, Muse and Claude on that exact input-only packet and identical prompt, using the same skill candidate in fresh participant contexts. Withhold other participants' answers, accepted answers and correctness feedback. Preserve every first response, error, input hash and runtime version; verify calculations locally after collection. Report correct agreement separately from shared mistakes, interpretation differences and execution limits. Label comparisons exploratory when memory, blinding or environments differ; do not replace a failed attempt.
 
-### 317. Continue when an optional library is missing
+### 318. Continue when an optional library is missing
 
 > Check the requirements of my requested portable operations in this host. When an optional library is missing, preserve the explicit DEPENDENCY_UNAVAILABLE outcome and identify the affected operations. Continue unrelated bundled calculations that can actually run, retaining their inputs and outputs separately. Do not install packages, switch models, substitute another method or contact a backend. Tell me which work remains uncomputed and the local dependency it requires.
 
@@ -1537,27 +1542,27 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Intermediate to advanced. Guides: [model alignment hardening](references/model-alignment-hardening.md), [source bound workflow](references/source-bound-workflow.md), [model independent research](references/model-independent-research.md).
 
-### 318. Execute and verify a supplied request
+### 319. Execute and verify a supplied request
 
 > Run [REQUEST.json] through the installed single-command offline workflow in a new private directory. Preserve the original inputs, report actual execution and verification, and build the numerical answer from generated facts. Keep incomplete work and host export limitations explicit.
 
-### 319. Keep sale proceeds distinct from costs
+### 320. Keep sale proceeds distinct from costs
 
 > Using [TRADE REQUEST], calculate gross sale value, transaction costs and net proceeds. Preserve their distinct generated labels, units and result pointers in both the table and final explanation. Do not call costs spendable proceeds.
 
-### 320. Separate selected order from affordable maximum
+### 321. Separate selected order from affordable maximum
 
 > For [ORDER INPUTS], report the selected quantity and its debit and remaining cash separately from the maximum affordable quantity and its own debit and remainder. Distinguish per-share cost rates from aggregate costs.
 
-### 321. Check concentration with an incomplete account
+### 322. Check concentration with an incomplete account
 
 > Using [ACCOUNT INPUTS], distinguish known dollar exposure, known-equity concentration and full-account concentration. Retain numerator and denominator completeness and justify any bound explicitly. If unknown assets could change both, report the concentration as unresolved rather than choosing a bound direction.
 
-### 322. Compare hash scopes before claiming equality
+### 323. Compare hash scopes before claiming equality
 
 > Compare [HASH DESCRIPTORS] using their algorithms, canonicalization and exact object scopes. Do not equate contract identity with full-input identity. Report incompatible scopes, missing metadata and different digests separately.
 
-### 323. Audit execution and export evidence
+### 324. Audit execution and export evidence
 
 > Review [RETAINED RUN RECORDS] without editing them. Separate synthetic historical invocation records, observed current execution, numerical replay and files actually collected. Check active package version consistency and preserve any failure or unavailable export.
 
@@ -1566,27 +1571,27 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Research users and quantitative analysts. Guides: [backtest data storage](references/backtest-data-storage.md), [compact evidence](references/compact-evidence.md), [monthly portfolio validation](references/monthly-portfolio-validation.md).
 
-### 324. Resume a bounded historical download
+### 325. Resume a bounded historical download
 
 > Capture [DATA REQUESTS] in the explicit local storage root [ROOT], keeping immutable compressed responses and source metadata. Set disk and request-size limits. Resume the same frozen run from its completed captures without redownloading them, and report missing or incomplete data separately.
 
-### 325. Opt into portable reuse without stale history
+### 326. Opt into portable reuse without stale history
 
 > I opt into partial fetch using [PORTABLE BUNDLE] and [CURRENT SOURCE CHECKS]. Verify exact provider, security identity, date range, schema and adjustment conventions. Reuse only compatible verified data; refresh affected historical data when revisions or corporate actions invalidate reuse. Preserve original retrieval times and report the actual network and reuse counts.
 
-### 326. Narrow and archive an owned research dataset
+### 327. Narrow and archive an owned research dataset
 
 > From [OWNED DATA ROOT], retain only the historical member keys and benchmarks specified in [SCOPE]. Preserve raw source witnesses, coverage gaps and availability dates. Fully verify a compressed archive before deleting only the explicitly authorized owned expanded files. Keep unrelated files and skill release evidence intact.
 
-### 327. Run a large calculation with compact evidence
+### 328. Run a large calculation with compact evidence
 
 > Execute [SOURCE-BOUND REQUEST] using compact evidence mode in [OUTPUT ROOT]. Keep complete inputs, results and claim pointers recoverable, avoid repeating shared source objects in every report, verify the saved run and compare its numerical results with the equivalent legacy calculation.
 
-### 328. Compare fixed portfolios with changing monthly weights
+### 329. Compare fixed portfolios with changing monthly weights
 
 > Using [DATED PRICE PANEL] and [COMPLETE EXCHANGE CALENDAR], freeze ten candidate stock lists. Change weights monthly using a declared capped inverse-volatility rule, with next-session execution and explicit costs and cash treatment. Screen one year, freeze five finalists before accessing their five-year results, then select two under the same predefined ranking. Keep failed candidates visible and disclose overlapping windows and current-constituent selection bias.
 
-### 329. Check a monthly target rule before accounting
+### 330. Check a monthly target rule before accounting
 
 > Validate [MONTHLY TARGET REQUEST] for fixed composition, sufficient past-only observations, completed month ends and a genuine following execution session. Check the feasibility of stock caps and the pre-fee equity target, then pass supported decisions to native portfolio accounting without changing its cash and fee conventions.
 
@@ -1595,11 +1600,11 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Research users and quantitative analysts. Guides: [historical coverage recovery](references/historical-coverage-recovery.md).
 
-### 330. Repair a historical coverage gap
+### 331. Repair a historical coverage gap
 
 > Repair [DATASET] within [EXPLICIT STORAGE ROOT AND CAP]. Classify missing sessions, ticker renames, reused symbols, corporate events, membership errors and missing filings. Reuse verified source pointers, acquire only needed public evidence, preserve original artifacts, and report before/after gaps on the same denominator without inventing prices or publication times.
 
-### 331. Audit identity-qualified session coverage
+### 332. Audit identity-qualified session coverage
 
 > Run historical_coverage.py on [DECLARED COVERAGE CONTRACT]. Check issuer and share-class identity, dated typed mappings and per-security membership/listing intervals. Retain rejected mappings and missing sessions; distinguish a multi-source union of dates from a usable return series or point-in-time certification.
 
@@ -1608,27 +1613,27 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Investors comparing public disclosures and follower strategies. Guides: [SKILL](subskills/portfolio-following/SKILL.md), [portfolio follower sources](references/portfolio-follower-sources.md), [portfolio disclosure inputs](references/portfolio-disclosure-inputs.md), [portfolio follower calculations](references/portfolio-follower-calculations.md).
 
-### 332. Refresh public investor portfolios on demand
+### 333. Refresh public investor portfolios on demand
 
 > Refresh publicly available allocations for Berkshire, Pelosi-family disclosures, Scion, Pershing Square and other publicly listed Autopilot portfolios. Show holdings dates, publication dates, allocation denominators and unavailable sources; do not create a recurring schedule.
 
-### 333. Model a long-only inverse recommendation sleeve
+### 334. Model a long-only inverse recommendation sleeve
 
 > Using these dated original recommendations and my supplied sleeve budget, build a long-only inverse Cramer proposal. Preserve stale and ambiguous signals, aggregate overlaps, show costs and cash, and distinguish proposed trades from actual orders.
 
-### 334. Compare corrected disclosures without duplicate signals
+### 335. Compare corrected disclosures without duplicate signals
 
 > Compare this newly retrieved disclosure against the previous checkpoint. Identify amendments, withdrawals and new source records without treating the initial baseline as newly executed trades or inventing exact weights from amount ranges.
 
-### 335. Normalize supplied public disclosures
+### 336. Normalize supplied public disclosures
 
 > Normalize [RETAINED 13F FILINGS OR PUBLIC TRANSACTION DISCLOSURES] at [CUTOFF]. Reconcile source value units, cover-page totals, dated security mappings and the disclosed owner or reporting manager. Keep excluded options, unmapped securities, amount ranges and amendments visible; do not infer exact political-trade quantities, personal wealth weights or a complete replacement basket from an incomplete filing.
 
-### 336. Build overlapping follower sleeves
+### 337. Build overlapping follower sleeves
 
 > Using [NORMALIZED PUBLIC DISCLOSURES], [RECONCILED FOLLOWER BASELINES] and [SLEEVE BUDGETS], calculate a long-only USD common-stock target portfolio under my declared weighting, source-age and position-cap rules. Aggregate duplicate securities, retain cap overflow as cash and preserve frozen or unavailable-source holdings. Separate disclosed source allocations from my proposed targets and show issuer overlap across share classes separately.
 
-### 337. Prepare a cash-funded follower rebalance
+### 338. Prepare a cash-funded follower rebalance
 
 > Turn [FOLLOWER TARGETS] into proposals using [RECONCILED HOLDINGS], dated unadjusted quotes, settled cash, pending receivables, fees and quantity increments. Propose selling only shares attributed to the follower scope, including when I own unrelated shares of the same ticker. Fund buys only from spendable settled cash; show deferred trades, rounding cash and estimated unsettled sale proceeds without treating proposals as orders.
 
@@ -1637,21 +1642,38 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 **Audience:** Researchers working from supplied offline data. Guides: [quant data contracts](references/quant-data-contracts.md), [holdings event ledger](references/holdings-event-ledger.md), [risk diagnostics](references/risk-diagnostics.md), [experiment registry](references/experiment-registry.md).
 
-### 338. Compose historical study readiness
+### 339. Compose historical study readiness
 
 > Use [STUDY REQUEST], [SOURCE-BOUND SECURITY EPISODES], [FEATURE CONTRACT] and [OBSERVATION ARCHIVE] to assess historical and current-roster readiness. Retain required lookback gaps, revision cutoffs, held valuations and purpose usability; show the selected source records.
 
-### 339. Explain unresolved tax and cash differences
+### 340. Explain unresolved tax and cash differences
 
 > Replay these supplied holdings scenarios. Separate declared accruals and payments from unresolved event taxes, and explain cash differences without turning a comparator amount into an unknown liability.
 
-### 340. Assess cash for a withdrawal goal
+### 341. Assess cash for a withdrawal goal
 
 > Using [CONDITIONAL VARIANCE PATHS], [FULL-NOTIONAL WEIGHTS] and [WITHDRAWAL GOAL], show conditional cash-only coverage and supported risk horizons. Retain model diagnostics and distinguish modeled cash from verified availability and a calibrated funding probability.
 
-### 341. Retain executed experiment outcomes
+### 342. Retain executed experiment outcomes
 
 > Run this isolated local experiment sequence once, preserve failures and journal transitions, then write the result from captured outcomes. Keep plans separate from executed results and audit retained evidence without repeating stateful mutations.
+
+
+## Original-source REIT research and final reports
+
+**Audience:** Researchers reviewing supplied REIT disclosures. Guides: [supplied research](references/supplied-research.md), [reit reconciliation](references/reit-reconciliation.md), [reit sources](references/reit-sources.md), [final report](references/final-report.md), [original source lineage](references/original-source-lineage.md).
+
+### 343. Bind REIT operands and preserve property meaning
+
+> Use the complete supplied original-source manifest and its external hash to bind REIT monetary operands, reconcile FFO/AFFO/CFO and keep unknown capex overlap conditional. Preserve source-known property fraction meaning and unresolved denominator scope/time. Generate and replay the source report.
+
+### 344. Compose the exact final REIT response
+
+> Compose the final REIT response from complete supported source reports. Verify the exact saved first-response bytes against retained originals and review any visibly unaudited prose separately.
+
+### 345. Audit original metadata identity
+
+> Audit explicit scalar metadata mappings against this externally pinned original corpus. Retain declared values alongside unknown or conflicting lineage, without treating matching values as proof of accounting scope.
 
 ## Keeping this catalog current
 

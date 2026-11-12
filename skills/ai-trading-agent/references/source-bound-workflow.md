@@ -229,3 +229,5 @@ references inside that same response. Compose the response after substantive
 commands finish. Its authoring command may be recorded separately afterward;
 never claim a placeholder stream hash proves the completed stream. Preserve an
 incorrect original reference as a disclosed evidence failure, not a silent repair.
+
+For REIT comparisons supplied as an original-source corpus, use [integrated source research](supplied-research.md) and [final artifact composition](final-report.md). Bind supported original records, calculate, retain unknown metadata, and replay the saved report. Caller-created metadata is not original-source evidence.

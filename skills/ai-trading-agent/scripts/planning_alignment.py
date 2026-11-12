@@ -48,6 +48,7 @@ def finish(document, method, **result):
     if method!='cash-plan-contract':currency_check(document)
     def clean(value):
         if isinstance(value, Decimal):
+            require(value.is_finite(), 'FINITE_DECIMAL_REQUIRED')
             return str(value)
         if isinstance(value, list):
             return [clean(x) for x in value]
@@ -55,7 +56,9 @@ def finish(document, method, **result):
             return {k: clean(v) for k, v in value.items()}
         return value
     return clean({'method': method + '-1', 'currency': document['currency'], 'input_role': document['role'],
-                  'input_sha256': digest(document), 'advisory_only': True,
+                  # Canonical calculation input hash, not original file-byte identity.
+                  # Decimal inputs use the same exact strings as Decimal outputs.
+                  'input_sha256': digest(clean(document)), 'advisory_only': True,
                   'source_authenticity_verified': False, **result})
 
 

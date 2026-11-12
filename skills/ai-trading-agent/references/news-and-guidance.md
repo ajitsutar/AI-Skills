@@ -100,6 +100,105 @@ Overall `REVIEW_REQUIRED` or `DIAGNOSTICS_PRESENT` never means a semantic pass.
 Report mechanical source verification separately from the analyst's supported
 interpretation, preserving access limits, unsupported claims and declared context.
 
+## Audit provenance in the final ledger
+
+Use the provenance audit for a discovery/access ledger whose publication and
+underlying-origin fields are derived from retained sources. It checks the actual
+final JSON artifact, including custom ledger layouts; an issuer-candidate check
+or a correct narrative does not establish consistency of those separate fields.
+
+```text
+python scripts/news_provenance.py audit origin-audit.json artifact-directory origin-review.json --source-root source-directory --ingress-manifest source-ingress.json --ingress-sha256 EXTERNALLY_FROZEN_MANIFEST_SHA256
+```
+
+Supply the existing original-source ingress manifest and its externally frozen
+SHA256. The request selects the final ledger and its field pointers; bindings
+select source IDs from that manifest, without supplying an expected origin value:
+
+```json
+{
+  "schema_version": 1,
+  "final_ledger": {
+    "path": "final-ledger.json",
+    "sha256": "ACTUAL_FINAL_LEDGER_SHA256",
+    "rows_pointer": "/records",
+    "id_pointer": "/id",
+    "publication_pointer": "/publication_url",
+    "origin_pointer": "/underlying_origin"
+  },
+  "bindings": [{
+    "row_id": "bulletin-1",
+    "source_id": "retained-bulletin",
+    "adapter": "explicit-link-declarations-v1"
+  }]
+}
+```
+
+The ledger path is relative to the artifact directory. Field pointers are relative
+to each selected row; `rows_pointer` selects a nonempty array in the ledger.
+Use unique nonempty row IDs and separate publication/origin pointers; the audited
+field values may be strings or null. Missing or duplicate identities and bindings
+remain visible rather than silently merging rows.
+Use the actual layout and exact final bytes, not a second model-authored summary
+of what the ledger ought to say. The source manifest supplies source paths and
+hashes; this audit does not authenticate the supplied sources or discover missing
+ones. An unsupported or inaccessible source stays an explicit coverage gap.
+
+The bounded adapter accepts source-ingress entries with `format: "text"` or
+`format: "bytes"`, verifies their unchanged raw bytes and requires strict UTF-8
+decoding before scanning the complete source for explicit link declarations.
+It preserves the original manifest's format declaration; do not relabel or rewrite
+original evidence to make it fit. Other formats or undecodable bytes remain
+unsupported bindings. This is literal text inspection, not HTML/PDF rendering
+or a general document parser. It keeps publication identifiers (`Canonical identifier:`,
+`Publication identifier:` or `Publication URL:`) separate from original-link
+declarations (`Original source:` or `Original source URL:`), case-insensitively.
+It emits literal URL candidates with exact spans, zero-based Unicode code-point
+offsets in the unchanged decoded text, and hashes. A
+publication's canonical link is not automatically its underlying original source.
+The helper does not infer origin from a hostname, a wire/publisher category, a
+company mention, matching dates, or the caller's chosen label.
+
+The adapter is deliberately limited. Unsupported adapter requests are rejected;
+unsupported source formats retain invalid-provenance diagnostics. Missing or
+competing declarations and detected quote/negation/example or role-spoofing
+contexts remain unresolved rather than silently choosing a link. A terminal period
+can belong to the URL or the surrounding sentence: preserve both the raw token and
+the one-period-trimmed candidate, with `UNRESOLVED_URL_BOUNDARY`. A field matching
+one candidate does not resolve that boundary. A whitespace-ended or angle-bracketed
+URL can supply an unambiguous literal declaration; no redirect or same-event
+equivalence is inferred. Preserve path/query/fragment distinctions and all stated
+normalization alternatives. Reading the full retained text prevents a short selected
+excerpt from hiding competing declarations, but does not make lexical context
+checks a general natural-language proof.
+
+Every selected row and field is inventoried. `MATCHES_SELECTED_DECLARATION` and
+`DIFFERS_FROM_SELECTED_DECLARATION` describe literal field consistency with the
+selected source's declaration candidates. `UNRESOLVED_NO_DECLARATION`,
+`UNRESOLVED_MULTIPLE_DECLARATIONS`, `UNRESOLVED_CONTEXT` and
+`UNRESOLVED_URL_BOUNDARY` retain incomplete or ambiguous evidence;
+`INVALID_PROVENANCE` retains unusable bindings. Each field also retains a
+`literal_comparison` of `MATCHES_ONE_LITERAL_CANDIDATE`,
+`DIFFERS_FROM_ALL_LITERAL_CANDIDATES` or `UNAVAILABLE`. Thus a value can differ
+from all retained origin-link candidates even while punctuation or context remains
+unresolved; this identifies a literal inconsistency, not the true origin. Missing
+bindings remain `UNAUDITED_FIELD`, so a checked subset cannot masquerade as a
+fully audited ledger. No declaration is not proof that the publisher originated
+the story; leave an unsupported original-source assignment unknown.
+
+Keep `semantic_relation_verified: false` and `source_authenticity_verified: false`
+visible alongside the overall `REVIEW_REQUIRED` or `DIAGNOSTICS_PRESENT` result.
+A literal match does not certify authorship, source independence, issuer relevance,
+authenticity, live availability or a shared event. Review those meanings separately.
+The helper neither rewrites the ledger nor supplies a replacement prose conclusion.
+
+Before presenting the ledger, reconcile its diagnosed fields or disclose unresolved
+differences, preserving the first artifact and audit. Cite the exact audited final
+artifact and its receipt; any later ledger edit requires a new hash and audit.
+Do not claim a contradictory final field is covered by an earlier correct helper
+input, adjacent notes or a separate narrative. This local consistency route does
+not perform search, fetch, sentiment scoring, scheduling or broker actions.
+
 ## Free and conditional routes
 
 Apply [skill-wide source access](source-access.md): free routes are the default.

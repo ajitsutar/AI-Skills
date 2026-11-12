@@ -30,7 +30,7 @@ Source selection and surrounding narrative still require review.
 
 The trading workflows use accessible free sources first; paid subscriptions are
 optional and existing user-provided access can improve freshness or coverage.
-Version **5.7.4** includes free public-source intake and dated flow/squeeze
+Version **5.7.8** includes free public-source intake and dated flow/squeeze
 research. Repairs diagnose ambiguous columns and unknown volume bases, bind
 paper evaluation to supplied protocol/response clocks, and reconcile nested
 currency contracts. Public X posts remain leads; the paid Unusual Whales
@@ -42,6 +42,11 @@ Current helpers retain source-bound data readiness, tax and withdrawal
 uncertainty, dated cash-benchmark applicability, event-research capability limits
 and excerpt-based issuer diagnostics. Proposal evaluation preserves supplied
 terms and provenance separately from approval.
+REIT research binds each operand to its supplied disclosure, preserves property-fraction
+meaning and unknown attribution, and reconciles cross-measure assumptions before
+reporting conditional results. Saved REIT reports can retain their original sources
+and verify exact output consistency. News-ledger audits also retain original-source
+lineage. These checks do not authenticate sources or certify investment conclusions.
 
 Its [execution policy](skills/ai-trading-agent/references/execution-modes.md)
 is separate for each task, including each scheduled task, and defaults to `paper`.
