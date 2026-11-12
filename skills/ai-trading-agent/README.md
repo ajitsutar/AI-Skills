@@ -1,6 +1,6 @@
 # AI Trading Agent
 
-Version **5.7.1** includes [public-source intake](references/market-sources.md),
+Version **5.7.4** includes [public-source intake](references/market-sources.md),
 [flow, positioning and squeeze diagnostics](references/market-flow.md), and a
 [configurable event-driven U.S.-stock paper-research pilot](references/institutional-research.md).
 Intake diagnoses conflicting source columns; volume comparisons require an
@@ -25,6 +25,8 @@ projections. Partial event calendars preserve feasible descriptive research
 and explicit forecast limits. Retained news ledgers can check excerpt-supported
 issuer candidates while keeping semantic attribution unresolved. Existing
 proposals retain their exact terms and provenance through approval review.
+
+[Source-bound news comparisons](references/news-evidence.md) retain incomplete clocks and accounting basis, arithmetic-only range changes, and exact saved-output claim attribution.
 
 [Execution policy](references/execution-modes.md) selects `paper`, `approval` or
 `autonomous` in a separate persistent JSON file for each task, including each

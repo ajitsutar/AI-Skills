@@ -30,11 +30,14 @@ Source selection and surrounding narrative still require review.
 
 The trading workflows use accessible free sources first; paid subscriptions are
 optional and existing user-provided access can improve freshness or coverage.
-Version **5.7.1** includes free public-source intake and dated flow/squeeze
+Version **5.7.4** includes free public-source intake and dated flow/squeeze
 research. Repairs diagnose ambiguous columns and unknown volume bases, bind
 paper evaluation to supplied protocol/response clocks, and reconcile nested
 currency contracts. Public X posts remain leads; the paid Unusual Whales
 adapter is skipped. See the updated institutional backlog.
+News evidence helpers bind publication and observation clocks, preserve unknown
+comparison dimensions, and audit claims against retained outputs. Byte identity
+is not source authentication.
 Current helpers retain source-bound data readiness, tax and withdrawal
 uncertainty, dated cash-benchmark applicability, event-research capability limits
 and excerpt-based issuer diagnostics. Proposal evaluation preserves supplied

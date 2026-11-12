@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # AI Trading Agent
 
-Package version: **5.7.1 - November 12, 2026**.
+Package version: **5.7.4 - November 12, 2026**.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent
 policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
@@ -288,7 +288,7 @@ enhancements, free fallbacks and evidence limits. Dynamically discover material 
 analyst evidence using [news-and-guidance.md](references/news-and-guidance.md) and
 [analyst-research.md](references/analyst-research.md). Disclose actual access;
 headlines, full reports, paywalls and inaccessible sources are different coverage.
-For a retained discovery/access ledger, use the [discovery check](references/news-and-guidance.md#check-a-retained-discovery-ledger)
+For guidance clock/basis gaps, revisions and tool-attributed labels, use [source-bound news checks](references/news-evidence.md), preserving unknowns and arithmetic-only results. For a retained discovery/access ledger, use the [discovery check](references/news-and-guidance.md#check-a-retained-discovery-ledger)
 without requiring sentiment scoring. Keep excerpt-supported text candidates
 separate from configured issuer scope; lexical matches do not certify relevance.
 Forward targets are analyst opinions, distinct from past 52-week ranges and

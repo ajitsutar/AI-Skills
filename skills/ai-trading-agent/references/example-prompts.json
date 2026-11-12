@@ -413,7 +413,8 @@
       "title": "News, sentiment and between-quarter guidance",
       "audience": "Intermediate to quant",
       "guides": [
-        "references/news-and-guidance.md"
+        "references/news-and-guidance.md",
+        "references/news-evidence.md"
       ],
       "prompts": [
         {
@@ -455,6 +456,14 @@
         {
           "title": "Audit issuer support in a discovery ledger",
           "prompt": "Audit [RETAINED BULLETIN LEDGER] using the discovery check and [SAVED SOURCE DIRECTORY]. Verify the source hashes and exact accessible excerpts. Separate textual issuer candidates from the configured watchlist and declared industry context; keep unsupported assignments unknown. Explain whether each proposed attribution is supported by the content, retaining ambiguous aliases and limited access without treating a lexical match as semantic verification. This is a discovery/access review, not a sentiment-scoring request."
+        },
+        {
+          "title": "Compare guidance with incomplete source clocks",
+          "prompt": "Compare [ORIGINAL GUIDANCE SOURCES] at [CUTOFF] using exact source bindings. Preserve publication and observation roles, unknown accounting basis and revisions. Return supported descriptive arithmetic separately when a source-grounded disclosure-change claim cannot be established."
+        },
+        {
+          "title": "Audit reported helper labels",
+          "prompt": "Compare [CLAIMED LABELS AND VALUES] with exact JSON pointers in [SAVED HELPER RESULT]. Retain unsupported claims and actual values without changing the result, rerunning the original analysis or treating the audit as source authentication."
         }
       ]
     },
