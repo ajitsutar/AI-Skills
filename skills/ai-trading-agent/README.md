@@ -9,7 +9,7 @@ any final answer is created; a new preparation can correct declared inputs witho
 overwriting the failure. Both final outputs verify after relocation. These checks
 do not certify source truth, investment correctness or complete task coverage.
 
-Version **5.8.2** includes [production research operations](references/research-operations.md)
+Version **5.9.0** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
@@ -24,6 +24,13 @@ interest, short-sale volume, borrow snapshots and inferred pressure separately.
 Source-specific access and intended-use terms apply. Every paid subscription is
 optional; public X posts remain research leads requiring primary verification.
 No paid Unusual Whales adapter is included.
+
+Current source intake includes SEC issuer-symbol snapshots with conservative CIK
+mapping, explicit-calendar OHLCV exports and the documented shared-public IBKR
+inventory file. Indicative borrow quantities, lower bounds and unverified rate
+units stay distinct. Configure independent automated technical review when that
+work is delegated; deliver ready-to-read findings and preserve the reviewer type.
+Automated quality diagnostics do not establish human benefit or trading profit.
 
 Dated cash benchmarks retain source applicability separately from computable
 projections. Partial event calendars preserve feasible descriptive research

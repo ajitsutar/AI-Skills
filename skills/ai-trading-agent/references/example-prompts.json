@@ -99,6 +99,10 @@
         {
           "title": "Review deployed research readiness",
           "prompt": "Review [CONFIGURED WINDOWS RESEARCH INSTALLATION] against its operating runbook. Exercise overlap prevention, idempotent restart, failure recovery, source qualification and version rollback. Report each observed result and any unexercised dependency. Keep research effectiveness and investment performance separate from software readiness."
+        },
+        {
+          "title": "Deliver research with delegated technical review",
+          "prompt": "Handle the technical event research and independent automated review, then show me the completed readable report. Preserve source facts, assumptions, counterevidence, data gaps and paper-only implications. Declare automated reviewer type and baseline before included observations; do not ask me to become a technical review stage or present automated judgments as human benefit."
         }
       ]
     },
@@ -139,6 +143,18 @@
         {
           "title": "Reconcile conflicting public export columns",
           "prompt": "Parse [RETAINED PUBLIC SHORT-INTEREST CSV] at [CUTOFF]. Compare all supported headings that map to each date, symbol or quantity. Retain the original fields, diagnose conflicting aliases or normalized-header collisions, and keep ambiguous rows unusable. Do not silently choose a preferred value. Check the actual provider schema and preserve source-reported days-to-cover separately from recomputed ADV."
+        },
+        {
+          "title": "Resolve SEC identities without choosing a share class",
+          "prompt": "Parse [RETAINED SEC IDENTITY SNAPSHOT] and build a CIK mapping for [EXPLICIT EXCHANGE SCOPE] at [CUTOFF]. Preserve duplicate, multi-class, unknown-exchange and unavailable records. Carry the mapping source clock into the SEC filing index; never claim complete listings or backdate current identity."
+        },
+        {
+          "title": "Interpret free indicative borrow evidence",
+          "prompt": "Use the documented shared-public IBKR file or [PERMITTED RETAINED SNAPSHOT] for indicative borrow research. Retain the trailer, actual retrieval, source currency, exact versus strict-lower-bound inventory and unknown fee units. Keep provider inventory separate from short interest, utilization, a borrow locate and a squeeze conclusion."
+        },
+        {
+          "title": "Import explicit-calendar price and volume data",
+          "prompt": "Import [PERMITTED OHLCV CSV] using explicit column, share-unit, calendar, role, currency and adjustment declarations. Keep raw OHLC and adjusted close separate, retain partial/duplicate/future rows as unusable, and do not double count flow and ADV facets. Withhold comparable RVOL when volume basis is unknown."
         }
       ]
     },

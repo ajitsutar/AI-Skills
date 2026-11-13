@@ -38,7 +38,7 @@ LIMITATIONS = [
 ]
 ADAPTERS = frozenset(("sec_submissions", "sec_daily_index", "sec_form4_xml", "sec_13f_xml",
                      "finra_short_volume", "finra_short_interest_csv", "sec_ftd",
-                     "venue_csv", "social_leads"))
+                     "venue_csv", "social_leads", "sec_company_tickers", "ibkr_shortstock", "daily_bars_csv"))
 
 
 def _require(ok, message):
@@ -62,6 +62,10 @@ def _url(value):
         return False
     try:
         parsed = urlsplit(value)
+        if parsed.scheme == "ftp":
+            return (parsed.hostname == "ftp2.interactivebrokers.com" and parsed.path == "/usa.txt"
+                    and not parsed.username and not parsed.password and parsed.port in (None, 21)
+                    and not parsed.query and not parsed.fragment)
         return (parsed.scheme == "https" and bool(parsed.hostname) and not parsed.username
                 and not parsed.password and parsed.port in (None, 443))
     except ValueError:
@@ -333,7 +337,19 @@ def parse(document):
         records.append(_source_record(document, len(records) if source_index is None else source_index,
                                       kind, ticker, payload))
 
-    if adapter == "sec_daily_index":
+    if adapter in ("sec_company_tickers", "ibkr_shortstock", "daily_bars_csv"):
+        if adapter == "sec_company_tickers":
+            from sec_identity import parse as intake
+        elif adapter == "ibkr_shortstock":
+            from borrow_intake import parse as intake
+        else:
+            from price_volume_intake import parse as intake
+        parsed_rows, metadata, issues = intake(document, source_text)
+        for row in parsed_rows:
+            emit(row["kind"], row.get("ticker"), row["payload"])
+            if row.get("parse_error"):
+                records[-1]["parse_error"] = row["parse_error"]
+    elif adapter == "sec_daily_index":
         index_date = _daily_index_date(document.get("source", {}).get("url"))
         lines = source_text.lstrip("\ufeff").splitlines()
         headings = {"CIK|Company Name|Form Type|Date Filed|Filename",
@@ -722,10 +738,12 @@ def allowed_public_url(url):
     """Exact public-source host/path families, without redirects or credentials."""
     _require(_url(url), "Only credential-free HTTPS URLs are supported")
     parsed = urlsplit(url)
+    _require(parsed.scheme == "https", "Acquisition supports HTTPS only; retained public FTP provenance is not an FTP client")
     _require(not parsed.query and not parsed.fragment, "Use an exact public file URL without query/fragment")
     patterns = {
         "data.sec.gov": [r"/submissions/CIK\d{10}(?:-submissions-\d{3})?\.json"],
         "www.sec.gov": [r"/Archives/edgar/data/\d+/\d{18}/(?:[A-Za-z0-9_.-]+/){0,2}[A-Za-z0-9_.-]+\.(?:xml|txt|json|htm|html)",
+                        r"/files/company_tickers(?:_exchange)?\.json",
                         r"/Archives/edgar/data/\d+/\d{10}-\d{2}-\d{6}\.txt",
                         r"/Archives/edgar/daily-index/\d{4}/QTR[1-4]/master\.\d{8}\.idx",
                         r"/files/data/fails-deliver-data/[A-Za-z0-9_-]+\.(?:zip|txt)"],
@@ -872,7 +890,7 @@ def raw_text(path, member=None):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
-    for command in ("normalize", "parse"):
+    for command in ("normalize", "parse", "identity-map"):
         item = sub.add_parser(command)
         item.add_argument("--input", required=True)
         item.add_argument("--output", required=True)
@@ -904,7 +922,11 @@ def main():
         document["source"]["decoded_content_sha256"] = content_sha
         if document.get("adapter") in ("sec_submissions", "social_leads"):
             document["data"] = json.loads(text)
-    result = parse(document) if args.command == "parse" else normalize(document)
+    if args.command == "identity-map":
+        from sec_identity import identity_map
+        result = identity_map(document)
+    else:
+        result = parse(document) if args.command == "parse" else normalize(document)
     _write_json(Path(args.output), result)
     return 0
 

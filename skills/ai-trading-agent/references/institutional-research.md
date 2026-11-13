@@ -260,3 +260,22 @@ response, evaluates fictional October outcomes, journals and recovers the result
 Actual journal timestamps expose its later retrospective execution. It reports
 its retrospective execution scope; it is not a participant campaign case,
 live forward test, trading result or instruction to start recurring monitoring.
+
+
+## Reviewer type and completed-report delivery
+
+A configured reviewer may be human or explicitly automated. Preserve its actual
+`id`, `role`, criterion and baseline; do not pool different reviewer types into a
+human-usefulness claim. If the user delegates technical work, the assistant
+performs research and independent technical review and delivers readable findings;
+the user need not provide a source-only review, rating form or timing measure.
+A changed reviewer/baseline is a retained prospective protocol revision.
+
+An automated source-only versus brief-assisted comparison uses separate fresh
+non-author contexts and identical frozen source/request bytes; only the assisted
+arm sees the exact retained brief. Record unavoidable memory/control limits as
+exploratory. Quantitative review times require actual measured machine durations
+and must be labeled as such. Omit the legacy timed-usefulness metric when these
+measurements are absent; retain qualitative technical review separately. Never
+call automated quality judgments human feedback or causal time saved. Paper
+returns remain separately evaluated on their actual elapsed price/cost evidence.

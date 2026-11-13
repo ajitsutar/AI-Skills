@@ -22,7 +22,8 @@ immutable configuration. A registered hypothetical book supplies missing
 portfolio context only; it is never a live broker account.
 
 Each source explicitly declares `id`, exact allowlisted `url`, supported
-`adapter`, configured research-contact `user_agent` and `rights`. Optional
+`adapter` and `rights`. HTTPS sources also declare a configured research-contact
+`user_agent`; the exact shared-public IBKR FTP route can omit that HTTP field. Optional
 `parse_options` retain supported parser declarations, including an explicit ZIP
 member. Optional `max_bytes`, `timeout` and `retries` stay within existing public
 acquisition limits; absent retry count means zero automatic retries. No URL/date
@@ -166,3 +167,29 @@ and restoration need a deployment-specific owner and tested procedure. The tool
 does not install ACLs, encrypt a disk, back up data, configure a scheduler or
 promise unattended continuous operation. A Windows recovery/overlap exercise
 does not establish another OS/host or dependable recurring acquisition.
+
+
+## Source adapters and delegated technical review
+
+The source list can include `sec_company_tickers` and exact shared-public
+`ibkr_shortstock` acquisition; see [market sources](market-sources.md). FTP uses
+its own explicit protocol, zero automatic retries and completed-transfer proof;
+it cannot make an unrelated host/path or an HTTPS failure a valid capture.
+`bar_context` is retained as an explicit parse option for permitted OHLCV files.
+External price-adapter captures retain their provider-decoded versus HTTP-wire
+scope. Do not claim a live or licensed feed merely because an export parses.
+
+When the user delegates research and technical review, deliver completed readable
+reports. Do not turn the user into a source-selection, calculation or technical
+rating stage. Configure an explicitly automated reviewer and fixed criterion
+before included observations; preserve any earlier human-review protocol as a
+prior revision. Independent source-only and source-plus-brief contexts receive
+frozen permitted inputs, no other review answers or future outcomes, and retain
+actual model/context and clock limitations. Automated review is a quality proxy,
+separate from human usefulness and descriptive paper returns. Missing runtime
+measurements are absent, never zero minutes or human time savings.
+
+Scheduling requires the user's authorization and the host's supported scheduler;
+these scripts create no recurring task. A ready report can contain qualified
+partial evidence, explicit gaps or an abstention. Publishing a report does not
+create a fill, human rating or future return.

@@ -24,7 +24,7 @@ ROOT = Path(__file__).resolve().parents[1]
 MAX_JSON_BYTES = 256 * 1024 * 1024
 PARSE_OPTIONS = frozenset(('delimiter', 'value_unit', 'columns', 'venue_scope',
                            'security_context', 'ticker', 'cik', 'report_date',
-                           'form', 'id_prefix', 'zip_member', 'form_filter', 'cik_symbol_mapping', 'raw_complete'))
+                           'form', 'id_prefix', 'zip_member', 'form_filter', 'cik_symbol_mapping', 'raw_complete', 'bar_context'))
 
 
 def _require(ok, message):
@@ -139,11 +139,17 @@ def _config(value):
         _id(source.get('id'))
         _require(source['id'] not in seen, 'DUPLICATE_SOURCE_ID')
         seen.add(source['id'])
-        market_sources.allowed_public_url(source.get('url'))
         _require(source.get('adapter') in market_sources.ADAPTERS, 'SUPPORTED_ADAPTER_REQUIRED')
+        public_borrow = source['adapter'] == 'ibkr_shortstock'
+        if public_borrow:
+            from borrow_intake import allowed_public_url
+            allowed_public_url(source.get('url'))
+        else:
+            market_sources.allowed_public_url(source.get('url'))
         ua = source.get('user_agent')
-        _require(type(ua) is str and 0 < len(ua) <= 300 and '\r' not in ua and '\n' not in ua
-                 and ('@' in ua or 'https://' in ua), 'EXPLICIT_RESEARCH_CONTACT_USER_AGENT_REQUIRED')
+        if not public_borrow or ua is not None:
+            _require(type(ua) is str and 0 < len(ua) <= 300 and '\r' not in ua and '\n' not in ua
+                     and ('@' in ua or 'https://' in ua), 'EXPLICIT_RESEARCH_CONTACT_USER_AGENT_REQUIRED')
         _require(type(source.get('rights')) is str and source['rights'].strip(), 'RIGHTS_DECLARATION_REQUIRED')
         options = source.get('parse_options', {})
         _require(type(options) is dict and set(options) <= PARSE_OPTIONS, 'UNKNOWN_PARSE_OPTION')
@@ -152,6 +158,7 @@ def _config(value):
         timeout = source.get('timeout', 15)
         _require(type(size) is int and 1 <= size <= market_sources.MAX_BYTES, 'INVALID_BYTE_BOUND')
         _require(type(retries) is int and 0 <= retries <= 2, 'INVALID_RETRY_BOUND')
+        _require(not public_borrow or retries == 0, 'PUBLIC_FTP_REQUIRES_ZERO_AUTOMATIC_RETRIES')
         _require(type(timeout) in (int, float) and math.isfinite(timeout) and 0 < timeout <= 30, 'INVALID_TIMEOUT_BOUND')
     freshness = value.get('freshness')
     age = freshness.get('max_capture_age_seconds') if type(freshness) is dict else None
@@ -274,7 +281,7 @@ def _attempt_info(path, source, write_parse=False):
     _require(planned['source_id'] == source['id'] and planned['url'] == source['url'], 'CAPTURE_IDENTITY_MISMATCH')
     info = {'attempt': path.name, 'source_id': source['id'], 'started_at': planned['started_at'],
             'status': 'INCOMPLETE_CAPTURE_REQUIRES_EXPLICIT_RETRY', 'records': [],
-            'error': 'No complete acquisition manifest; do not assume whether the GET finished.'}
+            'error': 'No complete acquisition manifest; do not assume whether the public transfer finished.'}
     manifest_path = path / 'download/manifest.json'
     if not manifest_path.exists():
         if (path / 'call-error.json').exists():
@@ -292,7 +299,30 @@ def _attempt_info(path, source, write_parse=False):
     _require(type(name) is str and re.fullmatch(r'attempt-\d{2}\.raw', name), 'SAFE_RAW_FILENAME_REQUIRED')
     raw_path = path / 'download' / name
     raw = _read(raw_path)
-    _require(last.get('http_status') == 200 and last.get('raw_complete') is True
+    if source['adapter'] == 'ibkr_shortstock':
+        from borrow_intake import allowed_public_url
+        allowed_public_url(source['url'])
+        declared_size = last.get('declared_size_bytes')
+        unsupported_size = last.get('size_unavailable_response')
+        size_valid = ('declared_size_bytes' in last and
+            (type(declared_size) is int and declared_size == len(raw) or
+             declared_size is None and type(unsupported_size) is str and
+             re.match(r'^(?:500|502|504)(?:\s|$)', unsupported_size) is not None))
+        transport_valid = (manifest.get('transport') == last.get('transport') == 'FTP'
+            and type(manifest.get('attempts')) is list and len(manifest['attempts']) == 1
+            and manifest.get('method') == 'RETR' and type(manifest.get('retries_limit')) is int
+            and manifest['retries_limit'] == 0
+            and manifest.get('personal_account_access') is False
+            and manifest.get('raw_complete') is True
+            and manifest.get('source', {}).get('raw_complete') is True
+            and manifest.get('source', {}).get('transport') == 'FTP' and 'error' not in last
+            and type(last.get('ftp_response_code')) is int and last['ftp_response_code'] == 226
+            and type(last.get('retr_commands')) is int and last['retr_commands'] == 1
+            and last.get('ftp_control_socket_closed') is True
+            and size_valid)
+    else:
+        transport_valid = last.get('http_status') == 200 and manifest.get('transport', 'HTTPS') == 'HTTPS'
+    _require(transport_valid and last.get('raw_complete') is True
              and last.get('final_url') == source['url'] and last.get('raw_file') == name
              and last.get('retained_bytes') == len(raw)
              and manifest.get('raw_sha256') == last.get('raw_sha256') == _sha(raw), 'COMPLETE_RAW_ACQUISITION_BINDING_REQUIRED')
@@ -431,9 +461,15 @@ def collect(root_value, run_id, retry_failed=False):
                                              'started_at': _now(), 'explicit_retry_failed': bool(retry_failed)})
             try:
                 _pace_public_request(root, source)
-                market_sources.acquire(source['url'], attempt / 'download', source['id'], source['user_agent'],
-                                       source['rights'], source.get('max_bytes', 8 * 1024 * 1024),
-                                       source.get('timeout', 15), source.get('retries', 0))
+                if source['adapter'] == 'ibkr_shortstock':
+                    from borrow_intake import acquire
+                    acquire(source['url'], attempt / 'download', source['id'], source['rights'],
+                            source.get('max_bytes', 8 * 1024 * 1024), source.get('timeout', 15),
+                            source.get('retries', 0))
+                else:
+                    market_sources.acquire(source['url'], attempt / 'download', source['id'], source['user_agent'],
+                                           source['rights'], source.get('max_bytes', 8 * 1024 * 1024),
+                                           source.get('timeout', 15), source.get('retries', 0))
             except Exception as error:
                 _publish(attempt / 'call-error.json', {'error_type': type(error).__name__, 'error': str(error)})
         value, _ = _collection(run, identity, config, True)

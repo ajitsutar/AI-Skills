@@ -47,7 +47,7 @@ Common synthetic input, not an observed market claim:
 Kinds: trade, bar, short_sale_volume, short_interest, float, borrow, catalyst,
 social_lead, disclosure, ftd and venue_aggregate. Unknown envelope/payload fields
 are retained. Each returned record has eligible and exclusion_reasons.
-Eligibility checks identity, source HTTPS URL, precise availability, source
+Eligibility checks identity, credential-free source URL (HTTPS or exact supported public FTP provenance), precise availability, source
 clocks and revisions; it does not validate every payload measurement.
 Downstream [flow analysis](market-flow.md) checks numerical comparability.
 
@@ -270,3 +270,86 @@ is required by the operating software.
 The [operating commands](research-operations.md) retain configured source choices,
 failed acquisitions and explicit freshness. An empty source configuration exposes
 a coverage gap; it does not mean no market events occurred.
+
+
+## Current SEC issuer identity
+
+`sec_company_tickers` parses either official `company_tickers_exchange.json`
+(fields/data table) or `company_tickers.json` (numeric-key object). Exact HTTPS
+file acquisition is supported under `/files/` on `www.sec.gov`, with the same
+privately configured SEC client contact. Preserve raw bytes/hash, the actual
+retrieval clock and an explicit `raw_complete: true` declaration. Duplicate JSON
+keys, malformed rows and conflicting completion flags cannot silently select an
+identity. Plain ticker data do not invent an exchange or security classification.
+
+To build a mapping, supply `schema_version`, `as_of`, parsed `records` and an
+explicit unique `allowed_exchanges` list to:
+
+```text
+python scripts/market_sources.py identity-map --input MAPPING-INPUT.json --output MAPPING.json
+```
+
+`sec_identity.identity_map(document)` consumes one hash-bound source snapshot.
+It emits `cik_symbol_mapping` only for unique usable CIK/symbol declarations in
+the declared exchange scope. Multi-class CIKs, duplicate rows, shared symbols,
+unknown/out-of-scope exchanges and unavailable vintages remain unresolved.
+Exchange labels are supplied scope, not a closed built-in whitelist. A newly
+observed exchange is retained rather than dropped by a historical list. The
+mapping does not prove common-stock classification, complete U.S. listings or
+historical membership. For `sec_daily_index`, include the resulting mapping in
+`cik_symbol_mapping`; later mapping availability moves an index record's
+availability forward. Never backdate it to a filing or measurement date.
+
+## Explicit OHLCV exports
+
+`daily_bars_csv` accepts permitted retained exports or separately retained
+provider-decoded data. It creates no new price-provider entitlement or hidden
+network request. Supply exact `columns` for `date`, `open`, `high`, `low`, `close`
+and `volume`; optional `adjusted_close` remains a separate field. Supply the
+explicit `ticker`, source clocks/hash and complete-capture declaration.
+
+`bar_context` requires `feed_id`, `currency`, `price_basis`, `volume_basis`,
+`adjustment_basis`, `comparison_group`, `volume_unit: "shares"`, an explicit
+`role` (`current`, `baseline` or `benchmark`) and `sessions`, an object keyed by
+ISO session date with exact aware `start_at`/`end_at`. Optional
+`role_by_session` overrides only declared dates. Carry issuer/share-class
+identity as supplied evidence. Use the actual exchange calendar, including early
+closes; no normal open/close or currency is invented. Unknown share-adjustment
+basis remains unknown; `auto_adjust=False` alone does not establish volume basis.
+
+Each retained source row has two distinct facets: `cumulative` for interval flow
+and `daily_volume` for ADV. Their common source-line pointer is explicit. Never
+sum both facets or treat them as independent observations. Raw open/close price
+context never substitutes adjusted close, and these daily bars are not execution
+quotes or complete corporate-action history. Malformed quoting, invalid OHLC,
+nonfinite values, duplicate dates, partial captures and unfinished/future
+sessions cannot become eligible bars. Explicit supplied calendar declarations
+are checked for consistency, not authenticated as exchange truth.
+
+## Shared-public indicative borrow
+
+`ibkr_shortstock` supports the documented retained `usa.txt` pipe format. The
+configured research driver can perform one bounded request to the exact public
+provenance URL `ftp://ftp2.interactivebrokers.com/usa.txt`, using IBKR's published
+shared read-only access instructions. It never uses a personal account, broker
+order interface or a password from the user. See the
+[official public instructions](https://www.interactivebrokers.com/support/faq/content/monitoring-stock-loan-availability-1163250499).
+
+Use a source entry with `adapter: "ibkr_shortstock"`, that exact `url`, explicit
+`rights`, bounded `max_bytes`/`timeout` and `retries: 0`. No SEC User-Agent is
+needed for this FTP route. Acquisition requires one RETR, actual FTP 226 transfer
+completion, explicit SIZE handling and owned-client cleanup. Failed prefixes
+and manifests remain retained; no HTTP success code is invented for FTP.
+FTP is plaintext public transport and does not authenticate the supplied content.
+The generic HTTPS acquisition command remains HTTPS-only.
+
+The parser retains original rows, header, BOF clock, trailer and count. Exact
+`AVAILABLE` digits become `shares_available`; `>digits` is a strict lower bound
+with exact availability unknown. Provider fees/rebates remain raw with unknown
+units, so no annualized fee is inferred. The BOF timezone remains unknown and
+actual retrieval is the snapshot-observation clock. Currencies, masked ISINs and
+missing FIGIs stay explicit. This describes one provider's indicative inventory,
+not official short interest, utilization, a market-wide supply measure or a
+borrow locate. Public access does not grant unrestricted redistribution or
+commercial rights. More than 10,000 downstream records need explicit partitioning
+or a source-bound selected event view; raw rows must never be silently truncated.

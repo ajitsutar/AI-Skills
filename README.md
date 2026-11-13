@@ -30,11 +30,12 @@ Source selection and surrounding narrative still require review.
 
 The trading workflows use accessible free sources first; paid subscriptions are
 optional and existing user-provided access can improve freshness or coverage.
-Version **5.8.2** includes production research operations for configured
-supervised research: immutable workflow registration, bounded public-source
-collection, restart reconciliation, freshness reporting and retained-record
-verification. Every paid subscription remains optional; the paid Unusual Whales
-adapter is skipped. See the institutional research operating guide.
+Version **5.9.0** adds official SEC issuer-identity intake, public/supplied
+price and volume observations, and user-supplied borrow evidence with
+explicit dates, coverage and source qualification. Production research
+operations support retained briefs and automated technical review; users
+receive completed reports. Every paid subscription remains optional;
+the paid Unusual Whales adapter is skipped. See the research operating guide.
 News evidence helpers bind publication and observation clocks, preserve unknown
 comparison dimensions, and audit claims against retained outputs. Byte identity
 is not source authentication.

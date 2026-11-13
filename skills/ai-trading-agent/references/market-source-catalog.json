@@ -7,6 +7,58 @@
   "live_provider_connection_certified": false,
   "sources": [
     {
+      "id": "sec_company_tickers",
+      "adapter": "sec_company_tickers",
+      "access": "public_no_api_key",
+      "official_url": "https://www.sec.gov/about/webmaster-frequently-asked-questions",
+      "file_urls": [
+        "https://www.sec.gov/files/company_tickers_exchange.json",
+        "https://www.sec.gov/files/company_tickers.json"
+      ],
+      "acquisition": "explicit_bounded_https_get",
+      "coverage": "Current SEC CIK/name/symbol and nullable exchange declarations",
+      "timing": "Actual first-observed source snapshot; no historical identity backfill",
+      "limits": [
+        "Multi-class, duplicate, shared-symbol and unknown-exchange identities remain unresolved.",
+        "Explicit exchange scope is configurable; no fixed historical exchange whitelist.",
+        "SEC cautions that associations need not be accurate or complete; security type/listed-universe completeness is unverified."
+      ],
+      "rights": "Public SEC factual research route; retain actual access/content qualifications."
+    },
+    {
+      "id": "daily_bars_csv",
+      "adapter": "daily_bars_csv",
+      "access": "permitted_user_export_or_existing_research_adapter",
+      "acquisition": "pure_retained_csv_no_hidden_provider_request",
+      "coverage": "Explicit-calendar OHLCV, separate raw/adjusted prices and paired flow/ADV facets",
+      "timing": "Retain actual source availability and exact declared completed session windows",
+      "limits": [
+        "Requires explicit columns, currency, share units, roles, calendar and price/volume bases.",
+        "Unknown volume adjustment remains unqualified for comparable relative volume.",
+        "Provider-decoded data are not raw HTTP bytes or execution quotes.",
+        "No complete corporate-action or market-tape claim."
+      ],
+      "rights": "Source-specific intended-use qualification; no mandatory provider/subscription."
+    },
+    {
+      "id": "ibkr_public_borrow",
+      "adapter": "ibkr_shortstock",
+      "access": "documented_shared_public_read_only_ftp",
+      "official_url": "https://www.interactivebrokers.com/support/faq/content/monitoring-stock-loan-availability-1163250499",
+      "file_url": "ftp://ftp2.interactivebrokers.com/usa.txt",
+      "acquisition": "one_bounded_public_retr_zero_retries_no_personal_account",
+      "coverage": "One provider indicative stock-loan inventory with raw fee/rebate values",
+      "timing": "Actual retrieval snapshot; BOF local timezone and underlying freshness unknown",
+      "limits": [
+        "Strict greater-than quantities are lower bounds, not exact availability.",
+        "Rate units remain unknown; no annual fee conversion.",
+        "Masked identifiers and currencies retained; no automatic issuer/class match.",
+        "Not official short interest, all-market inventory, utilization or an approved borrow locate.",
+        "Actual FTP226/explicitSIZE handling and client cleanup are required."
+      ],
+      "rights": "Official public analytical-access instructions; retain intended-use and redistribution qualifications."
+    },
+    {
       "id": "sec_daily_index",
       "adapter": "sec_daily_index",
       "access": "public_no_api_key",

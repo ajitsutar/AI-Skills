@@ -77,3 +77,23 @@ Use the existing assurance and reporting tools for fixed inputs, baselines,
 methodology challenge, leakage checks, accounting and traceable claims. These
 research findings remain advisory and preserve the user's task-specific broker
 permissions.
+
+
+## Source intake and completed reports
+
+Use official SEC symbol snapshots to build only unambiguous, explicitly scoped
+current CIK mappings. Retain other classes, unknown exchanges and earlier source
+vintages as unresolved. Exact public IBKR inventory acquisition uses the
+published shared read-only route, one bounded transfer and actual FTP completion;
+indicative availability and lower bounds are distinct from outstanding short
+interest, fee-unit certainty or a borrow locate. Explicit-calendar OHLCV intake
+keeps raw and adjusted prices separate and never pools its flow and ADV facets.
+Source-specific permission, dates, units and coverage remain part of each report.
+
+When technical work is delegated, the assistant performs evidence checks,
+calculations and independent automated technical review and delivers ready-to-read
+findings. The user is the report viewer and decision maker, with no required
+technical rating form. An automated reviewer and baseline are named before
+included observations; its quality judgments and actual machine durations do not
+become human-usefulness or causal time-saving claims. Paper results still require
+elapsed, source-bound prices, consistent accounting and declared costs.
