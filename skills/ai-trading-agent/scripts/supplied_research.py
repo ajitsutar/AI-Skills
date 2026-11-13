@@ -10,7 +10,7 @@ from source_lineage import load_manifest,parse
 
 ROOT=Path(__file__).resolve().parent.parent
 METHOD='supplied-research-1'
-PRODUCERS={'reit_sources':'analyze'}
+PRODUCERS={'analyst_sources':'analyze','reit_sources':'analyze','source_claims':'audit','issuer_evidence':'analyze'}
 MAX_FILE=16*1024*1024;MAX_TOTAL=128*1024*1024;MAX_REPORT=1024*1024
 
 def require(value,message):
@@ -59,13 +59,30 @@ def produce(doc,manifest,pin,source_root):
     require(isinstance(result,dict),'PRODUCER_RESULT_OBJECT_REQUIRED')
     require(len(encode(result))<=MAX_FILE,'RESULT_TOO_LARGE')
     return result
+def claim_summary(result):
+    # A small fixed projection for the older source_claims producer. Complete
+    # fields and lexical references remain in result.json, not recopied prose.
+    keys=('operation','claim_verdict','classification','predicate','binding_state','binding_reason','status',
+          'eps','raw_operand_ratio','allowed_claims','unsupported_claims','reasons','unresolved_candidate_ids',
+          'unlinked_record_ids','source_absence_established','latest_selection_scope','limits')
+    lines=['## Source claim assessment']
+    for key in keys:
+        if key in result:lines.append('- '+key+': '+json.dumps(result[key],ensure_ascii=True,default=str))
+    scan=result.get('scan',result.get('coverage',{}).get('scan'))
+    if isinstance(scan,dict):
+        lines.append('- Configured lexical candidates: '+str(len(scan.get('candidates',[]))))
+        lines.append('- Unsupported sources: '+json.dumps(scan.get('unsupported_sources',[]),ensure_ascii=True,default=str))
+    lines.append('Source absence, whole-corpus semantic completeness and issuer authenticity are not established.')
+    return '\n'.join(lines)+'\n'
 def render(doc,result):
-    report=result.get('report')
-    require(isinstance(report,dict) and isinstance(report.get('text'),str) and report['text'].strip(),
-            'PRODUCER_FIXED_REPORT_REQUIRED')
-    body=report['text']
-    require(report.get('sha256')==digest(body.encode('utf-8')),'PRODUCER_REPORT_HASH_MISMATCH')
-    require(report.get('whole_report_semantic_pass') is False,'PRODUCER_REPORT_LIMIT_REQUIRED')
+    if doc['producer']=='source_claims':body=claim_summary(result)
+    else:
+        report=result.get('report')
+        require(isinstance(report,dict) and isinstance(report.get('text'),str) and report['text'].strip(),
+                'PRODUCER_FIXED_REPORT_REQUIRED')
+        body=report['text']
+        require(report.get('sha256')==digest(body.encode('utf-8')),'PRODUCER_REPORT_HASH_MISMATCH')
+        require(report.get('whole_report_semantic_pass') is False,'PRODUCER_REPORT_LIMIT_REQUIRED')
     text='# Supplied-source research\n\n'+body.rstrip()+'\n\n'
     text+='[Complete structured evidence](result.json) preserves the producer fields, source bindings and unresolved findings.\n'
     text+='Source replay checks the declared contract against retained bytes; it does not authenticate issuers or certify investment conclusions.\n'

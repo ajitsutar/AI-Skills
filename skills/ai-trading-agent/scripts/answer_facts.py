@@ -56,7 +56,7 @@ def _number(value):
 
 def _project(result, result_hash, artifact='result.json'):
     """Internal projection; external callers must use project_verified."""
-    facts, jobs = [], []
+    facts, jobs, generated_reports = [], [], []
     bindings = {row['job_id']: row['arguments'] for row in result['bindings']}
     for index, job in enumerate(result['jobs']):
         base = f'/jobs/{index}/result'
@@ -70,6 +70,19 @@ def _project(result, result_hash, artifact='result.json'):
             row['projection_status'] = 'UNAVAILABLE_JOB_NOT_COMPUTED'
             row['reason'] = job.get('reason')
             continue
+        if job['operation'] == 'financial.terminal_scenarios' and isinstance(value, dict):
+            diagnostic = value.get('diagnostic_objectives')
+            if isinstance(diagnostic, dict) and isinstance(diagnostic.get('report'), str):
+                generated_reports.append({'job_id': job['id'], 'operation': job['operation'],
+                    'kind': 'INSTALLED_TERMINAL_OBJECTIVE_DIAGNOSTICS', 'text': diagnostic['report'],
+                    'source': {'artifact': artifact, 'sha256': result_hash,
+                               'pointer': base + '/diagnostic_objectives/report'},
+                    'user_objective_inferred': False, 'whole_answer_pass': False})
+                row['projection_status'] = 'INSTALLED_OBJECTIVE_REPORT_PROJECTED'
+                import research_contracts
+                row['unsupported_or_unprojected_fields'] = [base + pointer for pointer in
+                    research_contracts.leaves(value) if pointer != '/diagnostic_objectives/report']
+                continue
         if job['operation'] != 'planning.trade_costs' or not isinstance(value, dict):
             row['projection_status'] = 'UNAVAILABLE_OPERATION_MAPPING'
             continue
@@ -120,7 +133,7 @@ def _project(result, result_hash, artifact='result.json'):
         row['unsupported_or_unprojected_fields'] = [base + pointer for pointer in
             research_contracts.leaves(value) if pointer not in projected]
     return {'schema_version': 1, 'projection_version': VERSION,
-            'result_sha256': result_hash, 'facts': facts, 'jobs': jobs,
+            'result_sha256': result_hash, 'facts': facts, 'jobs': jobs, 'generated_reports': generated_reports,
             'coverage': copy.deepcopy(result['coverage']),
             'free_form_commentary_verified': False, 'whole_answer_pass': False,
             'limits': [
@@ -167,6 +180,11 @@ def text_projection(facts):
         source = fact['source']
         lines.extend(['', fact['sentence'],
                       'Evidence: ' + source['artifact'] + '#' + source['pointer'] +
+                      '; SHA-256 ' + source['sha256'] + '.'])
+    for report in facts.get('generated_reports', []):
+        source = report['source']
+        lines.extend(['', 'Generated diagnostic report for job ' + json.dumps(report['job_id']) + ':',
+                      report['text'], 'Evidence: ' + source['artifact'] + '#' + source['pointer'] +
                       '; SHA-256 ' + source['sha256'] + '.'])
     lines.extend(['', *facts['limits']])
     return '\n'.join(lines) + '\n'

@@ -10,6 +10,13 @@ disjoint. Account equity, NAV, securities value and cash are not interchangeable
 or presumed additive. Copy source totals with their labels; report an unresolved
 reconciliation instead of constructing a new account value from field names.
 
+For owner-cash bridges, use `cash_metrics` to retain the metric ID, formula and
+signed components. Equal values do not make CFO-minus-capex-minus-SBC and
+CFO-minus-capex-minus-acquisitions the same measure. A combined deduction must
+use its own component set; the SBC deduction remains an economic proxy, not cash
+paid or measured dilution. Missing components stay null, distinct from zero.
+Additional deductions outside the bridge require their own explicit calculation.
+
 A source-bound comparison's `source_context_evidence_inventory` retains supplied
 baseline marks, cost assumptions and optional opening conventions. A missing
 current execution quote is not a missing analytical mark; an unspecified actual
@@ -49,6 +56,34 @@ checking every applicable alternative. For settlement sweeps use `timing_summary
 and its result pointers; conditional arrival on the deadline remains a possible
 modeled path with unresolved intraday acceptance, not a guarantee or impossibility.
 Calendar-coverage gaps do not establish that an arrival cannot occur.
+
+### Sampled valuation outcomes and necessary conditions
+
+For `financial.terminal_scenarios`, use `scenario_coverage` to describe exactly
+which supplied rows and explicit sensitivities were evaluated. A statement such
+as "only the favorable row has a positive after-cost return among these rows"
+is a sample comparison. It does not establish that every favorable-row growth,
+margin, multiple or dilution assumption is necessary, or that intermediate
+combinations cannot meet the same objective. Do not convert a sampled row into
+minimum required operating targets or automatic thesis-invalidation conditions.
+
+Distinguish a present-value discount closing, positive total return, and beating
+a benchmark: they have different criteria. A numerical threshold claim requires
+an explicit criterion, equation, parameter domain and held assumptions, with a
+retained solution and boundary check. Label a one-parameter break-even result as
+conditional on the fixed inputs; it is not a universal business requirement.
+Without that analysis, describe sufficient illustrative combinations and leave
+necessary conditions unresolved. A qualitative review trigger may be proposed
+as a judgment with its own rationale, not asserted as a model-proven threshold.
+
+`conditional_exit_multiple_diagnostics` supplies one such narrow analysis:
+the exit EV/EBIT boundary for zero after-cost return, holding every other row
+input fixed. Inspect its equation, domain, complete held assumptions, boundary
+replay and derived probes. A weaker operating row can have a sufficient
+alternative multiple; that does not establish that multiple is plausible.
+The built-in capital-preservation comparator is not an inferred user objective,
+DCF discount closure or benchmark outperformance. Boundary equality is not
+strictly positive return, and no joint necessary business conditions are proven.
 
 For funding quantities use `proceeds_sizing_precision` from trade-cost results.
 Label displayed decimals as approximate unless exactness is established. Preserve

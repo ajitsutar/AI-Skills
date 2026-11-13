@@ -197,6 +197,22 @@ income only and never automatically alter CFO. Capex/SBC/acquisition amounts
 are nonnegative. Reported FCF, maintenance-only cash, SBC-adjusted proxy and
 normalized earnings retain distinct definitions; supported adjustments do not
 resolve missing bridge observations.
+`cash_metrics` records stable IDs, formulas, signed input components, value,
+missing components, unit, period and classification for the base cash measures.
+The combined `sbc_and_acquisitions_deducted_economic_proxy` subtracts total capex,
+SBC and acquisition cash from CFO. It is null if either optional deduction is
+unknown; explicit zero is computable. It is an economic proxy, not a reported
+cash-flow line or measured dilution. Existing scalar outputs retain their labels.
+
+`financial.reit_reconciliation` retains explicit FFO/AFFO/CFO component ledgers
+and a separate recurring-to-gross-capex mapping state. See the
+[REIT reconciliation contract](reit-reconciliation.md) for independently declared
+units, periods, holder basis, optional allocations and property-fraction metadata.
+Workflow dispatch derives metadata binding roles automatically: assumed/unbound
+basis or property labels stay unresolved in primary results, while declared
+values and conditional arithmetic remain explicit. Direct, workbench and workflow calls retain
+conditional arithmetic; matching caller metadata or SOURCE roles do not establish
+original accounting scope. Source-known property meaning remains separately bound.
 
 `financial.acquisition_cash`: required
 `{pretax_synergies_per_year,tax_rate,integration_costs_by_year,
@@ -247,6 +263,32 @@ numeric fields listed after id. Optional `scenario_probabilities` are retained,
 not used to calculate a weighted value. Exit net debt is exogenous; reinvestment
 is shown separately and financing is not reconciled. Interim FCF remains null.
 A negative equity residual without a zero floor yields no investable price.
+
+Each supplied row and declared sensitivity also gets a separate
+`conditional_exit_multiple_diagnostics` entry. Its built-in criterion is zero
+after-cost total return, not the user's inferred objective. Only exit EV/EBIT
+varies; complete document/scenario assumptions remain fixed. With terminal EBIT
+E, diluted shares S, exit net debt N, cumulative dividends D, entry outlay O and
+exit-cost fraction c, the positive-equity interior boundary is
+`M = (N + S*(O-D)/(1-c)) / E`.
+
+The result retains an exact rational of the computed finite operands, an upward
+rounded decimal, the existing kernel's boundary replay, signed residual and an
+explicit numerical tolerance. Below/above checks use the midpoint between the
+investable domain minimum and boundary, and boundary plus one multiple unit.
+These are derived mathematical probes, not supplied forecasts or plausibility
+estimates. Equality is not strict outperformance. Original scenario/sensitivity
+rows and their coverage counts remain unchanged; coverage points to diagnostics
+separately and still leaves joint necessary parameter conditions unresolved.
+
+Inspect each diagnostic status. Zero EBIT can make the target unattainable or
+already satisfied by dividends/net cash. No-floor negative-equity prices are
+excluded from the investable domain. Targets met at the domain minimum require
+no higher boundary; absent lower valid probes are stated explicitly. Negative
+EBIT is rejected by the current operating model, and guarded as unsupported by
+this diagnostic. An unavailable or numerically unresolved diagnostic does not
+replace valid original row results. No DCF rate, benchmark, economic multiple
+cap, financing sufficiency or scenario probability is inferred.
 
 `financial.corporate_action_return`: required
 `{start_mark_on,end_mark_on,requested_end_on,start_raw_price,end_raw_price,
@@ -394,7 +436,3 @@ incomparability even if raw arithmetic is true. Optional `absolute_tolerance`
 (default 1e-8) and `relative_tolerance` (default 1e-7) apply to equality only;
 inequalities use exact boundaries. This checks declared operands and metadata,
 not arbitrary prose, authentic sources or causality.
-
-## REIT measure reconciliation
-
-Use `financial.reit_reconciliation` for declared FFO/AFFO/CFO component arithmetic and unresolved recurring-to-gross-capex mapping. [Original operand binding](reit-reconciliation.md) is required before primary source-record comparability. Direct, workbench and workflow calls retain conditional arithmetic; matching caller metadata or SOURCE roles cannot establish original accounting scope. [Property facts](reit-sources.md) preserve source-known meaning independently of unbound requested rows.

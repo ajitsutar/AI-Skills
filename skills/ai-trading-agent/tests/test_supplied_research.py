@@ -8,11 +8,10 @@ class SuppliedResearchTests(unittest.TestCase):
     def setUp(self):
         self.tmp=tempfile.TemporaryDirectory(prefix='supplied-research-');self.addCleanup(self.tmp.cleanup)
         self.root=Path(self.tmp.name);self.sources=self.root/'sources';self.sources.mkdir()
-        from test_reit_sources import fixture
-        req, original = fixture(); self.raw=bridge.encode(original)
+        self.raw=b'{"holding":{"basis":"common","amount":7.5}}\n'
         (self.sources/'record.json').write_bytes(self.raw)
         self.manifest=self.root/'ingress.json';self.make_manifest()
-        self.req=self.root/'request.json';self.document={'producer':'reit_sources','producer_request':req}
+        self.req=self.root/'request.json';self.document={'producer':'source_claims','producer_request':{'operation':'presence','terms':['common']}}
         self.save_request();self.output=self.root/'output'
     def make_manifest(self,filename='record.json'):
         self.manifest.write_bytes(bridge.encode({'schema_version':1,'sources':[{'id':'original','path':filename,
@@ -23,7 +22,7 @@ class SuppliedResearchTests(unittest.TestCase):
         p=self.output/'receipt.json';r=json.loads(p.read_bytes());r['artifacts']=bridge.file_inventory(self.output);p.write_bytes(bridge.encode(r))
     def test_real_producer_originals_report_and_replay(self):
         receipt=self.run_bridge();result=json.loads((self.output/'result.json').read_bytes())
-        self.assertTrue(result['metric_ledger']['affo']['source_bound_comparability'])
+        self.assertEqual(result['predicate'],'SOURCE_CANDIDATE_PRESENT')
         self.assertEqual((self.output/'originals/record.json').read_bytes(),self.raw)
         self.assertIn('Complete structured evidence',(self.output/'report.md').read_text())
         self.assertFalse(receipt['whole_report_semantic_pass']);self.assertEqual(bridge.verify(self.output)['status'],'SOURCE_REPLAY_AND_SAVED_REPORT_MATCH')
@@ -44,12 +43,10 @@ class SuppliedResearchTests(unittest.TestCase):
     def test_cached_output_edit_rejected_by_source_replay(self):
         self.run_bridge();p=self.output/'result.json';r=json.loads(p.read_bytes());r['predicate']='SOURCE_ABSENT';p.write_bytes(bridge.encode(r));self.rewrite_inventory()
         with self.assertRaisesRegex(ValueError,'ORIGINAL_SOURCE_REPLAY_MISMATCH'):bridge.verify(self.output)
-    def test_unbound_basis_stays_conditional_after_replay(self):
-        self.document['producer_request']['bindings']=[];self.save_request();receipt=self.run_bridge()
-        result=json.loads((self.output/'result.json').read_bytes())
-        self.assertIsNone(result['metric_ledger']['affo']['value'])
-        self.assertIsNotNone(result['metric_ledger']['affo']['conditional_same_basis_value'])
-        self.assertFalse(receipt['whole_report_semantic_pass']);bridge.verify(self.output)
+    def test_rejected_claim_never_becomes_semantic_pass(self):
+        self.document['producer_request']['assert_claims']=['source_absent'];self.save_request();receipt=self.run_bridge()
+        result=json.loads((self.output/'result.json').read_bytes());self.assertEqual(result['claim_verdict'],'REJECTED')
+        self.assertIn('REJECTED',(self.output/'report.md').read_text());self.assertFalse(receipt['whole_report_semantic_pass'])
     def test_free_prose_is_always_unaudited(self):
         self.document['unverified_prose']='An unsupported qualitative interpretation.';self.save_request();receipt=self.run_bridge()
         report=(self.output/'report.md').read_text();self.assertIn('## Unaudited prose',report)
@@ -60,11 +57,11 @@ class SuppliedResearchTests(unittest.TestCase):
         self.assertTrue((self.output/'ingress.json').exists());self.assertTrue((self.output/'originals/record.json').exists())
         self.assertFalse((self.output/'receipt.json').exists());self.assertEqual(json.loads((self.output/'failure.json').read_bytes())['stage'],'producer')
     def test_producer_drift_blocks_completion(self):
-        with patch.object(bridge,'produce',side_effect=[{'status':'FIRST','report':{'text':'Fixed report.','sha256':bridge.digest(b'Fixed report.'),'whole_report_semantic_pass':False}},{'status':'SECOND'}]):
+        with patch.object(bridge,'produce',side_effect=[{'status':'FIRST'},{'status':'SECOND'}]):
             with self.assertRaisesRegex(ValueError,'ORIGINAL_SOURCE_REPLAY_MISMATCH'):self.run_bridge()
         self.assertTrue((self.output/'result.json').exists());self.assertFalse((self.output/'receipt.json').exists())
     def test_producer_report_bad_digest_rejected(self):
-        self.document={'producer':'reit_sources','producer_request':{}};self.save_request()
+        self.document={'producer':'analyst_sources','producer_request':{}};self.save_request()
         with patch.object(bridge,'produce',return_value={'report':{'text':'Generated source findings.','sha256':'0'*64,'whole_report_semantic_pass':False}}):
             with self.assertRaisesRegex(ValueError,'PRODUCER_REPORT_HASH_MISMATCH'):self.run_bridge()
     def test_fixed_producer_report_is_replayed(self):
@@ -90,11 +87,17 @@ class SuppliedResearchTests(unittest.TestCase):
         # This also works on case-sensitive hosts.
         if not (self.sources/'RECORD.json').exists():(self.sources/'RECORD.json').write_bytes(self.raw)
         with self.assertRaisesRegex(ValueError,'DUPLICATE_SOURCE_PATH'):self.run_bridge()
-    def test_unavailable_producers_rejected_before_execution(self):
-        for producer in ('analyst_sources','source_claims'):
-            with self.subTest(producer=producer):
-                raw=bridge.encode({'producer':producer,'producer_request':{}})
-                with self.assertRaisesRegex(ValueError,'UNSUPPORTED_PRODUCER_OR_REQUEST'):bridge.request(raw)
+    def test_real_analyst_producer_report_and_replay(self):
+        row={'firm_id':'Cedar','analyst_id':'Researcher','issuer':'SYN','currency':'USD','target':46.5,
+             'issued_at':'2028-02-02T10:00:00Z','published_at':'2028-02-02T11:00:00Z','observed_at':'2028-02-02T12:00:00Z',
+             'url':'https://example.test/note','price_basis':'common_share_unadjusted','target_horizon':'forward_12_months','access':'FULL_REPORT'}
+        self.raw=bridge.encode(row);(self.sources/'record.json').write_bytes(self.raw);self.make_manifest()
+        self.document={'producer':'analyst_sources','producer_request':{'as_of':'2028-02-10T12:00:00Z',
+            'cohort':{'issuer':'SYN','currency':'USD','price_basis':'common_share_unadjusted','target_horizon':'forward_12_months'},
+            'extraction_profile':{'formats':['json_records','labelled_sentences']}}};self.save_request()
+        self.run_bridge();result=json.loads((self.output/'result.json').read_bytes())
+        self.assertEqual(result['eligible_cohort']['result']['consensus']['mean'],46.5)
+        self.assertIn('Cedar',(self.output/'report.md').read_text());self.assertFalse(bridge.verify(self.output)['whole_report_semantic_pass'])
     def test_real_reit_producer_report_and_replay(self):
         from test_reit_sources import fixture
         req,original=fixture();self.raw=bridge.encode(original);(self.sources/'record.json').write_bytes(self.raw);self.make_manifest()
@@ -121,6 +124,22 @@ class SuppliedResearchTests(unittest.TestCase):
         self.assertEqual(result['metric_ledger']['cfo']['value'], '17.125')
         self.assertEqual((self.output/'original-request.json').read_bytes(), raw_request)
         self.assertEqual((self.output/'originals/record.json').read_bytes(), self.raw)
+        self.assertFalse(receipt['whole_report_semantic_pass'])
+        self.assertEqual(bridge.verify(self.output)['status'], 'SOURCE_REPLAY_AND_SAVED_REPORT_MATCH')
+
+    def test_unbound_reit_basis_stays_conditional_after_replay(self):
+        # Preserve the accepted public-subset regression with an explicit REIT
+        # fixture, since the full experimental suite defaults to source claims.
+        from test_reit_sources import fixture
+        req, original = fixture()
+        req['bindings'] = []
+        self.raw = bridge.encode(original)
+        (self.sources/'record.json').write_bytes(self.raw); self.make_manifest()
+        self.document = {'producer':'reit_sources', 'producer_request':req}
+        self.save_request(); receipt = self.run_bridge()
+        result = json.loads((self.output/'result.json').read_bytes())
+        self.assertIsNone(result['metric_ledger']['affo']['value'])
+        self.assertIsNotNone(result['metric_ledger']['affo']['conditional_same_basis_value'])
         self.assertFalse(receipt['whole_report_semantic_pass'])
         self.assertEqual(bridge.verify(self.output)['status'], 'SOURCE_REPLAY_AND_SAVED_REPORT_MATCH')
 

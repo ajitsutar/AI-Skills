@@ -97,6 +97,32 @@ class FinancialAlignmentTests(unittest.TestCase):
         self.assertEqual(Decimal(result['sensitivities'][0]['terminal_share_price']),Decimal('10.9'))
         self.assertFalse(central['reinvestment_financing_reconciled']);self.assertIsNone(central['interim_free_cash_flow'])
 
+    def test_sampled_favorable_row_does_not_establish_necessary_parameter_values(self):
+        request=self.valuation()
+        request['sensitivities'].append({'id':'intermediate-margin','base_scenario_id':'central',
+                                        'overrides':{'terminal_ebit_margin':'.18'}})
+        result=f.terminal_scenarios(request)
+        central=result['scenarios'][0];low,intermediate=result['sensitivities']
+        self.assertGreater(Decimal(central['net_total_return_fraction']),0)
+        self.assertLess(Decimal(low['net_total_return_fraction']),0)
+        self.assertGreater(Decimal(intermediate['net_total_return_fraction']),0)
+        self.assertLess(Decimal(intermediate['terminal_share_price']),Decimal(central['terminal_share_price']))
+        coverage=result['scenario_coverage']
+        self.assertEqual(coverage['scenario_ids'],['central'])
+        self.assertEqual(coverage['sensitivity_ids'],['margin-down','intermediate-margin'])
+        self.assertEqual(coverage['evaluated_row_count'],3)
+        self.assertFalse(coverage['parameter_domain_exhaustive'])
+        self.assertIsNone(coverage['necessary_parameter_conditions'])
+        self.assertEqual(len(coverage['break_even_thresholds']),3)
+        self.assertTrue(all(row['criterion']=='AFTER_COST_CAPITAL_PRESERVATION' for row in coverage['break_even_thresholds']))
+        self.assertTrue(all(row['necessary_joint_parameter_conditions'] is None for row in result['conditional_exit_multiple_diagnostics']))
+        request['sensitivities']=[]
+        single=f.terminal_scenarios(request)
+        self.assertEqual(single['scenario_coverage']['evaluated_row_count'],1)
+        self.assertEqual(single['scenario_coverage']['sensitivity_ids'],[])
+        self.assertFalse(single['scenario_coverage']['parameter_domain_exhaustive'])
+        self.assertEqual(single['scenarios'][0],central)
+
     def test_discount_rate_without_dividend_timing_does_not_create_current_value(self):
         request=self.valuation();request['annual_discount_rate']='.1'
         result=f.terminal_scenarios(request)['scenarios'][0]

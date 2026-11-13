@@ -6,6 +6,15 @@ API subscription, broker connection or model-specific service.
 
 ## Run an explicit request once
 
+For analyst targets or REIT comparisons supplied as an original-source corpus,
+start with [integrated source research](supplied-research.md). The same entry point
+supports `source-run REQUEST.json --manifest MANIFEST.json --manifest-sha256 PIN
+--source-root ORIGINAL_ROOT --private-output-dir NEW_DIRECTORY` and
+`source-verify NEW_DIRECTORY`. These stages derive/bind supported source records,
+compute and render, then replay the saved report against retained originals.
+Keep original metadata gaps and conditional arithmetic visible. Selecting a
+complete-looking caller-created table is not original-source binding.
+
 For an existing workbench request, prefer the single offline entry point:
 
 ```console
@@ -101,5 +110,3 @@ collection separately. A correct manual result is not proof the required workflo
 ran. A skipped participant is not agreement. These tools reduce avoidable variation
 without guaranteeing that every model follows the workflow or makes identical
 future judgments.
-
-For REIT comparisons supplied as an original-source corpus, use [integrated source research](supplied-research.md) and [final artifact composition](final-report.md). Bind supported original records, calculate, retain unknown metadata, and replay the saved report. Caller-created metadata is not original-source evidence.

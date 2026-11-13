@@ -1,5 +1,12 @@
 # Source-bound research and reporting
 
+For original-corpus analyst targets and REIT comparisons, use
+[integrated source research](supplied-research.md) through `research_workflow.py source-run`.
+It connects source derivation/binding to computation, generated reporting and
+saved-byte replay. Its `source-verify` command replays the retained originals.
+Unbound declared REIT arithmetic remains conditional; a prepared caller-created
+input object alone cannot certify original accounting basis.
+
 For supplied-data numerical research, use `research_workflow.py` as the entrypoint.
 It calls the installed calculations, request/evidence receipts and report-facts
 adapter, producing the result and its report together. Reimplementing an available
@@ -229,5 +236,3 @@ references inside that same response. Compose the response after substantive
 commands finish. Its authoring command may be recorded separately afterward;
 never claim a placeholder stream hash proves the completed stream. Preserve an
 incorrect original reference as a disclosed evidence failure, not a silent repair.
-
-For REIT comparisons supplied as an original-source corpus, use [integrated source research](supplied-research.md) and [final artifact composition](final-report.md). Bind supported original records, calculate, retain unknown metadata, and replay the saved report. Caller-created metadata is not original-source evidence.

@@ -196,6 +196,21 @@ claims separate from the arithmetic.
 
 Use `evidence.price_comparison` for cross-item percentage arithmetic. Its
 arguments are `quote`, `references` and optional `conditional_same_basis`.
+When called through `research_workflow`, the workflow also derives
+`basis_provenance` from leaf or enclosing bindings. A `$assumption` supplying a
+compatibility dimension remains unknown in `primary_operands`, while its original
+value and reason remain in `assumed_basis_fields` and the separately labeled
+conditional sensitivity. Missing/null fields cannot borrow the other operand's
+basis. The retained arguments stay unchanged. Do not supply `basis_provenance`
+yourself in a source-bound plan; the workflow rejects that override.
+
+To support a primary comparison, bind actual observed metadata with `$source`.
+Text transcriptions entered as `$assumption` remain conditional, even when their
+reason cites a filename. If using an extracted observation record, retain its
+original text/hash, locator and extraction record for review; a source binding
+proves supplied-byte provenance, not semantic truth or source authentication.
+Direct helper calls without provenance retain caller-supplied arithmetic and
+label that basis `CALLER_SUPPLIED_UNVERIFIED`.
 Each operand has a unique `id`, a positive numeric `value`, and its own flat
 `security_id`, `issuer_id`, `currency`, `share_basis` and `adjustment_basis`
 metadata. Each reference also has `kind`: `fair_value`, `forward_target`,

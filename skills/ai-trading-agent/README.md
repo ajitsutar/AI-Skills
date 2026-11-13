@@ -1,6 +1,15 @@
 # AI Trading Agent
 
-Version **5.7.8** includes [public-source intake](references/market-sources.md),
+[Source-bound issuer facts](references/issuer-evidence.md) and the
+[canonical response export](references/final-report.md) derive readable and
+structured results from the same retained calculations. The generated-only
+contract rejects free-form analytical overrides and preserves diagnostic labels
+and unknowns. Rejected terminal calculations retain preparation evidence before
+any final answer is created; a new preparation can correct declared inputs without
+overwriting the failure. Both final outputs verify after relocation. These checks
+do not certify source truth, investment correctness or complete task coverage.
+
+Version **5.7.11** includes [public-source intake](references/market-sources.md),
 [flow, positioning and squeeze diagnostics](references/market-flow.md), and a
 [configurable event-driven U.S.-stock paper-research pilot](references/institutional-research.md).
 Intake diagnoses conflicting source columns; volume comparisons require an
@@ -11,6 +20,34 @@ separately from descriptive net returns. Public X posts are research leads;
 this package includes no paid Unusual Whales adapter. Reported short interest,
 daily short volume, borrow snapshots and inferred squeeze pressure stay separate.
 
+Dated cash benchmarks retain source applicability separately from computable
+projections. Partial event calendars preserve feasible descriptive research
+and explicit forecast limits. Retained news ledgers can check excerpt-supported
+issuer candidates while keeping semantic attribution unresolved. Existing
+proposals retain their exact terms and provenance through approval review.
+The [final news-ledger provenance audit](references/news-and-guidance.md#audit-provenance-in-the-final-ledger)
+checks retained declarations without certifying source authenticity.
+
+[Integrated original-source research](references/supplied-research.md) derives
+supported analyst records and binds REIT operands before calculating and replaying
+the saved report. Unknown metadata and conditional results remain explicit.
+Terminal reports distinguish after-cost capital preservation from DCF closure;
+these paths do not authenticate sources or certify arbitrary final prose.
+REIT reports retain source-known property-fraction meaning alongside unknown
+scope and attribution. [Final artifact composition](references/final-report.md)
+executes supported producers and checks the exact saved answer against their
+complete reports. Typed objective conclusions retain the requested comparator and supplied-row scope, separate actual conditional minima from larger-multiple probes, and leave uncomputed DCF closure unresolved. Necessary extra prose stays explicitly unaudited; replay does
+not establish investment correctness or complete task coverage. Fractional JSON
+inputs retain decimal precision through normalized calculation hashing, while
+original raw bytes remain separately pinned.
+
+Research claim repairs add [objective-bound scenario checks](references/scenario-claims.md),
+[source and corpus claim checks](references/source-claims.md), and
+[source-bound news comparisons](references/news-evidence.md). They retain counterexamples,
+unknown metadata and arithmetic-only outcomes, with exact saved-output attribution.
+These checks do not authenticate sources or certify arbitrary prose.
+[Bound report drafting](references/report-claims.md) now renders typed claims from retained outputs and audits the exact saved draft, exposing edited claims and every unaudited prose span before first-response publication.
+
 Every paid subscription is optional across all skill tools and research workflows.
 Use relevant accessible free sources first; user-provided paid access can add
 fresher data or materially better coverage. Missing access leaves explicit gaps
@@ -20,13 +57,11 @@ Each upgrade also reviews example prompts and P1/P2/P3 case impact, updating
 applicable coverage while preserving frozen evidence. See
 [documentation and case maintenance](references/maintaining-the-skill.md).
 
-Dated cash benchmarks retain source applicability separately from computable
-projections. Partial event calendars preserve feasible descriptive research
-and explicit forecast limits. Retained news ledgers can check excerpt-supported
-issuer candidates while keeping semantic attribution unresolved. Existing
-proposals retain their exact terms and provenance through approval review.
-
-[Source-bound news comparisons](references/news-evidence.md) retain incomplete clocks and accounting basis, arithmetic-only range changes, and exact saved-output claim attribution.
+Supplied-data research includes [scoped event coverage](references/research-capability-scope.md),
+[cross-tool horizon consistency](references/horizon-consistency.md), and optional
+[pinned original-leaf lineage](references/original-source-lineage.md). These distinguish
+what the evidence supports from forecasts, clock conflicts and derived metadata;
+they do not authenticate sources or certify final prose.
 
 [Execution policy](references/execution-modes.md) selects `paper`, `approval` or
 `autonomous` in a separate persistent JSON file for each task, including each
@@ -220,7 +255,7 @@ mapping with the same source facts preserved.
 
 ## Recommendations and evidence
 
-The shared Value–Quality–Momentum profile produces a reproducible research queue,
+The shared ValueÃ¢â‚¬â€œQualityÃ¢â‚¬â€œMomentum profile produces a reproducible research queue,
 followed by primary-source, horizon and portfolio review. Keep numerical rank,
 valuation evidence and recommendation confidence distinct. A relative factor score
 is not an expected return. Research labels describe the evidence; they do not
@@ -462,5 +497,3 @@ exercise. The [derivatives toolkit](references/derivatives-toolkit.md) separatel
 supports bounded vanilla American CRR valuation with explicit grid, rate/dividend
 conventions and source metadata. Missing inputs stay unresolved; do not substitute
 a European price or import example assumptions.
-
-[Original-source REIT research](references/supplied-research.md) binds monetary operands and preserves source-known property meaning with unknown scope. [Final report composition](references/final-report.md) replays the REIT producer and exact saved answer; extra prose stays unaudited. Finite Decimal inputs retain precision through normalized calculation hashing while original bytes remain separately pinned. [Final news-ledger provenance](references/news-and-guidance.md#audit-provenance-in-the-final-ledger) checks retained declarations without certifying authenticity.

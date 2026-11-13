@@ -30,7 +30,7 @@ Source selection and surrounding narrative still require review.
 
 The trading workflows use accessible free sources first; paid subscriptions are
 optional and existing user-provided access can improve freshness or coverage.
-Version **5.7.8** includes free public-source intake and dated flow/squeeze
+Version **5.7.11** includes free public-source intake and dated flow/squeeze
 research. Repairs diagnose ambiguous columns and unknown volume bases, bind
 paper evaluation to supplied protocol/response clocks, and reconcile nested
 currency contracts. Public X posts remain leads; the paid Unusual Whales
@@ -47,6 +47,15 @@ meaning and unknown attribution, and reconciles cross-measure assumptions before
 reporting conditional results. Saved REIT reports can retain their original sources
 and verify exact output consistency. News-ledger audits also retain original-source
 lineage. These checks do not authenticate sources or certify investment conclusions.
+
+[Canonical research reports](skills/ai-trading-agent/references/final-report.md)
+derive readable and structured answers from the same retained calculations.
+Source-bound issuer evidence keeps dated funding, dilution and covenant limits
+explicit. Terminal analysis separates conditional capital-preservation boundaries
+from larger-multiple probes and unevaluated DCF closure. Rejected terminal
+execution retains preparation evidence before finalization; valid negative
+outcomes and unknown values remain reportable. Proposed thesis reviews and
+rolling research plans do not create live schedules or trading authority.
 
 Its [execution policy](skills/ai-trading-agent/references/execution-modes.md)
 is separate for each task, including each scheduled task, and defaults to `paper`.

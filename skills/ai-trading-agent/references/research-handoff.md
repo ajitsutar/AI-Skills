@@ -134,6 +134,14 @@ Long-term event coverage can use the existing sourced `rolling_review` mode; dat
 beyond that window remain unassessed. A bare `decision_mode: long_term` review does
 not replace the handoff's exact-horizon evidence contract.
 
+When a request uses more than one clock helper, run
+[`research.audit_horizon_consistency`](horizon-consistency.md) over the route input
+and actual downstream input documents. Declare a legacy clock's role explicitly
+as `comparison_only` or `hard_exit`; the field name `exit_at` does not determine
+intent. A session-shifted timestamp cannot certify an unchanged date-only
+comparison. Retain conflicts and incomplete adapter coverage; a matching audit
+does not replace primary, scenario, event or screening checks.
+
 ## Check release freshness, not just retrieval time
 
 A financial period normally ends before the market-price date. That ordering

@@ -238,6 +238,11 @@ When passing a flexible thesis-review request to `research_handoff`, use
 fixed-horizon analytical checks; its internal `exit_at` comparison alias is not a
 sell instruction. `horizon_mode: fixed_exit` is reserved for a user-specified hard
 deadline. See [research-handoff.md](research-handoff.md) for the exact adapter.
+If separate helpers supply clocks for the same request, retain their original
+inputs and run the [typed consistency audit](horizon-consistency.md). A full
+fixed-horizon screen must keep its existing checks; a date-only flexible review
+does not acquire those checks by manufacturing a timestamp. Disclose incomplete
+coverage where the exact-timestamp adapter is inapplicable.
 
 ## Execution boundary
 

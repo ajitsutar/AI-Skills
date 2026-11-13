@@ -2,8 +2,10 @@
 name: ai-trading-agent
 description: Investment recommendations, reproducible equity and multi-asset research, portfolio risk, derivatives calculations, paper-event replay and native broker handoff across holding periods. Use for investment decisions, quantitative strategy evaluation, research and paper testing, and assessing evidence for actual host capabilities.
 ---
+
 # AI Trading Agent
-Package version: **5.7.8 - November 12, 2026**.
+
+Package version: **5.7.11 - November 12, 2026**.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent
 policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
@@ -17,16 +19,17 @@ See [proposal evaluation](references/execution-modes.md#evaluate-supplied-propos
 Only an explicit user request may change the policy. Ordinary prompts supply what to do, not which policy mode to use; ask clarifying questions where intent is missing.
 Re-read the task's file before each action. Initialize a new task's policy in paper; never inherit another task's mode or choose a bundled example as an active setting.
 An invalid, inaccessible or wrong-task policy is an error, never live authority.
+
 Research and pure payload formatting require no policy or approval. Research risk findings remain advisory; no grant, ticket, strategy promotion, volatility clearance
 or new numerical execution gate is introduced. Host/platform/broker requirements still apply. A policy setting cannot grant permissions the host does not have.
 Use actual host results: a recommendation, formatter output or empty response is not a fill. Read [broker handoff](references/broker-integration.md) for that boundary.
+
 Resolve all files relative to this SKILL.md. Keep the entire standalone folder; uploading only this file omits the implementation. Keep personal evidence and
 research archives outside the installed package. Run `scripts/research_preflight.py`
 when diagnosing research dependencies or package integrity. Missing components limit the calculations you can truthfully claim, not permission to execute.
 
 ## Start with the request and its evidence
-For supplied original-source REIT comparisons, use [integrated source research](references/supplied-research.md) to bind operands and retain conditional arithmetic. Preserve [source-known property meaning](references/reit-sources.md) separately from unknown scope. Use [final artifact composition](references/final-report.md) for supported REIT reports, verify the exact saved response and deliver its unchanged bytes; additional prose remains visibly unaudited. Replay does not certify source truth, complete task coverage or arbitrary prose.
-
+For supported issuer disclosures, use [issuer evidence](references/issuer-evidence.md) to retain original business facts and derive funding, point-change and covenant diagnostics with their limits. When delivering both readable and structured research, compose a `STRUCTURED_RESEARCH_ONLY` [final report](references/final-report.md), export its canonical response, and run `final-response-verify` on the saved result. Deliver the generated `first-response.md` and `response.json` unchanged; do not copy scratch metrics into a separate current-answer dictionary. Preserve requested qualitative topics, rolling-review context and unsupported subtasks explicitly. Generated output and replay do not establish complete request coverage, source authenticity or investment correctness. For supplied original-source analyst-target or REIT cross-measure research, use the [integrated source research path](references/supplied-research.md) before drafting conclusions. `research_workflow.py source-run` derives supported analyst records or binds each REIT operand, calculates and replays its report against retained originals. Keep conditional results and unsupported-source gaps. Direct REIT arithmetic without original-record binding remains conditional even when metadata agrees; preserve [source-known property meaning](references/reit-sources.md) separately from unknown attribution. For supported final reports, use [final artifact composition](references/final-report.md), verify the exact saved response, and deliver its unchanged bytes. When answering a terminal-objective or discount-closure question, enable `objective_conclusion_required` and add replayed `objective_conclusion` sections for the actual requested objectives; use `include_boundaries` to distinguish mathematical minima from above-threshold probes. Keep analyst judgments separate from computed conditions and review any necessary unaudited prose for contradictions. These checks do not certify source truth, complete task coverage or arbitrary prose.
 For public big-print, positioning and squeeze research, use [market sources](references/market-sources.md) and [market flow](references/market-flow.md).
 For a configurable event-driven U.S.-equity paper pilot, use [institutional research](references/institutional-research.md); real outcomes and host acceptance remain separate.
 
@@ -46,34 +49,22 @@ unresolved tax liabilities. For a withdrawal goal, include conditional cash-only
 `spending_goal` without inferring a calibrated probability or actual cash access.
 
 Before authoring a final answer, follow the [final claims and scenario review](references/evidence-semantics.md#final-claims-and-scenario-review).
-Retain source/result pointers, audit conditional claims and funding alternatives,
-and bind source opening conventions and event scope before scenario projections.
+Retain source/result pointers, audit conditional claims and funding alternatives, and bind source opening conventions and event scope before scenario projections.
 
-For supplied-data research, read the full current request and inventory its allowed
-files before selecting a calculation. Preserve its universe, horizon, objective,
-source scope and requested comparisons. An example configuration is not the user's
-mandate. When acquisition is excluded, work from the retained bytes and report
+For supplied-data research, read the full current request and inventory its allowed files before selecting a calculation. Preserve its universe, horizon, objective,
+source scope and requested comparisons. An example configuration is not the user's mandate. When acquisition is excluded, work from the retained bytes and report
 what is missing; do not invoke a download command to fill that gap.
 
-Carry supplied decision context through to the answer: the purpose of the money,
-recurring contributions, liquidity needs, constraints and any loss scenario the
-user asks to discuss. State how each material field affects the comparison, or
-why it remains unresolved or outside a clearly stated calculation scope. An
-initial-budget calculation does not answer recurring-contribution affordability.
-Do not invent contribution timing, returns or loss probabilities to fill a gap.
-Review this narrative coverage separately from numerical replay; helpers cannot
-certify that the answer addressed every supplied preference.
+Carry supplied decision context through to the answer: the purpose of the money, recurring contributions, liquidity needs, constraints and any loss scenario the
+user asks to discuss. State how each material field affects the comparison, or why it remains unresolved or outside a clearly stated calculation scope. An
+initial-budget calculation does not answer recurring-contribution affordability. Do not invent contribution timing, returns or loss probabilities to fill a gap.
+Review this narrative coverage separately from numerical replay; helpers cannot certify that the answer addressed every supplied preference.
 
-Before finalizing a portfolio comparison, check the answer against the original
-decision context, not just the computed jobs. Explain the consequence of a
-supplied loss for the spending goal (including delay or reduced spending where
-applicable), and whether a cash alternative is relevant if the goal cannot absorb
-that loss. A per-unit shock calculation alone does not answer this question.
-For each sized alternative used in the conclusion, reconcile its implemented
-gross exposures, costs and remaining cash on a stated denominator. A separately
-labeled pre-cost target is useful but does not replace this comparison. Support
-comparative diversification claims with the actual distinct underlying issuers,
-weights and known overlap; a fund wrapper, index label, complete holdings file or
+Before finalizing a portfolio comparison, check the answer against the original decision context, not just the computed jobs. Explain the consequence of a
+supplied loss for the spending goal (including delay or reduced spending where applicable), and whether a cash alternative is relevant if the goal cannot absorb
+that loss. A per-unit shock calculation alone does not answer this question. For each sized alternative used in the conclusion, reconcile its implemented
+gross exposures, costs and remaining cash on a stated denominator. A separately labeled pre-cost target is useful but does not replace this comparison. Support
+comparative diversification claims with the actual distinct underlying issuers, weights and known overlap; a fund wrapper, index label, complete holdings file or
 additional sector labels alone cannot establish broader diversification or lower
 risk. Keep unknown dimensions unknown. If any of these checks cannot be completed,
 state the exact remaining limitation in the conclusion rather than asserting it.
@@ -132,6 +123,7 @@ For explicit workbench requests, prefer the single offline `research_workflow.py
 command and its generated answer facts and completion record; see
 [checked answers across model hosts](references/model-alignment-hardening.md).
 Keep generated metric labels, scenario scopes and evidence states in the answer.
+For valuation necessity or sufficiency claims, use [objective-bound scenario checks](references/scenario-claims.md) to retain counterexamples, finite-domain scope and distinct goals alongside sampled rows and conditional exit-multiple diagnostics; a zero-return threshold does not establish DCF closure. Before presenting source-presence claims, scenario conditions, accounting labels or latest-cohort claims, use [bound report drafting and saved-byte audit](references/report-claims.md); retain exact objectives, counterexamples, basis and corpus scope. Review every unaudited material claim before publishing the unchanged audited draft as the first response; a consistency result does not certify source truth or prose correctness.
 
 For saved-campaign refreshes, read [research memory](references/research-memory.md).
 Verified archive bytes or unchanged snapshot fields do not establish current
@@ -274,8 +266,7 @@ When the supplied financial observations are not already normalized, map them
 explicitly with `data.normalize_flows` and [flow-normalization.md](references/flow-normalization.md).
 Run the installed normalizer; do not treat a missing input envelope as missing
 financial evidence or create a separate model-written TTM calculation.
-For statement education/comparisons, follow the [financial evidence and derivation contract](references/fundamental-toolkit.md#financial-statement-evidence).
-Use [REIT reconciliation](references/reit-reconciliation.md) for FFO/AFFO/CFO differences and unknown capex overlap. With an externally pinned original corpus, [leaf lineage](references/original-source-lineage.md) distinguishes source identity from accounting scope.
+For statement comparisons, follow the [financial evidence contract](references/fundamental-toolkit.md#financial-statement-evidence); use [REIT reconciliation](references/reit-reconciliation.md) for FFO/AFFO/CFO differences, unknown capex overlap and source-bound metadata roles. Use [source claim checks](references/source-claims.md) for adapter-versus-source presence, EPS classification and configured supplied-corpus coverage before analyst-cohort claims; retain their generated facts and unresolved coverage in the answer.
 For peer valuation, also verify the [numerator and cash-flow basis](references/fundamental-toolkit.md#valuation-numerator-and-cash-flow-basis) before recommending a multiple, including custom arithmetic.
 Preserve EPS period/numerator basis and comparator provenance; do not infer SBC issuance or covenant definitions. Use supported `fundamental.calculate` ratios and raw opening/closing or gross-profit operands.
 Derived observations are executed calculations, not assumptions. Retain source bindings and derived results, and reconcile intermediate inputs and every final narrative metric. Historical trend claims need a separate same-metric current/prior evidence row, including in the conclusion.
@@ -286,10 +277,12 @@ enhancements, free fallbacks and evidence limits. Dynamically discover material 
 analyst evidence using [news-and-guidance.md](references/news-and-guidance.md) and
 [analyst-research.md](references/analyst-research.md). Disclose actual access;
 headlines, full reports, paywalls and inaccessible sources are different coverage.
-For guidance clock/basis gaps, revisions and tool-attributed labels, use [source-bound news checks](references/news-evidence.md), preserving unknowns and arithmetic-only results. For a retained discovery/access ledger, use the [discovery check](references/news-and-guidance.md#check-a-retained-discovery-ledger)
+For a retained discovery/access ledger, use the [discovery check](references/news-and-guidance.md#check-a-retained-discovery-ledger)
 without requiring sentiment scoring. Keep excerpt-supported text candidates
 separate from configured issuer scope; lexical matches do not certify relevance.
-For publication/original-source fields, [audit the actual final ledger](references/news-and-guidance.md#audit-provenance-in-the-final-ledger) against retained declarations; preserve ambiguity and distinguish consistency from authenticity.
+For guidance clock/basis gaps, revisions and tool-attributed labels, use [source-bound news checks](references/news-evidence.md), preserving unknowns and arithmetic-only results. For publication/original-source fields, [audit the actual final ledger](references/news-and-guidance.md#audit-provenance-in-the-final-ledger)
+against retained declarations, preserving ambiguous or unaudited fields and the
+distinction between mechanical consistency and source authenticity.
 Forward targets are analyst opinions, distinct from past 52-week ranges and
 intrinsic value. Social posts supply research leads, not authoritative facts.
 Use the analyst helper's population-scoped provenance when explaining dependence:
@@ -330,6 +323,14 @@ do not substitute sample constraints, unrelated record dates or a different stra
 Receipts disclose uncertainty and do not infer the user's intent or authenticate sources.
 For partial event calendars, use the router's [research capability scope](references/research-capability-scope.md)
 to distinguish feasible descriptive work from uncertified forecasts or exclusions.
+When multiple tools represent one requested horizon, run the [cross-tool clock audit](references/horizon-consistency.md)
+on those retained contexts before combining their conclusions. It detects declared
+clock conflicts without substituting dates or relaxing actual fixed deadlines.
+If a pinned original-source ingress manifest is supplied, use [original leaf lineage](references/original-source-lineage.md)
+for derived financial metadata. Keep the declared document and its arithmetic;
+use the filtered metadata view only alongside the original reconciliation and
+semantic scope review. A newly authored request does not become original evidence
+by being labeled as a source. Without an external pin, disclose lineage as unverified.
 For retained model-run reviews, follow [original-request fidelity](references/research-alignment.md#review-retained-model-runs-against-the-original-request):
 compare every run with the authoritative requested input separately from its own
 internal consistency and numerical replay.
@@ -376,10 +377,10 @@ does not establish rounding to a whole monetary unit. Explicit precision
 sensitivities belong beside an unresolved primary result.
 
 For numerical fair-value, target or historical-range comparisons, use
-`evidence.price_comparison` and its named formulas. Discount from a reference
-price divides by that reference; upside from the current quote divides by the
-quote. Keep conditional basis assumptions and incompatible or unknown operand
-metadata in the result instead of silently borrowing them from another record.
+`evidence.price_comparison`: discount divides by reference; upside divides by quote.
+Source-bound assumed basis stays out of primary comparisons; retain incompatible
+or unknown metadata and use labeled conditional sensitivities. For cash bridges,
+keep each `cash_metrics` formula/component identity even when distinct measures have equal values.
 
 For day/swing research, use [short-term-trading.md](references/short-term-trading.md)
 and [strategy-playbook.md](references/strategy-playbook.md). Match signals, events,

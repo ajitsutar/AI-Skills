@@ -3,6 +3,57 @@
   "title": "Example prompts: learning, investing, trading and quantitative research",
   "sections": [
     {
+      "id": "canonical-generated-research",
+      "title": "Keep readable and structured research consistent",
+      "audience": "Researchers delivering reproducible supplied-source analysis",
+      "guides": [
+        "references/final-report.md",
+        "references/issuer-evidence.md"
+      ],
+      "prompts": [
+        {
+          "title": "Export one canonical analytical response",
+          "prompt": "Compose supported supplied-source research with STRUCTURED_RESEARCH_ONLY, then export and verify the canonical response. Deliver both generated artifacts unchanged. Keep diagnostic ratios separate from reported EPS, retain unknowns and source bindings, and identify requested work that the supported sections cannot cover."
+        },
+        {
+          "title": "Review preparation before finalizing research",
+          "prompt": "Prepare the supplied terminal research and inspect its retained execution results before finalizing the hash-pinned preparation. Resolve feasible input-mapping errors in a new preparation while preserving failed attempts. Declare supported assumptions explicitly rather than inventing missing source facts. Keep valid negative returns and unknown findings distinct from execution failures; do not overwrite an existing first answer."
+        },
+        {
+          "title": "Compare funding with original scope retained",
+          "prompt": "Bind the supplied issuer record and derive the funding comparison from retained source amounts and compatible dimensions. Distinguish equality from shortfall, a point-to-point share change from an annual rate, and a leverage diagnostic from contractual covenant compliance. Keep business context and monitoring hypotheses separate from proven valuation conditions."
+        },
+        {
+          "title": "Retain conditional thesis reviews and rolling plans",
+          "prompt": "Build a proposed research plan from the supplied issuer and event evidence. Separate conditions for reviewing the thesis from conditional invalidation criteria, identify source-bound thresholds versus analyst assumptions, and keep the review cadence distinct from the available event-calendar horizon. Retain unknowns and do not adopt a live schedule or execution policy."
+        }
+      ]
+    },
+    {
+      "id": "integrated-original-source-research",
+      "title": "Research from a retained original-source corpus",
+      "audience": "Analysts reviewing supplied disclosures and analyst notes",
+      "guides": [
+        "references/supplied-research.md",
+        "references/analyst-sources.md",
+        "references/reit-reconciliation.md"
+      ],
+      "prompts": [
+        {
+          "title": "Derive analyst cohorts from originals",
+          "prompt": "Use the complete supplied original-source manifest and its fixed hash to derive supported analyst target records at [CUTOFF]. Keep latest observed targets separate from the requested comparable horizon cohort, retain newer unresolved revisions and unsupported sources, and generate and replay the source-bound report. Do not manufacture publication, observation, price-basis or horizon metadata."
+        },
+        {
+          "title": "Reconcile REIT measures without assumed basis",
+          "prompt": "Reconcile [ORIGINAL REIT RECORDS] using a separately pinned source corpus. Bind each amount and supported accounting dimensions to its own original record. Report conditional arithmetic and missing holder, period or unit dimensions together, and verify the generated report from retained originals before using it."
+        },
+        {
+          "title": "Distinguish a return diagnostic from a valuation thesis",
+          "prompt": "Run the supplied terminal scenarios and inspect the generated objective-specific report. Keep after-cost capital preservation, modeled return, economic feasibility and DCF discount closure separate. Explain any derived alternative probes with their held assumptions; do not infer joint necessary business conditions from a few sampled rows."
+        }
+      ]
+    },
+    {
       "id": "institutional-event-pilot",
       "title": "Event-driven institutional paper research",
       "audience": "Research analysts, portfolio managers and reviewers",
@@ -82,8 +133,7 @@
         "references/quant-research-assurance.md",
         "references/quant-data-contracts.md",
         "references/release-acceptance.md",
-        "references/maintaining-the-skill.md",
-        "references/research-capability-scope.md"
+        "references/maintaining-the-skill.md"
       ],
       "prompts": [
         {
@@ -129,6 +179,34 @@
         {
           "title": "Review a flexible horizon with partial calendars",
           "prompt": "Review [ISSUERS] over [HORIZON] with a flexible exit. Use the research capability scope to describe known events and qualitative risk, retain later unknown dates, and keep unsupported quantified risks and terminal forecasts separate. Preserve any explicit event-exclusion requirement without inventing one."
+        },
+        {
+          "title": "Reconcile clocks across research tools",
+          "prompt": "For [RETAINED REQUEST AND TOOL CONTEXTS], audit that every analytical comparison date, precision, forced-exit declaration and buffer belongs to the same request. Show conflicts before combining outputs; preserve genuine fixed deadlines and do not infer a sale from an analytical comparison alias."
+        },
+        {
+          "title": "Trace derived accounting labels to original leaves",
+          "prompt": "Using [ORIGINAL SOURCE INGRESS MANIFEST] and [EXTERNALLY SUPPLIED SHA256], trace the metadata in [DERIVED FINANCIAL DOCUMENT] to exact original JSON leaves. Retain unmapped fields as unknown, preserve declared arithmetic and conflicting definitions, and assess measurement scope separately from byte identity."
+        },
+        {
+          "title": "Keep REIT metadata assumptions separate from source facts",
+          "prompt": "Bind [REIT DISCLOSURES] through the research workflow and inspect each measure's period, unit and holder metadata plus property denominators and time anchors. Retain actual binding roles, unknown primary fields, declared conflicts and separately conditional arithmetic. Check whether each selected source pointer applies to that measure; a verified file or matching assumed label does not establish accounting scope."
+        },
+        {
+          "title": "Inspect conditional capital-preservation boundaries",
+          "prompt": "For [DECLARED OPERATING SCENARIOS], inspect the exit-multiple diagnostic for zero after-cost return with all other inputs fixed. Retain its equation, domain, held assumptions, boundary replay and derived below/above probes. Distinguish a conditional sufficient alternative from necessary joint growth, margin or dilution targets; do not equate capital preservation with closing a DCF discount, beating a benchmark or a plausible future multiple."
+        },
+        {
+          "title": "Reconcile REIT measures without inventing capex overlap",
+          "prompt": "Reconcile [ISSUER FFO AND AFFO BRIDGES] with [CFO AND GROSS CAPEX COMPONENTS] using the supplied definitions, units, periods and holder bases. Show the cross-measure arithmetic identity separately from any documented recurring-capex allocation. Keep unknown overlap unresolved; category labels and equal totals do not prove inclusion or exclusion. Compare distributions with each distinct measure, and preserve missing denominator or time-anchor metadata for property fractions."
+        },
+        {
+          "title": "Keep price assumptions and cash components visible",
+          "prompt": "Compare [QUOTE] with [VALUATION REFERENCES] from [SUPPLIED SOURCES], preserving each operand's security, currency, share and adjustment basis. Keep assumed or missing basis out of primary conclusions and show any explicitly conditional sensitivity separately. Reconcile [CASH FLOW INPUTS] using metric formulas and signed components; distinguish separate and combined deductions even when their values match, preserve unknown components, and label economic proxies accurately."
+        },
+        {
+          "title": "Separate sampled valuation outcomes from required conditions",
+          "prompt": "Evaluate [SOURCE-BOUND VALUATION SCENARIOS] over [HOLDING PERIOD]. Show the exact rows and sensitivities evaluated, and distinguish closing a present-value discount, earning a positive after-cost return and beating [BENCHMARK]. Do not turn a favorable sampled combination into necessary growth, margin, multiple or dilution targets. If I ask for break-even conditions, retain the criterion, equation, domain, fixed assumptions and boundary check; otherwise leave necessary thresholds unresolved. Explain proposed thesis-review triggers separately from model-proven conditions."
         }
       ]
     },
@@ -413,8 +491,7 @@
       "title": "News, sentiment and between-quarter guidance",
       "audience": "Intermediate to quant",
       "guides": [
-        "references/news-and-guidance.md",
-        "references/news-evidence.md"
+        "references/news-and-guidance.md"
       ],
       "prompts": [
         {
@@ -456,14 +533,6 @@
         {
           "title": "Audit issuer support in a discovery ledger",
           "prompt": "Audit [RETAINED BULLETIN LEDGER] using the discovery check and [SAVED SOURCE DIRECTORY]. Verify the source hashes and exact accessible excerpts. Separate textual issuer candidates from the configured watchlist and declared industry context; keep unsupported assignments unknown. Explain whether each proposed attribution is supported by the content, retaining ambiguous aliases and limited access without treating a lexical match as semantic verification. This is a discovery/access review, not a sentiment-scoring request."
-        },
-        {
-          "title": "Compare guidance with incomplete source clocks",
-          "prompt": "Compare [ORIGINAL GUIDANCE SOURCES] at [CUTOFF] using exact source bindings. Preserve publication and observation roles, unknown accounting basis and revisions. Return supported descriptive arithmetic separately when a source-grounded disclosure-change claim cannot be established."
-        },
-        {
-          "title": "Audit reported helper labels",
-          "prompt": "Compare [CLAIMED LABELS AND VALUES] with exact JSON pointers in [SAVED HELPER RESULT]. Retain unsupported claims and actual values without changing the result, rerunning the original analysis or treating the audit as source authentication."
         },
         {
           "title": "Audit publication and original-source fields in the final ledger",
@@ -705,7 +774,7 @@
         },
         {
           "title": "Estimate historical tail losses",
-          "prompt": "Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps. If applying current weights to aligned asset returns, label the result a current-weight shock distribution rather than a historical strategy backtest. Report the supplied notional denominator, effective tail sample mass and sparse-sample warnings; do not scale a short sample into a guaranteed future loss limit. Calculate drawdown only from a supplied realized portfolio or strategy return path; do not infer historical strategy drawdown from today\u2019s weights."
+          "prompt": "Calculate empirical VaR, expected shortfall and drawdown for [RETURN SERIES] at [CONFIDENCE LEVEL]. Use frequency declared in the request or supplied data, preserving its provenance; state sample size, missing data and why historical tail estimates may miss future gaps. If applying current weights to aligned asset returns, label the result a current-weight shock distribution rather than a historical strategy backtest. Report the supplied notional denominator, effective tail sample mass and sparse-sample warnings; do not scale a short sample into a guaranteed future loss limit. Calculate drawdown only from a supplied realized portfolio or strategy return path; do not infer historical strategy drawdown from today’s weights."
         },
         {
           "title": "Run portfolio stress scenarios",
@@ -1911,6 +1980,57 @@
         {
           "title": "Retain executed experiment outcomes",
           "prompt": "Run this isolated local experiment sequence once, preserve failures and journal transitions, then write the result from captured outcomes. Keep plans separate from executed results and audit retained evidence without repeating stateful mutations."
+        }
+      ]
+    },
+    {
+      "id": "bound-research-claims",
+      "title": "Check research claims against retained evidence",
+      "audience": "Researchers working with supplied source records and declared models",
+      "guides": [
+        "references/scenario-claims.md",
+        "references/source-claims.md",
+        "references/news-evidence.md",
+        "references/report-claims.md",
+        "references/reit-sources.md",
+        "references/final-report.md"
+      ],
+      "prompts": [
+        {
+          "title": "Test a claimed necessary scenario condition",
+          "prompt": "For [MODEL] and [DECLARED FINITE PARAMETER DOMAIN], test [CONDITIONS] against [OBJECTIVES]. Retain joint and individual counterexamples, distinguish return and valuation goals, and state which claims extend only to the evaluated domain."
+        },
+        {
+          "title": "Audit source presence and accounting claims",
+          "prompt": "Use [PINNED ORIGINAL SOURCE CORPUS] to distinguish source-field candidates from an unbound adapter. Check whether [INCOME AND SHARE REFERENCES] support the claimed accounting metric, retaining diagnostic arithmetic separately from unresolved labels."
+        },
+        {
+          "title": "Reconcile analyst corpus coverage",
+          "prompt": "Audit [PINNED SUPPLIED CORPUS] with [DECLARED SEARCH TERMS], account for matching source spans and excluded records, then review the latest eligible analyst targets. State lexical coverage limits and unresolved source records before claiming the selected cohort is complete."
+        },
+        {
+          "title": "Compare guidance with incomplete source clocks",
+          "prompt": "Compare [ORIGINAL GUIDANCE SOURCES] at [CUTOFF] using exact source bindings. Preserve publication and observation roles, unknown accounting basis and revisions. Return supported descriptive arithmetic separately when a source-grounded disclosure-change claim cannot be established."
+        },
+        {
+          "title": "Audit reported helper labels",
+          "prompt": "Compare [CLAIMED LABELS AND VALUES] with exact JSON pointers in [SAVED HELPER RESULT]. Retain unsupported claims and actual values without changing the result, rerunning the original analysis or treating the audit as source authentication."
+        },
+        {
+          "title": "Bind report claims before publication",
+          "prompt": "Use [RETAINED HELPER OUTPUTS] to draft typed source-presence, scenario, accounting and cohort claims. Audit the exact saved draft for objective changes, unsupported labels, incomplete selection and unaudited prose. Preserve every limitation and publish only the reviewed unchanged draft; do not turn consistency into a source-truth or whole-report correctness claim."
+        },
+        {
+          "title": "Preserve property disclosure meaning",
+          "prompt": "Read [PINNED ORIGINAL PROPERTY DISCLOSURES] and distinguish source-known fraction meaning from unknown denominator scope, period and entity attribution. Retain conflicting or unbound observations without joining records by matching values."
+        },
+        {
+          "title": "Compose an exact final research artifact",
+          "prompt": "Use [PINNED ORIGINAL SOURCES] and [SUPPORTED RESEARCH PLAN] to execute source reports, accounting claims and terminal-objective diagnostics. Compose the complete generated sections, separate necessary unaudited prose, and verify that [SAVED RESPONSE] matches the generated artifact exactly. Preserve failed attempts and unresolved findings; byte consistency is not a correctness or completeness grade."
+        },
+        {
+          "title": "Keep objective conclusions tied to calculated evidence",
+          "prompt": "Compose [PINNED TERMINAL RESEARCH] with required typed conclusions for [REQUESTED OBJECTIVES]. Distinguish supplied-row capital preservation, conditional mathematical minima and above-threshold probes from an unevaluated DCF closure question. Keep analyst judgments and additional unaudited interpretation explicit, and review the full answer for contradictions."
         }
       ]
     },

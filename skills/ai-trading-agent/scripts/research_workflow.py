@@ -17,6 +17,7 @@ import tempfile
 import handoff_report as exact_json
 import report_facts
 import research_contracts
+import horizon_consistency
 import evidence_storage
 from research_contracts import require
 
@@ -37,6 +38,7 @@ CONTRACT_OPERATIONS = {
     'research.bind_request': research_contracts.bind_request,
     'research.inventory_evidence': research_contracts.inventory_evidence,
     'research.route_horizon': research_contracts.route_horizon,
+    'research.audit_horizon_consistency': horizon_consistency.audit,
     'research.audit_ranking': research_contracts.audit_ranking,
 }
 
@@ -108,6 +110,7 @@ def catalog():
             'research.bind_request': ['document'],
             'research.inventory_evidence': ['document'],
             'research.route_horizon': ['document'],
+            'research.audit_horizon_consistency': ['document'],
             'research.audit_ranking': ['document'],
             'report.quant': ['source_id', 'custom_source_id (optional)', 'include_source_text (optional)'],
             'report.public_vqm': ['source_id', 'custom_source_id (optional)', 'include_source_text (optional)'],
@@ -264,6 +267,21 @@ def bind(value, values, sources, trail='', bindings=None):
     if isinstance(value, list):
         return [bind(v, values, sources, trail + '/' + str(i), bindings) for i, v in enumerate(value)]
     raise ValueError('UNBOUND_LITERAL:' + trail)
+
+
+def price_basis_provenance(arguments, bindings):
+    """Classify price dimensions by their leaf or enclosing source binding."""
+    import price_comparison
+    result = {}
+    prefixes = ['/quote', *['/references/' + str(i) for i in range(len(arguments.get('references', [])))]]
+    for prefix in prefixes:
+        for dimension in price_comparison.DIMENSIONS:
+            pointer = prefix + '/' + dimension
+            enclosing = [b for b in bindings if pointer == b['target_pointer'] or
+                         pointer.startswith(b['target_pointer'] + '/')]
+            binding = max(enclosing, key=lambda b: len(b['target_pointer'])) if enclosing else None
+            result[pointer] = copy.deepcopy(binding) if binding else {'kind': 'UNBOUND'}
+    return result
 
 
 def unique_rows(rows, kind):
@@ -448,6 +466,10 @@ def build(raw, reader, artifact_writer=None, compact_evidence=False):
                 artifacts[f'jobs/{index:04d}/arguments.json'] = encode(args)
                 if op in quant_workbench.OPERATIONS:
                     execution_args = args
+                    if op == 'evidence.price_comparison':
+                        require('basis_provenance' not in args, 'PRICE_BASIS_PROVENANCE_IS_WORKFLOW_DERIVED')
+                        execution_args = copy.deepcopy(args)
+                        execution_args['basis_provenance'] = price_basis_provenance(args, job_bindings)
                     if op == 'financial.equity_cash_comparison':
                         import equity_cash_comparison
                         require('benchmark_provenance' not in args, 'CASH_BENCHMARK_PROVENANCE_IS_WORKFLOW_DERIVED')
@@ -781,7 +803,7 @@ def execute(request, output, request_role, source_roles=None, compact_evidence=F
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('command', choices=('schema', 'prepare', 'run', 'verify', 'summary', 'execute', 'source-run', 'source-verify', 'final-compose', 'final-verify'))
+    parser.add_argument('command', choices=('schema', 'prepare', 'run', 'verify', 'summary', 'execute', 'source-run', 'source-verify', 'final-compose', 'final-verify', 'final-response', 'final-response-verify'))
     parser.add_argument('input', nargs='?')
     parser.add_argument('--private-output-dir')
     parser.add_argument('--request-role')
@@ -791,18 +813,29 @@ def main():
     parser.add_argument('--manifest-sha256')
     parser.add_argument('--source-root')
     parser.add_argument('--final-response')
+    parser.add_argument('--response-metadata')
     args = parser.parse_args()
     try:
         require(not args.compact_evidence or args.command in ('run', 'execute'), 'COMPACT_RUN_OR_EXECUTE_ONLY')
-        if args.command not in ('execute', 'source-run', 'source-verify', 'final-compose', 'final-verify'):
+        if args.command not in ('execute', 'source-run', 'source-verify', 'final-compose', 'final-verify', 'final-response', 'final-response-verify'):
             require(DEPENDENCY_FAILURE is None, 'DEPENDENCY_UNAVAILABLE')
         if args.command not in ('source-run', 'final-compose'):
             require(args.manifest is None and args.manifest_sha256 is None and args.source_root is None,
                     'SOURCE_RUN_OPTIONS_ONLY')
-        require(args.final_response is None or args.command == 'final-verify', 'FINAL_VERIFY_OPTION_ONLY')
+        require(args.final_response is None or args.command in ('final-verify', 'final-response-verify'), 'FINAL_VERIFY_OPTION_ONLY')
+        require(args.response_metadata is None or args.command == 'final-response', 'RESPONSE_METADATA_OPTION_ONLY')
         if args.command not in ('prepare', 'execute'):
             require(args.request_role is None and args.source_role is None, 'PREPARE_OPTIONS_ONLY')
-        if args.command == 'final-compose':
+        if args.command == 'final-response':
+            require(args.input and args.private_output_dir and args.response_metadata,
+                    'REPORT_METADATA_AND_NEW_OUTPUT_REQUIRED')
+            import final_report
+            print(final_report.export_response(args.input, args.response_metadata, args.private_output_dir)['status'])
+        elif args.command == 'final-response-verify':
+            require(args.input and not args.private_output_dir, 'DIRECTORY_REQUIRED')
+            import final_report
+            print(final_report.verify_response(args.input, args.final_response)['status'])
+        elif args.command == 'final-compose':
             require(args.input and args.private_output_dir and args.manifest and args.manifest_sha256,
                     'FINAL_PLAN_MANIFEST_PIN_AND_OUTPUT_REQUIRED')
             import final_report

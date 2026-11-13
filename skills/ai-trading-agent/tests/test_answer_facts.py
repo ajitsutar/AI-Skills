@@ -29,6 +29,23 @@ def trade_request(side='buy'):
 
 
 class AnswerFactsTests(unittest.TestCase):
+    def test_terminal_diagnostic_report_survives_answer_projection_and_cannot_be_relabelled(self):
+        from test_terminal_capital_boundary import document
+        request = trade_request()
+        request['jobs'] = [{'id':'terminal','operation':'financial.terminal_scenarios',
+                            'inputs':{'document':document()}}]
+        request['requirements'] = [{'id':'terminal','question':'Inspect the declared terminal model',
+                                   'job_ids':['terminal'],'expected_operations':['financial.terminal_scenarios']}]
+        facts = self.project(request)
+        report = facts['generated_reports'][0]
+        self.assertEqual(report['source']['pointer'],'/jobs/0/result/diagnostic_objectives/report')
+        self.assertIn('DCF discount closure: unavailable', answer_facts.text_projection(facts))
+        self.assertIn('Derived probe', answer_facts.text_projection(facts))
+        changed = copy.deepcopy(facts)
+        changed['generated_reports'][0]['text'] = 'The return boundary proves DCF discount closure.'
+        with self.assertRaisesRegex(ValueError,'FIXED_ANSWER_FACTS_MISMATCH'):
+            answer_facts.verify_projection(self.directory/'run',workflow.encode(changed))
+
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix='answer-facts-')
         self.addCleanup(self.temp.cleanup)
