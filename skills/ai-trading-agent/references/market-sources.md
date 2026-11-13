@@ -80,6 +80,7 @@ fields; those declarations are retained without inventing missing context.
 
 | Adapter | Material | Preserved meaning |
 |---|---|---|
+| sec_daily_index | Whole official daily master index | Original row queue, CIK/name/form/filing date and constructed filing links; an explicit form filter and source-bound symbol mapping remain separate coverage choices. |
 | sec_submissions | SEC columnar submissions JSON, or older history JSON with explicit cik | Form, accession, filing/report dates and primary-document link. Additional-history filenames remain unvisited. 13D/G ownership percentages are not extracted. |
 | sec_form4_xml | Raw ownershipDocument XML | Transaction code, acquired/disposed flag, shares/price, XML snippets; owners/footnotes in adapter_metadata. |
 | sec_13f_xml | Raw information-table XML, namespaces supported | CUSIP/class, quantity type, original value, put/call. No automatic ticker mapping. |
@@ -100,6 +101,44 @@ unknown; they do not reconcile with a reported number. Identical literal headers
 fail before parsing because a dictionary could discard one value. Unsupported
 structures fail explicitly. XML DTD/entity declarations are refused.
 Retain the whole raw source alongside per-transaction XML snippets.
+
+For `sec_daily_index`, supply the whole master-index text and its exact source
+URL. Optional `form_filter` is a unique nonempty list of form names; no filter is
+applied by default. Include amendment names explicitly when they are needed.
+Bounded explicit names may include single internal ASCII spaces, such as
+`SCHEDULE 13G/A`; spelling, case, whitespace and duplicates are not coerced.
+Original source-line IDs remain stable across filters, and the whole retained
+row queue and per-form counts stay visible in adapter metadata. Malformed rows
+remain failures. More than 10,000 emitted records require explicit downstream
+partitioning. A well-formed file or filtered queue does not certify upstream
+completeness or full U.S.-listed event coverage.
+
+Optional `cik_symbol_mapping` maps canonical or padded CIK keys to objects with
+`ticker`, precise `available_at` and `source` provenance. Ambiguous normalized
+keys are rejected. Missing, invalid or future mappings leave the ticker unknown
+and the row ineligible. A usable row cannot precede the mapping's availability.
+Index/filing dates remain dates, and links constructed from accession fields are
+marked unvisited. `raw_complete` is a transport declaration, not a proof that an
+upstream index contains every filing. Acquire a selected submission separately
+before making claims about its business content.
+
+Index chronology compares date-only index metadata with the UTC calendar dates
+of original precise capture/availability declarations, before any later symbol
+mapping advances a row's availability. A date beyond those clocks is retained
+as a contradiction and excluded. This is a necessary conservative check; it does
+not infer an exact publication time, certify an EDGAR local-date convention or
+authenticate a source. Conflicting top-level and source-level `raw_complete`
+Boolean declarations likewise remain a qualification failure. Unknown completion
+does not become a successful transport assertion.
+
+The index adapter accepts the observed `File Name` heading alongside `Filename`,
+the SEC Daily Index and Master Index descriptions, full or abbreviated English
+received-month names, and compact or ISO filing dates. Raw headings and date text
+remain available. An absent terminal newline is usable only when transport is
+explicitly and consistently complete and every data row is well formed. Its
+`terminal_newline_qualification` remains visible; unknown/partial/conflicting
+completion or a malformed tail keeps the capture unusable. These format checks
+do not certify upstream completeness.
 
 Short-interest aliases include Settlement Date/settlementDate/Cycle Settlement Date,
 Symbol/Issue Symbol/issueSymbolIdentifier/BATS-Symbol,
@@ -215,3 +254,19 @@ Run python -B -m unittest discover -s tests -p test_market_sources.py -v.
 Synthetic fixtures and mocked HTTP establish parser/error/eligibility behavior.
 They do not prove live connectivity, rights, coverage, source truth, profitability
 or completed participant cases.
+
+## Configure sources for the intended deployment
+
+Use relevant free sources whose terms cover the intended retrieval, retention
+and processing. FINRA's [general website terms](https://www.finra.org/terms-of-use)
+restrict AI use and bulk extraction; establish any applicable source-specific
+permission or exception before configuring those materials as an automated AI
+feed. Source parsers accept retained inputs without authenticating their license.
+Cboe and other providers likewise require an intended-use review. Keep the exact
+source agreement or unresolved qualification in private deployment records.
+Existing user-provided licensed exports remain optional; no paid subscription
+is required by the operating software.
+
+The [operating commands](research-operations.md) retain configured source choices,
+failed acquisitions and explicit freshness. An empty source configuration exposes
+a coverage gap; it does not mean no market events occurred.

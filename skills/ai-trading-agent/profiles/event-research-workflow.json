@@ -1,0 +1,21 @@
+{
+  "schema_version": 1,
+  "intended_data_uses": [
+    "private research; confirm actual source terms before reuse"
+  ],
+  "sources": [],
+  "freshness": {
+    "max_capture_age_seconds": null
+  },
+  "source_configuration_status": "CONFIGURATION_REQUIRED",
+  "workflow": {
+    "id": "event-research-workflow",
+    "research_question": "Assess whether event-driven U.S.-listed equity research including flow and squeeze evidence improves a declared paper decision workflow.",
+    "universe": {
+      "mode": "us_listed_full"
+    },
+    "horizon": null,
+    "reviewer": null,
+    "study": null
+  }
+}

@@ -36,7 +36,7 @@ LIMITATIONS = [
     "Venue totals and public prints do not identify beneficial owners, aggressor intent, opening/closing trades or hedges.",
     "Social posts are leads requiring primary verification, never an authenticated catalyst or always-on feed.",
 ]
-ADAPTERS = frozenset(("sec_submissions", "sec_form4_xml", "sec_13f_xml",
+ADAPTERS = frozenset(("sec_submissions", "sec_daily_index", "sec_form4_xml", "sec_13f_xml",
                      "finra_short_volume", "finra_short_interest_csv", "sec_ftd",
                      "venue_csv", "social_leads"))
 
@@ -92,6 +92,19 @@ def _day(value):
         return date.fromisoformat(value).isoformat()
     except ValueError as error:
         raise ValueError("Expected ISO or YYYYMMDD date") from error
+
+
+def _daily_index_date(url):
+    """Validate one selected official master-index path, including its calendar."""
+    _require(_url(url), "SEC daily index requires credential-free HTTPS")
+    parsed = urlsplit(url)
+    match = re.fullmatch(r"/Archives/edgar/daily-index/(\d{4})/QTR([1-4])/master\.(\d{8})\.idx", parsed.path)
+    _require(parsed.hostname == "www.sec.gov" and not parsed.query and not parsed.fragment and match is not None,
+             "Expected exact SEC daily master-index URL")
+    day = date.fromisoformat(_day(match[3]))
+    _require(day.year == int(match[1]) and (day.month - 1) // 3 + 1 == int(match[2]),
+             "SEC daily-index path year/quarter/date mismatch")
+    return day.isoformat()
 
 
 def normalize(document):
@@ -160,6 +173,11 @@ def normalize(document):
             payload = row.get("payload", {})
             if type(payload) is dict and (not payload.get("author") or not payload.get("canonical_url")):
                 reasons.append("SOCIAL_IDENTITY_MISSING")
+        payload = row.get("payload")
+        if type(payload) is dict and payload.get("source_format") == "sec_daily_index":
+            if (type(row.get("ticker")) is not str or not row["ticker"].strip()
+                    or payload.get("symbol_mapping_status") != "MATCHED_DECLARED_CIK_SYMBOL_MAPPING"):
+                reasons.append("SEC_DAILY_INDEX_SYMBOL_MAPPING_UNRESOLVED")
         row["eligible"] = not reasons
         row["exclusion_reasons"] = reasons
         records.append(row)
@@ -310,11 +328,221 @@ def parse(document):
         document["_parsed_id_prefix"] = str(source.get("id", adapter)) + ":" + hashlib.sha256(vintage.encode("utf8")).hexdigest()[:20]
     records, metadata, issues = [], {}, []
 
-    def emit(kind, ticker, payload):
+    def emit(kind, ticker, payload, source_index=None):
         _require(len(records) < MAX_RECORDS, "Too many parsed records")
-        records.append(_source_record(document, len(records), kind, ticker, payload))
+        records.append(_source_record(document, len(records) if source_index is None else source_index,
+                                      kind, ticker, payload))
 
-    if adapter == "sec_submissions":
+    if adapter == "sec_daily_index":
+        index_date = _daily_index_date(document.get("source", {}).get("url"))
+        lines = source_text.lstrip("\ufeff").splitlines()
+        headings = {"CIK|Company Name|Form Type|Date Filed|Filename",
+                    "CIK|Company Name|Form Type|Date Filed|File Name"}
+        positions = [i for i, line in enumerate(lines) if line.strip() in headings]
+        _require(len(positions) == 1, "SEC daily-index header missing or duplicated")
+        header = positions[0]
+        heading = lines[header].strip()
+        _require(header + 1 < len(lines) and re.fullmatch(r"-{5,}", lines[header + 1].strip()),
+                 "SEC daily-index separator missing or malformed")
+        preamble = lines[:header]
+        _require(any(re.fullmatch(r"Description:\s+(?:.*Master Index.*EDGAR.*|Daily Index of EDGAR Dissemination Feed)", line.strip()) for line in preamble),
+                 "SEC daily-index description missing or unsupported")
+        received = [re.fullmatch(r"Last Data Received:\s+(.+)", line.strip()) for line in preamble]
+        received = [match[1] for match in received if match]
+        _require(len(received) == 1, "SEC daily-index received date missing or duplicated")
+        received_date = None
+        for date_format in ("%B %d, %Y", "%b %d, %Y"):
+            try:
+                received_date = datetime.strptime(received[0], date_format).date().isoformat()
+                break
+            except ValueError:
+                pass
+        _require(received_date is not None, "SEC daily-index received date malformed")
+        _require(received_date == index_date, "SEC daily-index header/filename date mismatch")
+        # Necessary date consistency only: these dates do not establish an exact
+        # publication instant or EDGAR's local calendar convention. Check original
+        # capture/availability declarations, before a later identity map can move
+        # a record's available_at forward and conceal an impossible capture date.
+        original_clocks = {"available_at": copy.deepcopy(document.get("available_at"))}
+        original_clocks.update({"source." + field: copy.deepcopy(document["source"].get(field))
+                                for field in ("retrieved_at", "observed_at")})
+        checked_dates = {}
+        for field, value in original_clocks.items():
+            try:
+                checked_dates[field] = _clock(value).date().isoformat()
+            except ValueError:
+                pass  # Common normalization retains unknown/invalid clocks.
+        conflicting_dates = [field for field, day in checked_dates.items() if index_date > day]
+        chronology = {"date_basis": "UTC_CALENDAR_DATE", "necessary_check_only": True,
+                      "original_clock_declarations": original_clocks,
+                      "checked_original_clock_utc_dates": checked_dates,
+                      "conflicting_clock_fields": conflicting_dates,
+                      "status": ("CONFLICTING_DECLARED_CHRONOLOGY" if conflicting_dates else
+                                 "NECESSARY_DATE_CHECK_PASSED" if checked_dates else
+                                 "NO_VALID_ORIGINAL_CLOCK_FOR_DATE_CHECK"),
+                      "limitation": "This conservative UTC-date check does not establish exact publication, EDGAR local-date convention or source authenticity."}
+        mapping = document.get("cik_symbol_mapping", {})
+        _require(type(mapping) is dict and len(mapping) <= MAX_RECORDS, "Bounded CIK symbol mapping object required")
+        mapped = {}
+        for cik, value in mapping.items():
+            _require(type(cik) is str and re.fullmatch(r"\d{1,10}", cik) and int(cik) > 0,
+                     "CIK mapping keys must be positive1-to10-digit strings")
+            canonical = str(int(cik))
+            _require(canonical not in mapped, "Duplicate normalized CIK mapping key")
+            mapped[canonical] = copy.deepcopy(value)
+        mapping_results = {}
+        form_filter = document.get("form_filter")
+        _require(form_filter is None or (type(form_filter) is list and 0 < len(form_filter) <= 100
+                 and all(type(value) is str and len(value) <= 32
+                         and re.fullmatch(r"[A-Za-z0-9/-]+(?: [A-Za-z0-9/-]+)*", value) for value in form_filter)
+                 and len(form_filter) == len(set(form_filter))), "Explicit unique form_filter list required")
+
+        def resolve(cik):
+            if cik in mapping_results:
+                return mapping_results[cik]
+            declaration = mapped.get(cik)
+            result = {"declaration": copy.deepcopy(declaration), "ticker": None,
+                      "status": "MISSING_CIK_SYMBOL_MAPPING", "exclusion_reasons": [], "available_at": None}
+            if declaration is not None:
+                result["status"] = "UNUSABLE_CIK_SYMBOL_MAPPING"
+                if type(declaration) is dict:
+                    symbol = declaration.get("ticker")
+                    valid_symbol = type(symbol) is str and re.fullmatch(r"[A-Za-z0-9][A-Za-z0-9._-]{0,31}", symbol)
+                    mapped_record = {"id": "cik-map-" + cik, "kind": "disclosure", "ticker": symbol,
+                                     "available_at": declaration.get("available_at"),
+                                     "source": copy.deepcopy(declaration.get("source")), "payload": {"cik": cik}}
+                    checked = normalize({"schema_version": 1, "as_of": document.get("as_of"),
+                                         "records": [mapped_record]})["records"][0]
+                    result["exclusion_reasons"] = checked["exclusion_reasons"]
+                    if not valid_symbol:
+                        result["exclusion_reasons"].append("UNIQUE_EXPLICIT_SYMBOL_REQUIRED")
+                    if valid_symbol and checked["eligible"]:
+                        result.update(ticker=symbol, status="MATCHED_DECLARED_CIK_SYMBOL_MAPPING",
+                                      available_at=declaration["available_at"])
+                else:
+                    result["exclusion_reasons"] = ["MAPPING_OBJECT_WITH_SOURCE_AND_CLOCK_REQUIRED"]
+            mapping_results[cik] = result
+            return result
+
+        row_count, parsed_count, malformed, filtered_out = 0, 0, 0, 0
+        source_queue, source_forms, emitted_forms = [], {}, {}
+        for line_number, raw_line in enumerate(lines[header + 2:], header + 3):
+            if not raw_line.strip():
+                continue
+            row_count += 1
+            _require(row_count <= MAX_RECORDS, "Too many SEC daily-index source rows")
+            raw_fields = raw_line.split("|")
+            queue_row = {"source_line_number": line_number, "raw_line": raw_line,
+                         "source_record_id": document["_parsed_id_prefix"] + ":" + str(row_count - 1),
+                         "form": None, "disposition": "UNRESOLVED"}
+            source_queue.append(queue_row)
+            payload = {"source_format": "sec_daily_index", "index_date": index_date,
+                       "raw_line": raw_line, "raw_fields": raw_fields, "source_line_number": line_number,
+                       "symbol_mapping_status": "UNRESOLVED", "disclosure_scope": "filing_metadata_not_position_or_trade"}
+            ticker, identity = None, None
+            try:
+                _require(len(raw_fields) == 5, "SEC daily-index row must have5 fields")
+                cik_raw, company, form, filed_raw, filename = [value.strip() for value in raw_fields]
+                _require(re.fullmatch(r"\d{1,10}", cik_raw) and int(cik_raw) > 0 and company and form,
+                         "SEC daily-index CIK/company/form invalid")
+                cik = str(int(cik_raw))
+                _require(re.fullmatch(r"(?:\d{4}-\d{2}-\d{2}|\d{8})", filed_raw),
+                         "SEC daily-index filing date must be ISO or YYYYMMDD date")
+                filing_date = _day(filed_raw)
+                _require(filing_date <= index_date, "SEC daily-index filing date after index date")
+                path = re.fullmatch(r"edgar/data/(\d{1,10})/(\d{10}-\d{2}-\d{6})\.txt", filename)
+                _require(path is not None and int(path[1]) == int(cik), "SEC daily-index filename/CIK invalid")
+                identity = resolve(cik)
+                ticker = identity["ticker"]
+                payload.update(filer_cik=cik, filer_cik_raw=cik_raw, filer_cik_padded=cik.zfill(10),
+                    filer_name=company, form=form, filing_date=filing_date, filename=filename,
+                    accession_number=path[2], source_filename_url="https://www.sec.gov/Archives/" + filename,
+                    filing_document_url=("https://www.sec.gov/Archives/edgar/data/" + cik + "/"
+                                         + path[2].replace("-", "") + "/" + path[2] + ".txt"),
+                    filing_document_url_status="CONSTRUCTED_NOT_FETCHED", published_at=None,
+                    symbol_mapping_status=identity["status"], symbol_mapping=identity["declaration"],
+                    symbol_mapping_exclusion_reasons=identity["exclusion_reasons"],
+                    identity_mapping_available_at=identity["available_at"])
+                parsed_count += 1
+                source_forms[form] = source_forms.get(form, 0) + 1
+                queue_row["form"] = form
+                if form_filter is not None and form not in form_filter:
+                    filtered_out += 1
+                    queue_row["disposition"] = "RETAINED_OUTSIDE_EXPLICIT_FORM_FILTER"
+                    continue
+                queue_row["disposition"] = "EMITTED_SELECTED_FORM" if form_filter is not None else "EMITTED_NO_FORM_FILTER"
+                emitted_forms[form] = emitted_forms.get(form, 0) + 1
+                emit("disclosure", ticker, payload, source_index=row_count - 1)
+                if identity["available_at"] is not None and records[-1].get("available_at") is not None:
+                    try:
+                        index_available = _clock(records[-1]["available_at"])
+                    except ValueError:
+                        pass  # Common eligibility retains the invalid/unknown index clock.
+                    else:
+                        if _clock(identity["available_at"]) > index_available:
+                            records[-1]["available_at"] = identity["available_at"]
+            except (ValueError, TypeError) as error:
+                malformed += 1
+                queue_row.update(disposition="EMITTED_PARSE_FAILURE", parse_error=str(error))
+                emit("disclosure", ticker, payload, source_index=row_count - 1)
+                records[-1]["parse_error"] = str(error)
+                issues.append({"code": "ROW_PARSE_ERROR", "row": row_count - 1, "line": line_number, "detail": str(error)})
+        incomplete = []
+        complete_declarations = {}
+        if "raw_complete" in document:
+            complete_declarations["raw_complete"] = document["raw_complete"]
+        if "raw_complete" in document["source"]:
+            complete_declarations["source.raw_complete"] = document["source"]["raw_complete"]
+        _require(all(value is None or type(value) is bool for value in complete_declarations.values()),
+                 "raw_complete must be Boolean when supplied")
+        complete_values = {value for value in complete_declarations.values() if value is not None}
+        complete_conflict = len(complete_values) > 1
+        complete_flag = next(iter(complete_values)) if len(complete_values) == 1 else None
+        terminal_newline = source_text.endswith(("\n", "\r"))
+        # The retained official index can end with a complete row but no newline.
+        # Only explicit, uncontradicted complete transport plus valid rows makes
+        # that supported. A declaration is not authenticated upstream completeness.
+        newline_qualified = not terminal_newline and complete_flag is True and not malformed
+        if not terminal_newline and not newline_qualified:
+            incomplete.append("SEC_DAILY_INDEX_TERMINAL_NEWLINE_MISSING_POSSIBLE_TRUNCATION")
+        if complete_conflict:
+            incomplete.append("SEC_DAILY_INDEX_CAPTURE_COMPLETENESS_CONFLICT")
+        if complete_flag is False:
+            incomplete.append("SEC_DAILY_INDEX_CAPTURE_INCOMPLETE")
+        qualification_errors = list(incomplete)
+        if conflicting_dates:
+            qualification_errors.append("SEC_DAILY_INDEX_DATE_AFTER_ORIGINAL_CLOCK")
+        for reason in qualification_errors:
+            issues.append({"code": reason})
+            for record in records:
+                record["parse_error"] = "; ".join(filter(None, [record.get("parse_error"), reason]))
+        if qualification_errors:
+            for row in source_queue:
+                row["qualification_errors"] = list(qualification_errors)
+        metadata = {"index_date": index_date, "received_date_raw": received[0], "source_headers": heading.split("|"),
+                    "source_data_rows": row_count, "parsed_rows": parsed_count, "malformed_rows": malformed,
+                    "source_row_queue": source_queue, "source_form_counts": source_forms,
+                    "form_filter": copy.deepcopy(form_filter), "form_filter_applied": form_filter is not None,
+                    "filtered_out_rows": filtered_out, "emitted_records": len(records), "emitted_form_counts": emitted_forms,
+                    "emitted_scope": "EXPLICIT_FORM_FILTER_SUBSET" if form_filter is not None else "ALL_RETAINED_DATA_ROWS",
+                    "identity_counts_scope": "EMITTED_RECORDS",
+                    "downstream_institutional_record_cap": 10000, "downstream_partition_required": len(records) > 10000,
+                    "all_retained_nonempty_data_rows_processed": True,
+                    "retained_file_structurally_valid": not malformed and not incomplete,
+                    "terminal_newline_present": terminal_newline,
+                    "terminal_newline_qualification": ("PRESENT" if terminal_newline else
+                        "ABSENT_WITH_COMPLETE_TRANSPORT_DECLARATION" if newline_qualified else
+                        "ABSENT_POSSIBLE_TRUNCATION"),
+                    "transport_complete_declared": complete_flag,
+                    "transport_completion_declarations": complete_declarations,
+                    "transport_completion_conflict": complete_conflict,
+                    "index_chronology": chronology,
+                    "capture_qualification_errors": qualification_errors,
+                    "upstream_index_completeness_verified": False, "exhaustive_us_listed_discovery_verified": False,
+                    "whole_queue_scope": "All retained rows of one selected daily master index; all forms/filer types retained, not a certified U.S.-listed event universe.",
+                    "completeness_limitation": "A well-formed row prefix ending at a newline cannot prove the upstream file is complete. A transport receipt/content length and scope reconciliation remain separate.",
+                    "ticker_mapping_performed": bool(mapping), "identity_mapping_is_caller_supplied": True}
+    elif adapter == "sec_submissions":
         data = document.get("data")
         if data is None:
             data = json.loads(source_text)
@@ -477,6 +705,15 @@ def parse(document):
     result = normalize({"schema_version": document.get("schema_version"), "as_of": document.get("as_of"), "records": records})
     result["issues"].extend(issues)
     result["adapter"] = adapter
+    if adapter == "sec_daily_index":
+        metadata["identity_resolved_rows"] = sum(r["payload"].get("symbol_mapping_status") == "MATCHED_DECLARED_CIK_SYMBOL_MAPPING" for r in records)
+        metadata["identity_unresolved_rows"] = len(records) - metadata["identity_resolved_rows"]
+        metadata["eligible_rows_at_cutoff"] = sum(r["eligible"] for r in result["records"])
+        metadata["queue_status"] = ("RETAINED_INDEX_INCOMPLETE_OR_MALFORMED" if not metadata["retained_file_structurally_valid"] else
+                                    "RETAINED_INDEX_CHRONOLOGY_CONFLICT" if metadata["index_chronology"]["conflicting_clock_fields"] else
+                                    "IDENTITY_RESOLUTION_INCOMPLETE" if metadata["identity_unresolved_rows"] else
+                                    "DOWNSTREAM_DOCUMENT_PARTITION_REQUIRED" if metadata["downstream_partition_required"] else
+                                    "RETAINED_FILE_QUEUE_READY_FOR_REVIEW")
     result["adapter_metadata"] = metadata
     return result
 
@@ -489,6 +726,8 @@ def allowed_public_url(url):
     patterns = {
         "data.sec.gov": [r"/submissions/CIK\d{10}(?:-submissions-\d{3})?\.json"],
         "www.sec.gov": [r"/Archives/edgar/data/\d+/\d{18}/(?:[A-Za-z0-9_.-]+/){0,2}[A-Za-z0-9_.-]+\.(?:xml|txt|json|htm|html)",
+                        r"/Archives/edgar/data/\d+/\d{10}-\d{2}-\d{6}\.txt",
+                        r"/Archives/edgar/daily-index/\d{4}/QTR[1-4]/master\.\d{8}\.idx",
                         r"/files/data/fails-deliver-data/[A-Za-z0-9_-]+\.(?:zip|txt)"],
         "cdn.finra.org": [r"/equity/regsho/daily/[A-Za-z]+shvol\d{8}(?:[_-][A-Za-z]+)?\.txt"],
         "cdn.cboe.com": [r"/resources/us/equities/market-statistics/short-interest/[A-Za-z0-9_.-]+\.csv"],
@@ -496,6 +735,8 @@ def allowed_public_url(url):
     _require(parsed.hostname in patterns and any(re.fullmatch(pattern, parsed.path) for pattern in patterns[parsed.hostname]),
              "URL is outside supported public file families")
     _require(all(part not in (".", "..") for part in parsed.path.split("/")), "Unsafe public path")
+    if parsed.hostname == "www.sec.gov" and parsed.path.startswith("/Archives/edgar/daily-index/"):
+        _daily_index_date(url)
     return parsed.hostname
 
 

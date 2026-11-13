@@ -54,18 +54,19 @@
       ]
     },
     {
-      "id": "institutional-event-pilot",
+      "id": "institutional-event-research",
       "title": "Event-driven institutional paper research",
       "audience": "Research analysts, portfolio managers and reviewers",
       "guides": [
         "references/institutional-research.md",
         "references/source-bound-workflow.md",
-        "references/costed-bar-replay.md"
+        "references/costed-bar-replay.md",
+        "references/research-operations.md"
       ],
       "prompts": [
         {
-          "title": "Configure the event research pilot",
-          "prompt": "Use the institutional pilot template to propose an event-driven U.S.-stock research workflow with flow and squeeze evidence. Retain my actual universe, horizon and constraints; list missing reviewer, dates, baselines and usefulness criterion for adoption. Use free sources first and paper research. Do not turn template choices into my preferences or start a recurring task."
+          "title": "Configure the event research workflow",
+          "prompt": "Use the institutional workflow template to propose an event-driven U.S.-stock research workflow with flow and squeeze evidence. Retain my actual universe, horizon and constraints; list missing reviewer, dates, baselines and usefulness criterion for adoption. Use free sources first and paper research. Do not turn template choices into my preferences or start a recurring task."
         },
         {
           "title": "Prepare a source-bound event decision brief",
@@ -73,15 +74,31 @@
         },
         {
           "title": "Run the retained synthetic paper example",
-          "prompt": "Run the bundled institutional-paper-demo.py from an unrelated working directory into [PRIVATE OUTPUT ROOT]. Verify first-response byte hashes, idempotent journal writes, recovery and separate usefulness/net-return summaries. Explain that fictional retrospective examples do not establish a completed prospective pilot or investment performance."
+          "prompt": "Run the bundled institutional-paper-demo.py from an unrelated working directory into [PRIVATE OUTPUT ROOT]. Verify first-response byte hashes, idempotent journal writes, recovery and separate usefulness/net-return summaries. Explain that fictional retrospective examples do not establish a completed prospective workflow or investment performance."
         },
         {
-          "title": "Evaluate pilot usefulness separately from returns",
-          "prompt": "Review [REGISTERED PROTOCOL, IMMUTABLE FIRST RESPONSES, CASE ROSTER AND OUTCOMES] at [CUTOFF]. Check pre-decision evidence, delayed outcomes, missing cases, fixed reviewer criterion and separate baselines. Report descriptive usefulness and matched net return differences without compounding overlapping events, annualizing them or claiming causal time savings or alpha. Reconcile any supplied pilot protocol with the evaluation dates, criterion, baselines, reviewer and target universe. Bind first-response input vintages at capture time and distinguish later decision inputs; preserve mismatches instead of counting them silently."
+          "title": "Evaluate workflow usefulness separately from returns",
+          "prompt": "Review [REGISTERED PROTOCOL, IMMUTABLE FIRST RESPONSES, CASE ROSTER AND OUTCOMES] at [CUTOFF]. Check pre-decision evidence, delayed outcomes, missing cases, fixed reviewer criterion and separate baselines. Report descriptive usefulness and matched net return differences without compounding overlapping events, annualizing them or claiming causal time savings or alpha. Reconcile any supplied workflow protocol with the evaluation dates, criterion, baselines, reviewer and target universe. Bind first-response input vintages at capture time and distinguish later decision inputs; preserve mismatches instead of counting them silently."
         },
         {
           "title": "Challenge a proposed event strategy",
           "prompt": "Challenge [FROZEN EVENT RESEARCH DESIGN] for source availability, revisions, survivor and selection bias, threshold tuning, cost/borrow assumptions, multiple trials, negative controls and simple baselines. Retain objections and dispositions before outcomes. Different reviewer names and passing software tests do not establish independent host acceptance or predictive performance."
+        },
+        {
+          "title": "Register a production research workflow",
+          "prompt": "Register [EXPLICIT WORKFLOW CONFIGURATION] under [PRIVATE OUTPUT ROOT]. Preserve the exact universe, horizon, reviewer, dates, baselines and source choices. Report missing deployment inputs without inventing permissions, a live feed or performance evidence."
+        },
+        {
+          "title": "Reconcile an interrupted source collection",
+          "prompt": "Use the production research operations commands to inspect [RUN ID]. Verify completed raw captures and parsed records before resuming. Retain failed and partial attempts, refuse conflicting input reuse and report source freshness and actual coverage."
+        },
+        {
+          "title": "Verify full and incremental research records",
+          "prompt": "At [EXPLICIT CUTOFF], compare the selected eligible records from [FULL SNAPSHOT] and [INCREMENTAL SNAPSHOT]. Retain revisions, cancellations and missing dependencies; report any semantic difference without treating matching hashes as proof of complete market coverage."
+        },
+        {
+          "title": "Review deployed research readiness",
+          "prompt": "Review [CONFIGURED WINDOWS RESEARCH INSTALLATION] against its operating runbook. Exercise overlap prevention, idempotent restart, failure recovery, source qualification and version rollback. Report each observed result and any unexercised dependency. Keep research effectiveness and investment performance separate from software readiness."
         }
       ]
     },

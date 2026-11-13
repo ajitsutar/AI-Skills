@@ -10,6 +10,7 @@ from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timezone
 from decimal import Decimal
+from functools import wraps
 import hashlib
 import json
 import os
@@ -21,7 +22,7 @@ import uuid
 MAX_BYTES = 50 * 1024 * 1024
 MAX_RECORDS = 10000
 HF = {
-    'HF01': 'Define pilot', 'HF02': 'Qualify data and rights',
+    'HF01': 'Define workflow', 'HF02': 'Qualify data and rights',
     'HF03': 'Decision-ready briefs', 'HF04': 'Portfolio impact',
     'HF05': 'Prospective usefulness study', 'HF06': 'Costs, liquidity and capacity',
     'HF07': 'Recurring operation dependability', 'HF08': 'Actual host acceptance',
@@ -30,7 +31,7 @@ LIMITS = [
     'Supplied records, source identities, rights and clocks are declarations; hashes do not authenticate them.',
     'Coverage is supplied eligible records only; requested U.S.-listed discovery scope is not live full-universe coverage.',
     'Public prints and short-position proxies do not establish trader identity, intent, a squeeze probability or causation.',
-    'Software and synthetic demos do not establish profitable alpha, elapsed real pilot results, commercial rights or host acceptance.',
+    'Software and synthetic demos do not establish profitable alpha, observed prospective research results, commercial rights or host acceptance.',
     'Research findings are advisory and add no execution gate or authorization.']
 
 
@@ -45,6 +46,44 @@ def _bytes(value):
 
 def _digest(value):
     return hashlib.sha256(_bytes(value)).hexdigest()
+
+
+def _workflow_protocol(operation):
+    """Accept the current workflow contract while retaining older callers."""
+    @wraps(operation)
+    def compatible(document):
+        if not isinstance(document, dict):
+            return operation(document)
+        has_workflow = 'workflow' in document
+        declared_evaluation = document.get('evaluation')
+        has_current_identity = isinstance(declared_evaluation, dict) and any(
+            key in declared_evaluation for key in ('workflow_id', 'workflow_sha256'))
+        if not has_workflow and not has_current_identity:
+            return operation(document)
+        translated = deepcopy(document)
+        if has_workflow:
+            _require(isinstance(document['workflow'], dict), 'WORKFLOW_OBJECT_REQUIRED')
+            _require('pilot' not in translated or _digest(translated['pilot']) == _digest(translated['workflow']),
+                     'CONFLICTING_PROTOCOL_DECLARATIONS')
+            translated['pilot'] = translated.pop('workflow')
+        evaluation = translated.get('evaluation')
+        if isinstance(evaluation, dict):
+            for current, retained in [('workflow_id', 'pilot_id'), ('workflow_sha256', 'pilot_sha256')]:
+                if current in evaluation:
+                    _require(retained not in evaluation or _digest(evaluation[retained]) == _digest(evaluation[current]),
+                             'CONFLICTING_EVALUATION_PROTOCOL_DECLARATIONS')
+                    evaluation[retained] = evaluation.pop(current)
+        result = operation(translated)
+        result['protocol_mapping'] = {
+            'kind': 'WORKFLOW_COMPATIBILITY_MAPPING',
+            'declared_input_sha256': _digest(document),
+            'calculation_input_sha256': _digest(translated)}
+        result['input_sha256'] = _digest(document)
+        protocol = document.get('workflow', document.get('pilot'))
+        result['workflow'] = deepcopy(protocol)
+        result['workflow_sha256'] = _digest(protocol) if protocol is not None else None
+        return result
+    return compatible
 
 
 def _stamp(value):
@@ -119,8 +158,8 @@ def _readiness(document, missing):
     rows = [{'id': key, 'requirement': title, 'software_support_implemented': True,
              'real_world_acceptance': 'NOT_ESTABLISHED',
              'supplied_evidence': supplied.get(key),
-             'remaining': ('Complete explicit pilot choices: ' + ', '.join(missing)) if key == 'HF01' and missing else {
-                 'HF01': 'Adopt and retain the actual pilot protocol before observations.',
+             'remaining': ('Complete explicit workflow choices: ' + ', '.join(missing)) if key == 'HF01' and missing else {
+                 'HF01': 'Register and retain the actual workflow protocol before observations.',
                  'HF02': 'Verify source terms, entitlements, redistribution and intended host use.',
                  'HF03': 'Review actual retained briefs for decision usefulness.',
                  'HF04': 'Supply dated live portfolio context and validate its completeness.',
@@ -154,8 +193,9 @@ def _readiness(document, missing):
     return rows
 
 
+@_workflow_protocol
 def plan(document):
-    """Produce an adoptable protocol without starting a pilot or recurring task."""
+    """Produce an adoptable protocol without starting a recurring task."""
     result = _base(document, 'INSTITUTIONAL_EVENT_PLAN')
     pilot, universe, missing = _configuration(document)
     result.update(status='CONFIGURATION_NEEDED' if missing else 'DECLARED_PROTOCOL_READY_FOR_REVIEW',
@@ -244,6 +284,7 @@ def _costs(document, ticker, cutoff):
     return result
 
 
+@_workflow_protocol
 def brief(document):
     """Create a decision brief at the supplied cutoff, without selecting an order."""
     result = _base(document, 'INSTITUTIONAL_EVENT_BRIEF')
@@ -404,6 +445,7 @@ def _case_scope(document, case, ids, universe):
     return {'ticker': ticker, 'basis': basis, 'status': status}
 
 
+@_workflow_protocol
 def evaluate(document):
     """Evaluate prospective usefulness separately from descriptive paper returns."""
     result = _base(document, 'INSTITUTIONAL_EVENT_EVALUATION')

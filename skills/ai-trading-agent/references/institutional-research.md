@@ -1,10 +1,10 @@
-# Institutional event research pilot
+# Institutional event research workflow
 
-Use this workflow for an explicitly configured, event-driven U.S.-equity paper
-pilot, including unusual-flow and short-squeeze hypotheses. It implements a
-repeatable research protocol, decision brief and evaluation record. It does not
-claim that a real prospective pilot has elapsed, that the research is profitable,
-or that a host, broker or data vendor has approved deployment.
+Use this workflow for configured event-driven U.S.-equity paper research,
+including unusual-flow and short-squeeze hypotheses. It implements a repeatable
+research protocol, decision brief and evaluation record. Prospective investment
+results, source rights and acceptance in each deployed host require their own
+observed evidence.
 
 The pure operations are `institutional.plan(document)`,
 `institutional.brief(document)` and `institutional.evaluate(document)`. Their
@@ -12,23 +12,26 @@ implementation is `scripts/institutional_research.py`. They return
 `execution_authorized: false`; findings are advisory and do not change execution
 policy. The separate journal/capture CLI writes only when explicitly invoked.
 
-## Configure and adopt a pilot
+## Configure and register a workflow
 
-Start with `profiles/event-research-pilot.json`. It is an inactive example
-template. Replace `as_of`, records, horizon, reviewer and study choices with the
-actual request. Its discovery scope defaults to **all U.S.-listed equities**;
+Start with `profiles/event-research-workflow.json` and the
+[operating commands](research-operations.md). It is a portable configuration
+template; each deployment supplies its horizon, reviewer, study, source choices
+and capture-age criterion before registration. For the pure operations, put the
+configured `workflow` object into the common envelope with explicit `as_of`,
+`records` and any required event fields. Discovery defaults to **all U.S.-listed equities**;
 that is the requested search universe, not proof of a complete live feed. An
 explicit symbol universe is supported when the user requests it. The bundled
 `DEMO` example is fictional and explicitly restricted to its synthetic universe.
 Its horizon, portfolio, costs, reviewer and dates are examples, not personal
 preferences or mandatory trading rules.
 
-`pilot` contains `id`, `research_question`, `universe`,
+`workflow` contains `id`, `research_question`, `universe`,
 `horizon: {label, entry_policy, exit_policy}`, `reviewer: {id, role}` and
 `study: {registered_at, start_at, end_at, usefulness_criterion,
 workflow_baseline_id}`. Supply `study.return_baseline_id` when evaluating returns
-under that pilot. Optional `study.expected_case_ids` binds the registered roster.
-The plan emits `pilot_sha256`, a canonical hash of the supplied `pilot` object.
+under that workflow. Optional `study.expected_case_ids` binds the registered roster.
+The plan emits `workflow_sha256`, a canonical hash of the supplied `workflow` object.
 Keep the registered protocol and its exact hash before the
 first decision; a later revised protocol gets a new retained ID and parent link.
 Missing choices produce `CONFIGURATION_NEEDED`, not invented user preferences.
@@ -168,25 +171,25 @@ actual immutable journal and timestamps. Pure evaluation
 cannot independently verify an external journal, an honest system clock or an
 unseen original answer.
 
-When a `pilot` is supplied, `protocol_reconciliation` retains it and the evaluation
+When a `workflow` is supplied, `protocol_reconciliation` retains it and the evaluation
 declarations, compares registration/start/end instants, criterion, workflow
 baseline and any registered roster, and exposes every conflict. Optional
-`evaluation.pilot_id` and `evaluation.pilot_sha256` must match the supplied pilot
+`evaluation.workflow_id` and `evaluation.workflow_sha256` must match the supplied workflow
 and the hash emitted by its plan. Shared protocol conflicts exclude affected
-cases from both metrics. A case's target must match an explicit pilot universe;
+cases from both metrics. A case's target must match an explicit workflow universe;
 use `case.ticker` for mixed-event studies. Otherwise the document's event ticker,
 or a unique eligible nonbenchmark input ticker, supplies that declared identity. Related
 evidence and benchmark tickers are not themselves target selections. Full
 U.S.-listed scope remains requested coverage, not certified listing membership.
 
-The declared pilot reviewer must match each included usefulness reviewer.
-A missing or conflicting pilot return baseline excludes returns while preserving
+The declared workflow reviewer must match each included usefulness reviewer.
+A missing or conflicting workflow return baseline excludes returns while preserving
 otherwise compatible usefulness judgments; a reviewer mismatch excludes usefulness
 while leaving independently compatible return comparisons available. The case
 exposes shared `prospective_exclusion_reasons`, `usefulness_exclusion_reasons`
 and `return_exclusion_reasons` separately. Reconciliation status is
 `MATCHED_DECLARED_PROTOCOL`, `PROTOCOL_CONFLICT` or
-`PROTOCOL_CONFIGURATION_INCOMPLETE`. With no pilot, standalone evaluation is
+`PROTOCOL_CONFIGURATION_INCOMPLETE`. With no workflow, standalone evaluation is
 explicitly `DECLARATION_ONLY_NO_PILOT`. None of these statuses authenticates a
 registration or closes institutional acceptance.
 
@@ -238,12 +241,12 @@ checks source/result consistency; it does not certify a profitable strategy.
 
 ## What HF01–HF10 mean here
 
-The software supports pilot definition, source/rights review, decision briefs,
+The software supports workflow definition, source/rights review, decision briefs,
 portfolio impact, prospective usefulness/return review, cost/liquidity context,
 durable recovery, host acceptance tracking, methodology challenge and deployment
 readiness respectively. All ten retain `real_world_acceptance:
 NOT_ESTABLISHED`. Supplied evidence remains a declaration. Implemented helpers
-and synthetic tests do not complete an elapsed pilot, qualify commercial data
+and synthetic tests do not complete an elapsed workflow, qualify commercial data
 rights, certify another host or operate an unattended live deployment.
 
 Run the explicit end-to-end software demo from an unrelated working directory:
@@ -255,5 +258,5 @@ python PATH_TO_SKILL/examples/institutional-paper-demo.py --output-root EXISTING
 It composes flow/squeeze diagnostics, creates a brief, retains its exact first
 response, evaluates fictional October outcomes, journals and recovers the result.
 Actual journal timestamps expose its later retrospective execution. It reports
-`real_prospective_pilot_completed: false`; it is not a participant campaign case,
+its retrospective execution scope; it is not a participant campaign case,
 live forward test, trading result or instruction to start recurring monitoring.

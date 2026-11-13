@@ -30,11 +30,11 @@ Source selection and surrounding narrative still require review.
 
 The trading workflows use accessible free sources first; paid subscriptions are
 optional and existing user-provided access can improve freshness or coverage.
-Version **5.7.11** includes free public-source intake and dated flow/squeeze
-research. Repairs diagnose ambiguous columns and unknown volume bases, bind
-paper evaluation to supplied protocol/response clocks, and reconcile nested
-currency contracts. Public X posts remain leads; the paid Unusual Whales
-adapter is skipped. See the updated institutional backlog.
+Version **5.8.2** includes production research operations for configured
+supervised research: immutable workflow registration, bounded public-source
+collection, restart reconciliation, freshness reporting and retained-record
+verification. Every paid subscription remains optional; the paid Unusual Whales
+adapter is skipped. See the institutional research operating guide.
 News evidence helpers bind publication and observation clocks, preserve unknown
 comparison dimensions, and audit claims against retained outputs. Byte identity
 is not source authentication.
@@ -74,7 +74,7 @@ Examples cover supported workflows and useful gap assessments without a fixed co
 For implementation boundaries and remaining research needs, see the
 [capabilities and limits](skills/ai-trading-agent/references/capabilities-and-limits.md).
 The [prioritized institutional research backlog](docs/robinhood-institutional-backlog.md)
-separates the completed 5.4.0 software foundation from the data, pilot, validation
+separates the completed 5.4.0 software foundation from the data, workflow, validation
 and operational work needed for broader professional use.
 
 ## Download one skill

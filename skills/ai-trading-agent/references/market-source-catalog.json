@@ -1,11 +1,30 @@
 {
   "schema_version": 1,
-  "documentation_checked_on": "2026-11-11",
+  "documentation_checked_on": "2026-11-12",
   "scope": "Free-first US equity event and positioning evidence",
   "execution_authorized": false,
   "public_access_is_not_redistribution_permission": true,
   "live_provider_connection_certified": false,
   "sources": [
+    {
+      "id": "sec_daily_index",
+      "adapter": "sec_daily_index",
+      "access": "public_no_api_key",
+      "official_url": "https://www.sec.gov/search-filings/edgar-search-assistance/accessing-edgar-data",
+      "file_url_template": "https://www.sec.gov/Archives/edgar/daily-index/YYYY/QTRq/master.YYYYMMDD.idx",
+      "acquisition": "explicit_bounded_get_no_crawl",
+      "coverage": "Retained full master-index row queue, with optional explicit form filter and separately sourced CIK-to-symbol mappings",
+      "timing": "Index and filing dates do not establish precise publication or availability; retain actual retrieval and later mapping availability",
+      "limits": [
+        "Configured SEC client contact required for automated acquisition",
+        "Missing, future or ambiguous symbol mappings remain unresolved",
+        "Constructed filing document links have not been fetched",
+        "A structurally valid retained file does not certify upstream or full-universe completeness",
+        "More than 10000 emitted rows require explicitly partitioned downstream institutional envelopes",
+        "Amendments need explicit filter names and source-bound ancestry; their labels do not identify exact replacements"
+      ],
+      "rights": "Review SEC access terms and any filing-content rights for the intended use; no API subscription is required"
+    },
     {
       "id": "sec_submissions",
       "adapter": "sec_submissions",
@@ -72,7 +91,12 @@
         "November 2026 file visibly includes fractional shares despite older integer-only layout text",
         "Numeric trailer must reconcile or parsed rows are ineligible"
       ],
-      "rights": "FINRA terms apply; public readability does not establish commercial redistribution rights"
+      "rights": "FINRA terms apply; public readability does not establish commercial redistribution rights",
+      "intended_use_review": {
+        "terms_url": "https://www.finra.org/terms-of-use",
+        "status": "SOURCE_SPECIFIC_PERMISSION_REQUIRED_FOR_AUTOMATED_AI_USE",
+        "limits": "General website terms restrict AI use and bulk extraction. Any applicable source-specific agreement or exception must be established; public download access does not establish permission."
+      }
     },
     {
       "id": "finra_equity_short_interest",
@@ -89,7 +113,12 @@
         "Float, share-class, adjustment and ADV-window compatibility must be supplied",
         "Unknown export headers remain explicit parse gaps"
       ],
-      "rights": "Review FINRA terms and API/export entitlements"
+      "rights": "Review FINRA terms and API/export entitlements",
+      "intended_use_review": {
+        "terms_url": "https://www.finra.org/terms-of-use",
+        "status": "SOURCE_SPECIFIC_PERMISSION_REQUIRED_FOR_AUTOMATED_AI_USE",
+        "limits": "General website terms restrict AI use and bulk extraction. Any applicable source-specific agreement or exception must be established; public download access does not establish permission."
+      }
     },
     {
       "id": "cboe_short_interest",
@@ -107,7 +136,12 @@
         "No float, issuer/share-class mapping, adjustment compatibility, borrow supply or trading authority is established by this file."
       ],
       "rights": "Cboe terms apply; free access is not an unrestricted license",
-      "schema_observed_on": "2026-11-12"
+      "schema_observed_on": "2026-11-12",
+      "intended_use_review": {
+        "terms_url": "https://www.cboe.com/terms/",
+        "status": "CONFIRM_INTENDED_RETENTION_AND_HOST_USE",
+        "limits": "A personal-copy permission does not establish commercial redistribution, unrestricted retention or AI/cloud processing rights."
+      }
     },
     {
       "id": "sec_ftd",
@@ -139,7 +173,12 @@
         "Downloads/history/API may have separate terms or entitlement",
         "No authenticated FINRA API is implemented"
       ],
-      "rights": "unknown_until_source_and_export_terms_reviewed"
+      "rights": "unknown_until_source_and_export_terms_reviewed",
+      "intended_use_review": {
+        "terms_url": "https://www.finra.org/terms-of-use",
+        "status": "SOURCE_SPECIFIC_PERMISSION_REQUIRED_FOR_AUTOMATED_AI_USE",
+        "limits": "General website terms restrict AI use and bulk extraction. Any applicable source-specific agreement or exception must be established; public download access does not establish permission."
+      }
     },
     {
       "id": "x_public_leads",
