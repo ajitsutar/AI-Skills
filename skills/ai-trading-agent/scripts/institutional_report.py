@@ -1,4 +1,4 @@
-"""Source-bound projection of pure institutional plans and study evaluations.
+"""Source-bound projection of pure institutional plans, briefs and evaluations.
 
 Preserves separate usefulness/return inclusion and all native limitations.
 No capture, journal, recovery, acquisition, scheduler or account action runs.
@@ -14,7 +14,8 @@ from source_lineage import at
 from supplied_research import encode
 
 METHOD = 'institutional-report-1'
-OPERATIONS = {'plan': institutional_research.plan, 'evaluate': institutional_research.evaluate}
+OPERATIONS = {'plan': institutional_research.plan, 'evaluate': institutional_research.evaluate,
+              'brief': institutional_research.brief}
 MAX_DOCUMENTS = 32
 
 
@@ -29,7 +30,7 @@ def fields(value, keys):
 
 def render(rows):
     lines = ['# Source-bound institutional research', '',
-             'Native plans and evaluations of the selected original documents follow. '
+             'Native plans, briefs and evaluations of the selected original documents follow. '
              'Declarations do not establish actual prospective operation, source authenticity '
              'or independent institutional acceptance.', '',
              'Usefulness and returns have separate inclusion flags, exclusion reasons and '
@@ -52,7 +53,7 @@ def render(rows):
 
 
 def analyze(request, manifest_path, expected_manifest_sha256, source_root=None):
-    """Run plan/evaluate on whole original JSON objects; no result overrides."""
+    """Run plan/brief/evaluate on whole original JSON objects; no result overrides."""
     fields(request, ('documents', 'operations'))
     documents, operations = request['documents'], request['operations']
     require(isinstance(documents, list) and 0 < len(documents) <= MAX_DOCUMENTS,
@@ -101,7 +102,7 @@ def analyze(request, manifest_path, expected_manifest_sha256, source_root=None):
             'manifest_sha256': expected_manifest_sha256,
             'report': {'text': text, 'sha256': hashlib.sha256(text.encode('utf-8')).hexdigest(),
                        'whole_report_semantic_pass': False},
-            'limits': ['Only selected original documents and pure plan/evaluate operations were analyzed.',
+            'limits': ['Only selected original documents and pure plan/brief/evaluate operations were analyzed.',
                        'Native per-case flags, exclusions, roster gaps and aggregate denominators remain distinct.',
                        'Failed operations are retained, not completed calculations.',
                        'No original journal authenticity, actual elapsed operation, causal attribution or profitability is established.',

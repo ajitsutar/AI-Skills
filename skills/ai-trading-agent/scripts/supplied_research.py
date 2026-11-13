@@ -10,7 +10,7 @@ from source_lineage import load_manifest,parse
 
 ROOT=Path(__file__).resolve().parent.parent
 METHOD='supplied-research-1'
-PRODUCERS={'analyst_sources':'analyze','reit_sources':'analyze','source_claims':'audit','issuer_evidence':'analyze','institutional_report':'analyze'}
+PRODUCERS={'analyst_sources':'analyze','reit_sources':'analyze','source_claims':'audit','issuer_evidence':'analyze','market_flow_report':'analyze','institutional_report':'analyze','market_sources_report':'analyze'}
 MAX_FILE=16*1024*1024;MAX_TOTAL=128*1024*1024;MAX_REPORT=1024*1024
 
 def require(value,message):

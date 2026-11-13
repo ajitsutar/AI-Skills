@@ -205,6 +205,27 @@ class InstitutionalReportTests(unittest.TestCase):
         moved = self.root / 'moved'; shutil.copytree(output, moved)
         self.assertEqual(final_report.verify_response(moved)['status'], 'COMPLETED_CANONICAL_RESPONSE_EXPORT')
 
+    def test_brief_native_equivalence_with_and_without_flow(self):
+        from test_institutional_research import fixture
+        for include_flow in (False, True):
+            document = fixture(); document['include_flow_analysis'] = include_flow
+            self.sources(document); self.request['operations'] = ['brief']
+            result = self.analyze(); outcome = result['rows'][0]['operations']['brief']
+            with self.subTest(include_flow=include_flow):
+                self.assertEqual(outcome['status'], 'EXECUTED')
+                self.assertEqual(outcome['result'], institutional_research.brief(deepcopy(document)))
+                self.assertFalse(result['execution_authorized'])
+                self.assertFalse(result['whole_report_semantic_pass'])
+
+    def test_brief_canonical_export_retains_full_native_result(self):
+        from test_institutional_research import fixture
+        document = fixture(); document['include_flow_analysis'] = True
+        self.sources(document); self.request['operations'] = ['brief']
+        output = self.export(); final_report.verify_response(output)
+        response = json.loads((output / 'response.json').read_bytes())
+        actual = response['rows'][0]['result']['rows'][0]['operations']['brief']['result']
+        self.assertEqual(actual, json.loads(supplied_research.encode(institutional_research.brief(document))))
+
 
 if __name__ == '__main__':
     unittest.main()

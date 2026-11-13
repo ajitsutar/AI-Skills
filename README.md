@@ -30,7 +30,7 @@ Source selection and surrounding narrative still require review.
 
 The trading workflows use accessible free sources first; paid subscriptions are
 optional and existing user-provided access can improve freshness or coverage.
-Version **5.9.5** adds official SEC issuer-identity intake, public/supplied
+Version **5.9.8** adds official SEC issuer-identity intake, public/supplied
 price and volume observations, and user-supplied borrow evidence with
 explicit dates, coverage and source qualification. Production research
 operations support retained briefs and automated technical review; users

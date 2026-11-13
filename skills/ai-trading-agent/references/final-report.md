@@ -87,11 +87,20 @@ Caller-created output, status or report strings cannot substitute for execution.
 Four section types are supported:
 
 - `source_report`: exactly `kind`, `producer` and `request`. Producer is
-  `analyst_sources`, `reit_sources`, `source_claims` or `institutional_report`. Request follows that
+  `analyst_sources`, `reit_sources`, `source_claims`, `issuer_evidence` or
+  `market_flow_report` or `institutional_report`. Request follows that
   producer's documented schema. The compositor calls the existing supplied
   research bridge and includes its whole generated report, with an evidence
   link to the complete result. It cannot hide an unsupported revision by
   selecting only a favorable sentence.
+  The [market-flow producer](market-flow.md#publish-metrics-from-the-retained-source-result)
+  binds whole original market documents and includes complete native metrics,
+  statuses and limitations. Incompatible share bases keep both days-to-cover
+  fields null; an unreconciled quotient retains its separate diagnostic name.
+  Canonical response export preserves those fields without manual numeric
+  re-expression. Retained failed operations do not become completed calculations,
+  and source replay does not certify unrelated parser, institutional or narrative
+  work.
   The [institutional producer](institutional-research.md#publish-source-bound-plans-and-evaluations)
   executes only pure `plan`/`evaluate` operations on whole original documents.
   Generated reports retain each case's separate usefulness/return flags, exclusion
@@ -300,3 +309,31 @@ request-completeness/authorization flags remain false.
 A neutral capture control may bind both final files to these receipts. Such byte
 association does not itself replay calculations or establish an independent
 correctness grade. Review the actual requested coverage and source assumptions.
+
+## Complete retained market workflows
+
+A supported market workflow can combine three `source_report` sections in one
+strict plan: `market_sources_report` for the entire original parser-job list and
+explicit original clock, `market_flow_report` for each requested original view
+and its `flow`, `positioning`, `squeeze` operations, and `institutional_report`
+with `brief` for requested event views. Select the actual requested documents
+and operations; there is no fixed job count or inferred request inventory.
+See [parser bindings](market-sources.md#source-bound-original-parse-jobs) and
+[event briefs](institutional-research.md#canonical-event-briefs).
+
+Compose and export this combined native result when it represents all requested
+deliverables. Preserve native unknowns, exclusions, row errors and failed jobs
+without substituting a numerical baseline from a different view. Canonical
+delivery checks its exact text/JSON; it does not grade unrelated manual
+cross-checks, certify source truth or repair incomplete command capture/export.
+If requested work also includes unsupported authored analysis, use the complete
+mixed-answer route and separately verified annexes described above. An omitted
+deliverable is not excused by a valid partial report.
+
+The native-operation list is not necessarily the entire request. Read the full
+original request and linked context before choosing strict-only delivery. If
+source-specific meaning extends beyond these producers, deliver the complete
+authored answer through [original-object briefing](source-bound-workflow.md#complete-original-object-briefings)
+with the exact native report as a separately checked annex. This route needs no
+invented category inventory. Original member coverage is structural; independent
+review still decides whether the contextual conclusions answer the request.

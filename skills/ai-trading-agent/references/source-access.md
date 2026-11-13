@@ -63,6 +63,14 @@ visible. Independently review the full delivered answer against the original
 request, including meaningful optional-access improvements. Correct scratch
 calculations and a complete-looking row inventory do not establish task completion.
 
+Without an original category inventory, use the
+[original-object briefing mode](source-bound-workflow.md#complete-original-object-briefings).
+Bind the complete root request and its exact linked contexts, then explain the
+meaning and limits of every relevant original member. Source-specific fitness
+conclusions belong in the delivered answer even when all numerical jobs have run.
+Retaining an unevaluated object is a coverage limitation, not completion. Do not
+fabricate categories or unsupported contracts for an unrelated readiness tool.
+
 Checked numerical reports may be attached as unchanged, separately verified
 annexes. Annexes are optional: direct captured calculations and parser results are
 still legitimate evidence outside the strict compositor. Preserve them through

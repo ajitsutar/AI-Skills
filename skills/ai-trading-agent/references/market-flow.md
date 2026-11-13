@@ -13,6 +13,49 @@ works for all three functions. Its prices, sources, issuers, volumes and thresho
 are fictional. Unit fixtures are software regressions, not campaign comparisons,
 prospective performance or calibrated squeeze probabilities.
 
+## Publish metrics from the retained source result
+
+For a report of supplied market documents, use the `market_flow_report` producer
+through [supplied-source reporting](final-report.md). It binds whole JSON market
+documents to the externally pinned source inventory and executes the native
+`flow`, `positioning` and `squeeze` operations. It retains all native outputs,
+source histories, issues, unknown fields and failed operations. The deterministic
+report uses their original metric names; it does not accept caller-authored
+numbers, adjustment overrides or a precomputed result.
+
+The producer request is:
+
+```json
+{
+  "documents": [
+    {"id": "observation-a", "source_ref": {"source_id": "original-market-document", "pointer": ""}}
+  ],
+  "operations": ["flow", "positioning", "squeeze"]
+}
+```
+
+The pointer selects a complete native market document, including its `as_of`,
+records and settings. Use a nested pointer only when the original JSON wraps that
+whole document. Up to 32 uniquely named documents are supported. Every manifest
+source is verified, including unselected context; selection does not establish
+that the request is complete or the source declarations are authentic.
+
+Use a `source_report` section with producer `market_flow_report`, then export and
+verify the canonical structured response with `final_report.py response` and
+`verify-response`. Its complete section results preserve nulls and source-bound
+field identities. Do not append a manually re-labelled numeric cross-check as
+another verified result: an unreconciled share-count quotient is not conditional
+days to cover, even when its arithmetic matches a comparable ratio elsewhere.
+Independent calculations can be retained as separate evidence, with discrepancies
+resolved before claiming agreement. A replay receipt alone does not grade them.
+
+Native failures are retained as `FAILED` operations under
+`PARTIAL_RETAINED_FAILURES`; independent operations continue. Such a report is
+not evidence that every requested calculation executed. Unknown valid metrics
+remain ordinary findings. Raw parser work, institutional briefs and qualitative
+source interpretation remain separately required when requested; the producer
+does not replace them or certify their conclusions.
+
 ## Retain the information actually available
 
 Each record needs an explicit availability timestamp, source declaration and

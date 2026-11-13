@@ -1,5 +1,85 @@
 # Source-bound research and reporting
 
+## Complete original-object briefings
+
+For a structured request without `requested_categories`, use `request_coverage.py`
+in `ORIGINAL_OBJECTS` mode. Deliver source-specific authored meaning beside
+optional verified native reports. Completing every numerical job does not answer
+remaining contextual questions; retained source bytes and generic disclaimers
+do not replace the requested analysis.
+
+Use the same `compose`/`verify` commands and optional metadata described below.
+An object plan has this shape (member names are illustrative):
+
+```json
+{
+  "kind": "ORIGINAL_OBJECTS",
+  "request_ref": {"source_id": "original-request", "pointer": ""},
+  "contexts": [
+    {"id": "supporting-notes", "link_pointer": "/supporting_file", "source_id": "original-notes"}
+  ],
+  "rows": [
+    {
+      "source_ref": {"source_id": "original-notes", "pointer": "/maintenance"},
+      "disposition": "AUTHORED_ANALYSIS",
+      "meaning": "Explain what this entire retained member establishes for the requested purpose, and what it does not establish.",
+      "limitations": ["State a source-specific remaining limitation or explain why none was identified."],
+      "evidence_refs": [],
+      "supporting_annex_ids": []
+    }
+  ]
+}
+```
+
+This abbreviated example is not complete: supply exactly one row for every
+top-level member of the original request and every linked context object, up to
+128 distinct members. Bind the request at its root, not a convenient subobject.
+Each row selects the entire member; nested values, null, false, zero and arrays
+remain intact. JSON Pointer escapes are `~0` for `~` and `~1` for `/`. Output
+follows original source member order.
+
+Object mode retains original JSON number tokens exactly in every request, context,
+member and evidence binding, including tiny/large exponents, long fractions,
+integers and signed zero. Numbers remain JSON numbers; numeric-looking strings,
+booleans and null stay distinct. Source strings use normal JSON escaping; original
+whitespace, string escape spelling and object key order may normalize. Decode the
+output with a lossless-number reader when precision matters: a consumer's default
+binary-float decoder can still round an otherwise exact JSON token. Original file
+bytes and hashes remain retained separately. Unsupported values, depth beyond64
+or an encoded object above16MiB reject delivery rather than changing or truncating
+values. Existing category output and native annex encodings are unchanged.
+
+Required contexts are direct top-level request string values resolving to pinned
+JSON-object sources, relative to the original request file. The `contexts` list
+must match every such link; IDs are display labels. Missing relative `.json`
+sources, unsafe local paths, substituted source IDs, omitted/duplicate links and
+partial member rows reject delivery. Multiple links to one source retain every
+link and cover its members once. URLs are never fetched. JSON-array links remain
+request members rather than context objects; arrays and nested links are not
+recursively expanded. This bounded mode does not infer exhaustive requirements
+from prose or discover additional files.
+
+Each member requires nonempty authored `meaning`, at least one nonempty
+`limitations` entry and a disposition: `AUTHORED_ANALYSIS`, `SUPPORTED_ANNEX` or
+`NON_ANALYTICAL_CONTEXT`. The latter needs a meaningful relevance rationale; it
+is not permission to skip a requested conclusion. `SUPPORTED_ANNEX` requires a
+checked annex reference, while its relevance remains unverified. Optional
+`evidence_refs` bind additional exact original JSON values. A nested member's
+meaning and the natural-language request still require substantive review.
+
+Authored meaning, dispositions and annex associations remain
+`SEMANTICALLY_UNVERIFIED`; populated rows do not prove analytical completeness.
+No financial calculation, source authentication or correctness grading occurs.
+Use readiness tools only when their original input contracts are supported; do
+not invent calendars, clocks or identity evidence to satisfy a schema. Deliver
+unsupported source-fitness conclusions as attributed judgments with their limits.
+
+The full authored answer has its own first-response hash and association. Optional
+native annexes retain unchanged strict verification and complete artifact trees.
+For comparison protocols, use the applicable outside-compositor path for the
+complete answer. Never associate an annex hash with the larger answer or append
+authored text to a strict canonical response. Controls remain unchanged.
+
 ## Complete category briefings
 
 `request_coverage.py` preserves a supplied machine-readable request's complete
@@ -372,3 +452,24 @@ references inside that same response. Compose the response after substantive
 commands finish. Its authoring command may be recorded separately afterward;
 never claim a placeholder stream hash proves the completed stream. Preserve an
 incorrect original reference as a disclosed evidence failure, not a silent repair.
+
+For complete retained market tasks, use the [combined canonical source reports](final-report.md#complete-retained-market-workflows):
+`market_sources_report` binds the original whole parser-job list, raw files and
+explicit cutoff; `market_flow_report` binds the requested original views;
+`institutional_report` adds pure native `brief` results. Missing interface schema
+version may be constructed from the installed parser contract, while the cutoff
+must come from original evidence. Never invent publication/availability clocks,
+share bases or other market metadata to make parsing succeed. Keep native
+rejected rows and unknowns visible. These supported outputs can share one exact
+canonical response; broader authored work still follows the mixed briefing route.
+
+The parser producer automatically includes the documented historical-descriptor
+metadata profile from the whole JSON document bound by its existing `as_of_ref`.
+This contributes source-specific historical-membership, availability and vintage
+limitations to that same canonical response. It performs no acquisition or
+historical study and never certifies point-in-time fitness or complete request
+coverage. Inspect partial-audit bounds and unassessed fields. Exact original field
+values use typed `original_json` JSON text to preserve numeric tokens; the native
+parser results keep their established numeric conventions. Broader unsupported
+context still needs authored analysis through the complete-object route. See
+[metadata fitness](market-sources.md#automatic-bound-context-metadata-fitness).

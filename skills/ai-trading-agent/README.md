@@ -9,7 +9,7 @@ any final answer is created; a new preparation can correct declared inputs witho
 overwriting the failure. Both final outputs verify after relocation. These checks
 do not certify source truth, investment correctness or complete task coverage.
 
-Version **5.9.5** includes [production research operations](references/research-operations.md)
+Version **5.9.8** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
@@ -24,6 +24,10 @@ the SEC index route preserves observed header/date variants and qualifies
 complete versus uncertain transport without inferring publication time.
 [flow and squeeze diagnostics](references/market-flow.md) preserve dated short
 interest, short-sale volume, borrow snapshots and inferred pressure separately.
+Source-bound market-flow reports replay retained native input documents and export
+readable and structured results together, preserving unknowns, compatibility
+statuses and unreconciled quotients. The report checks local consistency; it does
+not authenticate sources or replace parser and institutional-brief coverage.
 Source-specific access and intended-use terms apply. Every paid subscription is
 optional; public X posts remain research leads requiring primary verification.
 No paid Unusual Whales adapter is included.
@@ -66,7 +70,11 @@ These checks do not authenticate sources or certify arbitrary prose.
 Every paid subscription is optional across all skill tools and research workflows.
 Use relevant accessible free sources first; user-provided paid access can add
 fresher data or materially better coverage. Missing access leaves explicit gaps
-while supported research continues. See [source access](references/source-access.md). Mixed briefings retain every original requested category and the complete authored source plan, with verified calculations attached as supporting reports. Category coverage is structural; source authenticity and the substance of authored judgments remain unverified.
+while supported research continues. See [source access](references/source-access.md). Mixed briefings retain every original requested category and the complete authored source plan, with verified calculations attached as supporting reports. Structured requests without a category list can use [original-object briefings](references/source-bound-workflow.md#complete-original-object-briefings): the complete request and linked context members retain authored meaning, limitations and separately checked native annexes. Both modes check structural coverage; source authenticity and the substance of authored judgments remain unverified.
+
+Retained-text parser reports automatically assess supported historical descriptors
+in their bound clock-source context. The findings identify metadata limits; they
+do not certify point-in-time data or complete historical coverage.
 
 Each upgrade also reviews example prompts and P1/P2/P3 case impact, updating
 applicable coverage while preserving frozen evidence. See

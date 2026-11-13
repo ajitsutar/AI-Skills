@@ -353,3 +353,81 @@ not official short interest, utilization, a market-wide supply measure or a
 borrow locate. Public access does not grant unrestricted redistribution or
 commercial rights. More than 10,000 downstream records need explicit partitioning
 or a source-bound selected event view; raw rows must never be silently truncated.
+
+## Source-bound original parse jobs
+
+`market_sources_report.analyze(request, manifest_path, manifest_sha256, source_root)`
+is a pure local report producer for retained plain UTF-8 text/JSON. Through
+`supplied_research.py` or a `final_report.py` source-report section, use:
+
+```json
+{"jobs_ref":{"source_id":"original-jobs","pointer":"/jobs"},
+ "as_of_ref":{"source_id":"original-context","pointer":"/as_of"}}
+```
+
+Bind the complete original job list (up to64 jobs), not a literal reconstructed
+subset. Each job retains its adapter, source declarations and other parser
+configuration. Its `text_file` resolves relative to the original job JSON file
+and must match exactly one pinned manifest path. The full manifest is verified,
+including unselected context. No path search, external file import, acquisition,
+archive extraction or inferred source metadata occurs.
+
+An omitted `schema_version` is constructed as `1`, the installed parser interface
+contract; it is not a source observation. An omitted `as_of` requires the explicit
+original `as_of_ref`; otherwise the original aware job clock is used. When both
+are present they must identify the same instant. A date-only cutoff, unsupported
+version, conflicting inline text/data or raw hash, unsafe/missing raw path, or
+literal request override cannot silently replace original evidence. Raw hashes
+follow the native plain-file CLI convention. The `sec_submissions` and
+`social_leads` adapters decode the bound JSON with the native numeric convention
+after rejecting duplicate/nonfinite JSON values.
+
+Every selected-list job appears in order with the original job, clock/envelope
+construction, raw-source binding and complete native result or retained error.
+`EXECUTED` means the parser returned: rows can still be ineligible with parse
+errors, including conflicting aliases. Inspect those flags and retained raw
+fields. Failed jobs remain `FAILED` while the remaining jobs run. This does not
+certify source authenticity, whole-request completeness, separately authored
+cross-checks, capture completeness or investment correctness.
+
+### Automatic bound-context metadata fitness
+
+With the existing `as_of_ref`, the producer also audits the whole original JSON
+document containing that clock. `metadata_fitness` and its complete rendered
+report section carry source hashes, JSON pointers, field states and qualified
+findings. No new flag, reconstructed request or additional source selector is
+needed. Without a clock reference it returns `NO_BOUND_CONTEXT`; unrelated corpus
+sources are not searched. This does not replace analysis of the full request.
+
+The single `HISTORICAL_DESCRIPTOR_V1` profile recognizes objects containing
+`history_range` and either `roster_snapshot_at` or `revised_download_at`, regardless
+of enclosing names or field validity. There are no aliases. `history_range` means
+two ordered ISO calendar dates; snapshot and revised-download fields require
+timezone-aware instants. `constituents` means nonempty unique declared strings,
+not authenticated identities. `row_first_available_at`, `historical_membership`
+and `revision_vintages` retain declarations without verifying rows or versions.
+Absent, null, empty, boolean, malformed and insufficient-precision values stay
+distinct. Nonempty evidence objects/lists remain `PRESENT_UNVERIFIED`; global
+timestamps never establish per-row knowledge. Extra fields are unassessed.
+
+The findings explain that a supplied roster does not establish historical
+membership, download time does not establish earlier row availability, and this
+metadata audit does not reconstruct earlier versions. Even complete declarations
+remain unverified. No positive point-in-time, historical-universe, no-look-ahead,
+authenticity or whole-request certification is emitted; no measured bias or
+actual revisions are inferred. A generic `downloaded_at` is not treated as a
+revised-download event.
+
+Original values have `original_value_kind` and
+`encoding: EXACT_ORIGINAL_JSON_TEXT`. Their `original_json` string contains JSON
+text preserving exact original number tokens, including underflow, overflow,
+large integers and signed zero. It is an explicit representation of the source
+value, not a coerced numeric string or rounded `original_value`. Parse it
+losslessly when inspecting numbers. Missing pointers have no invented value.
+
+Traversal is limited to depth 8, 4096 encountered nodes and 32 descriptors;
+displayed scope and extra-field inventories retain at most 64 entries, and a
+field's JSON-text projection at most 16384 bytes. Limits report partial status,
+counts, pointers and reasons; the complete source remains hash-bound. A field
+projection exceeding its bound is omitted explicitly, never rounded. No matching
+profile means `NO_SUPPORTED_DESCRIPTOR`, not evidence absence or complete coverage.

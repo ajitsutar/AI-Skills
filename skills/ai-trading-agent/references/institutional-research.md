@@ -320,3 +320,16 @@ and must be labeled as such. Omit the legacy timed-usefulness metric when these
 measurements are absent; retain qualitative technical review separately. Never
 call automated quality judgments human feedback or causal time saved. Paper
 returns remain separately evaluated on their actual elapsed price/cost evidence.
+
+## Canonical event briefs
+
+The `institutional_report` source-report producer also accepts operation `brief`,
+alongside `plan` and `evaluate`. Bind each complete original JSON document using
+`documents: [{"id":"event-a","source_ref":{"source_id":"original-event","pointer":""}}]`
+and `operations: ["brief"]`. It invokes the installed pure
+`institutional_research.brief` on that original object. Its original
+`include_flow_analysis` flag is preserved; no override enables or disables it.
+All native findings, source/evidence scope, decision context and limitations
+remain in the structured result. The generated text retains native findings;
+the normalized evidence history remains in the complete structured result.
+No journal, capture, host workflow or acquisition operation is enabled.
