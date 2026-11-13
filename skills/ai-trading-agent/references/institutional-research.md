@@ -262,6 +262,47 @@ its retrospective execution scope; it is not a participant campaign case,
 live forward test, trading result or instruction to start recurring monitoring.
 
 
+## Publish source-bound plans and evaluations
+
+Use `institutional_report` with a `source_report` section in
+[final-report.md](final-report.md) to publish results derived from retained
+original study documents. The producer request selects complete JSON objects:
+
+```json
+{
+  "documents": [
+    {"id": "study-a", "source_ref": {"source_id": "original-study", "pointer": ""}}
+  ],
+  "operations": ["plan", "evaluate"]
+}
+```
+
+Each pointer must select the whole native document, including its `as_of`,
+records, workflow/pilot and evaluation declarations when applicable. Up to 32
+uniquely named documents are supported. The complete external source inventory
+is hash-verified, including unselected context. No literal baseline, reviewer,
+eligibility or result override is accepted. The adapter decodes original JSON
+using the native CLI's numeric convention and invokes the installed pure helpers.
+
+The report retains complete native results and limitations. In an evaluation,
+each case keeps its own usefulness and return inclusion flags and exclusion
+reasons; neither an aggregate result nor a general eligibility sentence replaces
+them. A return-baseline conflict may exclude returns while leaving compatible
+usefulness judgments included. Preserve that distinction in both text and JSON.
+
+Export the canonical structured response with `final_report.py response` and
+verify the published copy with `verify-response`; `verify --final-response`
+checks the associated generated text. Do not append a manually rewritten
+inclusion table as another verified result. Qualitative interpretations and
+separately requested work remain subject to independent review.
+
+Failed native operations are retained explicitly under
+`PARTIAL_RETAINED_FAILURES`, while independent operations continue. They are not
+completed calculations. Unknown, excluded or not-established native findings
+remain valid reportable outcomes. No journal, capture, recovery, lock, acquisition,
+scheduler or host action runs through this producer. It does not establish real
+prospective chronology, profitability or institutional acceptance.
+
 ## Reviewer type and completed-report delivery
 
 A configured reviewer may be human or explicitly automated. Preserve its actual

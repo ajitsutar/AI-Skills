@@ -1,5 +1,141 @@
 # Source-bound research and reporting
 
+## Complete category briefings
+
+`request_coverage.py` preserves a supplied machine-readable request's complete
+`requested_categories` inventory when a briefing includes work outside existing
+report producers. It assembles the **authored** briefing/source-plan rows and
+optional checked annex references into its own `first-response.md` and
+`response.json`. Category presence is checked; analytical correctness and semantic
+completeness are not. Continue using independent review to decide whether the
+actual category analysis, useful source routes and requested conclusions are sound.
+
+```console
+python -B scripts/request_coverage.py compose delivery-plan.json --manifest SOURCE-INGRESS.json --manifest-sha256 EXTERNAL_PIN --source-root ORIGINAL_ROOT --output NEW_DELIVERY
+python -B scripts/request_coverage.py verify NEW_DELIVERY --first-response SAVED_FIRST_RESPONSE.md --response SAVED_RESPONSE.json
+```
+
+For a comparison protocol that requires an explicit case/model envelope, add
+`--metadata metadata.json` to compose. The file uses the existing
+`final_report.response_metadata` schema: `case_id`, `runtime_model_metadata`
+with `model`/`effort`, and optional `evidence_paths`/`execution_limitations`.
+These are retained unverified declarations, not analytical overrides. Without
+metadata, the declared ID is `unspecified` and model/effort are `unknown`; provide
+the actual task ID when the protocol requires it. The adapter derives
+`candidate_version` from the installed package and `input_hashes` from every
+original manifest source. Metadata references to separately captured calculations
+are not imported or replayed by this helper.
+
+The output directory must be new. The original plan/corpus, failures and optional
+annexes are retained; nothing is overwritten or deleted. Verification is read-only.
+The complete source inventory is checked against the external pin. This command
+does not discover, browse or acquire sources, run financial calculations, request
+credentials or change accounts.
+
+The plan selects the whole original request object and its original fields:
+
+```json
+{
+  "request_ref": {"source_id": "original-request", "pointer": ""},
+  "categories_pointer": "/requested_categories",
+  "source_scope_pointer": "/source_scope",
+  "constraints_pointer": "/session_rules",
+  "rows": [
+    {
+      "category": "maintenance",
+      "observations": [
+        {
+          "source_ref": {"source_id": "retained-record", "pointer": "/observation"},
+          "interpretation": "An authored interpretation limited to the retained record's declared scope."
+        }
+      ],
+      "analysis": "The category briefing, including unsupported conclusions and their limits.",
+      "free_source_plan": {
+        "routes": [
+          {
+            "source_kind": "Original public documentation",
+            "purpose": "Resolve the identified coverage question.",
+            "stopping_condition": "Stop after the original documentation and one relevant independent source.",
+            "execution_status": "NOT_EXECUTED"
+          }
+        ],
+        "no_route_reason": null
+      },
+      "optional_access": {
+        "assessment": "Describe actual retained access, or state that it is unknown.",
+        "improvement_or_no_need_reason": "Explain the useful field, freshness or history improvement, or why none is needed.",
+        "source_refs": []
+      },
+      "remaining_gaps": ["State the remaining feature or source gap."],
+      "supporting_annex_ids": []
+    }
+  ]
+}
+```
+
+There must be exactly one row for every category in the **original** array, up to
+32 categories. The example's category is illustrative; do not replace a larger
+original array with it. Literal replacement inventories, alternate subset pointers,
+missing/duplicate categories and unrequested rows are rejected. Output rows follow
+original category order. Unknown category names remain required and visible.
+
+`categories_pointer` is fixed to `/requested_categories` in this bounded schema.
+The scope string and constraint object are selected relative to the original
+request object. If it contains `source_scope` or `session_rules`, the corresponding
+pointer must select that exact field, preventing redirection to convenient
+alternative text or permissions. Other schema pointers remain declared selections;
+the entire original request is retained for review. No permission is inferred from
+the selected constraints. Free-text requests without this inventory require an
+outside-compositor answer or a separately reviewed scope extraction; this helper
+does not infer exhaustive requirements from prose.
+
+`observations` may be empty when there is no retained evidence; explain the gap.
+Each nonempty observation binds an original JSON value and preserves the source
+hash. Source content remains attributed and unauthenticated. `interpretation`,
+`analysis`, access assessment, improvement reasoning and gaps are authored and
+explicitly `SEMANTICALLY_UNVERIFIED`, even when every category row exists. A
+structurally valid but irrelevant answer is still a substantive failure.
+
+All prospective route records must say `NOT_EXECUTED`. If no route is appropriate,
+use an empty `routes` list and a substantive `no_route_reason`, preserving offline
+and source-exclusive scope. Access references bind retained JSON receipts; their
+meaning is not automatically authenticated or a purchase requirement.
+
+Optional `annexes` accepts only existing supported strict report directories:
+
+```json
+{
+  "id": "checked-analysis",
+  "kind": "final_report",
+  "directory": "checked-report",
+  "receipt_sha256": "EXACT_RETAINED_RECEIPT_SHA256",
+  "first_response_sha256": "EXACT_RETAINED_ANNEX_FIRST_RESPONSE_SHA256"
+}
+```
+
+Use this object inside an `annexes` array. Paths are relative to the delivery
+plan's directory and cannot escape it. `kind: "canonical_response"` instead
+selects a `final_report.py response` export and additionally requires its
+`response_sha256`. Each annex is verified with its native verifier, copied by exact
+inventory into `annexes/ID`, and replayed there. A row may name its IDs in
+`supporting_annex_ids`. No arbitrary file tree or plugin is imported. Direct
+captured calculation/parser evidence remains valid outside this optional annex
+mechanism; keep it in the task's normal evidence record and cite it in the authored
+analysis without implying that this adapter replayed it.
+
+The full answer has method/association `request-coverage-delivery-1`, not the
+strict compositor's canonical-response identity. Preserve actual complete-answer
+bytes under normal capture/seal controls. Do not use an annex's first-response
+hash for the larger briefing, relabel the annex as the whole answer, or modify
+frozen controls. `STRUCTURAL_SCOPE_AND_BYTES_CHECKED` is neither a correctness pass
+nor permission to mark research complete. A failure retains an explicit diagnostic
+with the missing scope; finish that work rather than hiding it in a partial annex.
+
+The existing research workflow's `coverage(requirements, jobs)` remains useful for
+declared job execution. It does not establish that its caller-declared requirements
+exhaust the original request. Use the original-bound category inventory for this
+briefing route and assess semantic completeness separately.
+
 For original-corpus analyst targets and REIT comparisons, use
 [integrated source research](supplied-research.md) through `research_workflow.py source-run`.
 It connects source derivation/binding to computation, generated reporting and

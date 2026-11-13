@@ -125,7 +125,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 11. Evaluate workflow usefulness separately from returns
 
-> Review [REGISTERED PROTOCOL, IMMUTABLE FIRST RESPONSES, CASE ROSTER AND OUTCOMES] at [CUTOFF]. Check pre-decision evidence, delayed outcomes, missing cases, fixed reviewer criterion and separate baselines. Report descriptive usefulness and matched net return differences without compounding overlapping events, annualizing them or claiming causal time savings or alpha. Reconcile any supplied workflow protocol with the evaluation dates, criterion, baselines, reviewer and target universe. Bind first-response input vintages at capture time and distinguish later decision inputs; preserve mismatches instead of counting them silently.
+> Review [REGISTERED PROTOCOL, IMMUTABLE FIRST RESPONSES, CASE ROSTER AND OUTCOMES] at [CUTOFF]. Check pre-decision evidence, delayed outcomes, missing cases, fixed reviewer criterion and separate baselines. Report descriptive usefulness and matched net return differences without compounding overlapping events, annualizing them or claiming causal time savings or alpha. Reconcile any supplied workflow protocol with the evaluation dates, criterion, baselines, reviewer and target universe. Bind first-response input vintages at capture time and distinguish later decision inputs; preserve mismatches instead of counting them silently. For retained native study documents, use institutional_report with a canonical response export so each observation's usefulness and return eligibility agrees with the aggregate and retained exclusion reasons.
 
 ### 12. Challenge a proposed event strategy
 
@@ -162,7 +162,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 19. Use free flow sources before optional subscriptions
 
-> For [RESEARCH QUESTION], start with relevant accessible free sources in the market-source catalog. Preserve raw bytes, retrieval and publication clocks and missing coverage. Existing subscriptions for any tool category are optional; explain a useful freshness or coverage improvement before using access I provide. Do not purchase or start a trial.
+> For [RESEARCH QUESTION], start with relevant accessible free sources in the market-source catalog. Preserve raw bytes, retrieval and publication clocks and missing coverage. Existing subscriptions for any tool category are optional; explain a useful freshness or coverage improvement before using access I provide. Do not purchase or start a trial. Preserve every supplied requested category in a complete briefing and source plan using request_coverage.py; keep analyst-authored judgments explicitly unverified and attach supported numerical reports without replacing the broader answer.
 
 ### 20. Review an Unusual Whales public post
 

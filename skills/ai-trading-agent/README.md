@@ -9,12 +9,15 @@ any final answer is created; a new preparation can correct declared inputs witho
 overwriting the failure. Both final outputs verify after relocation. These checks
 do not certify source truth, investment correctness or complete task coverage.
 
-Version **5.9.0** includes [production research operations](references/research-operations.md)
+Version **5.9.5** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
 output roots and explicit source choices. See [institutional research](references/institutional-research.md)
 for event-driven U.S.-stock briefs and separate usefulness/net-return evaluation.
+Source-bound plan/evaluate reports export per-observation inclusion decisions,
+exclusion reasons and aggregates from the same retained calculations, keeping
+usefulness and return evidence separate in both readable and structured results.
 
 [Public-source intake](references/market-sources.md) diagnoses ambiguous columns;
 the SEC index route preserves observed header/date variants and qualifies
@@ -63,7 +66,7 @@ These checks do not authenticate sources or certify arbitrary prose.
 Every paid subscription is optional across all skill tools and research workflows.
 Use relevant accessible free sources first; user-provided paid access can add
 fresher data or materially better coverage. Missing access leaves explicit gaps
-while supported research continues. See [source access](references/source-access.md).
+while supported research continues. See [source access](references/source-access.md). Mixed briefings retain every original requested category and the complete authored source plan, with verified calculations attached as supporting reports. Category coverage is structural; source authenticity and the substance of authored judgments remain unverified.
 
 Each upgrade also reviews example prompts and P1/P2/P3 case impact, updating
 applicable coverage while preserving frozen evidence. See

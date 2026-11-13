@@ -5,6 +5,23 @@ terminal objective diagnostics should become the saved answer. It executes and
 replays the existing producers and writes one exact `first-response.md`. It does
 not acquire sources, infer missing metadata or grade arbitrary prose.
 
+Use this as the whole answer only when its supported sections represent the
+requested deliverables. For a mixed source briefing that also needs unsupported
+qualitative analysis, acquisition planning or other work, keep this output as a
+checked annex and deliver the complete answer through
+[request coverage](source-bound-workflow.md#complete-category-briefings) or the
+applicable outside-compositor route. Never choose unrelated supported operations
+just to fill a valid plan. Missing report-producer coverage does not remove the
+user's requested work.
+
+`request_coverage.py` produces its own authored briefing and response association,
+with structural-only category coverage and semantically unverified authored
+fields. It does not modify the strict compositor, claim its complete answer is
+`STRUCTURED_RESEARCH_ONLY`, or associate an annex's `first-response.md` hash with
+the larger authored answer. Existing capture/seal controls remain unchanged;
+retain and seal the actual complete first response under its own hash. Annex
+replay and full-answer correctness are separate checks.
+
 ```console
 python -B scripts/final_report.py compose plan.json --manifest SOURCE-INGRESS.json --manifest-sha256 EXTERNAL_PIN --source-root ORIGINAL_ROOT --output NEW_DIRECTORY
 python -B scripts/final_report.py verify NEW_DIRECTORY --final-response SAVED_FIRST_RESPONSE.md
@@ -70,11 +87,17 @@ Caller-created output, status or report strings cannot substitute for execution.
 Four section types are supported:
 
 - `source_report`: exactly `kind`, `producer` and `request`. Producer is
-  `analyst_sources`, `reit_sources` or `source_claims`. Request follows that
+  `analyst_sources`, `reit_sources`, `source_claims` or `institutional_report`. Request follows that
   producer's documented schema. The compositor calls the existing supplied
   research bridge and includes its whole generated report, with an evidence
   link to the complete result. It cannot hide an unsupported revision by
   selecting only a favorable sentence.
+  The [institutional producer](institutional-research.md#publish-source-bound-plans-and-evaluations)
+  executes only pure `plan`/`evaluate` operations on whole original documents.
+  Generated reports retain each case's separate usefulness/return flags, exclusion
+  reasons, roster and aggregate denominators. Canonical text and response
+  verification reject hand-edited eligibility claims; neither establishes
+  authentic prospective operation or independent institutional acceptance.
 - `source_claim`: exactly `kind`, `request`, and optional `label` for accounting.
   Request is an existing `source_claims` accounting or presence request against
   the complete pinned corpus. The actual output is rendered through

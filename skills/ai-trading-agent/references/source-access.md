@@ -41,6 +41,34 @@ does not establish API, streaming, historical or redistribution entitlement.
 
 ## Missing access and useful completion
 
+For a requested source-by-category briefing, retain the complete original category
+inventory before choosing calculations or report producers. A supported analyst,
+accounting or lexical report may answer only one subtask. Its replay receipt does
+not replace the remaining briefing, access assessment or acquisition plan.
+
+When the requested work extends beyond the strict compositor's supported sections,
+use the [complete category delivery](source-bound-workflow.md#complete-category-briefings)
+adapter, `scripts/request_coverage.py`. It binds the original `requested_categories`
+array and source/constraint pointers, then retains every authored category row in
+the readable and structured answer. Include supported observations with exact
+source references, a bounded prospective free-source plan (or a reason none is
+appropriate), useful optional improvements or a no-need rationale, actual access
+evidence and remaining gaps. Do not silently omit a category because a paid source
+is unavailable or a current producer lacks that topic.
+
+Authored interpretations and plans remain **semantically UNVERIFIED**. The adapter
+checks category presence and bytes, not whether the analysis is useful or correct.
+Prospective routes stay `NOT_EXECUTED`; source-only or offline constraints remain
+visible. Independently review the full delivered answer against the original
+request, including meaningful optional-access improvements. Correct scratch
+calculations and a complete-looking row inventory do not establish task completion.
+
+Checked numerical reports may be attached as unchanged, separately verified
+annexes. Annexes are optional: direct captured calculations and parser results are
+still legitimate evidence outside the strict compositor. Preserve them through
+the task's normal evidence capture and references; do not run unrelated supported
+sections merely to manufacture a compositor artifact.
+
 Absent keys, an expired subscription, denied endpoints or quota exhaustion make
 that provider unavailable, not the entire research task. Continue through relevant
 free sources and supported calculations. State the remaining feature, freshness

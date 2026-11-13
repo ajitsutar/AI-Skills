@@ -78,7 +78,7 @@
         },
         {
           "title": "Evaluate workflow usefulness separately from returns",
-          "prompt": "Review [REGISTERED PROTOCOL, IMMUTABLE FIRST RESPONSES, CASE ROSTER AND OUTCOMES] at [CUTOFF]. Check pre-decision evidence, delayed outcomes, missing cases, fixed reviewer criterion and separate baselines. Report descriptive usefulness and matched net return differences without compounding overlapping events, annualizing them or claiming causal time savings or alpha. Reconcile any supplied workflow protocol with the evaluation dates, criterion, baselines, reviewer and target universe. Bind first-response input vintages at capture time and distinguish later decision inputs; preserve mismatches instead of counting them silently."
+          "prompt": "Review [REGISTERED PROTOCOL, IMMUTABLE FIRST RESPONSES, CASE ROSTER AND OUTCOMES] at [CUTOFF]. Check pre-decision evidence, delayed outcomes, missing cases, fixed reviewer criterion and separate baselines. Report descriptive usefulness and matched net return differences without compounding overlapping events, annualizing them or claiming causal time savings or alpha. Reconcile any supplied workflow protocol with the evaluation dates, criterion, baselines, reviewer and target universe. Bind first-response input vintages at capture time and distinguish later decision inputs; preserve mismatches instead of counting them silently. For retained native study documents, use institutional_report with a canonical response export so each observation's usefulness and return eligibility agrees with the aggregate and retained exclusion reasons."
         },
         {
           "title": "Challenge a proposed event strategy",
@@ -122,7 +122,7 @@
         },
         {
           "title": "Use free flow sources before optional subscriptions",
-          "prompt": "For [RESEARCH QUESTION], start with relevant accessible free sources in the market-source catalog. Preserve raw bytes, retrieval and publication clocks and missing coverage. Existing subscriptions for any tool category are optional; explain a useful freshness or coverage improvement before using access I provide. Do not purchase or start a trial."
+          "prompt": "For [RESEARCH QUESTION], start with relevant accessible free sources in the market-source catalog. Preserve raw bytes, retrieval and publication clocks and missing coverage. Existing subscriptions for any tool category are optional; explain a useful freshness or coverage improvement before using access I provide. Do not purchase or start a trial. Preserve every supplied requested category in a complete briefing and source plan using request_coverage.py; keep analyst-authored judgments explicitly unverified and attach supported numerical reports without replacing the broader answer."
         },
         {
           "title": "Review an Unusual Whales public post",
