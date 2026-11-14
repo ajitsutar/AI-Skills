@@ -61,7 +61,9 @@
         "references/institutional-research.md",
         "references/source-bound-workflow.md",
         "references/costed-bar-replay.md",
-        "references/research-operations.md"
+        "references/research-operations.md",
+        "references/review-packet.md",
+        "references/institutional-acceptance.md"
       ],
       "prompts": [
         {
@@ -78,7 +80,7 @@
         },
         {
           "title": "Evaluate workflow usefulness separately from returns",
-          "prompt": "Review [REGISTERED PROTOCOL, IMMUTABLE FIRST RESPONSES, CASE ROSTER AND OUTCOMES] at [CUTOFF]. Check pre-decision evidence, delayed outcomes, missing cases, fixed reviewer criterion and separate baselines. Report descriptive usefulness and matched net return differences without compounding overlapping events, annualizing them or claiming causal time savings or alpha. Reconcile any supplied workflow protocol with the evaluation dates, criterion, baselines, reviewer and target universe. Bind first-response input vintages at capture time and distinguish later decision inputs; preserve mismatches instead of counting them silently. For retained native study documents, use institutional_report with a canonical response export so each observation's usefulness and return eligibility agrees with the aggregate and retained exclusion reasons."
+          "prompt": "Review [REGISTERED PROTOCOL, IMMUTABLE FIRST RESPONSES, CASE ROSTER AND OUTCOMES] at [CUTOFF]. Check pre-decision evidence, delayed outcomes, missing cases, fixed reviewer criterion and separate baselines. Report descriptive usefulness and matched net return differences without compounding overlapping events, annualizing them or claiming causal time savings or alpha. Reconcile any supplied workflow protocol with the evaluation dates, criterion, baselines, reviewer and target universe. Bind first-response input vintages at capture time and distinguish later decision inputs; preserve mismatches instead of counting them silently. For retained native study documents, use institutional_report with a canonical response export so each observation's usefulness and return eligibility agrees with the aggregate and retained exclusion reasons. Use only the registered cohort for protocol-bound aggregates; retain unregistered observations in separately labeled descriptive summaries and exclusions."
         },
         {
           "title": "Challenge a proposed event strategy",
@@ -103,6 +105,18 @@
         {
           "title": "Deliver research with delegated technical review",
           "prompt": "Handle the technical event research and independent automated review, then show me the completed readable report. Preserve source facts, assumptions, counterevidence, data gaps and paper-only implications. Declare automated reviewer type and baseline before included observations; do not ask me to become a technical review stage or present automated judgments as human benefit."
+        },
+        {
+          "title": "Seal an offline reviewer packet",
+          "prompt": "From [ADOPTED PROTOCOL, FIXED ROSTER, CRITERIA, SOURCE INPUTS, BRIEF AND ORIGINAL RESPONSE JOURNAL], prepare a review_packet under [PRIVATE OUTPUT ROOT]. Verify each criterion dependency, identity and selection coverage, capture and decision clocks, and the two exact participant arms. Keep evaluator-only evidence out of both arms, retain incomplete packets as UNASSESSED and do not dispatch a participant or manufacture a scored verdict."
+        },
+        {
+          "title": "Compare a bounded workflow benefit",
+          "prompt": "Using [PRESPECIFIED VALUE PROTOCOL, VERIFIED PACKETS AND RETAINED BASELINE/ASSISTED OUTPUTS], compare the one declared quality or human-productivity metric with institutional_acceptance.py. Require the same fixed review units and complete registered cohort, include review and correction time, retain unknown durations as null and exclude unexpected IDs from protocol means. Report negative results and reviewer declarations; an automated proxy does not establish human time saving or alpha."
+        },
+        {
+          "title": "Assess a particular institutional deployment",
+          "prompt": "Assess [DECLARED HOST, PACKAGE, RUNTIME, RESEARCH SCOPE AND RETAINED EVIDENCE ROOT] with institutional_acceptance.py. Replay original platform, source-study, rights and sealed-packet inputs; verify source identities, cutoff clocks, governance records, support/incident/recovery/rollback drills and implementation assumptions where applicable. Report each concrete gap and the prespecified value criterion separately from catalog completeness. Do not invent firm controls, licensed data, human benefit, live capability or execution authority."
         }
       ]
     },
@@ -134,7 +148,7 @@
         },
         {
           "title": "Triage possible squeeze pressure",
-          "prompt": "Using [SOURCE-BOUND RECORDS] and [MY DECLARED SQUEEZE CRITERIA], evaluate dated positioning and matched-window volume and benchmark-relative price evidence for [TICKER]. Keep missing float, incomplete ADV and absent borrow data unknown. Report heuristic states and evidence ages without a squeeze probability, causal confirmation, gamma-position inference or automatic trading trigger. For retained native input documents, compose a market_flow_report source section and export the verified canonical response; preserve unknown days-to-cover separately from any unreconciled share-count quotient. When the request includes parser jobs or event briefs, include source-bound market_sources_report sections using the original job list, text and explicit corpus cutoff, plus institutional_report brief sections. The existing explicit corpus cutoff also binds automatic historical-descriptor metadata-fitness findings from its whole original context document; inspect field states, exact JSON-text evidence and partial-audit limits without claiming point-in-time certification. Read the complete original request and linked context, not only the operation list. If source-fitness meaning is outside the native producers, deliver an ORIGINAL_OBJECTS request_coverage briefing with source-specific conclusions and limits for every original member, keeping the exact native report as a separately verified annex. Authored meaning stays unverified; do not invent categories or missing source contracts. Preserve original numeric tokens as numbers in object-mode delivery; keep numeric strings, null and booleans distinct and use lossless decoding when checking extreme or precise values. Preserve every requested output and any unresolved independent-check discrepancy."
+          "prompt": "Using [SOURCE-BOUND RECORDS] and [MY DECLARED SQUEEZE CRITERIA], evaluate dated positioning and matched-window volume and benchmark-relative price evidence for [TICKER]. Keep missing float, incomplete ADV and absent borrow data unknown. Report heuristic states and evidence ages without a squeeze probability, causal confirmation, gamma-position inference or automatic trading trigger. For retained native input documents, compose a market_flow_report source section and export the verified canonical response; preserve unknown days-to-cover separately from any unreconciled share-count quotient. When the request includes parser jobs or event briefs, include source-bound market_sources_report sections using the original job list, text and explicit corpus cutoff, plus institutional_report brief sections. The existing explicit corpus cutoff also binds automatic historical-descriptor metadata-fitness findings from its whole original context document; inspect field states, exact JSON-text evidence and partial-audit limits without claiming point-in-time certification. Read the complete original request and linked context, not only the operation list. If source-fitness meaning is outside the native producers, deliver an ORIGINAL_OBJECTS request_coverage briefing with source-specific conclusions and limits for every original member, keeping the exact native report as a separately verified annex. Authored meaning stays unverified; do not invent categories or missing source contracts. Preserve original numeric tokens as numbers in object-mode delivery; keep numeric strings, null and booleans distinct and use lossless decoding when checking extreme or precise values. Preserve every requested output and any unresolved independent-check discrepancy. Require explicitly resolved and compatible short/float/ADV, price and volume bases. Preserve unreconciled arithmetic separately; ambiguous amendment forks, equal-clock corrections and cancellation branches cannot support affirmative positioning or squeeze labels."
         },
         {
           "title": "Replay a later print correction",
@@ -155,6 +169,10 @@
         {
           "title": "Import explicit-calendar price and volume data",
           "prompt": "Import [PERMITTED OHLCV CSV] using explicit column, share-unit, calendar, role, currency and adjustment declarations. Keep raw OHLC and adjusted close separate, retain partial/duplicate/future rows as unusable, and do not double count flow and ADV facets. Withhold comparable RVOL when volume basis is unknown."
+        },
+        {
+          "title": "Retain malformed source jobs independently",
+          "prompt": "Parse [ORDERED RETAINED SOURCE JOBS] at [EXPLICIT CUTOFF] using the original source bindings. Preserve malformed nested SEC schema failures per job and continue independent valid jobs before and after them. Keep original order, source bytes, parse diagnostics and the exact delivered native/canonical findings; do not turn source errors or unknown bases into positive market evidence."
         }
       ]
     },
@@ -778,7 +796,7 @@
         },
         {
           "title": "Evaluate signed research weights",
-          "prompt": "Evaluate [RESEARCH ALLOCATION] with explicit signed bounds, gross/net limits and supplied borrow availability and costs. Flag missing evidence and keep the result separate from unsupported live short-selling execution."
+          "prompt": "Evaluate [RESEARCH ALLOCATION] with explicit signed bounds, gross/net limits and supplied borrow availability and costs. Flag missing evidence and keep the result separate from unsupported live short-selling execution. Include holding-period borrow expense in each loss constraint and reported scenario P&L as well as the objective; separate entry transaction costs, borrow reserve and entry cash."
         }
       ]
     },
@@ -819,7 +837,7 @@
         },
         {
           "title": "Estimate covariance and component risk",
-          "prompt": "Estimate aligned-return covariance and component risk for [PORTFOLIO]. Review sample coverage, asset ordering and documented shrinkage settings, then show sensitivity without claiming an unimplemented estimator was run."
+          "prompt": "Estimate aligned-return covariance and component risk for [PORTFOLIO]. Review sample coverage, asset ordering and documented shrinkage settings, then show sensitivity without claiming an unimplemented estimator was run. Use the documented unlevered simple-total-return domain: values below -1 are invalid. Distinguish undefined constant-series null correlations from measured zero and retain controlled numerical-range failures as unavailable calculations, never zero risk."
         },
         {
           "title": "Combine conditional portfolio variance paths",
@@ -1362,7 +1380,7 @@
         },
         {
           "title": "Audit institutional readiness",
-          "prompt": "Assess this deployment against the skill's current capability inventory. Separate implemented/tested software, empirically validated investment effectiveness and available data or operational dependencies."
+          "prompt": "Assess this deployment against the skill's current capability inventory. Separate implemented/tested software, empirically validated investment effectiveness and available data or operational dependencies. Where actual retained inputs are supplied, run institutional_acceptance.py for the exact host, package, runtime, data contract and declared scope. Verify original components and sealed packets, source-rights identity, observed drills and prespecified value coverage. Evidence-catalog completeness grants no certification, productivity claim, alpha or execution permission."
         },
         {
           "title": "Plan a point-in-time research database",

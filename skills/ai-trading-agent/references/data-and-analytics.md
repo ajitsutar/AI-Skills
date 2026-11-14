@@ -90,6 +90,25 @@ diagonal shrinkage and reports component risk/constant-series flags. Historical
 correlation may fail in a crisis; stress scenarios ignore promised stop fills.
 This is risk analysis, not an automatic return/covariance optimizer.
 
+The covariance operation's inputs are unlevered simple total returns, so a value
+below `-1` is a domain error with its symbol and timestamp retained in the
+diagnostic. Exactly `-1` and positive returns above `1` remain valid. Inputs are
+never clipped or reinterpreted as percentages, logarithmic returns or leveraged
+P&L. This input rule belongs to this operation only.
+`sample_correlation` is authoritative and nullable: every cell involving a
+constant series is `null`, with `CONSTANT_RETURN_SERIES` in the corresponding
+`sample_correlation_reason` cell. A measured zero between varying series remains
+numeric zero with no reason. `sample_correlation_legacy_zero_filled` is an
+explicit compatibility representation whose undefined cells use zero placeholders;
+consumers must use the nullable matrix for conclusions. Covariance and available
+portfolio volatility retain their existing definitions.
+Finite return inputs can still exceed binary floating-point covariance range.
+Nonconstant sample variances that underflow to zero or subnormal precision, and
+nonfinite sample/annualized covariance or portfolio risk results, raise
+`COVARIANCE_NUMERICAL_RANGE_UNAVAILABLE`. These are unavailable calculations,
+never measured zero correlations or zero-risk conclusions. This range failure
+does not change the constant-series null-correlation convention.
+
 accounting_tools supports cash, returns, lots and wash-sale review (see its CLI
 operation mapping and function signatures). Reconcile broker cash and corporate
 actions; settled cash remains broker truth. Flow-timed returns need valuations

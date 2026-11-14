@@ -321,6 +321,38 @@ measurements are absent; retain qualitative technical review separately. Never
 call automated quality judgments human feedback or causal time saved. Paper
 returns remain separately evaluated on their actual elapsed price/cost evidence.
 
+Before dispatch, use the [offline review-packet preflight](review-packet.md) to
+bind the adopted protocol, roster, selection/identity coverage, source cutoff,
+native original-response journal, actual declared decision clocks and rubric.
+It seals separate participant directories and emits criterion-by-evidence support;
+missing or unverifiable support stays `UNASSESSED`, never a passing score.
+Only the assisted participant sees the exact retained brief and explicitly allowed
+provenance. Keep evaluator-only evidence, private contact and runtime configuration
+out of participant inputs. A byte-consistent packet does not authenticate sources,
+clocks or independence, and cannot repair a historical incomplete review verdict.
+
+### Prespecified cohort denominators
+
+`evaluate` derives membership before accumulating any metric. A supplied
+workflow/pilot `study.expected_case_ids` is authoritative; otherwise an explicit
+evaluation roster defines the cohort. Conflicting rosters remain protocol
+conflicts. Order does not change membership. Duplicate case or roster IDs are
+rejected. Unexpected observations are retained with `cohort_membership:
+UNEXPECTED` and `CASE_OUTSIDE_PRESPECIFIED_COHORT` metric exclusions; they cannot
+change the primary `usefulness` or `returns` aggregate. Missing observations are
+listed without fabricated cases or zero returns. Each metric retains its own
+observed eligible denominator.
+
+`all_supplied_descriptive` separately reports eligible supplied observations under
+`ALL_SUPPLIED_DESCRIPTIVE_NOT_REGISTERED_COHORT`; do not label that population the
+registered result. Per-case `all_supplied_descriptive_*_included` flags explain
+its denominators. With no roster in either declaration, standalone work remains
+available under `metric_cohort: UNREGISTERED_ALL_SUPPLIED` and roster status
+`UNKNOWN`; it does not become a registered study. Source-bound
+`institutional_report` retains both populations and all flags in JSON and text.
+Protocol changes require a retained predecessor and a new adoption clock; never
+retroactively change the roster or reinterpret original missing observations.
+
 ## Canonical event briefs
 
 The `institutional_report` source-report producer also accepts operation `brief`,

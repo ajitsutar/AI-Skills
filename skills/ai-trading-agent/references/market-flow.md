@@ -56,6 +56,20 @@ remain ordinary findings. Raw parser work, institutional briefs and qualitative
 source interpretation remain separately required when requested; the producer
 does not replace them or certify their conclusions.
 
+Comparability requires explicit resolved string bases. Matching `UNKNOWN`,
+`unresolved`, `unspecified`, `N/A`, blank or nonstring declarations cannot
+establish a shared adjustment, volume or price basis. Original metadata remains
+in the evidence. SI/float percentages and ADV/days-to-cover become null when
+their bases are unresolved or mismatched; separately named
+`unreconciled_short_interest_percent_float`, `supplied_volume_arithmetic_mean`
+and `unreconciled_share_count_quotient` preserve arithmetic without verifying a
+quotient. Own price returns require a resolved price basis; benchmark-relative
+returns additionally require matched resolved own/benchmark bases. Raw price
+quotients remain in `unreconciled_price_return_percent` and
+`unreconciled_benchmark_price_return_percent` when comparability is unavailable.
+Volume and price comparability are assessed independently. Known equal labels
+remain caller declarations; they do not establish adjustment dates or actions.
+
 ## Retain the information actually available
 
 Each record needs an explicit availability timestamp, source declaration and
@@ -76,6 +90,13 @@ explicitly before analysis. A trade marked `status: corrected` needs a replace
 envelope; unsupported feed statuses are unusable. Identical repeated print IDs
 are deduplicated only inside the same ticker/feed. Conflicting payloads for the
 same active feed/print identity remain unusable until explicitly revised.
+
+For short-interest amendment forks or unresolved ordering, every connected
+vintage retains an `amendment_ambiguity` group. Positioning explicitly marks
+`active_positioning_eligible: false`; squeeze assessments remain
+`INSUFFICIENT_EVIDENCE` even when the retained branch's arithmetic meets the
+declared thresholds. Linear chains, prior cutoffs and future corrections preserve
+their existing time semantics. No latest-wins rule resolves conflicting branches.
 
 `comparison_group` declares an actual comparable filter, including relevant
 session/market, trade conditions and adjustment conventions. It is not proof

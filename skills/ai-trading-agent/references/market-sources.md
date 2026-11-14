@@ -66,8 +66,14 @@ also match wherever either side declares them. Bar windows/session, feed,
 currency, units, price/volume bases and issuer/class must remain compatible.
 An invalid or future revision leaves the original usable. Equal timestamps are
 unresolved order. Duplicate record IDs exclude every copy. Raw vintages remain
-visible; generic revisions do not solve ambiguous amendment chains or implement
-every exchange's correction protocol.
+visible; generic revisions do not select a winning branch or implement every
+exchange's correction protocol. For short-interest envelopes, contemporary
+forks and unresolved revision ordering produce an `amendment_ambiguity` group
+on every connected vintage, including cancellation branches. Positioning and
+squeeze retain these records but set `active_positioning_eligible: false` and
+refuse affirmative triage. A future/unusable correction does not create current
+ambiguity. A linear ordered chain retains its existing behavior. This conservative
+state does not infer provider-specific latest-wins or source disambiguation.
 
 ## Retained-source adapters
 
@@ -77,6 +83,14 @@ becomes first_observed_snapshot. Default IDs bind source URL/retrieval/content
 vintage plus row number. Optional id_prefix explicitly names a retained vintage.
 Optional security_context maps ticker to supplied issuer/class/adjustment
 fields; those declarations are retained without inventing missing context.
+
+For `sec_submissions`, a supplied `filings` member must be an object. Nested
+`recent` must be an object of equally sized list columns, including
+`accessionNumber`. Null, scalar and list containers are controlled schema errors;
+malformed data never becomes an empty successful extraction. The source-bound
+multi-job report retains that failed job, its original input and raw-source
+binding in order while continuing independent valid jobs. Unexpected programmer
+or resource failures are not converted into schema successes.
 
 | Adapter | Material | Preserved meaning |
 |---|---|---|

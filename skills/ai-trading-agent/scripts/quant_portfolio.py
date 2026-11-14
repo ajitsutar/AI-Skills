@@ -159,10 +159,15 @@ def construct(document):
     # w, u>=abs(w), t>=abs(w-previous): smooth convex formulation.
     def cost(x):
         return costs @ x[2*n:] + impact @ (x[2*n:] ** 1.5)
+    def period_borrow(x):
+        # Exposure held over the declared period, including unchanged shorts.
+        return borrow @ ((x[n:2*n]-x[:n])/2)
+    def total_cost(x):
+        return cost(x) + period_borrow(x)
     def objective(x):
         w, u = x[:n], x[n:2*n]
         return float(risk_aversion * (w @ sigma @ w) / 2 - alpha @ w +
-                     uncertainty @ u + cost(x) + borrow @ ((u-w)/2))
+                     uncertainty @ u + total_cost(x))
     constraints = [
         {'type': 'eq', 'fun': lambda x: x[:n].sum()-net},
         {'type': 'ineq', 'fun': lambda x: x[n:2*n]-x[:n]},
@@ -171,7 +176,8 @@ def construct(document):
         {'type': 'ineq', 'fun': lambda x: x[2*n:]+(x[:n]-previous)},
         {'type': 'ineq', 'fun': lambda x: gross-x[n:2*n].sum()},
         {'type': 'ineq', 'fun': lambda x: turnover-x[2*n:].sum()},
-        {'type': 'ineq', 'fun': lambda x: 1-x[:n].sum()-cost(x)-cash_floor-reserve}]
+        {'type': 'ineq', 'fun': lambda x: 1-x[:n].sum()-cost(x)-cash_floor-reserve},
+        {'type': 'ineq', 'fun': lambda x: 1-x[:n].sum()-total_cost(x)-cash_floor-reserve}]
     for issuer in sorted({a['issuer'] for a in assets}):
         mask = np.array([a['issuer'] == issuer for a in assets], float)
         constraints.append({'type': 'ineq', 'fun': lambda x, m=mask: issuer_cap-m @ x[n:2*n]})
@@ -186,7 +192,7 @@ def construct(document):
     for s in scenarios:
         shock = vector(s['returns'], 'scenario_returns', n, -1)
         cap = scalar(s['max_loss_fraction'], 'max_loss_fraction', 0)
-        constraints.append({'type': 'ineq', 'fun': lambda x, r=shock, c=cap: c+r @ x[:n]-cost(x)})
+        constraints.append({'type': 'ineq', 'fun': lambda x, r=shock, c=cap: c+r @ x[:n]-total_cost(x)})
     if 'volatility_cap' in p:
         cap = scalar(p['volatility_cap'], 'volatility_cap', 0)
         constraints.append({'type': 'ineq', 'fun': lambda x: cap**2-x[:n] @ sigma @ x[:n]})
@@ -246,6 +252,7 @@ def construct(document):
                    'covariance_min_eigenvalue': positive_min, 'covariance_condition_number': condition,
                    'covariance_warning': 'SINGULAR_OR_ILL_CONDITIONED' if condition is None or condition > 1e8 else None}
     slack = {'cash_floor': float(1-w.sum()-cost(actual)-cash_floor-reserve),
+             'cash_floor_after_borrow_reserve': float(1-w.sum()-total_cost(actual)-cash_floor-reserve),
              'gross_cap': float(gross-abs(w).sum()), 'turnover_cap': float(turnover-abs(w-previous).sum())}
     slack.update({'upper:'+s: float(high[i]-w[i]) for i, s in enumerate(ids)})
     slack.update({'lower:'+s: float(w[i]-low[i]) for i, s in enumerate(ids)})
@@ -254,7 +261,7 @@ def construct(document):
     for issuer in sorted({a['issuer'] for a in assets}):
         slack['issuer:'+issuer] = float(issuer_cap-sum(abs(w[i]) for i, a in enumerate(assets) if a['issuer'] == issuer))
     for scenario in scenarios:
-        slack['stress:'+scenario['name']] = float(scenario['max_loss_fraction']+np.array(scenario['returns']) @ w-cost(actual))
+        slack['stress:'+scenario['name']] = float(scenario['max_loss_fraction']+np.array(scenario['returns']) @ w-total_cost(actual))
     slack_units = {key: 'fraction_of_portfolio_notional' for key in slack}
     if 'volatility_cap' in p:
         slack['variance_cap_squared'] = float(p['volatility_cap']**2-variance)
@@ -265,12 +272,25 @@ def construct(document):
         slack_units['tracking_variance_cap_squared'] = 'variance_over_covariance_horizon'
     return {'status': 'RESEARCH_PROPOSAL', 'weights': dict(zip(ids, w.tolist())),
             'gross_exposure': float(abs(w).sum()), 'net_exposure': float(w.sum()),
-            'gross_turnover': float(abs(w-previous).sum()), 'estimated_cost_fraction': float(cost(actual)),
+            'gross_turnover': float(abs(w-previous).sum()), 'estimated_cost_fraction': float(total_cost(actual)),
+            'entry_transaction_cost_fraction': float(cost(actual)),
+            'holding_period_borrow_cost_fraction': float(period_borrow(actual)),
             'cash_after_modeled_cost': float(1-w.sum()-cost(actual)),
             'free_cash_after_collateral_reserve': float(1-w.sum()-cost(actual)-reserve),
+            'cash_after_entry_cost': float(1-w.sum()-cost(actual)),
+            'cash_after_period_borrow_reserve': float(1-w.sum()-total_cost(actual)),
+            'free_cash_after_collateral_and_borrow_reserve': float(1-w.sum()-total_cost(actual)-reserve),
+            'cost_accounting': {
+                'units': 'fraction_of_initial_nav',
+                'entry_cost_formula': 'sum(one_way_cost * abs(weight - previous_weight) + impact_coefficient * abs(weight - previous_weight)**1.5)',
+                'borrow_cost_formula': 'sum(borrow_cost_per_period * max(-weight, 0))',
+                'timing': 'Entry transaction costs reduce entry cash. Period borrow is reserved for the declared holding period, not assumed settled at entry. No cash yield or other holding-period cash flows are modeled.',
+                'legacy_cash_fields': 'cash_after_modeled_cost and free_cash_after_collateral_reserve exclude the separately reported period borrow reserve.',
+                'modeled_return_basis': 'modeled_return is gross; modeled_net_return and scenario_pnl_fraction subtract entry and period borrow costs.'},
             'volatility_over_covariance_horizon': float(np.sqrt(max(0., w @ sigma @ w))),
             'modeled_return': float(alpha @ w) if objective_name == 'robust_return' else None,
-            'scenario_pnl_fraction': {s['name']: float(np.array(s['returns']) @ w-cost(actual)) for s in scenarios},
+            'modeled_net_return': float(alpha @ w-total_cost(actual)) if objective_name == 'robust_return' else None,
+            'scenario_pnl_fraction': {s['name']: float(np.array(s['returns']) @ w-total_cost(actual)) for s in scenarios},
             'max_violation': max(violations), 'input_sha256': digest(document),
             'solver_attempts': attempts, 'original_constraint_validation_tolerance': 1e-7,
             'constraint_slacks': slack, 'binding_constraints': [name for name, value in slack.items() if abs(value) <= 1e-7],

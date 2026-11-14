@@ -4,7 +4,10 @@ Caller-supplied dated events, not an execution simulator or tax-law engine. Pric
 are unadjusted per-unit marks; corporate actions must not also be in adjusted NAV.
 """
 from copy import deepcopy
-from decimal import Decimal, InvalidOperation
+from decimal import (Context, Decimal, DecimalException, DivisionByZero, Inexact,
+                     InvalidOperation, Overflow, ROUND_HALF_EVEN, Subnormal,
+                     Underflow, localcontext)
+from fractions import Fraction
 from quant_common import digest, require, timestamp, cli
 
 
@@ -15,6 +18,8 @@ def dec(x, name, minimum=None):
     except InvalidOperation as exc:
         raise ValueError('INVALID_DECIMAL:'+name) from exc
     require(v.is_finite() and (minimum is None or v >= minimum), 'INVALID_RANGE:'+name)
+    require(len(v.as_tuple().digits) <= 36 and -36 <= v.as_tuple().exponent <= 36
+            and (v.is_zero() or v.adjusted() <= 35), 'UNSUPPORTED_DECIMAL_INPUT_RANGE:'+name)
     return v
 
 
@@ -26,6 +31,31 @@ def clean(x):
 
 
 def replay(document):
+    """Own the entire numeric context; never alter the caller's settings/flags."""
+    context = Context(prec=120, rounding=ROUND_HALF_EVEN, Emin=-999, Emax=999,
+                      capitals=1, clamp=0, flags=[],
+                      traps=[InvalidOperation, DivisionByZero, Overflow, Underflow,
+                             Subnormal, Inexact])
+    try:
+        with localcontext(context):
+            return _replay(document)
+    except DecimalException as exc:
+        raise ValueError('UNSUPPORTED_DECIMAL_ARITHMETIC:'+type(exc).__name__) from None
+
+
+def _allocated_basis(basis, take, quantity):
+    if basis is None or take == quantity:
+        return basis
+    numerator = basis * take  # Must be exact under the accounting context.
+    # Only this mathematical ratio may round: no currency or quantity-step rule.
+    # Leave 60 guard digits for subsequent exact ledger additions/products.
+    with localcontext() as allocation_context:
+        allocation_context.prec = 60
+        allocation_context.traps[Inexact] = False
+        return numerator / quantity
+
+
+def _replay(document):
     """Replay explicit events; unknown valuation or taxes stay unknown.
 
     Required: currency, as_of, opening{at,cash,lots,marks}, events,
@@ -130,7 +160,7 @@ def replay(document):
             require(lid in lots and lots[lid]['security_id']==sid,'LOT_SECURITY_MISMATCH')
             lot=lots[lid]; take=min(remaining,lot['quantity'])
             if take==0: continue
-            allocated=None if lot['basis'] is None else lot['basis']*take/lot['quantity']
+            allocated=_allocated_basis(lot['basis'],take,lot['quantity'])
             details.append({'lot_id':lid,'quantity':take,'basis':allocated})
             basis=None if basis is None or allocated is None else basis+allocated
             lot['quantity']-=take
@@ -264,12 +294,25 @@ def replay(document):
         trace.append(state)
     settle(end);final=snapshot(d['as_of'],'final')
     cash_identity=dec(d['opening']['cash'],'cash')+external+receipts_created-buy_debits-tax_payments-cash-sum((r['amount'] for r in pending),Decimal(0))
-    require(abs(cash_identity)<Decimal('0.00000001'),'CASH_AND_RECEIVABLE_CONSERVATION_FAILURE')
+    # Exact rational reconstruction is independent of Decimal accumulation.
+    exact_identity=(Fraction(dec(d['opening']['cash'],'cash'))+Fraction(external)
+                    +Fraction(receipts_created)-Fraction(buy_debits)-Fraction(tax_payments)
+                    -Fraction(cash)-sum((Fraction(r['amount']) for r in pending),Fraction(0)))
+    require(cash_identity == 0 and exact_identity == 0,'CASH_AND_RECEIVABLE_CONSERVATION_FAILURE')
     return {'method':'explicit-holdings-ledger-v1','currency':d['currency'],'input_sha256':digest(document),
             'status':'UNRESOLVED' if final['unknown_valuations'] or unknown_tax else 'COMPUTED_SCENARIO',
             'final':final,'lots':clean(list(lots.values())),'pending_receipts':clean(pending),'timeline':trace,
             'realizations':clean(realized),'net_external_cash_flows':str(external),'transaction_costs':str(fees),
             'cash_and_receivable_conservation_residual':str(cash_identity),
+            'numeric_contract':{
+                'input_max_coefficient_digits':36, 'input_exponent_range':[-36,36],
+                'input_max_adjusted_exponent':35,
+                'accounting_precision':120, 'accounting_exponent_range':[-999,999],
+                'accounting_arithmetic':'Exact; inexact, subnormal or out-of-range arithmetic raises UNSUPPORTED_DECIMAL_ARITHMETIC.',
+                'partial_basis_division_precision':60, 'rounding':'ROUND_HALF_EVEN',
+                'basis_rounding_scope':'Only proportional partial-lot basis division may round; the remaining lot retains the residual basis. Full-lot disposal consumes all remaining basis.',
+                'cash_conservation':'Decimal equality and independent exact rational reconstruction.',
+                'currency_or_share_step_rounding':False, 'ambient_context_used':False},
             'tax_evidence':clean({'scope':'SUPPLIED_SCENARIO_NOT_VERIFIED_ACTUAL_TAX',
                 'input_sha256':digest(document),'mode':d['tax_mode'],
                 'opening_declared_liability':{'amount':opening_tax,

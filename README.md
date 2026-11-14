@@ -30,7 +30,7 @@ Source selection and surrounding narrative still require review.
 
 The trading workflows use accessible free sources first; paid subscriptions are
 optional and existing user-provided access can improve freshness or coverage.
-Version **5.9.8** adds official SEC issuer-identity intake, public/supplied
+Version **5.10.1** includes official SEC issuer-identity intake, public/supplied
 price and volume observations, and user-supplied borrow evidence with
 explicit dates, coverage and source qualification. Production research
 operations support retained briefs and automated technical review; users
@@ -48,6 +48,11 @@ meaning and unknown attribution, and reconciles cross-measure assumptions before
 reporting conditional results. Saved REIT reports can retain their original sources
 and verify exact output consistency. News-ledger audits also retain original-source
 lineage. These checks do not authenticate sources or certify investment conclusions.
+Offline reviewer packets bind criterion dependencies and separate participant inputs
+from evaluator evidence. Scope-bound institutional acceptance composes retained
+host, data, rights, operating controls and prespecified workflow-value evidence;
+it grants no enterprise certification, alpha claim or execution permission.
+
 
 [Canonical research reports](skills/ai-trading-agent/references/final-report.md)
 derive readable and structured answers from the same retained calculations.

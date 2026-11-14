@@ -189,6 +189,20 @@ actual model/context and clock limitations. Automated review is a quality proxy,
 separate from human usefulness and descriptive paper returns. Missing runtime
 measurements are absent, never zero minutes or human time savings.
 
+Before an authorized scored review, compose retained originals with the
+[offline review-packet preflight](review-packet.md). Bind the adopted protocol,
+roster, selection/identity evidence, source cutoff, native original-response
+journal and actual declared decision clocks to the frozen rubric. Supply a
+purpose-built source manifest; never include this driver's private contact or
+runtime configuration. Give participants only their own sealed input directory.
+The source-only arm receives common neutral/request/source bytes; assisted adds
+the exact brief and explicitly permitted provenance. Evaluator-only criteria,
+cross-arm answers and future outcomes remain outside both participant views.
+The support matrix leaves unsupported criteria unassessed before any dispatch.
+Later evidence uses a new immutable review revision and leaves original answers
+and scores intact. The checker performs no model calls and does not establish
+authentic sources, honest clocks, independent contexts or investment efficacy.
+
 Scheduling requires the user's authorization and the host's supported scheduler;
 these scripts create no recurring task. A ready report can contain qualified
 partial evidence, explicit gaps or an abstention. Publishing a report does not

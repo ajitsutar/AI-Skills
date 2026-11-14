@@ -178,7 +178,31 @@ Constraints: `net_target,gross_cap,gross_turnover_cap,cash_floor,collateral_rese
 Gross turnover is sum of absolute risky-weight changes, not half-turnover. Optional
 `volatility_cap` and `tracking_volatility_cap` use the covariance horizon; tracking
 also needs asset `benchmark_weight`. Scenarios: `{name,returns,max_loss_fraction}`.
-Costs reduce scenario P&L/free cash. Declared collateral is not a broker margin model.
+All costs and weights use initial NAV as their denominator. Entry transaction cost
+is `sum(one_way_cost * abs(weight - previous_weight) + impact_coefficient *
+abs(weight - previous_weight)**1.5)`. Holding-period borrow expense is
+`sum(borrow_cost_per_period * max(-weight, 0))`, including existing shorts without
+turnover. Both costs enter both supported objectives, every net scenario P&L and
+every scenario loss constraint. Borrow is a supplied fixed period rate on the
+target short exposure, not a path-dependent daily accrual or recall model.
+
+`entry_transaction_cost_fraction` and `holding_period_borrow_cost_fraction`
+separate the components; `estimated_cost_fraction` is their total.
+`modeled_return` retains the gross forecast for `robust_return`;
+`modeled_net_return` subtracts both costs. Both forecasts are null for
+`minimum_risk`, which does not invent an expected return. `scenario_pnl_fraction`
+is the weighted scenario return minus both costs.
+
+`cash_after_entry_cost` deducts entry transaction costs. The retained
+`cash_after_modeled_cost` field is an alias for this entry cash, and
+`free_cash_after_collateral_reserve` deducts collateral from entry cash.
+`cash_after_period_borrow_reserve` additionally reserves period borrow;
+`free_cash_after_collateral_and_borrow_reserve` deducts collateral and period
+borrow. The cash floor must hold both at entry and after that borrow reserve;
+the two slacks are `cash_floor` and `cash_floor_after_borrow_reserve`.
+Reserving a period fee does not mean it settles at entry. These modeled cash
+amounts assume no other holding-period cash flows or cash yield and do not
+establish actual settled broker cash. Declared collateral is not a broker margin model.
 
 `minimum_risk` needs no forecast. `robust_return` additionally needs asset
 `expected_return,return_uncertainty` and calibration with matching horizon/currency,

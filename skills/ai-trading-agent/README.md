@@ -9,7 +9,7 @@ any final answer is created; a new preparation can correct declared inputs witho
 overwriting the failure. Both final outputs verify after relocation. These checks
 do not certify source truth, investment correctness or complete task coverage.
 
-Version **5.9.8** includes [production research operations](references/research-operations.md)
+Version **5.10.1** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
@@ -18,6 +18,10 @@ for event-driven U.S.-stock briefs and separate usefulness/net-return evaluation
 Source-bound plan/evaluate reports export per-observation inclusion decisions,
 exclusion reasons and aggregates from the same retained calculations, keeping
 usefulness and return evidence separate in both readable and structured results.
+
+[Offline review packets](references/review-packet.md) seal complete criterion dependencies and separate participant inputs from evaluator evidence. [Institutional deployment evidence](references/institutional-acceptance.md) joins actual retained platform, data, rights and control inputs with a prespecified matched workflow-value comparison. Scope identities, time cutoffs, fixed review units and registered cohorts remain explicit. These tools report evidence gaps and negative outcomes without granting execution permission or certifying a firm deployment.
+
+Portfolio scenarios and reported total costs now include holding-period short-borrow expense; holdings arithmetic is isolated from ambient decimal settings. Covariance inputs enforce the documented simple-return domain, preserve undefined correlation cells as null and refuse unrepresentable numerical ranges. Unknown flow bases and ambiguous amendment branches cannot support affirmative squeeze triage, and malformed SEC jobs remain isolated from independent valid jobs.
 
 [Public-source intake](references/market-sources.md) diagnoses ambiguous columns;
 the SEC index route preserves observed header/date variants and qualifies
@@ -278,7 +282,7 @@ mapping with the same source facts preserved.
 
 ## Recommendations and evidence
 
-The shared ValueÃ¢â‚¬â€œQualityÃ¢â‚¬â€œMomentum profile produces a reproducible research queue,
+The shared Value–Quality–Momentum profile produces a reproducible research queue,
 followed by primary-source, horizon and portfolio review. Keep numerical rank,
 valuation evidence and recommendation confidence distinct. A relative factor score
 is not an expected return. Research labels describe the evidence; they do not

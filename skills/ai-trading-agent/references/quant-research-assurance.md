@@ -75,6 +75,8 @@ multiple-testing tools only with their stated assumptions and the full retained
 trial inventory. Neither a high Sharpe ratio nor repeated model agreement repairs
 selection bias. A future paper record must accumulate in real time.
 
+[Review packets](review-packet.md) retain criterion dependencies, source/assisted arms and original-response evidence. [Institutional deployment evidence](institutional-acceptance.md) composes native platform/data/rights evidence for one declared host, package and scope, with retained control files and a prespecified matched value comparison. It does not establish human productivity or alpha from software success.
+
 [Release acceptance](release-acceptance.md) covers artifact-locked environments,
 software inventories, frozen fixtures, actual host responses and source rights.
 `release.rights_inventory` and `release.grade_response` are pure operations.

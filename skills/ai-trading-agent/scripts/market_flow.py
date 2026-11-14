@@ -79,13 +79,20 @@ def _text(value):
     return value
 
 
-def _volume_basis(value):
+def _resolved_basis(value):
     """An absent or explicitly unresolved declaration cannot establish a match."""
     if not isinstance(value, str) or not value.strip():
         return None
     if value.strip().casefold() in {'unknown', 'unresolved', 'unspecified', 'n/a', 'na', '--', '?'}:
         return None
     return value
+
+
+def _basis_comparability(values):
+    resolved = [_resolved_basis(value) for value in values]
+    if any(value is None for value in resolved):
+        return 'UNKNOWN'
+    return 'MATCHED_DECLARED_BASIS' if all(value == resolved[0] for value in resolved) else 'MISMATCH'
 
 
 def _identity(record):
@@ -245,7 +252,7 @@ def analyze(document):
             volume = _number(p['volume'], 0) if p.get('volume') is not None else None
             if p['role'] != 'benchmark' and (volume is None or p.get('volume_unit') != 'shares'):
                 raise ValueError('SHARE_VOLUME_REQUIRED')
-            basis = _volume_basis(p.get('volume_basis'))
+            basis = _resolved_basis(p.get('volume_basis'))
             if p['role'] != 'benchmark' and basis is None:
                 _issue(out['issues'], record, 'RELATIVE_VOLUME_BASIS_UNKNOWN_OR_UNRESOLVED')
             key = (_identity(record), p['feed_id'], currency, group, p.get('volume_unit'),
@@ -258,7 +265,7 @@ def analyze(document):
     out['cumulative_bars'] = []
     for record, key, start, end, volume in bars:
         p = record['payload']
-        basis = _volume_basis(p.get('volume_basis'))
+        basis = _resolved_basis(p.get('volume_basis'))
         baseline = [x for x in bars if basis is not None and x[1] == key and x[0]['payload']['role'] == 'baseline'
                     and x[3] < start and x[0]['payload']['session_id'] != p['session_id']]
         sessions = [x[0]['payload']['session_id'] for x in baseline]
@@ -273,21 +280,35 @@ def analyze(document):
                        'ZERO_BASELINE_VOLUME' if mean == 0 else
                        'COMPUTED_FROM_MATCHED_DECLARED_BASIS')
         own_return, benchmark_return, relative_return = None, None, None
+        own_arithmetic, benchmark_arithmetic = None, None
+        price_status = 'NO_PRICES'
+        benchmark_status = 'NOT_REQUESTED'
         benchmark_id = p.get('benchmark_record_id')
         try:
             if p.get('start_price') is not None or p.get('end_price') is not None:
-                own_return = (_positive(p.get('end_price')) / _positive(p.get('start_price')) - 1) * 100
+                own_arithmetic = (_positive(p.get('end_price')) / _positive(p.get('start_price')) - 1) * 100
+                price_status = ('COMPUTED_FROM_DECLARED_BASIS' if _resolved_basis(p.get('price_basis')) is not None
+                                else 'PRICE_BASIS_UNKNOWN_OR_UNRESOLVED')
+                if _resolved_basis(p.get('price_basis')) is not None:
+                    own_return = own_arithmetic
+                else:
+                    _issue(out['issues'], record, price_status)
             if benchmark_id is not None:
+                benchmark_status = 'UNUSABLE'
                 other = index.get(benchmark_id)
                 if other is None:
                     raise ValueError('BENCHMARK_UNAVAILABLE')
                 bp = other[0]['payload']
                 if (bp['role'] != 'benchmark' or (start, end) != (other[2], other[3]) or
-                        p['currency'] != bp['currency'] or not p.get('price_basis') or
-                        p['price_basis'] != bp.get('price_basis')):
+                        p['currency'] != bp['currency']):
                     raise ValueError('BENCHMARK_WINDOW_CURRENCY_OR_PRICE_BASIS_MISMATCH')
-                benchmark_return = (_positive(bp.get('end_price')) / _positive(bp.get('start_price')) - 1) * 100
-                relative_return = own_return - benchmark_return if own_return is not None else None
+                benchmark_arithmetic = (_positive(bp.get('end_price')) / _positive(bp.get('start_price')) - 1) * 100
+                benchmark_status = _basis_comparability([p.get('price_basis'), bp.get('price_basis')])
+                if benchmark_status == 'MATCHED_DECLARED_BASIS':
+                    benchmark_return = benchmark_arithmetic
+                    relative_return = own_return - benchmark_return if own_return is not None else None
+                else:
+                    _issue(out['issues'], record, 'BENCHMARK_PRICE_BASIS_' + benchmark_status)
         except (ValueError, TypeError, OverflowError) as exc:
             _issue(out['issues'], record, 'UNUSABLE_PRICE_CONTEXT: ' + str(exc))
         out['cumulative_bars'].append({
@@ -300,8 +321,12 @@ def analyze(document):
             'baseline_sessions': len(baseline) if p['role'] == 'current' else 0,
             'baseline_mean_volume': _value(mean) if p['role'] == 'current' else None,
             'relative_volume': _value(rvol), 'relative_volume_status': rvol_status,
-            'return_percent': _value(own_return),
+            'price_basis': deepcopy(p.get('price_basis')), 'return_percent': _value(own_return),
+            'return_status': price_status,
+            'unreconciled_price_return_percent': _value(own_arithmetic) if own_return is None else None,
             'benchmark_record_id': benchmark_id, 'benchmark_return_percent': _value(benchmark_return),
+            'benchmark_price_comparability': benchmark_status,
+            'unreconciled_benchmark_price_return_percent': _value(benchmark_arithmetic) if benchmark_return is None else None,
             'benchmark_relative_return_percent': _value(relative_return),
         })
     out['declared_settings'] = deepcopy(settings)
@@ -360,9 +385,9 @@ def _adv(record, index, cutoff):
     average = sum(volumes, Decimal(0)) / len(volumes)
     dtc = _number(p['short_interest_shares'], 0) / average if average > 0 else None
     declared = [p.get('adjustment_basis')] + bases
-    known = all(isinstance(v, str) and v.strip() for v in declared)
-    comparable = known and all(v == declared[0] for v in declared)
-    compatibility = 'MATCHED_DECLARED_SHARE_BASIS' if comparable else 'MISMATCH' if known else 'UNKNOWN'
+    compatibility = _basis_comparability(declared)
+    comparable = compatibility == 'MATCHED_DECLARED_BASIS'
+    compatibility = 'MATCHED_DECLARED_SHARE_BASIS' if comparable else compatibility
     result.update(average_daily_volume=_value(average) if comparable else None,
                   supplied_volume_arithmetic_mean=_value(average),
                   share_adjustment_comparability=compatibility,
@@ -415,6 +440,11 @@ def positioning(document):
                        'short_interest_shares': _value(shares), 'short_interest_percent_float': None,
                        'float_record_id': p.get('float_record_id'), 'float_shares': None,
                        'float_effective_date': None, 'float_measure_basis': None,
+                       'float_adjustment_comparability': 'UNKNOWN',
+                       'supplied_float_shares': None, 'float_adjustment_basis': None,
+                       'unreconciled_short_interest_percent_float': None,
+                       'amendment_ambiguity': deepcopy(record.get('amendment_ambiguity')),
+                       'active_positioning_eligible': not bool(record.get('amendment_ambiguity')),
                        'provider_reported_days_to_cover': reported_dtc,
                        'provider_reported_days_to_cover_fields': dtc_fields,
                        'provider_reported_average_daily_volume': p.get('average_daily_volume')}
@@ -426,13 +456,20 @@ def positioning(document):
                         fp = other['payload']; effective = _day(fp.get('effective_date'))
                         if (not _complete_identity(record) or _identity(other) != _identity(record) or
                                 fp.get('share_basis') != 'float' or effective > measurement or
-                                effective > _time(other['available_at']).date() or not p.get('adjustment_basis') or
-                                p['adjustment_basis'] != fp.get('adjustment_basis')):
+                                effective > _time(other['available_at']).date()):
                             raise ValueError('FLOAT_ISSUER_CLASS_DATE_OR_ADJUSTMENT_MISMATCH')
                         floating = _positive(fp.get('float_shares'))
-                        row.update(float_shares=_value(floating), float_effective_date=effective.isoformat(),
+                        compatibility = _basis_comparability([p.get('adjustment_basis'), fp.get('adjustment_basis')])
+                        comparable = compatibility == 'MATCHED_DECLARED_BASIS'
+                        row.update(float_shares=_value(floating) if comparable else None,
+                                   supplied_float_shares=_value(floating), float_effective_date=effective.isoformat(),
                                    float_measure_basis=fp.get('measure_basis', 'UNKNOWN'),
-                                   short_interest_percent_float=_value(shares / floating * 100))
+                                   float_adjustment_basis=deepcopy(fp.get('adjustment_basis')),
+                                   float_adjustment_comparability=compatibility,
+                                   short_interest_percent_float=_value(shares / floating * 100) if comparable else None,
+                                   unreconciled_short_interest_percent_float=_value(shares / floating * 100) if not comparable else None)
+                        if not comparable:
+                            _issue(out['issues'], record, 'FLOAT_ADJUSTMENT_BASIS_' + compatibility)
                     except (ValueError, TypeError, OverflowError) as exc:
                         _issue(out['issues'], record, 'UNUSABLE_FLOAT: ' + str(exc))
                 try:
@@ -511,7 +548,7 @@ def squeeze(document):
                 value = si['adv']['days_to_cover'] if field == 'days_to_cover' else si[field]
                 checks.append({'criterion': name, 'value': value, 'threshold': _value(rules[name]),
                                'met': _number(value) >= rules[name] if value is not None else None})
-        candidate = (bool(checks) and complete and _number(si['short_interest_shares']) > 0
+        candidate = (bool(checks) and complete and si['active_positioning_eligible'] and _number(si['short_interest_shares']) > 0
                      and si['measure_basis'] in {'official_reported', 'vendor_estimate'}
                      and all(x['met'] is True for x in checks))
         contexts = []
@@ -534,6 +571,8 @@ def squeeze(document):
         out['assessments'].append({'short_interest_record_id': si['record_id'], 'ticker': si['ticker'],
                                   'issuer_id': si['issuer_id'], 'share_class': si['share_class'],
                                   'state': state, 'measure_basis': si['measure_basis'],
+                                  'amendment_ambiguity': deepcopy(si['amendment_ambiguity']),
+                                  'active_positioning_eligible': si['active_positioning_eligible'],
                                   'measurement_date': si['measurement_date'], 'measurement_age_days': si['measurement_age_days'],
                                   'positioning_checks': checks, 'flow_contexts': contexts,
                                   'squeeze_confirmed': False, 'probability': None, 'causal_covering_confirmed': False})
@@ -541,7 +580,9 @@ def squeeze(document):
     for si in positions['short_interest']:
         key = (si['ticker'], si['issuer_id'], si['share_class'], si['source_id'], si['measure_basis'],
                si['measurement_scope'], si['adjustment_basis'])
-        if all(isinstance(x, str) and x.strip() for x in key) and si['measure_basis'] in {'official_reported', 'vendor_estimate'}:
+        if (si['active_positioning_eligible'] and _resolved_basis(si['adjustment_basis']) is not None
+                and all(isinstance(x, str) and x.strip() for x in key)
+                and si['measure_basis'] in {'official_reported', 'vendor_estimate'}):
             groups.setdefault(key, []).append(si)
     raw_index = {x['id']: x for x in normalized['records'] if x['eligible']}
     for items in groups.values():

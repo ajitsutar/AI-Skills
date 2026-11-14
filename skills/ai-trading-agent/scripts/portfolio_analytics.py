@@ -5,6 +5,7 @@ import argparse
 import json
 from collections import defaultdict
 from datetime import date
+from decimal import Decimal
 from pathlib import Path
 
 from research_analytics import fraction, number
@@ -85,6 +86,7 @@ def lookthrough(positions, equity, funds):
 
 
 def covariance_risk(returns, weights, periods_per_year=252, shrinkage=.1, min_observations=60):
+    """Risk from aligned, unlevered simple total returns (minimum return -1)."""
     import numpy as np
     shrinkage = fraction(shrinkage)
     annualization = number(periods_per_year)
@@ -103,22 +105,54 @@ def covariance_risk(returns, weights, periods_per_year=252, shrinkage=.1, min_ob
         if reference is not None and dates != reference:
             raise ValueError("Unaligned returns; do not pair different dates or silently drop gaps")
         reference = dates
-        matrix.append([number(row["return"]) for row in observations])
+        values = []
+        for row in observations:
+            value = number(row['return'])
+            # Check supplied decimal strings before float rounding at the boundary.
+            if Decimal(str(row['return'])) < -1:
+                raise ValueError('SIMPLE_TOTAL_RETURN_BELOW_MINUS_ONE: symbol=' + str(symbol)
+                                 + ' timestamp=' + str(row['timestamp']))
+            values.append(value)
+        matrix.append(values)
     if len(reference) < min_observations:
         raise ValueError("Insufficient aligned return history")
     x = np.array(matrix).T
-    sample = np.atleast_2d(np.cov(x, rowvar=False, ddof=1))
-    covariance = ((1 - shrinkage) * sample + shrinkage * np.diag(np.diag(sample))) * annualization
-    variance = float(w @ covariance @ w)
+    constant = np.all(x == x[0], axis=0)
+    with np.errstate(over='ignore', under='ignore', invalid='ignore'):
+        sample = np.atleast_2d(np.cov(x, rowvar=False, ddof=1))
+    if not np.isfinite(sample).all():
+        raise ValueError('COVARIANCE_NUMERICAL_RANGE_UNAVAILABLE: nonfinite sample covariance')
+    unavailable = [symbol for symbol, diagonal, fixed in zip(symbols, np.diag(sample), constant)
+                   if not fixed and diagonal < np.finfo(float).tiny]
+    if unavailable:
+        raise ValueError('COVARIANCE_NUMERICAL_RANGE_UNAVAILABLE: underflowed or subnormal sample variance symbols='
+                         + ','.join(unavailable))
+    with np.errstate(over='ignore', under='ignore', invalid='ignore'):
+        covariance = ((1 - shrinkage) * sample + shrinkage * np.diag(np.diag(sample))) * annualization
+        variance = float(w @ covariance @ w)
+    if not np.isfinite(covariance).all() or not np.isfinite(variance):
+        raise ValueError('COVARIANCE_NUMERICAL_RANGE_UNAVAILABLE: nonfinite annualized covariance or portfolio variance')
     vol = float(np.sqrt(max(variance, 0)))
-    component = w * (covariance @ w) / vol if vol > 0 else np.zeros(len(w))
+    with np.errstate(over='ignore', under='ignore', invalid='ignore'):
+        component = w * (covariance @ w) / vol if vol > 0 else np.zeros(len(w))
+    if not np.isfinite(component).all():
+        raise ValueError('COVARIANCE_NUMERICAL_RANGE_UNAVAILABLE: nonfinite component volatility')
     std = np.sqrt(np.diag(sample))
-    correlation = np.divide(sample, np.outer(std, std), out=np.zeros_like(sample), where=np.outer(std, std) > 0)
+    valid = (np.outer(std, std) > 0) & ~np.logical_or.outer(constant, constant)
+    correlation = np.divide(sample, np.outer(std, std), out=np.zeros_like(sample), where=valid)
+    reasons = [['CONSTANT_RETURN_SERIES' if constant[i] or constant[j] else None
+                for j in range(len(symbols))] for i in range(len(symbols))]
+    nullable_correlation = [[None if reasons[i][j] else float(correlation[i, j])
+                             for j in range(len(symbols))] for i in range(len(symbols))]
     return {"symbols": symbols, "observations": len(reference), "periods_per_year": annualization,
             "shrinkage_to_diagonal": shrinkage, "annualized_volatility": vol,
             "component_volatility": dict(zip(symbols, map(float, component))),
-            "covariance": covariance.tolist(), "sample_correlation": correlation.tolist(),
-            "cash_weight": float(1 - sum(w)), "constant_return_symbols": [s for s, v in zip(symbols, std) if v == 0],
+            "covariance": covariance.tolist(), "sample_correlation": nullable_correlation,
+            "sample_correlation_reason": reasons,
+            "sample_correlation_legacy_zero_filled": correlation.tolist(),
+            "legacy_correlation_convention": "Zero placeholders for undefined constant-series cells; sample_correlation is authoritative",
+            "return_basis": "UNLEVERED_SIMPLE_TOTAL_RETURN",
+            "cash_weight": float(1 - sum(w)), "constant_return_symbols": [s for s, v in zip(symbols, constant) if v],
             "caveat": "Historical covariance with an explicit shrinkage assumption; excludes unmodeled gaps and liquidity risk"}
 
 

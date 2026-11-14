@@ -111,6 +111,56 @@ def _daily_index_date(url):
     return day.isoformat()
 
 
+def _short_interest_amendment_ambiguities(records, ids, availability):
+    """Retain graph ambiguity without selecting a winning branch by clock/order.
+
+    Only envelopes usable at this cutoff participate. This is deliberately
+    independent of mutation of revision eligibility in the linear replay below.
+    """
+    neighbors, children, seeds = {}, {}, set()
+    for index, row in enumerate(records):
+        if (not row['eligible'] or row.get('kind') != 'short_interest'
+                or row.get('action') not in ('replace', 'cancel')):
+            continue
+        target = row.get('supersedes')
+        positions = ids.get(target, []) if type(target) is str else []
+        if len(positions) != 1 or positions[0] == index:
+            continue
+        previous_index = positions[0]
+        previous = records[previous_index]
+        if not previous['eligible'] or previous.get('kind') != 'short_interest':
+            continue
+        scope = lambda value: (value.get('ticker'), value['source']['id'],
+                               urlsplit(value['source']['url']).hostname)
+        if scope(row) != scope(previous):
+            continue
+        neighbors.setdefault(index, set()).add(previous_index)
+        neighbors.setdefault(previous_index, set()).add(index)
+        children.setdefault(previous_index, []).append(index)
+        if availability[previous_index] >= availability[index]:
+            seeds.update((previous_index, index))
+    for parent, branches in children.items():
+        if len(branches) > 1:
+            seeds.update([parent] + branches)
+    groups = []
+    while seeds:
+        pending, component = [min(seeds)], set()
+        while pending:
+            current = pending.pop()
+            if current in component:
+                continue
+            component.add(current)
+            pending.extend(neighbors.get(current, set()) - component)
+        seeds -= component
+        group = {'code': 'UNRESOLVED_SHORT_INTEREST_AMENDMENT_GRAPH',
+                 'record_ids': [records[index]['id'] for index in sorted(component)],
+                 'active_positioning_eligible': False}
+        groups.append(group)
+        for index in component:
+            records[index]['amendment_ambiguity'] = copy.deepcopy(group)
+    return groups
+
+
 def normalize(document):
     """Preserve envelopes and add cutoff/revision eligibility; never fetch data."""
     _require(type(document) is dict and type(document.get("schema_version")) is int
@@ -191,6 +241,7 @@ def normalize(document):
             for index in positions:
                 records[index]["exclusion_reasons"].append("DUPLICATE_RECORD_ID")
                 records[index]["eligible"] = False
+    issues.extend(_short_interest_amendment_ambiguities(records, ids, availability))
     # Apply explicit revisions only when the new vintage was usable at cutoff.
     # Raw envelopes remain present, including unavailable and cancelled vintages.
     for index in sorted(availability, key=lambda number: (availability[number], number)):
@@ -563,7 +614,9 @@ def parse(document):
         if data is None:
             data = json.loads(source_text)
         _require(type(data) is dict, "SEC submissions JSON must be an object")
-        recent = data.get("filings", {}).get("recent", data if "accessionNumber" in data else {})
+        filings = data.get("filings", {})
+        _require(type(filings) is dict, "SEC filings must be an object")
+        recent = filings.get("recent", data if "accessionNumber" in data else {})
         _require(type(recent) is dict and type(recent.get("accessionNumber")) is list, "Missing SEC recent array")
         count = len(recent["accessionNumber"])
         _require(count <= MAX_RECORDS and all(type(values) is list and len(values) == count
@@ -589,7 +642,7 @@ def parse(document):
                 "filer_name": data.get("name"), "raw_fields": raw,
                 "disclosure_scope": "filing_metadata_not_position_or_trade",
             })
-        metadata = {"additional_history_files": copy.deepcopy(data.get("filings", {}).get("files", [])),
+        metadata = {"additional_history_files": copy.deepcopy(filings.get("files", [])),
                     "filer_tickers": data.get("tickers"), "history_complete": False}
     elif adapter in ("sec_form4_xml", "sec_13f_xml"):
         root = _xml(source_text)

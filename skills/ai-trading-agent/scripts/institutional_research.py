@@ -445,6 +445,32 @@ def _case_scope(document, case, ids, universe):
     return {'ticker': ticker, 'basis': basis, 'status': status}
 
 
+def _cohort(document, evaluation):
+    """Resolve declared membership before any metric accumulation."""
+    evaluation_roster = evaluation.get('expected_case_ids')
+    study = (document.get('pilot') or {}).get('study') or {}
+    protocol_roster = study.get('expected_case_ids')
+    for roster in (evaluation_roster, protocol_roster):
+        if roster is not None:
+            _require(isinstance(roster, list) and all(isinstance(x, str) and x for x in roster)
+                     and len(roster) == len(set(roster)), 'UNIQUE_EXPECTED_CASE_IDS_REQUIRED')
+    # The adopted declaration takes precedence even when the evaluation conflicts.
+    expected = protocol_roster if protocol_roster is not None else evaluation_roster
+    return expected, ('SUPPLIED_PROTOCOL_ROSTER' if protocol_roster is not None else
+                      'EVALUATION_ROSTER' if evaluation_roster is not None else 'NO_ROSTER_SUPPLIED')
+
+
+def _study_metrics(useful, saved, excess, cohort):
+    return {'cohort': cohort,
+            'usefulness': {'included_cases': len(useful), 'declared_useful_count': sum(useful),
+                           'declared_useful_fraction': None if not useful else str(Decimal(sum(useful)) / len(useful)),
+                           'mean_declared_minutes_saved': None if not saved else str(sum(saved) / len(saved)),
+                           'basis': 'Supplied reviewer judgment and workflow baseline; no causal time-saving attribution.'},
+            'returns': {'included_cases': len(excess),
+                        'mean_descriptive_excess_return_decimal': None if not excess else str(sum(excess) / len(excess)),
+                        'overlapping_periods_not_compounded': True, 'annualization_or_significance_computed': False}}
+
+
 @_workflow_protocol
 def evaluate(document):
     """Evaluate prospective usefulness separately from descriptive paper returns."""
@@ -461,7 +487,10 @@ def evaluate(document):
     _require(isinstance(cases, list) and len({c['id'] for c in cases}) == len(cases), 'UNIQUE_EVALUATION_CASES_REQUIRED')
     protocol, universe, protocol_reasons, protocol_return_reasons = _evaluation_protocol(
         document, evaluation, any(c.get('paper_return') is not None for c in cases))
+    expected, roster_basis = _cohort(document, evaluation)
+    membership = None if expected is None else set(expected)
     rows, useful, saved, excess = [], [], [], []
+    all_useful, all_saved, all_excess = [], [], []
     import market_sources
     for case in cases:
         reasons = list(protocol_reasons)
@@ -509,7 +538,12 @@ def evaluate(document):
         row = {'id': case['id'], 'declared_case': deepcopy(case), 'prospective_exclusion_reasons': reasons,
                'first_response_bytes_hash_verified': verified_first, 'usefulness_included': False,
                 'returns_included': False, 'response_input_review': response_review, 'scope_review': scope,
-                'usefulness_exclusion_reasons': useful_reasons, 'return_exclusion_reasons': return_reasons}
+                'usefulness_exclusion_reasons': useful_reasons, 'return_exclusion_reasons': return_reasons,
+                'cohort_membership': 'UNREGISTERED_SUPPLIED' if membership is None else
+                                     'REGISTERED' if case['id'] in membership else 'UNEXPECTED',
+                'all_supplied_descriptive_usefulness_included': False,
+                'all_supplied_descriptive_returns_included': False}
+        in_cohort = membership is None or case['id'] in membership
         outcome = case.get('usefulness')
         if outcome is not None:
             if protocol['pilot_present']:
@@ -525,8 +559,11 @@ def evaluate(document):
             if valid and not reasons and not useful_reasons:
                 assisted = _number(outcome['assisted_minutes'], 0)
                 baseline = _number(outcome['baseline_minutes'], 0)
-                useful.append(outcome['useful']); saved.append(baseline - assisted)
-                row.update(usefulness_included=True, declared_minutes_saved=str(baseline - assisted))
+                all_useful.append(outcome['useful']); all_saved.append(baseline - assisted)
+                row.update(all_supplied_descriptive_usefulness_included=True, declared_minutes_saved=str(baseline - assisted))
+                if in_cohort:
+                    useful.append(outcome['useful']); saved.append(baseline - assisted)
+                    row['usefulness_included'] = True
             else:
                 row['usefulness_status'] = 'MISSING_CLOCK_CRITERION_BASELINE_OR_PROSPECTIVE_EVIDENCE'
         returns = case.get('paper_return')
@@ -544,30 +581,32 @@ def evaluate(document):
                          and benchmark.get('id') == evaluation['return_baseline_id'] and hi <= _stamp(benchmark['available_at']) <= at)
                 if valid and not reasons and not return_reasons:
                     delta = _number(returns['return_decimal'], -1) - _number(benchmark['return_decimal'], -1)
-                    excess.append(delta)
-                    row.update(returns_included=True, descriptive_excess_return_decimal=str(delta))
+                    all_excess.append(delta)
+                    row.update(all_supplied_descriptive_returns_included=True, descriptive_excess_return_decimal=str(delta))
+                    if in_cohort:
+                        excess.append(delta)
+                        row['returns_included'] = True
                 else:
                     row['returns_status'] = 'NONMATCHING_OR_UNAVAILABLE_NET_RETURN_BASELINE'
             except (KeyError, ValueError, TypeError):
                 row['returns_status'] = 'INCOMPLETE_OR_INVALID_RETURN_CONTRACT'
+        if not in_cohort:
+            useful_reasons.append('CASE_OUTSIDE_PRESPECIFIED_COHORT')
+            return_reasons.append('CASE_OUTSIDE_PRESPECIFIED_COHORT')
         rows.append(row)
     if protocol['conflicts']:
         protocol['status'] = 'PROTOCOL_CONFLICT'
-    expected = evaluation.get('expected_case_ids')
-    if expected is not None:
-        _require(isinstance(expected, list) and len(expected) == len(set(expected)), 'UNIQUE_EXPECTED_CASE_IDS_REQUIRED')
     present = {c['id'] for c in cases}
+    primary = _study_metrics(useful, saved, excess, 'UNREGISTERED_ALL_SUPPLIED' if expected is None else 'PRESPECIFIED_COHORT')
     result.update(status='DECLARED_STUDY_WINDOW_ELAPSED' if end <= at else 'PROSPECTIVE_PILOT_IN_PROGRESS',
                   evaluation_contract=evaluation, protocol_reconciliation=protocol, cases=rows,
                   roster={'status': 'UNKNOWN' if expected is None else 'MATCHED' if set(expected) == present else 'INCOMPLETE_OR_UNEXPECTED',
+                          'basis': roster_basis, 'expected_case_ids': deepcopy(expected),
+                          'observed_registered': [] if expected is None else sorted(set(expected) & present),
                           'missing': [] if expected is None else sorted(set(expected) - present),
                           'unexpected': [] if expected is None else sorted(present - set(expected))},
-                  usefulness={'included_cases': len(useful), 'declared_useful_count': sum(useful),
-                              'declared_useful_fraction': None if not useful else str(Decimal(sum(useful)) / len(useful)),
-                              'mean_declared_minutes_saved': None if not saved else str(sum(saved) / len(saved)),
-                              'basis': 'Supplied reviewer judgment and workflow baseline; no causal time-saving attribution.'},
-                  returns={'included_cases': len(excess), 'mean_descriptive_excess_return_decimal': None if not excess else str(sum(excess) / len(excess)),
-                           'overlapping_periods_not_compounded': True, 'annualization_or_significance_computed': False},
+                  metric_cohort=primary['cohort'], usefulness=primary['usefulness'], returns=primary['returns'],
+                  all_supplied_descriptive=_study_metrics(all_useful, all_saved, all_excess, 'ALL_SUPPLIED_DESCRIPTIVE_NOT_REGISTERED_COHORT'),
                   challenge=_challenge(document.get('challenge'), at),
                   actual_elapsed_operation_verified=False, profitability_established=False,
                   external_or_independent_validation_established=False,

@@ -26,6 +26,27 @@ Required top-level fields: `currency`, timezone-bearing `as_of`,
 after reserving the declared tax liability. Amounts and quantities use decimal
 strings or integers. The module never rounds share units to an assumed broker step.
 
+The whole public replay, including validation and result construction, runs in an
+owned Decimal context and preserves the caller's precision, rounding, exponent
+bounds, traps and flags. Each decimal input supports at most 36 coefficient
+digits, an exponent from -36 through 36 and a nonzero adjusted exponent at most
+35. Original decimal strings are parsed exactly; unsupported inputs raise
+`UNSUPPORTED_DECIMAL_INPUT_RANGE` rather than being rounded into this domain.
+Arithmetic uses 120 significant digits, `ROUND_HALF_EVEN`, exponent bounds
+[-999, 999], and traps for inexact, invalid, subnormal, underflow, overflow and
+division-by-zero operations. Unsupported derived arithmetic raises
+`UNSUPPORTED_DECIMAL_ARITHMETIC` and produces no successful accounting result.
+
+The sole rounding exception is proportional basis allocation on a partial-lot
+disposal: its mathematical division uses 60 significant digits with
+`ROUND_HALF_EVEN`. The remaining lot retains the residual basis; a full-lot
+disposal consumes all remaining basis. This is numerical division precision,
+not a currency quantum, tax-law rule or broker share step. Other calculations,
+including cash sums, quantities and tax products, must be exact in the accounting
+context or fail explicitly. The result's `numeric_contract` records these rules.
+Cash/receivable conservation requires both zero Decimal residual and an
+independent exact rational reconstruction, not a rounded near-zero tolerance.
+
 `opening` supplies `at`, `cash`, optional `tax_liability`, `lots` and `marks`.
 Each lot supplies unique `lot_id`, stable caller-mapped `security_id`, `quantity`,
 total `basis` (or null) and `acquired_at`. Marks supply security, `price` (or null),
