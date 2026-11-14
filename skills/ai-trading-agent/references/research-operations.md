@@ -158,6 +158,16 @@ Power loss, unsupported filesystems and arbitrary external writers remain outsid
 the atomicity guarantee; publication relies on local fsync and same-directory
 hard links. Test the target filesystem rather than assuming it supports them.
 
+The shared institutional publisher uses a shorter create-only UUID temporary
+basename. Known native journal and review-packet output batches probe pending
+destination lengths before their first immutable artifact. Actual path failures
+report `OUTPUT_PUBLICATION_PATH_UNAVAILABLE`: choose a shorter explicit private
+root or a host/filesystem supporting those paths. This is a measured filesystem
+check, not a fixed MAX_PATH rule or a change to system settings. Existing
+idempotent artifacts are not overwritten; empty owned directories can remain
+after a rejected path preflight. Source acquisition and later unpredictable I/O
+retain their separate failure/recovery behavior.
+
 Assign a human workflow owner, usefulness reviewer and local operations owner.
 Keep configurations, captures, input documents, journals, failures and review
 records private under their actual source-retention terms. Exclude them from

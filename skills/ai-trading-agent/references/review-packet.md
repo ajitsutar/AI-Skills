@@ -120,6 +120,18 @@ The explicit request and manifest are each capped at 50 MiB. This is a local
 cooperating-filesystem contract, not a defense against arbitrary concurrent
 external writers or an access-control installation.
 
+Atomic publication uses a create-only 23-character temporary basename containing
+the same random UUID payload as its longer hexadecimal spelling. Before writing
+the first packet artifact, prepare creates any needed owned directories and
+probes the pending destination lengths with create-only random files, then removes
+those probes. A real unsupported path produces `OUTPUT_PUBLICATION_PATH_UNAVAILABLE`
+with the destination and guidance to choose a shorter existing private output
+root or a supporting host/filesystem. There is no blanket path-length limit and
+no OS/ACL setting is changed; explicitly supported extended Windows paths remain
+usable. Empty owned directories may remain after rejection, but no packet artifact
+is published by a failed path preflight. Later I/O failure, power loss or external
+writers can still require recovery; a successful probe is not a durability promise.
+
 The immutable directory contains exact request/manifest bytes, complete indexed
 originals under `sealed/`, the two participant directories and `packet.json`.
 Repeated identical prepare calls return the same hash. Changed bytes never

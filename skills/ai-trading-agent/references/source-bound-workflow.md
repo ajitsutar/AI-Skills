@@ -426,6 +426,26 @@ approves or blocks a trade. Preparation reduces copying and binding errors;
 neither command guarantees that a model chooses the right request or follows the
 workflow in a future answer.
 
+## Fixed portfolio and holdings answer facts
+
+After full retained-workflow verification, `answer_facts.project_verified`
+projects `portfolio.construct` and `backtest.holdings_ledger` with fixed typed
+labels, units, source pointers and original input bindings. It distinguishes
+entry transaction costs from period borrow reserves, gross from net modeled
+returns, and NAV fractions from holdings currency amounts. Settled cash,
+receivables, declared tax reserves and lot basis retain their native meaning.
+Missing tax, marks, basis and reserves remain unavailable; no actual tax amount,
+currency conversion or observed return is inferred. Measurement periods and
+observation frequencies remain explicitly unknown.
+
+Use `answer_facts.verify_projection` against the same retained run to reject
+changed values, labels, units, scenarios or pointers. `quant_report.verify` and
+`research_workflow.verify` still replay the native computations and compare the
+complete canonical report bytes; verifying selected facts does not validate
+additional authored prose. See [report facts](report-facts.md#portfolio-costs-and-holdings-accounting)
+for cash timing and valuation qualifications. These reports remain research
+outputs and add no execution gate or order authorization.
+
 ## Interpretation boundaries
 
 | Evidence | What it establishes | What remains separate |

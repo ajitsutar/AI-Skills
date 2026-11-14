@@ -75,6 +75,40 @@ certify a user's semantic claim. New numerical claims still need an existing
 helper or separately retained calculation code. This adapter does not assess
 whether the selected inputs, denominator or source joins were appropriate.
 
+## Portfolio costs and holdings accounting
+
+Current-code `portfolio.construct` results have fixed typed facts for entry
+transaction cost, holding-period borrow cost, their total, gross/net modeled
+return, net scenario P&L, exposure and the separate cash/reserve balances. These
+values are **fractions of initial portfolio NAV**, including cash fields; they
+are not currency amounts. Entry costs reduce entry cash. Period borrow is a
+holding-period reserve and is not assumed paid at entry. The legacy entry-cash
+fields exclude that reserve. Existing shorts incur borrow even without turnover.
+Collateral and free-cash balances are neither profit nor broker buying power.
+
+`backtest.holdings_ledger` facts retain the native currency and exact decimal
+strings for settled cash, unsettled receivables, declared tax reserves, NAV,
+costs, external flows, pending receipts, realized gains and allocated/remaining
+basis. Quantities retain security units. Declared tax, missing scenario tax and
+actual tax liability remain separate; actual liability is not verified by this
+ledger. Unknown marks, basis, tax and absent reserve fields remain unknown, never
+zero. A declared zero balance does not resolve missing tax, and a cross-scenario
+cash difference does not identify it. Supplied observed marks remain caller
+declarations; reference/model values are not executable prices.
+
+These mappings require the current implementation and native result schema.
+Wrapped artifacts also require matching input/result hashes and a unique matching
+job ID and operation. Unknown/historical code retains its existing limited
+mapping behavior. Malformed numeric fields do not become monetary facts. All
+facts retain exact source pointers; source currency and cost-timing pointers are
+recorded separately. Declared contract horizons still do not establish a measured
+period or observation frequency, and no FX conversion or annualization is added.
+
+The same fixed semantics feed `answer_facts.project_verified` after the complete
+retained workflow is replayed. Unprojected fields remain listed and retained in
+the native result. Neither adapter verifies arbitrary prose, source truth,
+request completeness or execution permission.
+
 ## Verify a retained projection
 
 Verification recomputes the canonical projection from the original artifact and

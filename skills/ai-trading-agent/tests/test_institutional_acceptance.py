@@ -3,10 +3,12 @@ from copy import deepcopy
 from decimal import getcontext, localcontext, ROUND_DOWN, Inexact
 import hashlib
 import json
+import os
 from pathlib import Path
 import subprocess
 import sys
 import unittest
+from unittest.mock import patch
 
 ROOT = Path(__file__).resolve().parents[1]
 sys.path.insert(0, str(ROOT / 'tests'))
@@ -22,7 +24,7 @@ class InstitutionalAcceptanceTests(unittest.TestCase):
         self.packet = ReviewPacketTests('test_complete_packet_seals_exact_arm_bytes_and_replays_idempotently')
         self.packet.setUp()
         self.addCleanup(self.packet.doCleanups)
-        self.root = self.packet.root
+        self.root = self.packet.root.resolve()
         self.data = data_fixture()
         request = self.data['study_request']
         request['study_modes'] = ['historical_membership']
@@ -281,6 +283,57 @@ class InstitutionalAcceptanceTests(unittest.TestCase):
         self.assertEqual(json.loads(output.read_bytes())['status'],'DEPLOYMENT_EVIDENCE_GAPS')
         again=subprocess.run(command,capture_output=True,text=True)
         self.assertNotEqual(again.returncode,0)
+
+
+class InstitutionalAcceptancePathTests(unittest.TestCase):
+    def assert_fixture_spelling(self, spelling):
+        original_packet = ReviewPacketTests
+        owner = self
+        class SpelledPacket(original_packet):
+            def setUp(self):
+                super().setUp()
+                original = self.root
+                alternate = spelling(original)
+                owner.assertTrue(alternate.is_dir())
+                owner.assertEqual(alternate.resolve(), original.resolve())
+                for name in ('source', 'output', 'manifest', 'request_path'):
+                    setattr(self, name, alternate / getattr(self, name).relative_to(original))
+                self.root = alternate
+        fixture = InstitutionalAcceptanceTests('test_complete_fixture_replays_real_components_but_never_certifies_enterprise')
+        self.addCleanup(fixture.doCleanups)
+        # Inject an actual filesystem spelling, as tempfile does on Windows CI;
+        # packet preparation and all component replay still use real local files.
+        with patch.dict(globals(), {'ReviewPacketTests': SpelledPacket}):
+            fixture.setUp()
+        self.assertEqual(fixture.root, fixture.packet.root.resolve())
+        prepared = Path(fixture.prepared['packet_directory'])
+        with self.assertRaises(ValueError):
+            prepared.relative_to(fixture.packet.root)  # The original CI defect.
+        self.assertEqual(fixture.packet_reference['packets'][0]['packet_directory'],
+                         prepared.relative_to(fixture.root).as_posix())
+        fixture.test_complete_fixture_replays_real_components_but_never_certifies_enterprise()
+
+    def test_native_dotted_root_spelling_preserves_complete_fixture(self):
+        self.assert_fixture_spelling(lambda root: root / '..' / root.name)
+
+    @unittest.skipUnless(os.name == 'nt', 'Windows native8.3 path alias control')
+    def test_native_windows_short_path_alias_preserves_complete_fixture(self):
+        import ctypes
+        from ctypes import wintypes
+        kernel = ctypes.WinDLL('kernel32', use_last_error=True)
+        short_name = kernel.GetShortPathNameW
+        short_name.argtypes = (wintypes.LPCWSTR, wintypes.LPWSTR, wintypes.DWORD)
+        short_name.restype = wintypes.DWORD
+        def alias(root):
+            resolved = root.resolve(); buffer = ctypes.create_unicode_buffer(32768)
+            size = short_name(str(resolved), buffer, len(buffer))
+            if not size: raise ctypes.WinError(ctypes.get_last_error())
+            self.assertLess(size, len(buffer))
+            alternate = Path(buffer.value)
+            if alternate == resolved:
+                self.skipTest('This Windows filesystem supplies no distinct8.3 alias')
+            return alternate
+        self.assert_fixture_spelling(alias)
 
 
 if __name__=='__main__':

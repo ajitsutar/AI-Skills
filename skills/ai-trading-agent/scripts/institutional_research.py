@@ -6,11 +6,13 @@ retain local bytes; they perform no network, scheduling, account or broker actio
 from __future__ import annotations
 
 import argparse
+import base64
 from contextlib import contextmanager
 from copy import deepcopy
 from datetime import datetime, timezone
 from decimal import Decimal
 from functools import wraps
+import errno
 import hashlib
 import json
 import os
@@ -616,8 +618,11 @@ def evaluate(document):
 
 def _directory(root, name):
     path = root / name
-    if not path.exists():
-        path.mkdir()
+    try:
+        if not path.exists():
+            path.mkdir()
+    except OSError as error:
+        _publication_path_error(path, error)
     _require(path.is_dir() and not path.is_symlink() and path.resolve() == root / name, 'OWNED_DIRECTORY_REQUIRED')
     return path
 
@@ -636,22 +641,85 @@ def _read(path):
     return value
 
 
+def _publication_path_error(path, error):
+    """Explain actual path failures without imposing a guessed host length cap."""
+    if (isinstance(error, FileNotFoundError) or error.errno == errno.ENAMETOOLONG
+            or getattr(error, 'winerror', None) in (3, 206)):
+        raise ValueError('OUTPUT_PUBLICATION_PATH_UNAVAILABLE: choose a shorter existing private output root '
+                         'or a host/filesystem supporting these paths; destination=' + str(path)
+                         + '; original_error=' + type(error).__name__ + ': ' + str(error)) from error
+    raise error
+
+
+def _temporary_name(minimum_length=23):
+    # The UUID payload is unchanged; Base64url saves 14 filename characters.
+    token = ''
+    while len(token) + 1 < minimum_length:
+        token += base64.urlsafe_b64encode(uuid.uuid4().bytes).decode('ascii').rstrip('=')
+    return '.' + token[:minimum_length - 1]
+
+
+def _open_temporary(parent, minimum_length=23):
+    for _ in range(16):
+        path = parent / _temporary_name(minimum_length)
+        try:
+            return path, path.open('xb')
+        except FileExistsError:
+            continue  # A collision is never ours to remove or overwrite.
+    raise ValueError('TEMPORARY_NAME_COLLISIONS_NO_OVERWRITE')
+
+
+def _preflight_publications(paths):
+    """Probe pending parent/filename lengths before publishing a known batch.
+
+    Probes use create-only random files and leave no successful artifact. This
+    measures the current filesystem, not MAX_PATH or a configurable OS policy.
+    It cannot promise later I/O against resource failure or external writers.
+    """
+    checked = set()
+    for supplied in paths:
+        path = Path(supplied)
+        try:
+            if path.exists():
+                continue  # Existing immutable/idempotent reads need no write test.
+            length = (len(path.name.encode('utf-16-le')) // 2 if os.name == 'nt'
+                      else len(os.fsencode(path.name)))
+            length = max(23, length)
+            key = (path.parent, length)
+            if key in checked:
+                continue
+            temporary = None
+            try:
+                temporary, stream = _open_temporary(path.parent, length)
+                stream.close()
+            finally:
+                if temporary is not None:
+                    temporary.unlink(missing_ok=True)
+            checked.add(key)
+        except OSError as error:
+            _publication_path_error(path, error)
+
+
 def _publish(path, data):
     """Atomic no-clobber publication via same-directory hard link; no unsafe fallback."""
-    if path.exists() or path.is_symlink():
-        _require(_read(path) == data, 'IMMUTABLE_ARTIFACT_CONFLICT')
-        return
-    temp = path.parent / ('.tmp-' + uuid.uuid4().hex)
+    path = Path(path)
+    temp = None
     try:
-        with temp.open('xb') as stream:
+        if path.exists() or path.is_symlink():
+            _require(_read(path) == data, 'IMMUTABLE_ARTIFACT_CONFLICT')
+            return
+        temp, stream = _open_temporary(path.parent)
+        with stream:
             stream.write(data); stream.flush(); os.fsync(stream.fileno())
         try:
             os.link(temp, path)
         except FileExistsError:
             _require(_read(path) == data, 'IMMUTABLE_ARTIFACT_CONFLICT')
+    except OSError as error:
+        _publication_path_error(path, error)
     finally:
-        if temp.exists():
-            temp.unlink()
+        if temp is not None:
+            temp.unlink(missing_ok=True)
 
 
 @contextmanager
@@ -664,6 +732,8 @@ def _lock(root, release_guard=False):
         descriptor = os.open(path, os.O_CREAT | os.O_EXCL | os.O_WRONLY, 0o600)
     except FileExistsError as exc:
         raise ValueError('LOCK_HELD_NO_AUTOMATIC_STALE_BREAK') from exc
+    except OSError as error:
+        _publication_path_error(path, error)
     try:
         with os.fdopen(descriptor, 'wb') as stream:
             stream.write(token); stream.flush(); os.fsync(stream.fileno())
@@ -680,9 +750,11 @@ def _complete(root, transaction):
     _require(hashlib.sha256(_read(object_path)).hexdigest() == digest, 'CAPTURE_HASH_MISMATCH')
     data = _bytes(transaction['entry']) + b'\n'
     entry_path = _directory(root, 'entries') / (entry_id + '.json')
+    commit_path = _directory(root, 'commits') / (entry_id + '.json')
+    _preflight_publications([entry_path, commit_path])
     _publish(entry_path, data)
     commit = {'id': entry_id, 'entry_sha256': hashlib.sha256(data).hexdigest(), 'object_sha256': digest}
-    _publish(_directory(root, 'commits') / (entry_id + '.json'), _bytes(commit) + b'\n')
+    _publish(commit_path, _bytes(commit) + b'\n')
     return {'status': 'COMMITTED', **commit, 'execution_authorized': False}
 
 
@@ -695,6 +767,9 @@ def _record(root_value, entry_id, kind, raw, metadata):
     key = _digest(stable)
     with _lock(root):
         path = _directory(root, 'transactions') / (entry_id + '.json')
+        _preflight_publications([_directory(root, 'objects') / (digest + '.bin'), path,
+                                 _directory(root, 'entries') / (entry_id + '.json'),
+                                 _directory(root, 'commits') / (entry_id + '.json')])
         if path.exists():
             transaction = json.loads(_read(path))
             stored = {k: v for k, v in transaction['entry'].items() if k != 'recorded_at'}

@@ -353,6 +353,16 @@ available under `metric_cohort: UNREGISTERED_ALL_SUPPLIED` and roster status
 Protocol changes require a retained predecessor and a new adoption clock; never
 retroactively change the roster or reinterpret original missing observations.
 
+For journal/capture output, the shared atomic publisher preserves UUID uniqueness
+with a shorter create-only temporary basename. A known journal batch probes its
+pending paths before publishing its first immutable artifact. Actual host path
+failures identify `OUTPUT_PUBLICATION_PATH_UNAVAILABLE` and suggest a shorter
+explicit private root or a supporting host/filesystem, without imposing a fixed
+length cap or changing OS settings. Original files and collided temporary names
+are never overwritten or deleted as an attempted repair. Empty owned directories
+may remain after a rejected path probe; later I/O failures still use the existing
+retained transaction/recovery contract.
+
 ## Canonical event briefs
 
 The `institutional_report` source-report producer also accepts operation `brief`,

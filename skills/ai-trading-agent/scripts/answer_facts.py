@@ -70,6 +70,36 @@ def _project(result, result_hash, artifact='result.json'):
             row['projection_status'] = 'UNAVAILABLE_JOB_NOT_COMPUTED'
             row['reason'] = job.get('reason')
             continue
+        if job['operation'] in ('portfolio.construct', 'backtest.holdings_ledger'):
+            fields = report_facts.native_finance_fields(job['operation'], value)
+            if fields is None:
+                row['projection_status'] = 'UNAVAILABLE_NATIVE_RESULT_SCHEMA'
+                continue
+            projected = set()
+            for field in fields:
+                pointer = field['pointer']
+                status = 'AVAILABLE' if field['missingness'] is None else 'UNAVAILABLE_' + field['missingness'].upper()
+                fact = {'job_id': job['id'], 'operation': job['operation'],
+                        'semantic_label': field['metric'], 'scenario': field['scenario'],
+                        'input_role': 'supplied_portfolio_model' if job['operation'] == 'portfolio.construct' else 'supplied_holdings_scenario',
+                        'unit': field['unit'], 'denominator': field['denominator'], 'basis': field['basis'],
+                        'value_kind': field['value_kind'], 'status': status, 'value': copy.deepcopy(field['value']),
+                        'measurement_period': None, 'observation_frequency': None,
+                        'context': copy.deepcopy(field['context']),
+                        'source': {'artifact': artifact, 'sha256': result_hash, 'pointer': base + pointer},
+                        'input_bindings': copy.deepcopy(bindings.get(job['id'], []))}
+                label = 'Job ' + json.dumps(job['id'], ensure_ascii=False) + '; ' + field['scenario'] + '; ' + field['metric']
+                if field['context']:
+                    label += '; context ' + json.dumps(field['context'], sort_keys=True, ensure_ascii=False)
+                shown = (_number(field['value']) if field['value_kind'] == 'number' else json.dumps(field['value']))
+                fact['sentence'] = (label + ' = ' + shown + ' ' + field['unit'] + '. Basis: ' + field['basis']
+                                    if status == 'AVAILABLE' else label + ' is unavailable (' + status + '). Basis: ' + field['basis'])
+                facts.append(fact)
+                projected.add(pointer)
+            row['projection_status'] = 'FIXED_FIELDS_PROJECTED'
+            import research_contracts
+            row['unsupported_or_unprojected_fields'] = [base + pointer for pointer in research_contracts.leaves(value) if pointer not in projected]
+            continue
         if job['operation'] == 'financial.terminal_scenarios' and isinstance(value, dict):
             diagnostic = value.get('diagnostic_objectives')
             if isinstance(diagnostic, dict) and isinstance(diagnostic.get('report'), str):

@@ -374,7 +374,7 @@ def prepare(request_path, manifest_path, expected_manifest_sha256, source_root, 
             require(research._stamp(protocol.get('adopted_at')) > research._stamp(prior_protocol.get('adopted_at')),
                     'CHANGED_PROTOCOL_REQUIRES_NEW_ADOPTION_CLOCK')
     folder = root / (request['packet_id'] + '-r' + str(request['revision']))
-    no_links(folder); folder.mkdir(exist_ok=True)
+    no_links(folder)
     corpus, manifest_raw = load_corpus(manifest_path, expected_manifest_sha256, source_root)
     files = {'request.json': request_raw, 'ingress.json': manifest_raw}
     # Seal complete originals, including evaluator-only context, outside participant directories.
@@ -386,9 +386,19 @@ def prepare(request_path, manifest_path, expected_manifest_sha256, source_root, 
     inventory = {name: raw_hash(raw) for name, raw in sorted(files.items())}
     packet = {'schema_version': 1, 'preflight': result, 'files': inventory}
     packet_raw = encode(packet); pin = raw_hash(packet_raw)
+    # Probe all pending paths before the first immutable packet artifact. Use
+    # actual filesystem operations so supported long-path hosts stay supported.
+    destinations = [relative(folder, name) for name in files] + [folder / 'packet.json']
+    try:
+        folder.mkdir(exist_ok=True)
+        for path in destinations:
+            path.parent.mkdir(parents=True, exist_ok=True)
+        research._preflight_publications(destinations)
+    except OSError as error:
+        research._publication_path_error(folder, error)
     # An incomplete previous attempt may be resumed, but no existing byte changes.
     for name, raw in files.items():
-        path = relative(folder, name); path.parent.mkdir(parents=True, exist_ok=True)
+        path = relative(folder, name)
         research._publish(path, raw)
     research._publish(folder / 'packet.json', packet_raw)
     result = verify(folder, pin)

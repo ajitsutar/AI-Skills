@@ -108,7 +108,7 @@
         },
         {
           "title": "Seal an offline reviewer packet",
-          "prompt": "From [ADOPTED PROTOCOL, FIXED ROSTER, CRITERIA, SOURCE INPUTS, BRIEF AND ORIGINAL RESPONSE JOURNAL], prepare a review_packet under [PRIVATE OUTPUT ROOT]. Verify each criterion dependency, identity and selection coverage, capture and decision clocks, and the two exact participant arms. Keep evaluator-only evidence out of both arms, retain incomplete packets as UNASSESSED and do not dispatch a participant or manufacture a scored verdict."
+          "prompt": "From [ADOPTED PROTOCOL, FIXED ROSTER, CRITERIA, SOURCE INPUTS, BRIEF AND ORIGINAL RESPONSE JOURNAL], prepare a review_packet under [PRIVATE OUTPUT ROOT]. Verify each criterion dependency, identity and selection coverage, capture and decision clocks, and the two exact participant arms. Keep evaluator-only evidence out of both arms, retain incomplete packets as UNASSESSED and do not dispatch a participant or manufacture a scored verdict. Use an explicit writable output root; preserve existing artifacts and report any actual destination-path failure before retrying under a suitable root."
         },
         {
           "title": "Compare a bounded workflow benefit",
@@ -173,6 +173,10 @@
         {
           "title": "Retain malformed source jobs independently",
           "prompt": "Parse [ORDERED RETAINED SOURCE JOBS] at [EXPLICIT CUTOFF] using the original source bindings. Preserve malformed nested SEC schema failures per job and continue independent valid jobs before and after them. Keep original order, source bytes, parse diagnostics and the exact delivered native/canonical findings; do not turn source errors or unknown bases into positive market evidence."
+        },
+        {
+          "title": "Replay flow evidence at another cutoff",
+          "prompt": "Using [RETAINED RAW RECORDS AND THEIR NORMALIZED ENVELOPES], replay [TICKER] at [EARLIER AND LATER CUTOFFS]. Check equivalent raw and normalized results and repeated normalization. Recompute engine-derived amendment ambiguity from revisions eligible at each cutoff, retain genuine forks, equal-clock corrections and cancellations, and keep unknown comparability bases unresolved. Preserve the original records and report any disagreement without inferring a trading signal."
         }
       ]
     },
@@ -763,7 +767,8 @@
       "audience": "Quant",
       "guides": [
         "references/quant-workbench.md",
-        "references/institutional-manager.md"
+        "references/institutional-manager.md",
+        "references/report-facts.md"
       ],
       "prompts": [
         {
@@ -797,6 +802,10 @@
         {
           "title": "Evaluate signed research weights",
           "prompt": "Evaluate [RESEARCH ALLOCATION] with explicit signed bounds, gross/net limits and supplied borrow availability and costs. Flag missing evidence and keep the result separate from unsupported live short-selling execution. Include holding-period borrow expense in each loss constraint and reported scenario P&L as well as the objective; separate entry transaction costs, borrow reserve and entry cash."
+        },
+        {
+          "title": "Verify allocation and holdings report units",
+          "prompt": "From [CURRENT-CODE PORTFOLIO.CONSTRUCT AND BACKTEST.HOLDINGS_LEDGER RESULTS], compose and replay the canonical quantitative report. Preserve fixed typed cost, borrow-reserve, cash and modeled-return facts with native JSON pointers. Keep NAV fractions separate from ledger currency, entry costs separate from holding-period borrow, and unknown taxes or missing final marks unresolved. Retain caller-supplied assumptions and unsupported historical result mappings; do not infer dollars, alpha, investable cash or order permission from a fraction."
         }
       ]
     },

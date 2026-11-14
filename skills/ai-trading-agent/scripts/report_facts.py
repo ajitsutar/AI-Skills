@@ -10,6 +10,7 @@ from pathlib import Path
 import re
 from functools import lru_cache
 from collections import defaultdict, deque
+from decimal import Decimal, InvalidOperation
 
 ROOT = Path(__file__).resolve().parents[1]
 VERSION = 'report-facts-1'
@@ -227,6 +228,143 @@ FINANCIAL = {
     'quality_raw/2': ('Negative debt to common equity', 'current common equity', '-TotalDebt / CommonStockEquity')}
 
 
+def native_finance_fields(operation, result):
+    """Fixed native semantics shared with replay-verified answer facts.
+
+    Values are selected, never recomputed. Absent, null, malformed and unknown
+    currency remain distinct. Source clocks and contract horizons do not supply
+    measurement periods; supplied marks/tax are never promoted to verified facts.
+    """
+    if not isinstance(result, dict):
+        return None
+    portfolio = operation == 'portfolio.construct'
+    ledger = operation == 'backtest.holdings_ledger'
+    if portfolio:
+        if (result.get('status') != 'RESEARCH_PROPOSAL' or not isinstance(result.get('weights'), dict)
+                or not isinstance(result.get('cost_accounting'), dict)
+                or result['cost_accounting'].get('units') != 'fraction_of_initial_nav'):
+            return None
+    elif ledger:
+        if (result.get('method') != 'explicit-holdings-ledger-v1'
+                or result.get('status') not in ('COMPUTED_SCENARIO', 'UNRESOLVED')
+                or not isinstance(result.get('final'), dict)):
+            return None
+    else:
+        return None
+    rows = []
+    currency = result.get('currency')
+    currency_valid = isinstance(currency, str) and re.fullmatch('[A-Z]{3}', currency)
+
+    def add(path, metric, unit, denominator, basis, scenario, context=None, kind='number'):
+        try:
+            value = pointer(result, path)
+            missing = 'null' if value is None else None
+        except (KeyError, IndexError, TypeError):
+            value, missing = None, 'absent'
+        if missing is None:
+            if kind == 'number':
+                valid = type(value) in (int, float, str, Decimal) and not isinstance(value, bool)
+                if isinstance(value, str):
+                    valid = re.fullmatch(r'-?\d+(?:\.\d+)?(?:[eE][+-]?\d+)?', value) is not None
+                try:
+                    valid = valid and Decimal(str(value)).is_finite()
+                except (InvalidOperation, ValueError):
+                    valid = False
+            else:
+                valid = isinstance(value, str) and value in {
+                    'UNKNOWN', 'REFERENCE_OR_MODEL_SCENARIO', 'CALLER_SUPPLIED_OBSERVED_MARKS'}
+            if not valid:
+                value, missing = None, 'invalid_type_or_value'
+        if unit.startswith('currency'):
+            unit = currency + unit[len('currency'):] if currency_valid else None
+            if not currency_valid and missing is None:
+                missing = 'unknown_currency'
+        rows.append({'pointer': path, 'metric': metric, 'value': value, 'unit': unit,
+                     'denominator': denominator, 'basis': basis, 'scenario': scenario,
+                     'missingness': missing, 'value_kind': kind, 'context': context or {},
+                     'measurement_period': None, 'observation_frequency': None})
+
+    if portfolio:
+        denominator = 'initial portfolio NAV'
+        fields = (
+            ('entry_transaction_cost_fraction', 'Modeled entry transaction cost', 'entry', 'One-way turnover cost plus nonlinear impact; deducted from entry cash.'),
+            ('holding_period_borrow_cost_fraction', 'Modeled holding-period borrow cost', 'holding_period_reserve', 'Declared period borrow rate times short exposure, including unchanged shorts; reserved, not assumed paid at entry.'),
+            ('estimated_cost_fraction', 'Modeled total entry and period borrow cost', 'holding_period_model', 'Entry transaction cost plus holding-period borrow cost; not all fees settle at entry.'),
+            ('cash_after_modeled_cost', 'Modeled entry cash after transaction cost (legacy field)', 'entry', 'One minus net exposure minus entry transaction cost; excludes period borrow reserve.'),
+            ('cash_after_entry_cost', 'Modeled entry cash after transaction cost', 'entry', 'One minus net exposure minus entry transaction cost; excludes period borrow reserve.'),
+            ('free_cash_after_collateral_reserve', 'Modeled entry cash after collateral reserve', 'entry_reserve', 'Entry cash less declared collateral reserve; excludes period borrow reserve; not profit or broker buying power.'),
+            ('cash_after_period_borrow_reserve', 'Modeled cash after period borrow reserve', 'holding_period_reserve', 'Entry cash less period borrow reserve; reserve is not evidence of settlement at entry.'),
+            ('free_cash_after_collateral_and_borrow_reserve', 'Modeled cash after collateral and period borrow reserves', 'holding_period_reserve', 'Entry cash less collateral and period borrow reserves; not profit, settled account cash or broker buying power.'),
+            ('modeled_return', 'Modeled gross portfolio return', 'declared_return_model', 'Supplied expected returns times proposed weights; before entry and period borrow costs; unavailable for minimum-risk objective.'),
+            ('modeled_net_return', 'Modeled net portfolio return', 'declared_return_model', 'Modeled gross return less entry transaction and holding-period borrow costs; unavailable for minimum-risk objective.'),
+            ('gross_exposure', 'Proposed gross exposure', 'portfolio_model', 'Sum of absolute proposed weights; not an executable order.'),
+            ('net_exposure', 'Proposed net exposure', 'portfolio_model', 'Sum of signed proposed weights; not an executable order.'),
+            ('gross_turnover', 'Proposed gross turnover', 'entry', 'Sum of absolute changes from supplied previous weights.'))
+        for field, metric, scenario, basis in fields:
+            add('/' + field, metric, 'fraction_of_initial_nav', denominator, basis, scenario)
+        scenarios = result.get('scenario_pnl_fraction')
+        if isinstance(scenarios, dict):
+            for name in sorted(scenarios):
+                add('/scenario_pnl_fraction/' + escape(name), 'Modeled net scenario profit or loss',
+                    'fraction_of_initial_nav', denominator,
+                    'Supplied scenario returns times proposed weights less entry transaction and holding-period borrow costs; no probability or observed outcome inferred.',
+                    'declared_stress_scenario', {'declared_scenario_name': name})
+    else:
+        basis = 'Supplied holdings/events scenario; currency amounts, not NAV fractions; no FX conversion or broker cash-access inference.'
+        for field, metric in (
+                ('settled_cash', 'Scenario settled cash after declared payments'),
+                ('cash_receivables', 'Scenario cash receivables not yet settled'),
+                ('declared_tax_liability', 'Remaining declared tax liability'),
+                ('cash_available_after_tax_reserve', 'Scenario cash after declared tax reserve'),
+                ('tax_reserve_shortfall', 'Declared tax reserve cash shortfall'),
+                ('cash_floor_shortfall', 'Declared cash-floor shortfall after declared tax reserve'),
+                ('gross_nav', 'Scenario gross NAV including receivables and usable marks'),
+                ('net_nav_after_declared_tax', 'Scenario NAV after declared tax; unknown when tax or valuations are unresolved')):
+            add('/final/' + field, metric, 'currency', None, basis + ' Reserves cover declared liability only; missing tax is not zero.', 'final_holdings_scenario')
+        add('/final/valuation_status', 'Supplied mark valuation classification', 'status', None,
+            'Caller-supplied observed marks are not independently authenticated; reference/model marks remain scenarios and are not executable prices.', 'final_holdings_scenario', kind='status')
+        for field, metric in (('net_external_cash_flows', 'Net supplied external cash flows'),
+                              ('transaction_costs', 'Scenario transaction costs'),
+                              ('cash_and_receivable_conservation_residual', 'Cash and receivable accounting residual')):
+            add('/' + field, metric, 'currency', None, basis, 'holdings_event_window')
+        for field, metric in (
+                ('opening_declared_liability/amount', 'Opening declared tax liability'),
+                ('declared_accrual_total', 'Supplied scenario tax accrual total'),
+                ('declared_payment_total', 'Declared tax payment total'),
+                ('declared_liability_remaining', 'Remaining declared scenario tax liability'),
+                ('unresolved_scenario_liability_amount', 'Unresolved scenario tax amount'),
+                ('total_scenario_liability_remaining', 'Total remaining scenario tax liability including unresolved tax'),
+                ('actual_tax_liability_amount', 'Actual tax liability (not verified by the ledger)')):
+            add('/tax_evidence/' + field, metric, 'currency', None,
+                'Declared amounts and supplied rates only; missing amounts remain unknown. A cross-scenario cash delta does not identify missing tax.', 'supplied_tax_scenario')
+        collections = (
+            ('lots', (('quantity', 'Remaining lot quantity', 'security_units'), ('basis', 'Remaining lot cost basis', 'currency'))),
+            ('realizations', (('realized_gain', 'Scenario realized gain after allocated basis', 'currency'),
+                              ('basis', 'Allocated disposed-lot basis', 'currency'), ('net_proceeds', 'Scenario sale proceeds after transaction costs', 'currency'))),
+            ('pending_receipts', (('amount', 'Pending unsettled receipt amount', 'currency'),)),
+            ('tax_evidence/events', (('amount', 'Declared or unresolved event tax amount', 'currency'),)))
+        for collection, specs in collections:
+            try:
+                entries = pointer(result, '/' + collection)
+            except (KeyError, IndexError, TypeError):
+                entries = None
+            if isinstance(entries, list):
+                for index, row in enumerate(entries):
+                    if not isinstance(row, dict):
+                        continue
+                    for field, metric, unit in specs:
+                        add(f'/{collection}/{index}/{field}', metric, unit, None, basis + ' Unknown basis and tax remain null; no currency or share-step rounding inferred.',
+                            'supplied_event_or_lot', {'collection': collection, 'row_index': index})
+        positions = result['final'].get('positions')
+        if isinstance(positions, dict):
+            for security in sorted(positions):
+                for field, metric, unit in (('quantity', 'Final scenario position quantity', 'security_units'),
+                                             ('value', 'Final scenario position value from usable supplied mark', 'currency')):
+                    add('/final/positions/' + escape(security) + '/' + field, metric, unit, None,
+                        basis + ' Unavailable marks remain unknown rather than zero.', 'final_holdings_scenario', {'declared_security_id': security})
+    return rows
+
+
 class Projector:
     def __init__(self, raw, kind, include_source_text=False):
         self.document = strict_json(raw)
@@ -300,8 +438,31 @@ class Projector:
             if job.get('status') != 'COMPUTED':
                 self.fact(root + '/reason', 'Reported non-computation reason', unit='text', mapping='SOURCE_STATUS', **common)
                 continue
+            native_paths = set()
+            if op in ('portfolio.construct', 'backtest.holdings_ledger'):
+                native_ready = current_code and (not wrapped or (bound and result_bound and linked is not None))
+                fields = native_finance_fields(op, job.get('result')) if native_ready else None
+                self.notices.append({'job_index': i, 'native_finance_mapping':
+                                     'FIXED_TYPED_FIELDS' if fields is not None else 'UNAVAILABLE_SCHEMA_OR_BINDING'})
+                for field in fields or []:
+                    native_paths.add(field['pointer'].lstrip('/'))
+                    metadata = dict(meta)
+                    if op == 'backtest.holdings_ledger':
+                        metadata['currency'] = root + '/result/currency'
+                        metadata['tax_scope'] = root + '/result/tax_evidence/scope'
+                    else:
+                        metadata['cost_timing'] = root + '/result/cost_accounting/timing'
+                    fact = self.fact(root + '/result' + field['pointer'], field['metric'], field['unit'],
+                                     field['denominator'], field['basis'], horizon,
+                                     assumptions=common['assumptions'] + ['Supplied/model scenario only; reserves are not settled payments or profit.'],
+                                     mapping='BUILTIN_CODE_SCHEMA', metadata_sources=metadata,
+                                     context={**common['context'], 'scenario': field['scenario'], **field['context']})
+                    fact['value'], fact['missingness'] = field['value'], field['missingness']
+                    fact['value_kind'] = field['value_kind']
             for path, value in leaves(job.get('result', {}), root + '/result'):
                 rel = path[len(root + '/result/'):]
+                if rel in native_paths:
+                    continue
                 if any(part in OMIT_FIELDS for part in rel.split('/')):
                     continue
                 spec = None

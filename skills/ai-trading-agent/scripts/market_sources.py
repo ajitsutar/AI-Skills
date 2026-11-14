@@ -172,6 +172,10 @@ def normalize(document):
     for index, original in enumerate(supplied):
         _require(type(original) is dict, "Each record must be an object")
         row = copy.deepcopy(original)
+        # This engine-owned annotation belongs to one normalization cutoff.
+        # Like eligible/exclusion_reasons below, it must be recomputed from the
+        # original envelope facts, never inherited from a prior normalized view.
+        row.pop("amendment_ambiguity", None)
         reasons = []
         identity = row.get("id")
         if type(identity) is not str or not identity.strip():

@@ -75,6 +75,17 @@ refuse affirmative triage. A future/unusable correction does not create current
 ambiguity. A linear ordered chain retains its existing behavior. This conservative
 state does not infer provider-specific latest-wins or source disambiguation.
 
+`eligible`, `exclusion_reasons` and the record-level `amendment_ambiguity` are
+engine-owned, cutoff-specific output annotations. Each normalization recomputes
+them from the supplied envelopes and the requested `as_of`, including when its
+input records came from a previous normalized view. A later fork annotation
+cannot suppress an earlier view where that fork was unavailable. Genuine forks
+at the requested cutoff remain ambiguous. Supplied objects are never mutated;
+other provenance and all retained vintages remain intact. Keep pinned raw input
+and prior results separately for audit history. When reusing normalized records,
+retain the original settings explicitly: `normalize` returns evidence, not a
+copy of an enclosing flow request's settings.
+
 ## Retained-source adapters
 
 parse(document) accepts schema_version, as_of, source, adapter and text or data.
