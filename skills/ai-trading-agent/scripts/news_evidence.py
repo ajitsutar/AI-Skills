@@ -4,7 +4,7 @@ These checks establish retained-byte/field relationships, not source authenticit
 No acquisition, broker action, timestamp substitution or semantic inference occurs.
 """
 import argparse
-from datetime import datetime, timezone
+from datetime import date, datetime, timezone
 from decimal import Decimal, InvalidOperation, localcontext
 import hashlib
 import json
@@ -12,7 +12,7 @@ from pathlib import Path, PureWindowsPath
 import re
 import stat
 
-METHOD = 'news-source-evidence-1.0.0'
+METHOD = 'news-source-evidence-1.1.0'
 CLOCK_FIELDS = {
     'publication': {'published_at', 'publication_time'},
     'observation': {'observed_at', 'first_observed_at', 'first_seen_at'},
@@ -241,7 +241,7 @@ def number(value):
     return result
 
 
-def record(item, root):
+def scoped_source(item, root):
     raw = read_source(root, item['source'])
     # Scope a structured archive to one original record before resolving fields.
     # JSON strings retain their exact contents, including line endings and offsets.
@@ -249,18 +249,231 @@ def record(item, root):
         scoped = pointer(decode(raw, exact_numbers=True), item['source']['record_pointer'])
         if not isinstance(scoped, dict):
             raise ValueError('SOURCE_RECORD_OBJECT_REQUIRED')
-        raw = scoped
-    clocks = {role: clock(raw, item['clocks'][role], role) for role in CLOCK_FIELDS}
-    fields = {name: field(raw, item['fields'][name]) for name in (*DIMENSIONS, 'low', 'high')}
+        return raw, scoped
+    return raw, raw
+
+
+def dimension(raw, scoped, item, name, spec):
+    """Bind an archive issuer header without claiming document subject identity."""
+    if spec.get('kind') != 'source_context':
+        return field(scoped, spec)
+    if name != 'issuer' or 'span' in spec:
+        raise ValueError('ARCHIVE_CONTEXT_ONLY_FOR_ISSUER')
+    record_path = item['source'].get('record_pointer')
+    container_path = spec.get('container_pointer')
+    path = spec.get('pointer')
+    if (not isinstance(record_path, str) or not record_path.startswith('/') or
+            not isinstance(container_path, str) or
+            (container_path and not container_path.startswith('/')) or
+            not record_path.startswith(container_path + '/') or
+            path not in ('/issuer', '/issuer/id', '/issuer/name')):
+        raise ValueError('ANCESTOR_ISSUER_CONTEXT_BINDING_REQUIRED')
+    container = pointer(decode(raw, exact_numbers=True), container_path)
+    if not isinstance(container, dict):
+        raise ValueError('ARCHIVE_CONTEXT_OBJECT_REQUIRED')
+    value = pointer(container, path)
+    if not isinstance(value, str) or not value.strip():
+        raise ValueError('ARCHIVE_ISSUER_SCALAR_REQUIRED')
+    if 'value' in spec and not same(spec['value'], value):
+        raise ValueError('FIELD_VALUE_DIFFERS_FROM_SOURCE')
+    return {'kind': 'source_context', 'value': value,
+            'binding': {'container_pointer': container_path, 'pointer': path,
+                        'record_pointer': record_path},
+            'scope': 'ARCHIVE_HEADER_NOT_DOCUMENT_SUBJECT_IDENTITY',
+            'semantic_identity_verified': False}
+
+
+def record(item, root):
+    raw, scoped = scoped_source(item, root)
+    clocks = {role: clock(scoped, item['clocks'][role], role) for role in CLOCK_FIELDS}
+    fields = {name: dimension(raw, scoped, item, name, item['fields'][name])
+              for name in (*DIMENSIONS, 'low', 'high')}
     if any(not isinstance(fields[k]['value'], str) or not fields[k]['value'].strip() for k in DIMENSIONS):
         raise ValueError('NAMED_COMPARISON_DIMENSIONS_REQUIRED')
-    fields['accounting_basis'] = basis(raw, item['fields']['accounting_basis'], fields['metric']['value'])
+    fields['accounting_basis'] = basis(scoped, item['fields']['accounting_basis'], fields['metric']['value'])
     if any(fields[k]['kind'] != 'source' for k in ('low', 'high')):
         raise ValueError('SOURCE_BOUND_NUMERIC_RANGE_REQUIRED')
     low, high = (number(fields[k]['value']) for k in ('low', 'high'))
     if low > high:
         raise ValueError('REVERSED_RANGE')
     return {'id': item['id'], 'source': item['source'], 'clocks': clocks, 'fields': fields}
+
+
+def period_evidence(item, row, root):
+    """Keep a literal period label separate from optional exact source dates."""
+    _, scoped = scoped_source(item, root)
+    boundaries = item.get('period_boundaries', {})
+    if not isinstance(boundaries, dict) or set(boundaries) - {'start', 'end'}:
+        raise ValueError('PERIOD_BOUNDARIES_START_END_ONLY')
+    dates = {}
+    for name in ('start', 'end'):
+        info = field(scoped, boundaries.get(name, {'kind': 'unknown'}))
+        if info['kind'] not in ('source', 'unknown'):
+            raise ValueError('EXACT_PERIOD_DATES_REQUIRE_SOURCE_BINDINGS')
+        if info['kind'] == 'source':
+            if not isinstance(info['value'], str) or not re.fullmatch(r'\d{4}-\d{2}-\d{2}', info['value']):
+                raise ValueError('EXACT_PERIOD_DATE_REQUIRED')
+            date.fromisoformat(info['value'])
+        dates[name] = info
+    known = [dates[k]['value'] is not None for k in ('start', 'end')]
+    if any(known) and not all(known):
+        raise ValueError('EXACT_PERIOD_BOUNDARIES_REQUIRE_BOTH_DATES')
+    if all(known) and dates['start']['value'] > dates['end']['value']:
+        raise ValueError('REVERSED_PERIOD_BOUNDARIES')
+    return {'label': row['fields']['period'], 'start': dates['start'], 'end': dates['end'],
+            'scope': 'SOURCE_BOUND_DATES_NOT_LABEL_EQUIVALENCE_PROOF' if all(known)
+            else 'LABEL_ONLY_EXACT_CALENDAR_BOUNDARIES_UNKNOWN'}
+
+
+def withdrawal_evidence(scoped, spec, metric):
+    """Recognize only an explicit same-metric status or a bounded whole clause."""
+    if spec.get('kind') == 'source':
+        path = spec.get('pointer', '')
+        if path.rsplit('/', 1)[-1] not in ('status', 'guidance_status') or 'span' in spec:
+            raise ValueError('WITHDRAWAL_STATUS_FIELD_REQUIRED')
+        parent = pointer(scoped if isinstance(scoped, dict) else decode(scoped, exact_numbers=True),
+                         path.rsplit('/', 1)[0])
+        info = field(scoped, spec)
+        if parent.get('metric') != metric or info['value'] != 'withdrawn':
+            raise ValueError('WITHDRAWAL_STATUS_METRIC_MISMATCH')
+        return info
+    if spec.get('kind') != 'source_phrase':
+        raise ValueError('SOURCE_BOUND_WITHDRAWAL_REQUIRED')
+    quote = selected(scoped, spec)
+    container = selected(scoped, {'pointer': spec['pointer']} if 'pointer' in spec else {})
+    if not isinstance(quote, str) or not isinstance(container, str) or not quote.strip():
+        raise ValueError('WITHDRAWAL_PHRASE_REQUIRED')
+    start, end = spec.get('span', [0, len(container)])
+    # Inspect the original full sentence, so clipping cannot hide a condition,
+    # negation, attribution or a different metric. Line wrapping and semicolons
+    # do not end that context. Complex prose remains rejected.
+    left = max(container.rfind(c, 0, start) for c in '.!?') + 1
+    content_end = end
+    while content_end > start and container[content_end - 1] in '.!?;\r\n \t':
+        content_end -= 1
+    endings = [container.find(c, content_end) for c in '.!?']
+    right = min([x for x in endings if x >= 0] or [len(container)])
+    clause = container[left:right].strip().rstrip('.!?;').strip()
+    m = re.escape(metric)
+    active = r'(?:the company|the issuer|we)\s+(?:(?:has|have)\s+)?(?:withdrew|withdrawn)\s+(?:its\s+|our\s+|the\s+)?' + m + r'\s+(?:guidance|outlook)'
+    passive = m + r'\s+(?:guidance|outlook)\s+(?:has been|is)\s+withdrawn'
+    if not re.fullmatch('(?:' + active + '|' + passive + ')', clause, re.I):
+        raise ValueError('WITHDRAWAL_PHRASE_UNRESOLVED')
+    if not re.search(r'\b(?:withdrew|withdrawn)\b', quote, re.I) or not re.search(m, quote, re.I):
+        raise ValueError('WITHDRAWAL_SPAN_MISSING_METRIC_OR_ACTION')
+    if 'value' in spec and spec['value'] != 'withdrawn':
+        raise ValueError('FIELD_VALUE_DIFFERS_FROM_SOURCE')
+    return {'kind': 'source', 'value': 'withdrawn', 'excerpt': quote,
+            'binding': {k: spec[k] for k in ('pointer', 'span') if k in spec},
+            'scope': 'LIMITED_LITERAL_WITHDRAWAL_CLAUSE_NOT_SOURCE_AUTHENTICITY'}
+
+
+def withdrawal_record(item, root):
+    raw, scoped = scoped_source(item, root)
+    clocks = {role: clock(scoped, item['clocks'][role], role) for role in CLOCK_FIELDS}
+    fields = {name: dimension(raw, scoped, item, name, item['fields'].get(name, {'kind': 'unknown'}))
+              for name in DIMENSIONS}
+    metric = fields['metric']
+    if metric['kind'] != 'source' or not isinstance(metric['value'], str) or not metric['value'].strip():
+        raise ValueError('SOURCE_BOUND_WITHDRAWAL_METRIC_REQUIRED')
+    for name in DIMENSIONS:
+        if fields[name]['value'] is not None and (not isinstance(fields[name]['value'], str) or
+                                                not fields[name]['value'].strip()):
+            raise ValueError('NAMED_OR_UNKNOWN_WITHDRAWAL_DIMENSION_REQUIRED')
+    fields['accounting_basis'] = basis(scoped, item['fields'].get('accounting_basis', {'kind': 'unknown'}), metric['value'])
+    for name in ('low', 'high'):
+        info = field(scoped, item['fields'].get(name, {'kind': 'unknown'}))
+        if info['kind'] != 'unknown':
+            raise ValueError('WITHDRAWAL_IS_NOT_A_NUMERIC_GUIDANCE_RANGE')
+        fields[name] = info
+    status = withdrawal_evidence(scoped, item['withdrawal'], metric['value'])
+    return {'id': item['id'], 'source': item['source'], 'clocks': clocks, 'fields': fields,
+            'withdrawal': status}
+
+
+def guidance(request, root):
+    """Source-bound ranges and withdrawal statements without manufactured fields."""
+    item = request['current']
+    status = item.get('status', 'issued')
+    if status not in ('issued', 'withdrawn'):
+        raise ValueError('GUIDANCE_STATUS_MUST_BE_ISSUED_OR_WITHDRAWN')
+    if status == 'issued':
+        if request.get('previous') is None:
+            raise ValueError('ISSUED_RANGE_COMPARISON_REQUIRES_PREVIOUS')
+        if request['previous'].get('status', 'issued') != 'issued':
+            raise ValueError('ISSUED_RANGE_COMPARISON_REQUIRES_ISSUED_PREVIOUS')
+        result = compare(request, root)
+        periods = [period_evidence(request[k], row, root)
+                   for k, row in zip(('previous', 'current'), result['records'])]
+        known = [p['start']['value'] is not None for p in periods]
+        mismatch = all(known) and any(periods[0][k]['value'] != periods[1][k]['value'] for k in ('start', 'end'))
+        if mismatch:
+            result['mismatched_dimensions'].append('exact_period_boundaries')
+            result['arithmetic'] = None
+            if result['comparison_status'] != 'EXCLUDED_AT_CUTOFF':
+                result['comparison_status'] = 'NOT_COMPARABLE'
+        elif any(known) and not all(known):
+            result['limitations'].append('EXACT_PERIOD_BOUNDARIES_NOT_MATCHED_BOTH_RECORDS')
+            if result['comparison_status'] == 'SOURCE_BOUND_DISCLOSURE_CHANGE':
+                result['comparison_status'] = 'ARITHMETIC_ONLY'
+        result.update(mode='guidance', guidance_status='issued', period_evidence=periods)
+        return result
+    cutoff = timestamp(request['as_of'])
+    current = withdrawal_record(item, root)
+    previous = record(request['previous'], root) if request.get('previous') is not None else None
+    if previous is not None and request['previous'].get('status', 'issued') != 'issued':
+        raise ValueError('WITHDRAWAL_PRIOR_RANGE_MUST_BE_ISSUED')
+    rows = [previous, current] if previous is not None else [current]
+    periods = [period_evidence(request['previous'], previous, root)] if previous is not None else []
+    periods.append(period_evidence(item, current, root))
+    reasons, future = [], False
+    for row in rows:
+        for role, info in row['clocks'].items():
+            if info['kind'] != 'source':
+                reasons.append(row['id'] + ':' + role.upper() + '_' + info['kind'].upper())
+            elif timestamp(info['value']) > cutoff:
+                future = True
+                reasons.append(row['id'] + ':' + role.upper() + '_AFTER_CUTOFF')
+        pub, obs = (row['clocks'][k] for k in ('publication', 'observation'))
+        if pub['kind'] == obs['kind'] == 'source' and timestamp(obs['value']) < timestamp(pub['value']):
+            reasons.append(row['id'] + ':OBSERVED_BEFORE_PUBLICATION')
+        reasons.extend(row['id'] + ':' + k.upper() + '_' + v['kind'].upper()
+                       for k, v in row['fields'].items() if k not in ('low', 'high') and v['kind'] != 'source')
+    order = 'NO_PRIOR_RANGE'
+    if previous is not None:
+        a, b = previous['clocks']['publication'], current['clocks']['publication']
+        order = 'UNKNOWN_PUBLICATION_ORDER'
+        if a['kind'] == b['kind'] == 'source':
+            x, y = timestamp(a['value']), timestamp(b['value'])
+            order = 'LATER_DISCLOSURE' if y > x else 'SAME_PUBLICATION' if y == x else 'EARLIER_DISCLOSURE'
+        if order != 'LATER_DISCLOSURE':
+            reasons.append(order)
+    matched = previous is not None and all(
+        previous['fields'][k]['value'] is not None and
+        previous['fields'][k]['value'] == current['fields'][k]['value'] and
+        all(row['fields'][k]['kind'] == 'source' or
+            (k == 'issuer' and row['fields'][k]['kind'] == 'source_context')
+            for row in (previous, current))
+        for k in (*DIMENSIONS, 'accounting_basis'))
+    if matched and all(p['start']['value'] is not None for p in periods):
+        matched = all(periods[0][k]['value'] == periods[1][k]['value'] for k in ('start', 'end'))
+    elif matched and any(p['start']['value'] is not None for p in periods):
+        matched = False
+        reasons.append('EXACT_PERIOD_BOUNDARIES_NOT_MATCHED_BOTH_RECORDS')
+    if previous is not None and not matched:
+        reasons.append('PRIOR_RANGE_DIMENSIONS_NOT_MATCHED')
+    clock_problem = any('PUBLICATION_' in x or 'OBSERVATION_' in x or 'OBSERVED_BEFORE' in x or
+                        x in ('UNKNOWN_PUBLICATION_ORDER', 'SAME_PUBLICATION', 'EARLIER_DISCLOSURE') for x in reasons)
+    classification = None if future or clock_problem else 'WITHDRAWN' if matched else 'WITHDRAWAL_PRIOR_RANGE_UNKNOWN'
+    return {'method': METHOD, 'mode': 'guidance', 'guidance_status': 'withdrawn', 'as_of': request['as_of'],
+            'comparison_status': 'EXCLUDED_AT_CUTOFF' if future else 'WITHDRAWAL_REVIEW_REQUIRED' if clock_problem else 'SOURCE_BOUND_WITHDRAWAL_STATEMENT',
+            'classification': classification, 'publication_order': order, 'limitations': sorted(set(reasons)),
+            'records': rows, 'period_evidence': periods, 'arithmetic': None,
+            'prior_range': {k: previous['fields'][k]['value'] for k in ('low', 'high')} if classification == 'WITHDRAWN' else None,
+            'range_change': None, 'midpoint_change': None, 'withdrawal_is_zero_guidance': False,
+            'source_authenticity_verified': False, 'semantic_extraction_verified': False, 'execution_authorized': False,
+            'input_sha256': digest(json.dumps(request, sort_keys=True, default=str).encode()),
+            'implementation_sha256': digest(Path(__file__).read_bytes())}
 
 
 def compare(request, root):
@@ -354,13 +567,13 @@ def audit_claims(request, root):
 
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('mode', choices=('compare', 'audit'))
+    parser.add_argument('mode', choices=('compare', 'guidance', 'audit'))
     parser.add_argument('input')
     parser.add_argument('source_root')
     parser.add_argument('output')
     args = parser.parse_args()
     request = decode(Path(args.input).read_bytes(), exact_numbers=True)
-    result = (compare if args.mode == 'compare' else audit_claims)(request, args.source_root)
+    result = {'compare': compare, 'guidance': guidance, 'audit': audit_claims}[args.mode](request, args.source_root)
     with Path(args.output).open('x', encoding='utf-8') as stream:
         json.dump(result, stream, indent=2, allow_nan=False, default=str)
         stream.write('\n')

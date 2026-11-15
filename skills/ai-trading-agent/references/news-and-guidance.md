@@ -6,6 +6,10 @@ notices, relevant macro releases and accessible independent reporting. Do not wa
 for a 10-Q to refresh a thesis. This workflow supports frequent supervised research;
 it is not an exchange-speed news feed, an always-on service or a validated HFT strategy.
 
+For supplied exchange halt-message collections, use [retained halt review](halt-review.md).
+It binds the whole collection and as-of source, separates publication and observed
+views, and preserves later notices without using them in an earlier status.
+
 ## Discover sources for the actual issuer
 
 1. Resolve legal issuer, ticker history, CIK, exchange, ADR ratio and official IR
@@ -370,13 +374,22 @@ follow the requested ranking route separately and disclose its unresolved review
 
 ## Guidance comparison
 
+For retained source text/JSON, start with `news_evidence.py guidance` described in
+[source-bound guidance](news-evidence.md#guidance-labels-and-withdrawals). It can
+compare literal fiscal labels without manufacturing calendar dates or URLs, and
+retain a withdrawal whose period, units, currency or prior range is unknown.
+`FY2031` is a fiscal label, not proof of January 1 through December 31. Keep the
+originally requested disclosures; a later-observed revision does not silently
+replace one. Do not borrow one metric's dimensions for another metric's withdrawal.
+
 Review new/raised/lowered/reaffirmed/withdrawn guidance, preliminary results and
 material changes in orders/backlog, margins, demand, capex, financing or regulation.
 For US issuers inspect relevant 8-K items (including 2.02, 7.01, 8.01) and exhibits
 such as 99.1; 6-K and issuer supplements matter for foreign issuers. Not every event
 is filed in the same form or immediately. Search IR sources even if EDGAR is quiet.
 
-`python scripts/news_analysis.py guidance guidance.json source-directory result.json`
+The legacy reviewed-dimension arithmetic route,
+`python scripts/news_analysis.py guidance guidance.json source-directory result.json`,
 uses this record shape (both ranges optional only when status is withdrawn):
 
 ```json
@@ -402,6 +415,13 @@ evidence. `previous`, when known, has the same structure. Preserve original HTML
 or PDF plus a traceable UTF-8 extraction if the quote cannot match original bytes.
 The helper verifies source bytes, dates and excerpts, not authorship or the
 reviewer's numeric interpretation. No hash authenticates a fabricated claim.
+Its result explicitly marks dimensions as `CALLER_DECLARED_NOT_SOURCE_VERIFIED`:
+equal request fields and a successful classification do not establish that fiscal
+boundaries, accounting basis, issuer identity or URL appear in the original source.
+Use this route when its required dimensions and source URL are actually available
+and independently reviewed. A schema requirement never justifies filling a gap
+with calendar dates, an example URL or another metric's basis. Use the source-bound
+route or retain an explicit limitation instead.
 
 Compare only identical issuer, metric, fiscal period, units, currency and accounting
 basis. Output midpoint and endpoint changes, overlaps and mixed range changes.

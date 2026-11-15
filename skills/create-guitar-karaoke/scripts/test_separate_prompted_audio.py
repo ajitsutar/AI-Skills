@@ -41,7 +41,7 @@ class TimestampAndSafetyTests(unittest.TestCase):
 
     def test_safe_outputs_and_no_source_replacement(self) -> None:
         with tempfile.TemporaryDirectory() as directory:
-            root = Path(directory)
+            root = Path(directory).resolve()
             source = root / "source.wav"
             source.write_bytes(b"audio")
             outputs = sam.plan_outputs(source, root / "out", "../unsafe:name")
@@ -50,6 +50,39 @@ class TimestampAndSafetyTests(unittest.TestCase):
             outputs["target"] = source
             with self.assertRaisesRegex(sam.UserError, "source audio"):
                 sam.validate_output_paths(source, outputs, True)
+
+    @unittest.skipUnless(os.name == "nt", "Windows native short-path alias control")
+    def test_native_short_alias_preserves_containment_and_source_protection(self) -> None:
+        import ctypes
+        from ctypes import wintypes
+
+        with tempfile.TemporaryDirectory(prefix="sam-alias-") as directory:
+            root = Path(directory).resolve() / "long output fixture directory"
+            root.mkdir()
+            get_short_path = ctypes.WinDLL("kernel32", use_last_error=True).GetShortPathNameW
+            get_short_path.argtypes = (wintypes.LPCWSTR, wintypes.LPWSTR, wintypes.DWORD)
+            get_short_path.restype = wintypes.DWORD
+            buffer = ctypes.create_unicode_buffer(32768)
+            size = get_short_path(str(root), buffer, len(buffer))
+            if not 0 < size < len(buffer):
+                self.skipTest("Host could not provide an existing short-path alias")
+            alias = Path(buffer.value)
+            if alias == root:
+                self.skipTest("Host does not provide a distinct 8.3 alias")
+            self.assertTrue(alias.samefile(root))
+            source = alias / "source.wav"
+            source.write_bytes(b"audio")
+            (alias / "out").mkdir()
+            outputs = sam.plan_outputs(source, alias / "out", "../unsafe:name")
+            self.assertNotEqual(alias / "out", root / "out")
+            self.assertTrue(all(path.parent == root / "out" for path in outputs.values()))
+            self.assertTrue(all(path.parent.samefile(alias / "out") for path in outputs.values()))
+            self.assertFalse(any("/" in path.name or ":" in path.name for path in outputs.values()))
+            sam.validate_output_paths(source, outputs, False)
+            outputs["target"] = source
+            with self.assertRaisesRegex(sam.UserError, "source audio"):
+                sam.validate_output_paths(source, outputs, True)
+            self.assertEqual(source.read_bytes(), b"audio")
 
 
 class FakeBatch:

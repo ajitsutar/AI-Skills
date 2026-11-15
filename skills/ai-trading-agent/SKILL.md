@@ -5,7 +5,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 
 # AI Trading Agent
 
-Package version: **5.10.6 - November 14, 2026**.
+Package version: **5.10.13 - November 14, 2026**.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent
 policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
@@ -280,10 +280,10 @@ headlines, full reports, paywalls and inaccessible sources are different coverag
 For a retained discovery/access ledger, use the [discovery check](references/news-and-guidance.md#check-a-retained-discovery-ledger)
 without requiring sentiment scoring. Keep excerpt-supported text candidates
 separate from configured issuer scope; lexical matches do not certify relevance.
-For guidance clock/basis gaps, revisions and tool-attributed labels, use [source-bound news checks](references/news-evidence.md), preserving unknowns and arithmetic-only results. For publication/original-source fields, [audit the actual final ledger](references/news-and-guidance.md#audit-provenance-in-the-final-ledger)
+For comparisons of retained guidance disclosures and withdrawals, use [source-bound news checks](references/news-evidence.md). Preserve fiscal labels as supplied; a matching year label does not establish exact fiscal start/end dates. Keep missing period, basis, currency, units and prior ranges unknown, and use retained source pointers when no URL is supplied. Do not fill missing dimensions to satisfy the legacy declared-input arithmetic schema. Preserve clock/basis gaps, revisions and arithmetic-only results. For publication/original-source fields, [audit the actual final ledger](references/news-and-guidance.md#audit-provenance-in-the-final-ledger)
 against retained declarations, preserving ambiguous or unaudited fields and the
 distinction between mechanical consistency and source authenticity.
-Forward targets are analyst opinions, distinct from past 52-week ranges and
+For retained exchange-halt notices, use [halt review](references/halt-review.md) to select the latest publication within the supplied cutoff from the full retained collection. Keep later notices, unknown observation clocks and resumption schedules distinct from observed trading or broker clearance. Forward targets are analyst opinions, distinct from past 52-week ranges and
 intrinsic value. Social posts supply research leads, not authoritative facts.
 Use the analyst helper's population-scoped provenance when explaining dependence:
 shared upstream data among consensus publishers establishes no shared lineage or

@@ -641,10 +641,37 @@ def _read(path):
     return value
 
 
-def _publication_path_error(path, error):
+def _windows_invalid_path(path):
+    """Confirm an invalid Windows name/range without assuming a length limit."""
+    if os.name != 'nt':
+        return False
+    try:
+        import ctypes
+        from ctypes import wintypes
+        attributes = ctypes.WinDLL('kernel32', use_last_error=True).GetFileAttributesW
+        attributes.argtypes = (wintypes.LPCWSTR,)
+        attributes.restype = wintypes.DWORD
+        previous = ctypes.get_last_error()
+        try:
+            ctypes.set_last_error(0)
+            value = attributes(str(path))
+            code = ctypes.get_last_error()
+        finally:
+            ctypes.set_last_error(previous)
+        # ERROR_INVALID_NAME / ERROR_FILENAME_EXCED_RANGE. Missing files,
+        # access errors and failed probes do not establish an invalid name.
+        return value == 0xFFFFFFFF and code in (123, 206)
+    except (ImportError, AttributeError, OSError):
+        return False
+
+
+def _publication_path_error(path, error, *, check_invalid_argument=False):
     """Explain actual path failures without imposing a guessed host length cap."""
     if (isinstance(error, FileNotFoundError) or error.errno == errno.ENAMETOOLONG
-            or getattr(error, 'winerror', None) in (3, 206)):
+            or getattr(error, 'winerror', None) in (3, 206)
+            or (check_invalid_argument and (getattr(error, 'winerror', None) == 123
+                or (error.errno == errno.EINVAL and getattr(error, 'winerror', None) is None
+                    and _windows_invalid_path(path))))):
         raise ValueError('OUTPUT_PUBLICATION_PATH_UNAVAILABLE: choose a shorter existing private output root '
                          'or a host/filesystem supporting these paths; destination=' + str(path)
                          + '; original_error=' + type(error).__name__ + ': ' + str(error)) from error
@@ -666,6 +693,8 @@ def _open_temporary(parent, minimum_length=23):
             return path, path.open('xb')
         except FileExistsError:
             continue  # A collision is never ours to remove or overwrite.
+        except OSError as error:
+            _publication_path_error(path, error, check_invalid_argument=True)
     raise ValueError('TEMPORARY_NAME_COLLISIONS_NO_OVERWRITE')
 
 
@@ -680,7 +709,11 @@ def _preflight_publications(paths):
     for supplied in paths:
         path = Path(supplied)
         try:
-            if path.exists():
+            try:
+                exists = path.exists()
+            except OSError as error:
+                _publication_path_error(path, error, check_invalid_argument=True)
+            if exists:
                 continue  # Existing immutable/idempotent reads need no write test.
             length = (len(path.name.encode('utf-16-le')) // 2 if os.name == 'nt'
                       else len(os.fsencode(path.name)))
@@ -705,7 +738,11 @@ def _publish(path, data):
     path = Path(path)
     temp = None
     try:
-        if path.exists() or path.is_symlink():
+        try:
+            exists = path.exists() or path.is_symlink()
+        except OSError as error:
+            _publication_path_error(path, error, check_invalid_argument=True)
+        if exists:
             _require(_read(path) == data, 'IMMUTABLE_ARTIFACT_CONFLICT')
             return
         temp, stream = _open_temporary(path.parent)
@@ -715,6 +752,8 @@ def _publish(path, data):
             os.link(temp, path)
         except FileExistsError:
             _require(_read(path) == data, 'IMMUTABLE_ARTIFACT_CONFLICT')
+        except OSError as error:
+            _publication_path_error(path, error, check_invalid_argument=True)
     except OSError as error:
         _publication_path_error(path, error)
     finally:

@@ -6,6 +6,82 @@ date, or when checking that a report attributes only emitted helper fields.
 This adapter complements `news_analysis.py`; it performs no acquisition, source
 authentication, free-text semantic certification or trading operation.
 
+## Guidance labels and withdrawals
+
+For guidance from retained source bytes, run
+`python -B scripts/news_evidence.py guidance request.json source-root result.json`.
+Use the same source/clock/field bindings described below. An issued comparison
+has `previous` and `current` ranges, optionally marked `status: "issued"`.
+It uses the existing range arithmetic without requiring a URL or exact calendar
+boundaries. Bind `period` to its literal source label, such as `FY2031`; never
+expand that label into calendar dates. Output `period_evidence` keeps the label
+separate from `start`/`end`, which default to unknown null values.
+
+If exact fiscal dates are supplied in the original record, an optional
+`period_boundaries` object binds both `start` and `end` using `kind: "source"`
+pointers/spans to ISO dates. Declared dates and one-sided boundaries are rejected.
+Conflicting known boundaries suppress arithmetic; boundaries known for only one
+record remain unmatched. Literal source binding does not prove that a label and
+the selected dates describe the same fiscal convention; review their association.
+
+For a withdrawal, set `current.status: "withdrawn"`. `previous` may be null.
+Bind the metric and withdrawal statement to the original current record; omit
+unknown period/currency/unit/basis, or use `kind: "unknown"`. Do not provide a
+new numeric low/high range: withdrawal is not zero guidance. For a structured
+record with its own `metric` and `guidance_status: "withdrawn"`, the current row
+can use this shape (replace every path/hash/pointer with actual retained evidence):
+
+```json
+{
+  "id": "withdrawal",
+  "status": "withdrawn",
+  "source": {"path": "archive.json", "sha256": "ACTUAL_SHA256",
+             "record_pointer": "/releases/1"},
+  "clocks": {
+    "publication": {"kind": "source", "pointer": "/published_at"},
+    "observation": {"kind": "source", "pointer": "/first_seen_at"}
+  },
+  "fields": {
+    "issuer": {"kind": "source_context", "container_pointer": "",
+               "pointer": "/issuer/id"},
+    "metric": {"kind": "source", "pointer": "/metric"}
+  },
+  "withdrawal": {"kind": "source", "pointer": "/guidance_status"}
+}
+```
+
+For prose, `withdrawal: {"kind": "source_phrase", "pointer": "/body", "span":
+[start, end]}` selects an actual withdrawal clause. Bind `fields.metric` to its
+literal source span as well. The bounded recognizer accepts clauses such as
+“The company withdrew its operating profit guidance,” “We have withdrawn our
+operating profit outlook,” or “Operating profit guidance has been withdrawn.”
+It examines the original full clause, so clipping cannot hide a negation,
+condition, reported attribution or another metric. It intentionally rejects
+complex/unrecognized prose, including unsupported named-subject grammar; retain
+that limitation and review the source rather than rewriting it to fit.
+Structured status must belong to the same object whose `metric` matches the
+selected metric. Neither kind certifies source authenticity or general semantics.
+
+`WITHDRAWAL_PRIOR_RANGE_UNKNOWN` retains an explicit source-bound statement while
+leaving prior range and numerical changes null. `WITHDRAWN` requires a matched
+prior issued range; a different metric or unresolved dimensions cannot supply it.
+Missing/assumed clocks or non-later publication produce `WITHDRAWAL_REVIEW_REQUIRED`
+without a current-withdrawal classification. Future source clocks produce
+`EXCLUDED_AT_CUTOFF`. All unknown dimensions and source context remain visible.
+
+### Archive issuer context
+
+A scoped record cannot reach sibling records. When an archive places issuer
+metadata outside its records, `fields.issuer.kind: "source_context"` may bind
+`/issuer`, `/issuer/id` or `/issuer/name` relative to a specified ancestor
+`container_pointer`. The container must be an object and a strict ancestor of
+`source.record_pointer`. Other dimensions cannot use this escape. Value overrides
+must equal the source. Output retains `ARCHIVE_HEADER_NOT_DOCUMENT_SUBJECT_IDENTITY`:
+an archive header is context, not independently proven subject identity for each
+document. An issued comparison therefore remains `ARITHMETIC_ONLY` when it uses
+this context binding. Declared issuer context remains available when no supported
+header shape exists; do not bypass record isolation to claim a stronger result.
+
 ## Source-bound comparison
 
 Run `python -B scripts/news_evidence.py compare request.json source-root result.json`.

@@ -9,7 +9,7 @@ any final answer is created; a new preparation can correct declared inputs witho
 overwriting the failure. Both final outputs verify after relocation. These checks
 do not certify source truth, investment correctness or complete task coverage.
 
-Version **5.10.6** includes [production research operations](references/research-operations.md)
+Version **5.10.13** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
@@ -70,6 +70,13 @@ Research claim repairs add [objective-bound scenario checks](references/scenario
 [source and corpus claim checks](references/source-claims.md), and
 [source-bound news comparisons](references/news-evidence.md). They retain counterexamples,
 unknown metadata and arithmetic-only outcomes, with exact saved-output attribution.
+[Retained halt review](references/halt-review.md) selects notices within a supplied
+publication cutoff, preserves later updates separately and distinguishes scheduled
+quote/trade resumption from observed activity. Unknown observation and broker state
+remain unknown.
+Retained guidance preserves fiscal labels separately from exact date boundaries.
+Source-bound withdrawals keep missing dimensions and prior ranges unknown, and
+bounded archive issuer context remains distinct from document identity proof.
 These checks do not authenticate sources or certify arbitrary prose.
 [Bound report drafting](references/report-claims.md) now renders typed claims from retained outputs and audits the exact saved draft, exposing edited claims and every unaudited prose span before first-response publication.
 

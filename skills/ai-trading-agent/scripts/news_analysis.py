@@ -150,7 +150,7 @@ def evidence(ref, root, cutoff):
     if not raw or digest(raw) != ref['sha256']:
         raise ValueError('Evidence bytes/hash mismatch')
     if not ref.get('url', '').startswith('https://'):
-        raise ValueError('Evidence URL required')
+        raise ValueError('Evidence URL required; use news_evidence.py guidance for retained sources without supplied URLs, never insert a placeholder')
     if stamp(ref['published_at']) > cutoff or stamp(ref['observed_at']) > cutoff:
         raise ValueError('Evidence not available at cutoff')
     if stamp(ref['observed_at']) < stamp(ref['published_at']):
@@ -167,7 +167,7 @@ def guidance_change(request, source_root):
     keys = ('issuer', 'metric', 'period_start', 'period_end', 'currency', 'unit', 'accounting_basis')
     for item in [i for i in (old, new) if i is not None]:
         if any(not item.get(k) for k in keys):
-            raise ValueError('Explicit guidance dimensions required')
+            raise ValueError('Explicit guidance dimensions required; use news_evidence.py guidance for source labels or unknown withdrawal dimensions, never invent dates or basis')
         if date.fromisoformat(item['period_start']) > date.fromisoformat(item['period_end']):
             raise ValueError('Guidance period end precedes start')
         if item['source'].get('source_kind') not in ('issuer', 'sec'):
@@ -182,6 +182,10 @@ def guidance_change(request, source_root):
               'implementation_sha256': digest(Path(__file__).read_bytes()),
               'classification': None, 'economic_direction': 'REQUIRES_METRIC_AND_CONTEXT_REVIEW',
               'numeric_extraction': 'REVIEWER_SUPPLIED_NOT_AUTOMATICALLY_AUTHENTICATED',
+              'dimension_provenance': 'CALLER_DECLARED_NOT_SOURCE_VERIFIED',
+              'source_dimensions_verified': False,
+              'classification_scope': 'Arithmetic/status on caller-supplied dimensions; excerpt presence does not verify fiscal boundaries, issuer, metric basis or URL.',
+              'source_bound_route': 'news_evidence.py guidance',
               'execution_authorized': False}
     if old and stamp(new['source']['published_at']) <= stamp(old['source']['published_at']):
         raise ValueError('Current disclosure must be later than previous disclosure')

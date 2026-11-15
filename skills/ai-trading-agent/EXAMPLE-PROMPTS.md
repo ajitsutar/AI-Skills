@@ -530,7 +530,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ## News, sentiment and between-quarter guidance
 
-**Audience:** Intermediate to quant. Guides: [news and guidance](references/news-and-guidance.md).
+**Audience:** Intermediate to quant. Guides: [news and guidance](references/news-and-guidance.md), [halt review](references/halt-review.md).
 
 ### 102. Discover relevant news sources
 
@@ -558,7 +558,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 108. Review a trading halt
 
-> Review the latest exchange status for [SYMBOL]. Distinguish halt event time from a feed dateline and quote resumption from trade resumption. Explain current exchange/broker restrictions as external facts, not new skill gates.
+> Review exchange status for [SYMBOL] at [AS-OF TIME] from the complete supplied notice collection. Separate notices published by that cutoff from later updates, and distinguish publication-only reconstruction from observed availability. Keep halt event time, feed dateline, quote resumption and trade resumption separate; schedules do not prove resumed activity. Explain supplied exchange/broker restrictions as external facts, not new skill gates.
 
 ### 109. Test news data quality
 
@@ -1794,7 +1794,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 372. Compare guidance with incomplete source clocks
 
-> Compare [ORIGINAL GUIDANCE SOURCES] at [CUTOFF] using exact source bindings. Preserve publication and observation roles, unknown accounting basis and revisions. Return supported descriptive arithmetic separately when a source-grounded disclosure-change claim cannot be established.
+> Compare [ORIGINAL GUIDANCE SOURCES] at [CUTOFF] using exact source bindings. Preserve fiscal period labels without inventing calendar dates, publication and observation roles, unknown dimensions and revisions. For withdrawn guidance, retain unknown prior ranges rather than substituting zero. Return supported descriptive arithmetic separately when a source-grounded disclosure-change claim cannot be established.
 
 ### 373. Audit reported helper labels
 

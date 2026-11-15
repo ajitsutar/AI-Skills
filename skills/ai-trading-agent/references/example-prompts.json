@@ -546,7 +546,8 @@
       "title": "News, sentiment and between-quarter guidance",
       "audience": "Intermediate to quant",
       "guides": [
-        "references/news-and-guidance.md"
+        "references/news-and-guidance.md",
+        "references/halt-review.md"
       ],
       "prompts": [
         {
@@ -575,7 +576,7 @@
         },
         {
           "title": "Review a trading halt",
-          "prompt": "Review the latest exchange status for [SYMBOL]. Distinguish halt event time from a feed dateline and quote resumption from trade resumption. Explain current exchange/broker restrictions as external facts, not new skill gates."
+          "prompt": "Review exchange status for [SYMBOL] at [AS-OF TIME] from the complete supplied notice collection. Separate notices published by that cutoff from later updates, and distinguish publication-only reconstruction from observed availability. Keep halt event time, feed dateline, quote resumption and trade resumption separate; schedules do not prove resumed activity. Explain supplied exchange/broker restrictions as external facts, not new skill gates."
         },
         {
           "title": "Test news data quality",
@@ -2070,7 +2071,7 @@
         },
         {
           "title": "Compare guidance with incomplete source clocks",
-          "prompt": "Compare [ORIGINAL GUIDANCE SOURCES] at [CUTOFF] using exact source bindings. Preserve publication and observation roles, unknown accounting basis and revisions. Return supported descriptive arithmetic separately when a source-grounded disclosure-change claim cannot be established."
+          "prompt": "Compare [ORIGINAL GUIDANCE SOURCES] at [CUTOFF] using exact source bindings. Preserve fiscal period labels without inventing calendar dates, publication and observation roles, unknown dimensions and revisions. For withdrawn guidance, retain unknown prior ranges rather than substituting zero. Return supported descriptive arithmetic separately when a source-grounded disclosure-change claim cannot be established."
         },
         {
           "title": "Audit reported helper labels",
