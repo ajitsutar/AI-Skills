@@ -131,6 +131,11 @@ no OS/ACL setting is changed; explicitly supported extended Windows paths remain
 usable. Empty owned directories may remain after rejection, but no packet artifact
 is published by a failed path preflight. Later I/O failure, power loss or external
 writers can still require recovery; a successful probe is not a durability promise.
+Packet preparation translates actual directory/path-operation failures only.
+Errors from an opened preflight or publication stream propagate as their original
+exception; an ENOENT or native Windows 206 code from stream I/O is not by itself
+evidence that the output root is too long. This preserves error origin and adds
+no new host-length limit or publication permission.
 
 The immutable directory contains exact request/manifest bytes, complete indexed
 originals under `sealed/`, the two participant directories and `packet.json`.

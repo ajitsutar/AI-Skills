@@ -101,6 +101,12 @@ def review(request, source_root):
                  'firm_count_meaning': 'Distinct firm identities after source filtering/deduplication; statistical independence is unestablished.'}
     if values:
         med = statistics.median(values)
+        if not math.isfinite(med):
+            # Positive finite middle values can overflow only in their sum.
+            ordered = sorted(values)
+            middle = len(ordered) // 2
+            lower, upper = ordered[middle - 1], ordered[middle]
+            med = lower + (upper - lower) / 2
         q1, q3 = percentile(values, .25), percentile(values, .75)
         consensus.update(status='PARTIAL_OBSERVED_COHORT', mean=statistics.mean(values), median=med,
                          minimum=min(values), maximum=max(values), range_width=max(values)-min(values),
@@ -120,6 +126,9 @@ def review(request, source_root):
             consensus['median_implied_price_change_denominator'] = price
             consensus['median_implied_price_change_meaning'] = 'Price change from quote to median forward target; excludes dividends, costs and probability of attainment.'
             consensus['quote_published_at'] = quote['source']['published_at']
+        if any(isinstance(value, (int, float)) and not math.isfinite(value)
+               for value in consensus.values()):
+            raise ValueError('ANALYST_STATISTIC_RANGE_UNSUPPORTED')
     # Provider consensus pools may overlap. Keep them separate; do not average their averages.
     for r in request.get('provider_consensus', []):
         evidence(r['source'], source_root, cutoff)

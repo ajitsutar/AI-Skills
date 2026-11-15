@@ -123,3 +123,7 @@ free prose. `whole_report_semantic_pass` remains false. The wrapper must retain
 unknowns, rejected records and original coverage; do not turn an empty eligible
 cohort into an invented complete consensus. There is no network, broker or
 publication operation.
+
+Provider statistics use the same precision-checked numeric conversion as individual targets. Supported fractional values retain their original field pointers and numeric bindings; JSON spellings such as `107` and `107.0` have equivalent eligibility. Unsupported precision remains an explicit source gap. Provider counts remain positive integers.
+
+Recognized original-request dimensions, age policies and supported collections do not themselves create unsupported-target warnings. Their children are still scanned: genuinely unknown target objects remain unresolved. Recognizing these roles does not establish semantic completeness or source absence.

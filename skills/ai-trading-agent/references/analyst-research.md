@@ -376,3 +376,5 @@ Do not infer individual targets or firm-level upstream lineage from an aggregate
 equate firm population size with analyst/target counts, or average provider means.
 Unknown issue dates and unsupported prose remain unknown. Replay verifies these
 bounded declarations and calculations, not arbitrary prose or publisher truth.
+
+Native derived consensus statistics must be finite. Finite input prices can still produce an unrepresentable dispersion ratio or implied price change; those combinations raise `ANALYST_STATISTIC_RANGE_UNSUPPORTED` instead of returning infinity. The median retains supported large equal targets without avoidable midpoint overflow. This range check does not validate source truth or investment plausibility.

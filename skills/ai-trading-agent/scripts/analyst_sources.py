@@ -300,6 +300,9 @@ def _provider_record(obj, sid, pointer, source, cutoff, root):
     require(any(values.get(k) is not None for k in PROVIDER_COUNTS), 'PROVIDER_COUNT_REQUIRED')
     for key in PROVIDER_STATISTICS:
         if key in values:
+            if isinstance(values[key], Decimal):
+                values[key] = analyst_numbers(values[key])
+                bindings[key]['transform'] = 'DECIMAL'
             number(values[key], True)
     for key in PROVIDER_COUNTS:
         if key in values:
@@ -385,6 +388,10 @@ def _extract(corpus, formats):
                 # documented own-source metadata extension. No inheritance.
                 if 'target' not in obj:
                     for key, value in obj.items():
+                        # Root request roles were validated by _request_filters.
+                        # Their children remain independently grammar-scanned.
+                        if pointer == '' and _original_shape(obj) and key in ORIGINAL_REQUIRED | ORIGINAL_OPTIONAL:
+                            continue
                         if key == 'provider_consensus' and isinstance(value, list):
                             continue
                         if (re.search(r'target|consensus', key, re.I) or

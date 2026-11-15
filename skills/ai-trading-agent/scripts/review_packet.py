@@ -393,9 +393,11 @@ def prepare(request_path, manifest_path, expected_manifest_sha256, source_root, 
         folder.mkdir(exist_ok=True)
         for path in destinations:
             path.parent.mkdir(parents=True, exist_ok=True)
-        research._preflight_publications(destinations)
     except OSError as error:
         research._publication_path_error(folder, error)
+    # The shared preflight classifies its own path operations. Its stream errors
+    # must retain their original identity rather than acquire directory guidance.
+    research._preflight_publications(destinations)
     # An incomplete previous attempt may be resumed, but no existing byte changes.
     for name, raw in files.items():
         path = relative(folder, name)

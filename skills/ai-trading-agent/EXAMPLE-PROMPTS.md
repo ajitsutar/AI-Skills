@@ -591,7 +591,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 115. Calculate forward target consensus
 
-> Review forward [52-WEEK OR 12-MONTH] analyst targets for [COMPANY]. Bind any original analyst request in [PINNED SOURCE CORPUS] to its exact cohort dimensions, cutoff and age policy; reject conflicting manual filters. Deliver mean, median, minimum, maximum, range width and raw IQR with the quartile method and distinct-firm count. Keep source-bound provider aggregates separate with their declared populations, dates, lineage and unknown dimensions. Replay the native report and canonical response.
+> Review forward [52-WEEK OR 12-MONTH] analyst targets for [COMPANY]. Bind any original analyst request in [PINNED SOURCE CORPUS] to its exact cohort dimensions, cutoff and age policy; reject conflicting manual filters. Deliver mean, median, minimum, maximum, range width and raw IQR with the quartile method and distinct-firm count. Keep source-bound provider aggregates separate with their declared populations, dates, lineage and unknown dimensions. Replay the native report and canonical response. Retain supported fractional provider statistics and their declared currency; report unsupported precision or numerical range explicitly.
 
 ### 116. Reconcile different website targets
 
