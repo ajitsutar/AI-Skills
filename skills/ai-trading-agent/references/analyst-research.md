@@ -317,3 +317,62 @@ News, guidance and analyst evidence can expose thesis risks and require further
 review, but they do not silently add weights, rerank the official candidate queue,
 establish calibrated Strong Buy labels. Findings inform recommendations and do
 not authorize, veto or pause the common host handoff.
+
+## Source-first JSON extraction
+
+The `analyst_sources` producer reads canonical target records from the pinned
+source corpus. A record's `published_at`, `observed_at` and `url` may be direct
+fields or fields of that same record's immediate `source` object. Each extracted
+value retains its exact JSON pointer. Identical direct and nested declarations
+use the direct pointer; conflicting declarations, including null versus a value,
+leave the record unresolved. A present non-object `source` is malformed.
+
+This extension does not supply firm, analyst, issuer, issue date, access, currency,
+share basis or target horizon from nested metadata, the cohort request, ancestors
+or adjacent records. Missing or invalid clocks and URLs still prevent cohort use;
+the existing cutoff, chronology, age, access and latest-per-firm checks apply.
+
+The containing original JSON and its manifest hash are the evidence for these
+metadata declarations. Nested `path`, `sha256`, excerpts and URLs are not followed
+or authenticated by this extraction grammar. Inspect separately retained reports
+when assessing those declarations; successful extraction does not verify publisher
+authenticity or whole-corpus completeness. The explicit `analyst_evidence` input
+contract above remains available for reviewing declared report references.
+
+### Delivered dispersion and provider context
+
+The nonempty eligible cohort emits `range_width = maximum - minimum`, `iqr =
+q3 - q1` and `quartile_method = LINEAR_INTERPOLATION_INDEX_(n-1)*p` (sorted
+zero-based index, interpolated at p=0.25 and p=0.75), alongside its endpoints,
+quartiles and IQR/median. A singleton has zero dispersion; an empty cohort stays
+unavailable. These values appear in the generated source report and canonical
+response, with the cohort's currency, share basis and horizon. The range is a
+forward-target distribution, not the historical trading range.
+
+For retained JSON, `analyst_sources` also recognizes provider records with explicit
+`provider`, `as_of`, `issuer`, `currency`, `price_basis`, `target_horizon`, at least
+one of `mean`, `median`, `minimum`, `maximum`, and at least one positive integer
+`target_count` or `analyst_count`. Supported optional fields are `upstream` and
+`firm_population` (unique declared firm names). Only these canonical roles and
+the three own-record source metadata fields above are supported. Unrecognized
+qualifying roles, invalid ranges/counts, conflicts or missing dimensions leave
+that provider record unresolved. Objects can be supplied in a `provider_consensus`
+array; malformed entries remain visible as gaps.
+
+Each value retains its pointer in the original JSON; population members retain
+individual pointers too. Source paths and excerpts inside a declared `source`
+object are not followed. The producer binds the containing retained JSON bytes,
+not a claimed external report. A provider date-only `as_of` stays date-only;
+it is checked against publication and the cutoff without inventing an intraday
+timestamp. Full timestamps must precede publication and the cutoff. Observation
+must follow publication and precede the cutoff. Snapshot dates do not supply
+the individual recommendations' issue dates.
+
+Provider pools are delivered separately as `PROVIDER_REPORTED_NOT_COMBINED`.
+`comparable_dimensions` means equality of declared dimensions, not freshness,
+authenticity, a common population or statistical independence. Mismatching pools
+stay explicitly noncomparable; missing dimensions are not filled from the request.
+Do not infer individual targets or firm-level upstream lineage from an aggregate,
+equate firm population size with analyst/target counts, or average provider means.
+Unknown issue dates and unsupported prose remain unknown. Replay verifies these
+bounded declarations and calculations, not arbitrary prose or publisher truth.

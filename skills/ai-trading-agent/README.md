@@ -9,7 +9,11 @@ any final answer is created; a new preparation can correct declared inputs witho
 overwriting the failure. Both final outputs verify after relocation. These checks
 do not certify source truth, investment correctness or complete task coverage.
 
-Version **5.10.13** includes [production research operations](references/research-operations.md)
+Source-bound analyst requests preserve the original cohort dimensions and age policy, rejecting contradictory manual filters. Record-only corpora retain explicit declared filters. See [request binding](references/analyst-sources.md).
+
+Source-first analyst reports deliver explicit range width, IQR and the quartile method. Canonical provider pools retain same-record source metadata, separate populations and unknown issue dates; their means are never averaged. See [analyst research](references/analyst-research.md#delivered-dispersion-and-provider-context).
+
+Version **5.10.14** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private

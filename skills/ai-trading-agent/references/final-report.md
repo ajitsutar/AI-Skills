@@ -1,5 +1,10 @@
 # Compose and verify the final research artifact
 
+For analyst-source sections, an original request in the pinned corpus supplies the
+cohort dimensions and age policy through the [source-bound request form](analyst-sources.md).
+Manual conflicts are rejected even in the legacy literal form. Replay rederives
+these bindings; it does not establish full original-request coverage.
+
 Use `final_report.py` when the supported source reports, accounting claims or
 terminal objective diagnostics should become the saved answer. It executes and
 replays the existing producers and writes one exact `first-response.md`. It does

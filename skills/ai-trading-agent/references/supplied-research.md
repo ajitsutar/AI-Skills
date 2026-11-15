@@ -1,5 +1,10 @@
 # One-run supplied-source research
 
+For analyst-source sections, an original request in the pinned corpus supplies the
+cohort dimensions and age policy through the [source-bound request form](analyst-sources.md).
+Manual conflicts are rejected even in the legacy literal form. Replay rederives
+these bindings; it does not establish full original-request coverage.
+
 Use this path for supplied-corpus analyst, REIT, issuer or source-claim research when its
 producer contract fits the request. It joins the original corpus, actual producer
 output, readable fixed report and saved-byte audit. It does not acquire sources,

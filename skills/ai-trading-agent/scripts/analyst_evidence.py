@@ -103,7 +103,10 @@ def review(request, source_root):
         med = statistics.median(values)
         q1, q3 = percentile(values, .25), percentile(values, .75)
         consensus.update(status='PARTIAL_OBSERVED_COHORT', mean=statistics.mean(values), median=med,
-                         minimum=min(values), maximum=max(values), q1=q1, q3=q3, iqr_over_median=(q3-q1)/med)
+                         minimum=min(values), maximum=max(values), range_width=max(values)-min(values),
+                         q1=q1, q3=q3, iqr=q3-q1, iqr_over_median=(q3-q1)/med,
+                         quartile_method='LINEAR_INTERPOLATION_INDEX_(n-1)*p',
+                         quartile_probabilities={'q1': 0.25, 'q3': 0.75})
         if request.get('quote'):
             quote = request['quote']
             evidence(quote['source'], source_root, cutoff)
