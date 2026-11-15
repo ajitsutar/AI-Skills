@@ -13,7 +13,9 @@ Source-bound analyst requests preserve the original cohort dimensions and age po
 
 Source-first analyst reports deliver explicit range width, IQR and the quartile method. Canonical provider pools retain same-record source metadata, separate populations and unknown issue dates; their means are never averaged. See [analyst research](references/analyst-research.md#delivered-dispersion-and-provider-context).
 
-Version **5.10.20** includes [production research operations](references/research-operations.md)
+The package is a self-contained skill for supported hosts such as Muse, Claude and Instinct. It requires no local backend or background service. Bundled commands run only when invoked in a host that supports them; host tools, execution and data access remain capability-dependent. A backend is outside this architecture unless explicitly requested.
+
+Version **5.11.1** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
@@ -22,6 +24,8 @@ for event-driven U.S.-stock briefs and separate usefulness/net-return evaluation
 Source-bound plan/evaluate reports export per-observation inclusion decisions,
 exclusion reasons and aggregates from the same retained calculations, keeping
 usefulness and return evidence separate in both readable and structured results.
+
+[Answer review](references/answer-review.md) binds itemized reviewer findings to the actual delivered artifacts and derives coverage and declared error-tolerance results. [Buyer qualification](references/buyer-qualification.md) organizes the purchased scope, comparison costs, data rights, deployment and support evidence. Reviewer judgments and buyer evidence remain explicit; these tools do not establish semantic truth or institutional approval.
 
 [Offline review packets](references/review-packet.md) seal complete criterion dependencies and separate participant inputs from evaluator evidence. [Institutional deployment evidence](references/institutional-acceptance.md) joins actual retained platform, data, rights and control inputs with a prespecified matched workflow-value comparison. Scope identities, time cutoffs, fixed review units and registered cohorts remain explicit. These tools report evidence gaps and negative outcomes without granting execution permission or certifying a firm deployment.
 

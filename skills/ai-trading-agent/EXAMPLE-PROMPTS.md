@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-380 examples across 49 workflows, from first-time investing to quantitative research.
+385 examples across 50 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -68,6 +68,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Source study and withdrawal evidence](#source-study-and-withdrawal-evidence) | Researchers working from supplied offline data | 4 |
 | [Check research claims against retained evidence](#check-research-claims-against-retained-evidence) | Researchers working with supplied source records and declared models | 9 |
 | [Original-source REIT research and final reports](#original-source-reit-research-and-final-reports) | Researchers reviewing supplied REIT disclosures | 3 |
+| [Delivered-answer review and buyer qualification](#delivered-answer-review-and-buyer-qualification) | Research leads, analysts and teams evaluating a deployment | 5 |
 
 ## Keep readable and structured research consistent
 
@@ -1832,6 +1833,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 ### 380. Audit original metadata identity
 
 > Audit explicit scalar metadata mappings against this externally pinned original corpus. Retain declared values alongside unknown or conflicting lineage, without treating matching values as proof of accounting scope.
+
+
+## Delivered-answer review and buyer qualification
+
+**Audience:** Research leads, analysts and teams evaluating a deployment. Guides: [answer review](references/answer-review.md), [buyer qualification](references/buyer-qualification.md), [institutional acceptance](references/institutional-acceptance.md), [INSTALL](INSTALL.md).
+
+### 381. Review the answer the analyst actually receives
+
+> Review [ORIGINAL REQUEST, SOURCES AND EXACT DELIVERED ANSWER FILES] against [ADOPTED REVIEW PROTOCOL]. Retain itemized findings for currency, period, amount meaning, missing versus supplied-but-unreviewed evidence, omissions and prose/structured disagreement. Calculate coverage and the declared material-error tolerance using answer_review. Identify the reviewer type and preserve unsupported judgments; byte checks do not establish semantic truth.
+
+### 382. Qualify a research-assistant purchase
+
+> Use the buyer qualification worksheet for [PROPOSED RESEARCH-ASSISTANT PURCHASE]. Specify the deliverable, price and maintenance terms, buyer workflow and comparison alternatives. Map supplied data, rights, confidentiality, operations and value evidence to existing native assessments. Report missing evidence and accountable owners. Apply alpha and execution requirements only where those capabilities are part of the purchase.
+
+### 383. Compare the total cost of analyst workflows
+
+> Compare [CURRENT WORKFLOW], [PROPOSED SKILL WORKFLOW] and [AGREED ALTERNATIVE] over [HORIZON AND EXPECTED VOLUME] with common inputs and prespecified criteria. Include work, review and correction effort plus onboarding, model, data, compute and support costs. Keep missing costs unknown and avoid double counting. Distinguish measured human productivity from automated-quality proxies and investment returns.
+
+### 384. Prepare evidence for a team deployment
+
+> Using [BUYER HOST, DATA SCOPE AND RETAINED EVIDENCE], prepare a scoped qualification record for confidentiality, approved model/tool routes, data freshness and usage rights, restart and rollback, change monitoring and support. Reuse existing host controls and native skill assessors. Show observed failures and unrun checks, keep paid subscriptions optional, and do not infer permission for live orders or a recurring study.
+
+### 385. Set up the skill on a permitted host
+
+> Assess [HOST AND AVAILABLE RUNTIME] for this self-contained skill. Where the host permits dependency installation, use an isolated environment and the bundled requirements, then record actual preflight, fixture and relevant test results. Distinguish missing packages from operating-system incompatibility, direct pins from complete artifact locks, and executed host evidence from unrun templates. Keep unavailable features explicit and do not create a backend or background service.
 
 ## Keeping this catalog current
 

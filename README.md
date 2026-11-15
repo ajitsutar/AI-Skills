@@ -30,7 +30,7 @@ Source selection and surrounding narrative still require review.
 
 The trading workflows use accessible free sources first; paid subscriptions are
 optional and existing user-provided access can improve freshness or coverage.
-Version **5.10.20** includes official SEC issuer-identity intake, public/supplied
+Version **5.11.1** includes official SEC issuer-identity intake, public/supplied
 price and volume observations, and user-supplied borrow evidence with
 explicit dates, coverage and source qualification. Production research
 operations support retained briefs and automated technical review; users
@@ -52,6 +52,13 @@ Offline reviewer packets bind criterion dependencies and separate participant in
 from evaluator evidence. Scope-bound institutional acceptance composes retained
 host, data, rights, operating controls and prespecified workflow-value evidence;
 it grants no enterprise certification, alpha claim or execution permission.
+
+AI Trading Agent remains a self-contained portable skill for supported hosts,
+with no required local backend or background service. Optional delivered-answer
+review binds declared reviewer findings to retained answer/request/source bytes;
+buyer qualification organizes offering, cost, data-rights and deployment evidence.
+These tools do not certify semantic truth, human productivity or buyer readiness.
+Host capabilities remain explicit; a backend requires an explicit user request.
 Flow reuse recomputes cutoff-specific amendment ambiguity. Typed allocation and
 holdings reports preserve cost, reserve and return units and unknown tax evidence.
 Compact publication names and measured path checks support private Windows output.

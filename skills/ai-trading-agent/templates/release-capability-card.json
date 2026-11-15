@@ -1,6 +1,6 @@
 {
   "schema_version": 1,
-  "release_version": "5.6.1",
+  "release_version": null,
   "package_manifest_sha256": null,
   "scope": "Populate from actual release receipts; template alone proves no qualification",
   "capabilities": [
@@ -59,6 +59,11 @@
     },
     {
       "host": "Claude",
+      "status": "NOT_RUN",
+      "receipt": null
+    },
+    {
+      "host": "Instinct",
       "status": "NOT_RUN",
       "receipt": null
     }

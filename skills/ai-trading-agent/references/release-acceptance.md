@@ -87,7 +87,9 @@ python scripts/release_acceptance.py hosts HOST_CATALOG.json PRIVATE_EVIDENCE_RO
 hashes and input identities. The catalog also requires separately attributed
 review of numerical results, universe, dates/availability, units/denominators,
 source access, assumptions, exclusions, recommendation limits and export. Missing
-hosts remain `NOT_RUN`. These semantic reviews remain reviewer declarations;
+hosts remain `NOT_RUN`. The starter catalog lists Codex, Muse, Claude and
+Instinct as intended hosts, with no captures or passes supplied; use the actual
+host scope adopted for the evaluation. These semantic reviews remain reviewer declarations;
 file hashes cannot authenticate that an external model produced the file.
 Different model outputs are results, not a reason to discard or fabricate runs.
 One shared arithmetic fixture does not establish general model equivalence.
@@ -112,6 +114,9 @@ user data; do not present such an arrangement as a bundled data entitlement.
 The SBOM inventories dependency metadata, not a completed legal/security audit.
 
 Populate `templates/release-capability-card.json` from actual scoped receipts.
+Its release version and manifest hash start null: populate both from the same
+reviewed package (`VERSION` and `PACKAGE-MANIFEST.json`) and matching release
+receipts. Never reuse a historical version as the current package identity.
 Distinguish implemented local calculation, tested runtime, independently reviewed
 research, external data coverage and observed host/broker capability. Numerical
 replay, actual host collection and forward investment outcomes are separate

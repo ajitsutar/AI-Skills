@@ -16,6 +16,46 @@ installation and frozen-fixture replay. These locks do not claim compatibility
 with other operating systems or include transformer model weights. Keep downloaded
 wheels and virtual environments outside the installed skill folder.
 
+## Host-permitted research environment on other systems
+
+Use Python 3.11 or newer available to the selected host. Where that host permits
+local Python and dependency installation, create a fresh, unused environment
+outside the skill; do not install globally or launch a server. For Linux, run
+from this extracted skill folder (the macOS executable layout is the same):
+
+```sh
+python3 -m venv ../trading-env
+../trading-env/bin/python -m pip install -r requirements-tested.txt
+../trading-env/bin/python -m pip check
+../trading-env/bin/python -B scripts/research_preflight.py
+../trading-env/bin/python -B scripts/release_acceptance.py fixtures examples/release-acceptance-fixtures.json ../trading-fixtures-new
+../trading-env/bin/python -B -m unittest discover -s tests -v
+```
+
+On Windows, use `python` to create the environment and substitute
+`..\trading-env\Scripts\python.exe` for its executable. Choose unused environment
+and fixture-output paths. The package remains portable files plus invoked local
+helpers: no backend, daemon, endpoint or always-on service is required. A host
+that cannot run Python or install these packages can still use the instructions
+and supported supplied evidence, but must report unavailable calculations.
+
+`requirements-tested.txt` pins direct research dependencies; it is not a complete
+artifact-hashed transitive lock for every OS/Python combination. Optional PyArrow,
+QuantLib, VADER and model-weight features retain their separate requirements;
+missing components remain explicit limitations. Do not copy Windows-only wheels
+or present a preflight availability result as proof of a clean installation.
+
+The repository validation workflow runs standalone tests on Ubuntu and Windows
+with CPython 3.11 and `requirements-tested.txt`. This describes its configured
+scope; consult the actual matching-commit CI result before claiming a pass. It
+does not establish a Linux CPython3.12 artifact lock/clean-install receipt,
+macOS qualification, or successful feature use on Muse, Claude, Instinct or any
+other model host. Cross-host first responses and feature qualification require
+separate observed evidence under [release acceptance](references/release-acceptance.md).
+Record install failures, actual package versions, preflight gaps and test results
+for the environment used. No dependency installation occurred merely by reading
+this recipe.
+
 ## Codex or another Agent Skills host
 
 Copy this entire `ai-trading-agent` folder into the skills directory used by your host.

@@ -67,6 +67,10 @@ to silence a stale-documentation failure. When a change only fixes documentation
 and adds no capability, retaining already accurate prompts is appropriate, but
 the catalog still must be reviewed and regenerated for the new package.
 
+`DOCS-STATE.json.input_file_count` counts the selected documentation-fingerprint
+inputs enumerated by `release_docs.input_fingerprint()`, not all package-manifest
+files; tests, environment locks and generated state/manifest are outside that selection.
+
 ## Verification scope
 
 Inspect the rendered catalog's links and workflow coverage. Exercise the generator
