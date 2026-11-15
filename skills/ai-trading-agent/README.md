@@ -1,5 +1,11 @@
 # AI Trading Agent
 
+[Source-bound insider and institution disclosure delivery](references/insider-disclosures.md) keeps currency and identity local to each original row. Native mechanisms, dates, conditional listed-row arithmetic and explicit institutional amendment chains remain separate from actual cash, current holdings and motive claims in the complete replayed answer.
+
+[Source-bound analyst revision delivery](references/analyst-revisions.md) compares rating, target, EPS and revenue on their own dimensions, retains earlier-coverage conflicts and raw/structured gaps, and regenerates the complete answer from pinned original records. Conditional differences never become verified genuine revisions.
+
+[Exact-source coverage delivery](references/source-coverage.md) generates the whole information map and structured answer from unchanged original source text. It binds literal requested topics and the complete corpus, keeps missing evidence unresolved and replays the exact delivered pair without numeric paraphrase. Relevance, access and lineage remain declared judgments.
+
 [Source-bound issuer facts](references/issuer-evidence.md) and the
 [canonical response export](references/final-report.md) derive readable and
 structured results from the same retained calculations. The generated-only
@@ -15,7 +21,7 @@ Source-first analyst reports deliver explicit range width, IQR and the quartile 
 
 The package is a self-contained skill for supported hosts such as Muse, Claude and Instinct. It requires no local backend or background service. Bundled commands run only when invoked in a host that supports them; host tools, execution and data access remain capability-dependent. A backend is outside this architecture unless explicitly requested.
 
-Version **5.11.1** includes [production research operations](references/research-operations.md)
+Version **5.11.6** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
@@ -25,7 +31,7 @@ Source-bound plan/evaluate reports export per-observation inclusion decisions,
 exclusion reasons and aggregates from the same retained calculations, keeping
 usefulness and return evidence separate in both readable and structured results.
 
-[Answer review](references/answer-review.md) binds itemized reviewer findings to the actual delivered artifacts and derives coverage and declared error-tolerance results. [Buyer qualification](references/buyer-qualification.md) organizes the purchased scope, comparison costs, data rights, deployment and support evidence. Reviewer judgments and buyer evidence remain explicit; these tools do not establish semantic truth or institutional approval.
+[Answer review](references/answer-review.md) binds itemized reviewer findings to the actual delivered artifacts and derives coverage and declared error-tolerance results. Complete authored Markdown/JSON pairs can be reviewed against exact original text and source inputs without inventing a native producer contract; this mode binds bytes and reviewer declarations, not numerical replay or semantic consistency. [Buyer qualification](references/buyer-qualification.md) organizes the purchased scope, comparison costs, data rights, deployment and support evidence. Reviewer judgments and buyer evidence remain explicit; these tools do not establish semantic truth or institutional approval.
 
 [Offline review packets](references/review-packet.md) seal complete criterion dependencies and separate participant inputs from evaluator evidence. [Institutional deployment evidence](references/institutional-acceptance.md) joins actual retained platform, data, rights and control inputs with a prespecified matched workflow-value comparison. Scope identities, time cutoffs, fixed review units and registered cohorts remain explicit. These tools report evidence gaps and negative outcomes without granting execution permission or certifying a firm deployment.
 
@@ -541,3 +547,5 @@ exercise. The [derivatives toolkit](references/derivatives-toolkit.md) separatel
 supports bounded vanilla American CRR valuation with explicit grid, rate/dividend
 conventions and source metadata. Missing inputs stay unresolved; do not substitute
 a European price or import example assumptions.
+
+Target-only chronological coverage is included in [native analyst revision delivery](references/analyst-revisions.md): every original target-list record receives a source-bound disposition, including changed or unknown literal horizons and same-time conflicts. No horizon equivalence or independent revision count is inferred.

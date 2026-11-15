@@ -43,9 +43,9 @@ changed hashes are refused. Keep original files unchanged. No data is acquired.
 Every listed file and the delivery receipt is hash-bound. The native verifier
 checks the retained artifact inventory and regenerates both outputs. An unchanged
 numerical annex does not verify surrounding prose: select the **whole** mixed
-`request_coverage` delivery when that is what the user receives. Other answer
-formats remain unsupported here; retain and review them separately without
-claiming this result covers them. Do not create an irrelevant annex just to use
+`request_coverage` delivery when that is what the user receives. For a complete authored Markdown/JSON pair outside those producer contracts, use
+`authored_pair` below. Other answer formats remain unsupported; retain and review
+them separately without claiming this result covers them. Do not create an irrelevant annex just to use
 this helper.
 
 `reviewer` is `{id, kind}`; kind is `human_reported`, `automated`, or `unknown`.
@@ -141,3 +141,42 @@ using these counts as separately declared value evidence, retain this assessment
 and its input pins, bind the same unit roster and actual output, and explain the
 mapping. Unsupported, omitted or unreviewed units are not satisfied checks or
 favorable zero-error results; do not map incomparable semantics automatically.
+
+## Complete authored pairs outside native producer contracts
+
+Use `kind: authored_pair` when the original request is free text, or the full
+answer is not covered by a supported native delivery. Do not invent a category
+inventory, wrap an original request in new JSON, or supply a numerical annex as
+though it were the complete answer. The review's `delivery` then has exactly:
+
+```json
+{
+  "kind": "authored_pair",
+  "first_response": {"path": "answer/first-response.md", "sha256": "ACTUAL_SHA256"},
+  "response": {"path": "answer/response.json", "sha256": "ACTUAL_SHA256"},
+  "original_inputs": [{"path": "originals/request.txt", "sha256": "ACTUAL_SHA256"}],
+  "captured_at": "2032-01-01T10:00:00Z"
+}
+```
+
+The abbreviated `original_inputs` list must contain exactly the protocol's
+original request and every source, deduplicated by path with unchanged hashes.
+It cannot omit sources, substitute an answer for a source, or add unregistered
+inputs. Both answer files must be distinct, nonempty UTF-8 artifacts; `response`
+is a JSON object. Existing path, size, source-span and answer-span checks apply.
+Retain the complete first answer before review; record any proposed correction
+separately so the original outcome stays visible. Freeze review units and input
+pins before observing that answer. A coordinating workflow must independently
+bind these exact two paths/hashes to the actual delivered files; a filename or
+review declaration alone cannot prove that an annex was not substituted.
+
+This mode does **not** replay calculations, regenerate either answer, check
+Markdown/JSON semantic consistency or establish source truth. Results expose
+`generated_delivery_verifier_executed: false` and
+`authored_pair_semantic_consistency_verified: false`. Source relevance, claims,
+absence judgments, request completeness and every `SATISFIED` declaration still
+need a real reviewer; an incorrect self-review can remain incorrect. Existing
+review statuses, declared error counts and advisory escalation rules are
+unchanged. Do not treat a valid review record as a correct answer or case pass.
+
+For exact-source information maps, first generate and replay the complete pair with [source coverage](source-coverage.md). A coordinating workflow can require its external scope/corpus pins and compare both actual answer files before using `authored_pair` to record declared review. This separate generation check does not change `authored_pair` into a semantic or numerical verifier.

@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-385 examples across 50 workflows, from first-time investing to quantitative research.
+390 examples across 53 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -69,6 +69,9 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Check research claims against retained evidence](#check-research-claims-against-retained-evidence) | Researchers working with supplied source records and declared models | 9 |
 | [Original-source REIT research and final reports](#original-source-reit-research-and-final-reports) | Researchers reviewing supplied REIT disclosures | 3 |
 | [Delivered-answer review and buyer qualification](#delivered-answer-review-and-buyer-qualification) | Research leads, analysts and teams evaluating a deployment | 5 |
+| [Exact-source information coverage](#exact-source-information-coverage) | Researchers mapping supplied evidence to original requested topics | 1 |
+| [Metric-specific analyst revision delivery](#metric-specific-analyst-revision-delivery) | Researchers comparing original analyst events and target histories | 2 |
+| [Source-bound insider and institution disclosure delivery](#source-bound-insider-and-institution-disclosure-delivery) | Researchers reviewing supplied transaction rows and institutional snapshots | 2 |
 
 ## Keep readable and structured research consistent
 
@@ -1858,6 +1861,41 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 ### 385. Set up the skill on a permitted host
 
 > Assess [HOST AND AVAILABLE RUNTIME] for this self-contained skill. Where the host permits dependency installation, use an isolated environment and the bundled requirements, then record actual preflight, fixture and relevant test results. Distinguish missing packages from operating-system incompatibility, direct pins from complete artifact locks, and executed host evidence from unrun templates. Keep unavailable features explicit and do not create a backend or background service.
+
+
+## Exact-source information coverage
+
+**Audience:** Researchers mapping supplied evidence to original requested topics. Guides: [source coverage](references/source-coverage.md).
+
+### 386. Deliver a source-bound coverage map
+
+> Map the requested topics using the complete supplied corpus. Bind literal original-request topic spans and every original source, retain whole source quotations and explicit access/lineage gaps, and deliver the replayed complete Markdown and JSON files without an unbound factual summary. Keep missing evidence unresolved and prospective discovery unexecuted.
+
+
+## Metric-specific analyst revision delivery
+
+**Audience:** Researchers comparing original analyst events and target histories. Guides: [analyst revisions](references/analyst-revisions.md), [source coverage](references/source-coverage.md).
+
+### 387. Compare source-bound analyst revisions
+
+> Review the complete supplied analyst history using the native analyst-revision coverage profile. Compare target, EPS and revenue on their own dimensions, retain initiation claims that conflict with earlier firm coverage, distinguish raw corroboration from structured-only fields, and deliver the replayed whole Markdown/JSON pair with unresolved gaps intact.
+
+### 388. Review targets without revision events
+
+> Review every dated target record, including targets with no revision event. Preserve issuer and analyst scope, literal currency, basis and horizon labels; explicitly disposition incompatible or missing horizons and conflicting same-time observations. Deliver the complete source-bound Markdown/JSON pair without inferring duration equivalence or independent revision counts.
+
+
+## Source-bound insider and institution disclosure delivery
+
+**Audience:** Researchers reviewing supplied transaction rows and institutional snapshots. Guides: [insider disclosures](references/insider-disclosures.md), [source coverage](references/source-coverage.md).
+
+### 389. Preserve insider row units and mechanisms
+
+> Review every supplied insider transaction with its original code, footnote, transaction and filing date, row-local currency and identity limits. Separate awards, exercises and withholding from discretionary purchases or sales. Keep optional arithmetic conditional on listed rows and unknown units, and deliver the replayed complete Markdown/JSON pair.
+
+### 390. Compare reported snapshots and amendments
+
+> Read every supplied institutional reporting period and filing. Resolve only explicit unambiguous same-scope amendment chains, retain superseded originals and availability dates, calculate scoped snapshot differences, and explain entity, security and current-position limits in the complete replayed answer. Keep unrelated insider currencies and identities unresolved.
 
 ## Keeping this catalog current
 

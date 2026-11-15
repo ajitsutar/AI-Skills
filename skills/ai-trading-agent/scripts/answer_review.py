@@ -1,7 +1,9 @@
 """Bind declared answer reviews to retained deliveries; never grade arbitrary prose.
 
 Read-only local assessment. Existing delivery verifiers own numerical replay and
-Markdown/JSON consistency. Reviewer judgments and capture clocks remain declared.
+Markdown/JSON consistency for generated deliveries. Authored pairs receive only
+exact-byte/input bindings; no replay or semantic consistency is inferred.
+Reviewer judgments and capture clocks remain declared.
 """
 from __future__ import annotations
 
@@ -110,7 +112,34 @@ def protocol(raw, reader):
     return value, sources
 
 
+def authored_pair(value, reader):
+    """Review actual authored artifacts without inventing a producer contract."""
+    exact(value, ('kind', 'first_response', 'response', 'original_inputs', 'captured_at'), 'authored_pair')
+    evidence.clock(value['captured_at'])
+    inputs = value['original_inputs']
+    require(type(inputs) is list and 0 < len(inputs) <= MAX_SOURCES + 1, 'BOUNDED_ORIGINAL_INPUTS')
+    input_hashes = {}
+    for ref in inputs:
+        raw = reader.read(ref)
+        require(ref['path'] not in input_hashes, 'DUPLICATE_ORIGINAL_INPUT')
+        input_hashes[ref['path']] = sha(raw)
+    first = reader.read(value['first_response'])
+    response = reader.read(value['response'])
+    require(value['first_response']['path'] != value['response']['path'], 'DISTINCT_ANSWER_ARTIFACTS_REQUIRED')
+    require(not {value['first_response']['path'], value['response']['path']} & set(input_hashes),
+            'ANSWER_CANNOT_REPLACE_ORIGINAL_INPUT')
+    try:
+        require(bool(first.decode('utf8').strip()), 'NONEMPTY_AUTHORED_MARKDOWN')
+        result = evidence._json(response)
+    except UnicodeError as error:
+        raise ValueError('AUTHORED_PAIR_UTF8_REQUIRED') from error
+    require(type(result) is dict and bool(result), 'AUTHORED_RESPONSE_OBJECT_REQUIRED')
+    return {'first_response': first, 'response': response}, input_hashes
+
+
 def delivery(value, reader):
+    if type(value) is dict and value.get('kind') == 'authored_pair':
+        return authored_pair(value, reader)
     exact(value, ('kind', 'directory', 'receipt_sha256', 'first_response_sha256',
                   'response_sha256', 'captured_at'), 'delivery')
     require(value['kind'] in ('canonical_response', 'request_coverage'), 'SUPPORTED_DELIVERY_KIND')
@@ -153,6 +182,9 @@ def assess(document, evidence_root, expected_protocol_sha256):
     answer, input_hashes = delivery(document['delivery'], reader)
     pinned_inputs = [plan['original_request']] + [s['artifact'] for s in plan['sources']]
     require(all(ref['sha256'] in input_hashes.values() for ref in pinned_inputs), 'REVIEW_SOURCE_NOT_IN_DELIVERED_CORPUS')
+    if document['delivery']['kind'] == 'authored_pair':
+        expected_inputs = {ref['path']: ref['sha256'] for ref in pinned_inputs}
+        require(input_hashes == expected_inputs, 'AUTHORED_PAIR_EXACT_PROTOCOL_INPUTS_REQUIRED')
     require(type(document['reviews']) is list and len(document['reviews']) <= MAX_UNITS, 'BOUNDED_REVIEWS')
     units = {u['id']: u for u in plan['units']}
     reviewed = {}
@@ -214,12 +246,15 @@ def assess(document, evidence_root, expected_protocol_sha256):
         'supplied_unreviewed_source_ids': sorted(supplied_unreviewed),
         'max_material_error_units': plan['max_material_error_units'], 'declared_review_complete': complete,
         'declared_material_error_tolerance_met': tolerance_met, 'escalation_required_by_review_policy': escalation,
+        'delivery_binding_kind': document['delivery']['kind'],
+        'generated_delivery_verifier_executed': document['delivery']['kind'] != 'authored_pair',
+        'authored_pair_semantic_consistency_verified': False,
         'semantic_judgments_are_reviewer_declarations': True, 'whole_answer_correctness_verified': False,
         'request_semantic_completeness_verified': False, 'source_authenticity_verified': False,
         'source_absence_established': False, 'human_activity_authenticated': False,
         'capture_clocks_authenticated': False, 'execution_authorized': False,
         'input_sha256': evidence.digest(document), 'checked_artifacts': dict(reader.files),
-        'limits': ['Existing delivery verification checks replay and bytes; no arbitrary prose grading or source truth certification.',
+        'limits': ['Generated deliveries retain their existing verifier; authored pairs bind exact files and declared input inventory only, with no numerical replay or semantic consistency check.',
             'Units, relevance, materiality and semantic judgments are adopted/reviewer declarations; omitted requirements can remain outside that roster.',
             'Missing units and supplied-but-unreviewed sources are incomplete review, never a zero-error pass or source absence.',
             'Unsupported/omitted answers require advisory escalation even when the material-error count is within its declared limit.',
