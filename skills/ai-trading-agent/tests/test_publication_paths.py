@@ -345,6 +345,174 @@ class PublicationPathTests(unittest.TestCase):
         self.assertEqual(research._recover(journal, 'first'), first)
 
 
+class PublicationErrorOriginTests(unittest.TestCase):
+    setUp = PublicationPathTests.setUp
+
+    @staticmethod
+    def faults():
+        for code, native in ((errno.ENOENT, None), (errno.ENAMETOOLONG, None),
+                             (errno.EINVAL, 3), (errno.EINVAL, 206),
+                             (errno.EINVAL, 123), (errno.EINVAL, None),
+                             (errno.EIO, None), (errno.EACCES, None)):
+            error = (FileNotFoundError(code, 'synthetic stream or path fault') if code == errno.ENOENT
+                     else OSError(code, 'synthetic stream or path fault'))
+            if native is not None: error.winerror = native
+            yield error
+
+    def assert_path_classification(self, operation, error):
+        mapped = (isinstance(error, FileNotFoundError) or error.errno == errno.ENAMETOOLONG
+                  or getattr(error, 'winerror', None) in (3, 206))
+        with self.assertRaises(ValueError if mapped else OSError) as raised:
+            operation()
+        if mapped:
+            self.assertIn('OUTPUT_PUBLICATION_PATH_UNAVAILABLE', str(raised.exception))
+            self.assertIs(raised.exception.__cause__, error)
+        else:
+            self.assertIs(raised.exception, error)
+
+    def exercise_stream_fault(self, operation, error, preflight=False):
+        original_open = research._open_temporary
+        original_fsync = research.os.fsync
+        opened = []
+        class FaultStream:
+            def __init__(self, stream): self.stream = stream
+            def __enter__(self): self.stream.__enter__(); return self
+            def __exit__(self, *args):
+                self.stream.__exit__(*args)
+                if operation == 'close': raise error
+            def close(self):
+                self.stream.close()
+                if operation == 'close': raise error
+            def write(self, data):
+                if operation == 'write': raise error
+                return self.stream.write(data)
+            def flush(self):
+                if operation == 'flush': raise error
+                return self.stream.flush()
+            def fileno(self): return self.stream.fileno()
+        def faulty_open(parent, minimum_length=23):
+            path, stream = original_open(parent, minimum_length)
+            opened.append(stream)
+            return path, FaultStream(stream)
+        def fsync(descriptor):
+            if operation == 'fsync': raise error
+            return original_fsync(descriptor)
+        destination = self.root / 'absent.bin'
+        foreign = self.root / 'other-owner.bin'
+        if not foreign.exists(): foreign.write_bytes(b'unchanged foreign bytes')
+        with patch.object(research, '_open_temporary', faulty_open), \
+                patch.object(research.os, 'fsync', fsync), \
+                patch.object(research, '_windows_invalid_path', return_value=True) as path_probe:
+            with self.assertRaises(OSError) as raised:
+                if preflight: research._preflight_publications([destination])
+                else: research._publish(destination, b'new bytes')
+            self.assertIs(raised.exception, error)
+            self.assertIsNone(raised.exception.__cause__)
+            path_probe.assert_not_called()
+        self.assertTrue(opened, 'Use a successful real native temporary open before injecting a stream fault')
+        self.assertTrue(all(stream.closed for stream in opened))
+        self.assertEqual(foreign.read_bytes(), b'unchanged foreign bytes')
+        self.assertEqual(list(self.root.iterdir()), [foreign])
+
+    def test_publish_stream_errors_preserve_exact_objects_after_actual_temporary_open(self):
+        for operation in ('write', 'flush', 'fsync', 'close'):
+            for error in self.faults():
+                with self.subTest(operation=operation, errno=error.errno, winerror=getattr(error, 'winerror', None)):
+                    self.exercise_stream_fault(operation, error)
+
+    def test_preflight_close_errors_preserve_exact_objects_after_actual_temporary_open(self):
+        for error in self.faults():
+            with self.subTest(errno=error.errno, winerror=getattr(error, 'winerror', None)):
+                self.exercise_stream_fault('close', error, preflight=True)
+
+    def test_existing_and_racing_read_errors_keep_previous_path_classification(self):
+        destination = self.root / 'retained.bin'
+        for racing in (False, True):
+            for error in self.faults():
+                if destination.exists(): destination.unlink()
+                if not racing: destination.write_bytes(b'other owner')
+                def other_writer(source, target):
+                    Path(target).write_bytes(b'other owner')
+                    raise FileExistsError()
+                with self.subTest(racing=racing, errno=error.errno, winerror=getattr(error, 'winerror', None)), \
+                        patch.object(research, '_read', side_effect=error), \
+                        patch.object(research.os, 'link', other_writer):
+                    self.assert_path_classification(lambda: research._publish(destination, b'new'), error)
+                self.assertEqual(destination.read_bytes(), b'other owner')
+                self.assertEqual(list(self.root.iterdir()), [destination])
+
+    def test_cleanup_errors_keep_previous_path_classification(self):
+        original_unlink = Path.unlink
+        destination = self.root / 'absent.bin'
+        for preflight in (False, True):
+            for error in self.faults():
+                if destination.exists(): destination.unlink()
+                def cleanup_then_fail(path, *args, **kwargs):
+                    original_unlink(path, *args, **kwargs)
+                    raise error
+                with self.subTest(preflight=preflight, errno=error.errno, winerror=getattr(error, 'winerror', None)), \
+                        patch.object(Path, 'unlink', cleanup_then_fail):
+                    operation = (lambda: research._preflight_publications([destination])) if preflight else \
+                                (lambda: research._publish(destination, b'published before cleanup'))
+                    if preflight:
+                        self.assert_path_classification(operation, error)
+                    else:
+                        # Publication cleanup is outside its historical handler.
+                        with self.assertRaises(OSError) as raised: operation()
+                        self.assertIs(raised.exception, error)
+                self.assertEqual(list(self.root.iterdir()), [] if preflight else [destination])
+                if not preflight: self.assertEqual(destination.read_bytes(), b'published before cleanup')
+
+    def test_cleanup_failure_keeps_previous_precedence_over_stream_failure(self):
+        original_open, original_unlink = research._open_temporary, Path.unlink
+        for preflight in (False, True):
+            stream_error = OSError(errno.EIO, 'synthetic stream failure')
+            cleanup_error = FileNotFoundError(errno.ENOENT, 'synthetic cleanup failure')
+            class FaultStream:
+                def __init__(self, stream): self.stream = stream
+                def __enter__(self): return self
+                def __exit__(self, *args): self.stream.close()
+                def close(self): self.stream.close(); raise stream_error
+                def write(self, data): raise stream_error
+            def faulty_open(parent, minimum_length=23):
+                path, stream = original_open(parent, minimum_length)
+                return path, FaultStream(stream)
+            def cleanup_then_fail(path, *args, **kwargs):
+                original_unlink(path, *args, **kwargs)
+                raise cleanup_error
+            with self.subTest(preflight=preflight), patch.object(research, '_open_temporary', faulty_open), \
+                    patch.object(Path, 'unlink', cleanup_then_fail):
+                operation = (lambda: research._preflight_publications([self.root / 'absent.bin'])) if preflight else \
+                            (lambda: research._publish(self.root / 'absent.bin', b'new'))
+                if preflight:
+                    self.assert_path_classification(operation, cleanup_error)
+                else:
+                    with self.assertRaises(OSError) as raised: operation()
+                    self.assertIs(raised.exception, cleanup_error)
+                self.assertIs(cleanup_error.__context__, stream_error)
+            self.assertEqual(list(self.root.iterdir()), [])
+
+    def test_path_operations_keep_known_missing_long_and_native_path_diagnostics(self):
+        destination = self.root / 'absent.bin'
+        for operation in ('metadata', 'open', 'link'):
+            for error in self.faults():
+                # EINVAL/native123 is path-authoritative only at pathname calls.
+                mapped = (isinstance(error, FileNotFoundError) or error.errno == errno.ENAMETOOLONG
+                          or getattr(error, 'winerror', None) in (3, 123, 206))
+                if operation == 'metadata': context = patch.object(Path, 'exists', side_effect=error)
+                elif operation == 'open': context = patch.object(Path, 'open', side_effect=error)
+                else: context = patch.object(research.os, 'link', side_effect=error)
+                with self.subTest(operation=operation, errno=error.errno, winerror=getattr(error, 'winerror', None)), context, \
+                        patch.object(research, '_windows_invalid_path', return_value=False):
+                    with self.assertRaises(ValueError if mapped else OSError) as raised:
+                        research._publish(destination, b'new')
+                    if mapped:
+                        self.assertIn('OUTPUT_PUBLICATION_PATH_UNAVAILABLE', str(raised.exception))
+                        self.assertIs(raised.exception.__cause__, error)
+                    else: self.assertIs(raised.exception, error)
+                self.assertEqual(list(self.root.iterdir()), [])
+
+
 class PacketPathTests(unittest.TestCase):
     setUp = packet_tests.ReviewPacketTests.setUp
     add = packet_tests.ReviewPacketTests.add

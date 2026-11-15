@@ -363,6 +363,14 @@ are never overwritten or deleted as an attempted repair. Empty owned directories
 may remain after a rejected path probe; later I/O failures still use the existing
 retained transaction/recovery contract.
 
+Path guidance is limited to pathname operations. After a temporary file opens,
+stream write, flush, synchronization and close failures retain their original
+exception objects when cleanup succeeds; their error numbers alone do not
+establish an unsupported output path. Existing-file and racing-file reads retain
+their previous path-error classification. Cleanup retains its existing behavior:
+preflight unlink errors receive path classification, publication unlink errors
+propagate unchanged, and a cleanup failure can supersede a pending stream error.
+
 ## Canonical event briefs
 
 The `institutional_report` source-report producer also accepts operation `brief`,

@@ -709,28 +709,28 @@ def _preflight_publications(paths):
     for supplied in paths:
         path = Path(supplied)
         try:
-            try:
-                exists = path.exists()
-            except OSError as error:
-                _publication_path_error(path, error, check_invalid_argument=True)
-            if exists:
-                continue  # Existing immutable/idempotent reads need no write test.
-            length = (len(path.name.encode('utf-16-le')) // 2 if os.name == 'nt'
-                      else len(os.fsencode(path.name)))
-            length = max(23, length)
-            key = (path.parent, length)
-            if key in checked:
-                continue
-            temporary = None
-            try:
-                temporary, stream = _open_temporary(path.parent, length)
-                stream.close()
-            finally:
-                if temporary is not None:
-                    temporary.unlink(missing_ok=True)
-            checked.add(key)
+            exists = path.exists()
         except OSError as error:
-            _publication_path_error(path, error)
+            _publication_path_error(path, error, check_invalid_argument=True)
+        if exists:
+            continue  # Existing immutable/idempotent reads need no write test.
+        length = (len(path.name.encode('utf-16-le')) // 2 if os.name == 'nt'
+                  else len(os.fsencode(path.name)))
+        length = max(23, length)
+        key = (path.parent, length)
+        if key in checked:
+            continue
+        temporary = None
+        try:
+            temporary, stream = _open_temporary(path.parent, length)
+            stream.close()  # Stream errors are not evidence of an invalid path.
+        finally:
+            if temporary is not None:
+                try:
+                    temporary.unlink(missing_ok=True)
+                except OSError as error:
+                    _publication_path_error(path, error)
+        checked.add(key)
 
 
 def _publish(path, data):
@@ -743,7 +743,10 @@ def _publish(path, data):
         except OSError as error:
             _publication_path_error(path, error, check_invalid_argument=True)
         if exists:
-            _require(_read(path) == data, 'IMMUTABLE_ARTIFACT_CONFLICT')
+            try:
+                _require(_read(path) == data, 'IMMUTABLE_ARTIFACT_CONFLICT')
+            except OSError as error:
+                _publication_path_error(path, error)
             return
         temp, stream = _open_temporary(path.parent)
         with stream:
@@ -751,11 +754,12 @@ def _publish(path, data):
         try:
             os.link(temp, path)
         except FileExistsError:
-            _require(_read(path) == data, 'IMMUTABLE_ARTIFACT_CONFLICT')
+            try:
+                _require(_read(path) == data, 'IMMUTABLE_ARTIFACT_CONFLICT')
+            except OSError as error:
+                _publication_path_error(path, error)
         except OSError as error:
             _publication_path_error(path, error, check_invalid_argument=True)
-    except OSError as error:
-        _publication_path_error(path, error)
     finally:
         if temp is not None:
             temp.unlink(missing_ok=True)
