@@ -2,14 +2,14 @@
   "distribution": "Self-contained Option A; local candidate, no backend.",
   "hash_algorithm": "SHA-256",
   "package": "ai-trading-agent",
-  "version": "5.10.19",
+  "version": "5.10.20",
   "files": {
     ".gitignore": "d27e6417794e1ef293b0442d173c44e16dc62b7a9cbf37d51c611994f616c781",
     "agents/openai.yaml": "b07407e07a049fca9413461896ff93b00f20fcdb8449a2d2223e9147368c90c7",
     "agents/plugin/robinhood-trading-agent.md": "3c41de1f544330065e08bd89f89e2dd6d73ae5bf49ed6914d22e0509993f42a0",
     "agents/robinhood-trading-agent.md": "b1c0aaea597941fd642d1f79d61aab18730e4ea853354735b8bbae07613e5cda",
     "ARCH-LICENSE.txt": "c6e622bd89db4e13315f4e91605ff96fcbb9012d78ee74e429855870b203eed6",
-    "DOCS-STATE.json": "a31cf4cfe39137d2843926b276f62c0aeb188ad839f5e707db155ad8a06e7630",
+    "DOCS-STATE.json": "2bfd3789b10f143ec71bdb9c7415fc8a979494c4a9e432505754e1b3a0f2c260",
     "environments/windows-cp312-core/dependency-inventory.json": "ac1e887774639ac231a040b0d24ac0573b6796245e00866973248428ef775a54",
     "environments/windows-cp312-core/requirements.lock.txt": "e658908f98042f6789ef032072c947c81fdece614439717a55920ce429f33ea0",
     "environments/windows-cp312-core/sbom.cdx.json": "ce18400d1ef1f5dbb4f9a58b3426d67cf76d9a38b86bd0cf54b66a0f6854830a",
@@ -121,7 +121,7 @@
     "profiles/report-facts-v2.json": "1a7cebc2705f505011db927420f01dfd2fb2742904909b391bb9c74cedf46b1b",
     "profiles/vqm-fundamental-v1.json": "9078c2bebfb43ab4b84c6e9c70c22753571afc06d08554b8c1d09fcf80c2c295",
     "PROVENANCE.md": "e9238331280d80c5688da44331659828f66b4978820733b21d801cbe236d8211",
-    "README.md": "6894a9d625e0763a78ebc9b97155281bfef47ad65c8d92c9174aae20c2c0c5dc",
+    "README.md": "f0035d507252291046d85e0f35ea7df8e0b4e12390107b219890c89de67e0dec",
     "references/alignment-calculations.md": "aa92d72b124fa15a4f72ff44b2152fb60fe0e1d0495739d5d2b62a782b20bfd5",
     "references/allocation-policy.md": "363057119b5ad4bb365f57e760079393b0f52d8569684604232f797008f5f16a",
     "references/analysis-contracts.md": "15ed2e764ebe0ff9eaecbbd111eb2b7a327f6d675804dfbe2b1a5d2c5f5e04e6",
@@ -377,7 +377,7 @@
     "scripts/user_directed_execution.py": "c31d2cd8a8380fee3ae85c046e8f2cffd284a37f3b845c6f299ce8ab86293781",
     "scripts/vintage_eligibility.py": "33ae75e9e63c84d6ec468d3838320070cc5b805760447e99bc5c9dfa9a1e22cd",
     "scripts/vqm_research.py": "8f61ac4244eb9e6ad2d48aa0ccd402ef2352d45e5fd068eafd8b596506eaef45",
-    "SKILL.md": "004ce020950d2b279b1c64c8d9da160a9250c31e846a1dc678888ac30c31cfee",
+    "SKILL.md": "76a5eabd6bbad732a1ed105857aa2dc510506f7363f88a6a58953fdda190abbb",
     "SOURCES.md": "6d3e74e5563e7be6eb7a376897e8fffedc70bccb0aa4c0fcb27e0cc543fa9c33",
     "subskills/portfolio-following/SKILL.md": "d468a36e0fb71ebf655b841fc88784bcc252956a0778f04977f0c5b442d326c1",
     "templates/autonomous-mandate.md": "fd20a7d8250a50cf752b22936105df22825865ed845c9791a7576a774f2b8d47",
@@ -551,7 +551,7 @@
     "tests/test_research_workflow.py": "330be02efbbb6633c527674bd2cc2e34f3ca7c3dc60f7b19159f18152d8edf01",
     "tests/test_research_workflow_decimal.py": "d8c5a0748ba0d2cf98b49ff648270cfbcc6fa9728d6971f43c315e23ed2282c4",
     "tests/test_review_packet.py": "84ae98cb2bad56e85298b8e3119748c9b927fe7d687b80910971b6ba7005a84d",
-    "tests/test_review_packet_publication_errors.py": "4946650ba13727840ea8effbb04a3f2710dfafd99e97d7c61e6bd6ff14d9133d",
+    "tests/test_review_packet_publication_errors.py": "81d3cba5b1142ede1781ff949cbe10544dfeea6af7419ef2cd4180417032543b",
     "tests/test_risk_and_execution.py": "c2027caef87cf79dbffeafe14eab97cd63abe3f754ba7cdd966760501fd21eca",
     "tests/test_scenario_claims.py": "e491f2ff71420357978c3247b8558f023a03db7177b31f9ae166983b2c85b4ab",
     "tests/test_screen_and_price_audit.py": "2dccd47ff63e694e0a05e9208d91a6cfe8040c70671060c6562846403dd18e54",
@@ -581,6 +581,6 @@
     "tests/test_workflow_prepare.py": "1f213308d5b96a78752fd8db3db67bc44c0cc687054969bb55379b792e25a5c3",
     "tests/test_workflow_state_order.py": "6f98bab1210abdb481d595736183c65cdce7a0c06e5a0b28675a83b4b4c5e256",
     "THIRD-PARTY-NOTICES.md": "eddfaa014f20e68b60aa6c7aca7493d3b1ee5d0be6aba70b258e4ac2ccddbfb0",
-    "VERSION": "3a3252ad01fd27e2ac3b5f1589aebdcd644cf60d0b36873dc7254dc6123f0588"
+    "VERSION": "3874e610ab9d2bc974db3f73e2af92b2eb289092fcf44024ee07052b65755f90"
   }
 }

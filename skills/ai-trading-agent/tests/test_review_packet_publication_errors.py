@@ -96,12 +96,18 @@ class PacketPublicationErrorTests(unittest.TestCase):
         folder=self.output/'synthetic-review-r1';actual=Path.mkdir
         error=FileNotFoundError(errno.ENOENT,'injected actual directory creation failure',str(folder))
         def mkdir(path,*args,**kwargs):
-            if path==folder:raise error
+            if path.resolve()==folder.resolve():raise error
             return actual(path,*args,**kwargs)
         with patch.object(Path,'mkdir',mkdir),patch.object(research,'_preflight_publications',wraps=research._preflight_publications) as preflight:
             with self.assertRaisesRegex(ValueError,'OUTPUT_PUBLICATION_PATH_UNAVAILABLE') as raised:self.prepare()
             self.assertIs(raised.exception.__cause__,error);self.assertEqual(preflight.call_count,0)
         self.assertEqual(self.files(),{});self.retry_cli()
+
+    def test_directory_fault_injection_matches_existing_parent_alias(self):
+        self.output=self.output/'..'/self.output.name
+        self.assertTrue(self.output.is_dir())
+        self.assertNotEqual(self.output,self.output.resolve())
+        self.test_actual_directory_operation_failure_retains_path_guidance()
 
     def test_actual_preflight_open_path_failure_retains_guidance_then_retries(self):
         actual=Path.open;opened=[]

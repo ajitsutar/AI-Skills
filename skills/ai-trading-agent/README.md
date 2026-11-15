@@ -13,7 +13,7 @@ Source-bound analyst requests preserve the original cohort dimensions and age po
 
 Source-first analyst reports deliver explicit range width, IQR and the quartile method. Canonical provider pools retain same-record source metadata, separate populations and unknown issue dates; their means are never averaged. See [analyst research](references/analyst-research.md#delivered-dispersion-and-provider-context).
 
-Version **5.10.19** includes [production research operations](references/research-operations.md)
+Version **5.10.20** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
