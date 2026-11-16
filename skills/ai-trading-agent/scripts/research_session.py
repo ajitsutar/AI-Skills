@@ -322,7 +322,8 @@ def prepare_packet(root, *, expected_session_sha256, dispositions, filings=None,
         raise
 
 
-def start_review(root, *, expected_session_sha256, expected_packet_sha256, adopted_at, max_corrections=2):
+def start_review(root, *, expected_session_sha256, expected_packet_sha256, adopted_at, max_corrections=2,
+                 additional_review_sources=None):
     """Bind all original sources plus the actual packet/extractions/annex to review."""
     import research_revision
     root, manifest = session(root, expected_session_sha256)
@@ -346,6 +347,20 @@ def start_review(root, *, expected_session_sha256, expected_packet_sha256, adopt
             raw = read(member(root, ref['path']))
             require(sha(raw) == ref['sha256'], 'CALCULATION_OUTPUT_CHANGED')
             sources[f'session-calculation-output-{index}'] = raw
+    if additional_review_sources is not None:
+        require(type(additional_review_sources) is dict and len(additional_review_sources) <= 16,
+                'BOUNDED_ADDITIONAL_REVIEW_SOURCES_REQUIRED')
+        total = 0
+        for sid, raw in additional_review_sources.items():
+            identifier(sid)
+            require(sid.startswith('extra-') and sid not in sources, 'ADDITIONAL_REVIEW_SOURCE_ID_CONFLICT')
+            require(type(raw) is bytes and 0 < len(raw) <= MAX_BYTES,
+                    'ADDITIONAL_REVIEW_SOURCE_BYTES_REQUIRED')
+            total += len(raw)
+            require(total <= MAX_BYTES, 'ADDITIONAL_REVIEW_SOURCE_SIZE_LIMIT')
+            require(readable_source(raw, {'original_filename': sid + '.txt'}),
+                    'ADDITIONAL_REVIEW_SOURCE_MUST_BE_READABLE')
+            sources[sid] = raw
     units = []
     for unit in manifest['units']:
         item = dict(unit)

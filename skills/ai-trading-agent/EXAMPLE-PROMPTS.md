@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-395 examples across 54 workflows, from first-time investing to quantitative research.
+401 examples across 55 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -73,6 +73,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Metric-specific analyst revision delivery](#metric-specific-analyst-revision-delivery) | Researchers comparing original analyst events and target histories | 2 |
 | [Source-bound insider and institution disclosure delivery](#source-bound-insider-and-institution-disclosure-delivery) | Researchers reviewing supplied transaction rows and institutional snapshots | 2 |
 | [Ordinary research with review and correction](#ordinary-research-with-review-and-correction) | Investors and researchers asking complete questions without managing internal tools | 5 |
+| [Research updates, options evidence and host setup](#research-updates-options-evidence-and-host-setup) | Researchers refreshing earlier work or assessing event evidence on their chosen host | 6 |
 
 ## Keep readable and structured research consistent
 
@@ -1922,6 +1923,35 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 ### 395. Complete research when an exhibit is unavailable
 
 > Analyze the supplied earnings or event documents. If a referenced exhibit or essential observation cannot be accessed, complete the supported parts and state exactly what remains unknown. Review the whole answer and keep those limitations visible rather than inventing the missing contents or treating the research as fully verified.
+
+
+## Research updates, options evidence and host setup
+
+**Audience:** Researchers refreshing earlier work or assessing event evidence on their chosen host. Guides: [research refresh](references/research-refresh.md), [options activity](references/options-activity.md), [workflow setup](references/workflow-setup.md).
+
+### 396. Update previous research on demand
+
+> Update this retained research bundle as of [cutoff]. Recheck the relevant permitted sources, preserve the earlier answer, recompute affected calculations and explain what changed. Distinguish verified unchanged information from anything you could not recheck. Handle the tools and review yourself.
+
+### 397. Handle a corrected or withdrawn source
+
+> Revisit this research using the attached corrected announcement and source-check evidence. Identify the affected facts and calculations, preserve the superseded analysis, and explain which conclusions changed or remain unresolved. Review the complete updated answer.
+
+### 398. Analyze supplied options activity
+
+> Analyze these permitted options-chain and trade-print exports as of [cutoff]. Preserve contract terms, multipliers, currencies and timestamps; separate quotes from trades, corrections from additional volume, and daily volume from dated open interest. Explain supported observations without inferring buyer intent or dealer positioning.
+
+### 399. Reassess squeeze evidence with dated float
+
+> Use these dated float-share and short-interest observations, borrow snapshots and market records to reassess the squeeze hypothesis for [ticker]. Reconcile security identity, share basis and reporting dates before calculating ratios. Keep conflicts and missing evidence visible; free sources first, paid access only if already supplied and useful.
+
+### 400. Set up this workflow on the current host
+
+> Prepare this skill for [earnings research/event research/research refresh/options activity] on the current host. Check the tools and dependencies actually available, run a bounded representative exercise when permitted, and resolve recoverable setup issues. Report any missing capability and supported fallback without requiring a backend.
+
+### 401. Recover from unavailable tools or sources
+
+> Complete the supported parts of this research with the tools and supplied files available here. Diagnose the missing dependency or source access, choose a supported fallback, and preserve the failed attempt and remaining limitations. Do not claim another host or unavailable capability has been tested.
 
 ## Keeping this catalog current
 

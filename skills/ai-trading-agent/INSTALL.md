@@ -16,6 +16,8 @@ installation and frozen-fixture replay. These locks do not claim compatibility
 with other operating systems or include transformer model weights. Keep downloaded
 wheels and virtual environments outside the installed skill folder.
 
+For task-specific setup and missing-capability recovery, follow [workflow setup](references/workflow-setup.md). Its checks distinguish observed Python/file behavior from declared native host tools; a successful local check does not qualify every host. Keep each representative exercise and its actual result outside the installed skill.
+
 ## Host-permitted research environment on other systems
 
 Use Python 3.11 or newer available to the selected host. Where that host permits

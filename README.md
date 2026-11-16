@@ -30,7 +30,7 @@ Source selection and surrounding narrative still require review.
 
 The trading workflows use accessible free sources first; paid subscriptions are
 optional and existing user-provided access can improve freshness or coverage.
-Version **5.12.0** includes official SEC issuer-identity intake, public/supplied
+Version **5.13.0** includes official SEC issuer-identity intake, public/supplied
 price and volume observations, and user-supplied borrow evidence with
 explicit dates, coverage and source qualification. Production research
 operations support retained briefs and automated technical review; users
@@ -59,6 +59,12 @@ review binds declared reviewer findings to retained answer/request/source bytes;
 buyer qualification organizes offering, cost, data-rights and deployment evidence.
 These tools do not certify semantic truth, human productivity or buyer readiness.
 Host capabilities remain explicit; a backend requires an explicit user request.
+
+Research can be refreshed on demand with retained earlier answers, explicit source
+rechecks and reviewed changes. Options-chain and print diagnostics retain contract
+terms and dated positioning evidence. Workflow setup reports observed capabilities
+and supported recovery paths on the selected host. All helpers remain invoked
+on demand, with free or supplied evidence first and paid access optional.
 
 Ordinary earnings and event-research requests now connect actual filing/exhibit
 content, complete answers, and native assistant review with bounded corrections.

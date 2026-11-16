@@ -3135,6 +3135,176 @@
       }
     },
     "institutional.plan": {},
+    "market.bind_float": {
+      "positioning/borrow/*/fee_rate_annual_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "provider-declared scope and convention",
+        "metric": "Provider annual borrow fee or rebate",
+        "unit": "percent_per_year"
+      },
+      "positioning/borrow/*/shares_available": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Provider-reported available shares",
+        "unit": "shares"
+      },
+      "positioning/borrow/*/utilization_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "provider-declared lending population",
+        "metric": "Provider-reported utilization",
+        "unit": "percent"
+      },
+      "positioning/failures_to_deliver/*/quantity": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Dated outstanding failures balance",
+        "unit": "shares"
+      },
+      "positioning/short_interest/*/adv/average_daily_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Mean supplied daily share volume",
+        "unit": "shares_per_supplied_session"
+      },
+      "positioning/short_interest/*/adv/conditional_days_to_cover": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "arithmetic mean supplied share volume; declared completeness unresolved",
+        "metric": "Conditional days to cover over supplied sessions",
+        "unit": "sessions"
+      },
+      "positioning/short_interest/*/adv/days_to_cover": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "arithmetic mean share volume over exact declared sessions",
+        "metric": "Dated short shares divided by declared-complete ADV",
+        "unit": "sessions"
+      },
+      "positioning/short_interest/*/adv/sessions_observed": {
+        "basis": "Unique supplied session dates over declared window.",
+        "denominator": null,
+        "metric": "Supplied daily share-volume sessions",
+        "unit": "count"
+      },
+      "positioning/short_interest/*/adv/share_adjustment_comparability": {
+        "basis": "Declared matching nonempty share-adjustment labels; not independent corporate-action validation.",
+        "denominator": null,
+        "metric": "Declared daily-volume versus short-share basis comparability",
+        "unit": "status"
+      },
+      "positioning/short_interest/*/adv/window_coverage": {
+        "basis": "Exact equality against caller-supplied expected sessions; calendar is not independently validated.",
+        "denominator": null,
+        "metric": "Declared daily-volume session coverage",
+        "unit": "status"
+      },
+      "positioning/short_interest/*/float_shares": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Explicit linked dated float",
+        "unit": "shares"
+      },
+      "positioning/short_interest/*/measurement_age_days": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Age of dated short-interest measurement",
+        "unit": "calendar_days"
+      },
+      "positioning/short_interest/*/provider_reported_average_daily_volume": {
+        "basis": "Unrecomputed provider field; observation window and adjustment conventions are not inferred.",
+        "denominator": null,
+        "metric": "Provider-reported average daily share volume",
+        "unit": "provider_reported_shares_per_day"
+      },
+      "positioning/short_interest/*/provider_reported_days_to_cover": {
+        "basis": "Unrecomputed source display; supplied source definitions may differ from explicit-window calculation.",
+        "denominator": "source-defined displayed ADV convention",
+        "metric": "Provider-displayed days to cover",
+        "unit": "provider_reported_days"
+      },
+      "positioning/short_interest/*/short_interest_percent_float": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "explicit linked same-issuer/class dated float shares",
+        "metric": "Dated short interest as percent of linked float",
+        "unit": "percent"
+      },
+      "positioning/short_interest/*/short_interest_shares": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Dated short-interest shares",
+        "unit": "shares"
+      },
+      "positioning/short_sale_volume/*/reported_short_volume_ratio": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "same record reported total volume; not open short interest",
+        "metric": "Reported daily short-sale-volume ratio",
+        "unit": "fraction"
+      },
+      "positioning/short_sale_volume/*/short_exempt_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Short-exempt subset already included in short volume",
+        "unit": "shares"
+      },
+      "positioning/short_sale_volume/*/short_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Reported daily short-sale volume",
+        "unit": "shares"
+      },
+      "positioning/short_sale_volume/*/total_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Reported facility daily total volume",
+        "unit": "shares"
+      },
+      "squeeze/assessments/*/flow_contexts/*/benchmark_relative_return_percent": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Price return minus matched benchmark",
+        "unit": "percentage_points"
+      },
+      "squeeze/assessments/*/flow_contexts/*/relative_volume": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": "mean comparable prior-session cumulative volume",
+        "metric": "Same-window relative volume",
+        "unit": "ratio"
+      },
+      "squeeze/assessments/*/measurement_age_days": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Age of positioning measurement",
+        "unit": "calendar_days"
+      },
+      "squeeze/assessments/*/state": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Declared squeeze evidence heuristic",
+        "unit": "status"
+      },
+      "squeeze/reported_covering/*/classification": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Typed source-reported covering classification",
+        "unit": "status"
+      },
+      "squeeze/reported_covering/*/source_reported_covered_shares": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Source-asserted covered shares",
+        "unit": "shares"
+      },
+      "squeeze/retrospective_short_interest_changes/*/classification": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Dated net-position change classification",
+        "unit": "status"
+      },
+      "squeeze/retrospective_short_interest_changes/*/net_short_share_change": {
+        "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
+        "denominator": null,
+        "metric": "Comparable dated net short-interest change",
+        "unit": "shares"
+      }
+    },
     "market.flow": {
       "cumulative_bars/*/baseline_mean_volume": {
         "basis": "Supplied dated evidence and declared scope; not authenticated or independently observed by replay.",
@@ -3264,6 +3434,194 @@
       }
     },
     "market.normalize": {},
+    "market.options_activity": {
+      "chains/*/actual_print_premium": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. No identified print exists in a chain snapshot. Last price, midpoint, volume and OI are not actual traded premium.",
+        "denominator": null,
+        "metric": "Chain-derived actual-print premium is unknown",
+        "unit": "source_currency_amount"
+      },
+      "chains/*/aggressor_side": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. UNKNOWN is retained; quoted location, volume and OI do not identify this property.",
+        "denominator": null,
+        "metric": "Option aggressor side",
+        "unit": "status"
+      },
+      "chains/*/contract/multiplier": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Explicit premium multiplier; not inferred deliverable size, underlying exposure or a default100 shares.",
+        "denominator": null,
+        "metric": "Explicit option premium multiplier",
+        "unit": "multiplier_units_per_contract"
+      },
+      "chains/*/dealer_position": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. UNKNOWN is retained; quoted location, volume and OI do not identify this property.",
+        "denominator": null,
+        "metric": "Dealer position",
+        "unit": "status"
+      },
+      "chains/*/open_close_intent": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. UNKNOWN is retained; quoted location, volume and OI do not identify this property.",
+        "denominator": null,
+        "metric": "Option opening or closing intent",
+        "unit": "status"
+      },
+      "chains/*/open_interest_contracts": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Outstanding count for open_interest_date; it does not establish opening or closing intent for a print.",
+        "denominator": null,
+        "metric": "Separately dated reported option open interest",
+        "unit": "contracts"
+      },
+      "chains/*/quote/age_exceeds_declared_limit": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Caller-declared age limit only; null means no applicable declared comparison.",
+        "denominator": null,
+        "metric": "Quote exceeds the declared age limit",
+        "unit": "boolean"
+      },
+      "chains/*/quote/ask": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Quote reference in the same contract currency/premium-unit convention; not an executed trade or actual print premium.",
+        "denominator": null,
+        "metric": "Option quote ask reference",
+        "unit": "currency_per_multiplier_unit"
+      },
+      "chains/*/quote/bid": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Quote reference in the same contract currency/premium-unit convention; not an executed trade or actual print premium.",
+        "denominator": null,
+        "metric": "Option quote bid reference",
+        "unit": "currency_per_multiplier_unit"
+      },
+      "chains/*/quote/executed_trade": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. False for quote references; actual print identity is retained separately.",
+        "denominator": null,
+        "metric": "Quote represents an executed trade",
+        "unit": "boolean"
+      },
+      "chains/*/quote/midpoint": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Quote reference in the same contract currency/premium-unit convention; not an executed trade or actual print premium.",
+        "denominator": null,
+        "metric": "Option quote midpoint reference",
+        "unit": "currency_per_multiplier_unit"
+      },
+      "chains/*/quote/quote_age_seconds": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Observation time minus usable quote time; no automatic freshness threshold is inferred.",
+        "denominator": null,
+        "metric": "Quote age at option observation",
+        "unit": "seconds"
+      },
+      "chains/*/volume_contracts": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Reported activity for volume_date; separate from open-interest positions and never multiplied by a quote into actual premium.",
+        "denominator": null,
+        "metric": "Dated reported option volume",
+        "unit": "contracts"
+      },
+      "chains/*/volume_to_dated_open_interest": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Dated descriptive activity/position quotient; zero or unusably dated OI leaves the ratio unknown, not evidence of bullishness or unusual activity.",
+        "denominator": "same row dated open_interest_contracts",
+        "metric": "Reported volume divided by separately dated open interest",
+        "unit": "ratio"
+      },
+      "prints/*/actual_print_premium": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Actual print price times contracts times the declared premium multiplier; currency is the same row premium_currency. No FX conversion, underlying notional, investor risk or pooled premium is inferred.",
+        "denominator": null,
+        "metric": "Identified actual-print premium before fees",
+        "unit": "source_currency_amount"
+      },
+      "prints/*/aggressor_side": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. UNKNOWN is retained; quoted location, volume and OI do not identify this property.",
+        "denominator": null,
+        "metric": "Option aggressor side",
+        "unit": "status"
+      },
+      "prints/*/contract/multiplier": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Explicit premium multiplier; not inferred deliverable size, underlying exposure or a default100 shares.",
+        "denominator": null,
+        "metric": "Explicit option premium multiplier",
+        "unit": "multiplier_units_per_contract"
+      },
+      "prints/*/contracts": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. ",
+        "denominator": null,
+        "metric": "Identified actual-print contract quantity",
+        "unit": "contracts"
+      },
+      "prints/*/dealer_position": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. UNKNOWN is retained; quoted location, volume and OI do not identify this property.",
+        "denominator": null,
+        "metric": "Dealer position",
+        "unit": "status"
+      },
+      "prints/*/open_close_intent": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. UNKNOWN is retained; quoted location, volume and OI do not identify this property.",
+        "denominator": null,
+        "metric": "Option opening or closing intent",
+        "unit": "status"
+      },
+      "prints/*/price": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Reported actual-print price in the same contract currency and explicit premium_unit convention.",
+        "denominator": null,
+        "metric": "Identified actual-print premium price",
+        "unit": "currency_per_multiplier_unit"
+      },
+      "prints/*/quote/age_exceeds_declared_limit": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Caller-declared age limit only; null means no applicable declared comparison.",
+        "denominator": null,
+        "metric": "Quote exceeds the declared age limit",
+        "unit": "boolean"
+      },
+      "prints/*/quote/ask": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Quote reference in the same contract currency/premium-unit convention; not an executed trade or actual print premium.",
+        "denominator": null,
+        "metric": "Option quote ask reference",
+        "unit": "currency_per_multiplier_unit"
+      },
+      "prints/*/quote/bid": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Quote reference in the same contract currency/premium-unit convention; not an executed trade or actual print premium.",
+        "denominator": null,
+        "metric": "Option quote bid reference",
+        "unit": "currency_per_multiplier_unit"
+      },
+      "prints/*/quote/executed_trade": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. False for quote references; actual print identity is retained separately.",
+        "denominator": null,
+        "metric": "Quote represents an executed trade",
+        "unit": "boolean"
+      },
+      "prints/*/quote/midpoint": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Quote reference in the same contract currency/premium-unit convention; not an executed trade or actual print premium.",
+        "denominator": null,
+        "metric": "Option quote midpoint reference",
+        "unit": "currency_per_multiplier_unit"
+      },
+      "prints/*/quote/quote_age_seconds": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Observation time minus usable quote time; no automatic freshness threshold is inferred.",
+        "denominator": null,
+        "metric": "Quote age at option observation",
+        "unit": "seconds"
+      },
+      "summary/eligible_chain_count": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Snapshot count only; overlapping cumulative observations are not pooled.",
+        "denominator": null,
+        "metric": "Usable supplied option-chain snapshots",
+        "unit": "count"
+      },
+      "summary/eligible_print_count": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. Count after eligibility, revision and within-feed duplicate checks; different feeds are not pooled into economic activity.",
+        "denominator": null,
+        "metric": "Usable supplied option-print observations",
+        "unit": "count"
+      },
+      "summary/pooled_premium": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. No pooled premium is computed across feeds, contracts or currencies.",
+        "denominator": null,
+        "metric": "Pooled option premium remains unknown",
+        "unit": "source_currency_amount"
+      },
+      "summary/squeeze_confirmed": {
+        "basis": "Retained permitted source observations and explicit contract terms only; source authenticity and completeness are not certified. False: these descriptive observations establish no causal squeeze or calibrated probability.",
+        "denominator": null,
+        "metric": "Options evidence confirms a squeeze",
+        "unit": "boolean"
+      }
+    },
     "market.parse": {},
     "market.positioning": {
       "borrow/*/fee_rate_annual_percent": {

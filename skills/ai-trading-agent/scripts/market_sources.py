@@ -24,7 +24,8 @@ import xml.etree.ElementTree as ET
 import zipfile
 
 KINDS = frozenset(("trade", "bar", "short_sale_volume", "short_interest", "float",
-                   "borrow", "catalyst", "social_lead", "disclosure", "ftd", "venue_aggregate"))
+                   "borrow", "catalyst", "social_lead", "disclosure", "ftd", "venue_aggregate",
+                   "option_print", "option_chain"))
 MAX_BYTES = 32 * 1024 * 1024
 MAX_RECORDS = 200000
 LIMITATIONS = [
@@ -272,6 +273,10 @@ def normalize(document):
             if current_scope != previous_scope:
                 reason = "REVISION_SCOPE_MISMATCH"
             scope_fields = {
+                "option_print": ("contract_id", "underlying_id", "expiry", "strike", "right", "multiplier",
+                                 "currency", "premium_unit", "deliverable", "feed_id", "print_id"),
+                "option_chain": ("contract_id", "underlying_id", "expiry", "strike", "right", "multiplier",
+                                 "currency", "premium_unit", "deliverable", "feed_id", "observed_at"),
                 "trade": ("feed_id", "trade_id", "currency", "quantity_unit", "issuer_id", "share_class"),
                 "bar": ("feed_id", "bar_type", "start_at", "end_at", "session_id", "volume_unit",
                         "currency", "comparison_group", "issuer_id", "share_class", "price_basis", "volume_basis"),
@@ -279,8 +284,22 @@ def normalize(document):
             left, right = row.get("payload", {}), previous.get("payload", {})
             if type(right) is not dict:
                 right = {}
+
+            def same_scope_field(key):
+                if key not in left or key not in right:
+                    return False
+                if row.get('kind') in ('option_print', 'option_chain') and key in ('strike', 'multiplier'):
+                    # Compare numeric meaning without rewriting retained source
+                    # values; invalid or nonpositive contract terms fail closed.
+                    try:
+                        a, b = _number(left[key], exact=True), _number(right[key], exact=True)
+                        return a > 0 and b > 0 and a == b
+                    except (ValueError, TypeError, OverflowError):
+                        return False
+                return left[key] == right[key]
+
             if any((key in left or key in right)
-                   and (key not in left or key not in right or left[key] != right[key])
+                   and not same_scope_field(key)
                    for key in scope_fields):
                 reason = "REVISION_SCOPE_MISMATCH"
         if reason:

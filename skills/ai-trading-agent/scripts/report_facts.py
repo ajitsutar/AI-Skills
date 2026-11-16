@@ -73,7 +73,7 @@ QUANT_FILES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
                'price_refresh.py', 'holdings_ledger.py', 'analyst_adapter.py',
                'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py',
                'portfolio_follower.py', 'portfolio_disclosures.py',
-               'market_sources.py', 'market_flow.py', 'institutional_research.py')
+               'market_sources.py', 'market_flow.py', 'institutional_research.py', 'options_activity.py')
 
 
 def digest(value):

@@ -303,6 +303,34 @@ class ResearchSessionTests(unittest.TestCase):
             sys.setprofile(previous)
         self.assertLessEqual(len(visits), 17 + 136)
 
+    def test_additional_review_evidence_is_retained_and_required_by_whole_answer(self):
+        self.start()
+        packet = self.packet(calculation=False)
+        raw = b'Previous guidance was withdrawn; this is a change from the retained prior answer.'
+        result = module.start_review(self.run, expected_session_sha256=self.pin,
+                                     expected_packet_sha256=packet['packet_sha256'], adopted_at=T0,
+                                     additional_review_sources={'extra-refresh-delta': raw})
+        protocol = module.load(self.run / 'review/protocol.json')
+        whole = next(u for u in protocol['units'] if u['id'] == 'session-whole-answer')
+        self.assertIn('extra-refresh-delta', whole['required_source_ids'])
+        self.assertEqual((self.run / 'review/sources/extra-refresh-delta.bin').read_bytes(), raw)
+        import research_revision
+        research_revision.verify(self.run / 'review', result['head_sha256'])
+        (self.run / 'review/sources/extra-refresh-delta.bin').write_bytes(b'Changed evidence')
+        with self.assertRaises(ValueError):
+            research_revision.verify(self.run / 'review', result['head_sha256'])
+
+    def test_additional_review_evidence_rejects_reserved_ids_and_binary_content(self):
+        self.start()
+        packet = self.packet(calculation=False)
+        for extras in ({'session-packet': b'override'}, {'extra-binary': b'%PDF-1.7 binary'},
+                       {'extra-invalid': b'\xff'}, {'extra-empty': b''}):
+            with self.subTest(extras=list(extras)), self.assertRaises(ValueError):
+                module.start_review(self.run, expected_session_sha256=self.pin,
+                                    expected_packet_sha256=packet['packet_sha256'], adopted_at=T0,
+                                    additional_review_sources=extras)
+            self.assertFalse((self.run / 'review').exists())
+
     def test_safe_members_and_unsupported_workflow(self):
         for name in ('../outside.txt', '/absolute', 'C:/private', 'sources\\release.bin', './session.json'):
             with self.subTest(name=name), self.assertRaisesRegex(ValueError, 'SAFE_SESSION_MEMBER_REQUIRED'):

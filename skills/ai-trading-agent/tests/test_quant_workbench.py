@@ -373,7 +373,8 @@ class ReplayTests(unittest.TestCase):
         follower_operations = {'follower.normalize', 'follower.targets', 'follower.rebalance'}
         self.assertEqual(set(workbench.FOLLOWER_OPERATIONS), follower_operations)
         market_operations = {'market.normalize', 'market.parse', 'market.flow', 'market.positioning',
-                             'market.squeeze', 'institutional.plan', 'institutional.brief', 'institutional.evaluate'}
+                             'market.squeeze', 'market.options_parse', 'market.options_activity', 'market.bind_float',
+                             'institutional.plan', 'institutional.brief', 'institutional.evaluate'}
         self.assertEqual(set(workbench.MARKET_RESEARCH_OPERATIONS), market_operations)
         self.assertEqual({j['operation'] for j in doc['jobs']},
                          set(workbench.OPERATIONS) - source_operations - set(workbench.ANALYSIS_OPERATIONS)

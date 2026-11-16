@@ -67,6 +67,7 @@ import portfolio_follower
 import portfolio_disclosures
 import market_sources
 import market_flow
+import options_activity
 import institutional_research
 from quant_common import digest, require
 
@@ -230,6 +231,9 @@ MARKET_RESEARCH_OPERATIONS = {
     'market.flow': market_flow.analyze,
     'market.positioning': market_flow.positioning,
     'market.squeeze': market_flow.squeeze,
+    'market.options_parse': options_activity.parse,
+    'market.options_activity': options_activity.analyze,
+    'market.bind_float': options_activity.bind_float,
     'institutional.plan': institutional_research.plan,
     'institutional.brief': institutional_research.brief,
     'institutional.evaluate': institutional_research.evaluate,
@@ -256,7 +260,7 @@ MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
                'price_refresh.py', 'holdings_ledger.py', 'analyst_adapter.py',
                'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py',
                'portfolio_follower.py', 'portfolio_disclosures.py',
-               'market_sources.py', 'market_flow.py', 'institutional_research.py')
+               'market_sources.py', 'market_flow.py', 'institutional_research.py', 'options_activity.py')
 
 
 def implementation_hash():

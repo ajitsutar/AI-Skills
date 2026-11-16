@@ -418,6 +418,9 @@ def _reported_days_to_cover(record, issues):
 def positioning(document):
     """Keep dated positions, stock-lending scopes, short flow and fails separate."""
     normalized, settings, cutoff, out = _base(document, 'MARKET_POSITIONING')
+    for record in normalized['records']:
+        if not record['eligible'] and record['kind'] in ('short_interest', 'borrow', 'short_sale_volume', 'ftd'):
+            _issue(out['issues'], record, 'INELIGIBLE_POSITIONING_RECORD: ' + ';'.join(record.get('exclusion_reasons') or []))
     active = [x for x in normalized['records'] if x['eligible']]
     index = {x['id']: x for x in active}
     out.update(short_interest=[], borrow=[], short_sale_volume=[], failures_to_deliver=[])

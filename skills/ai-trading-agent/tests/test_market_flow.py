@@ -340,6 +340,69 @@ class PositionTests(unittest.TestCase):
         self.assertTrue(all(x['forced_buy_in_date'] is None and not x['naked_shorting_established'] for x in out['failures_to_deliver']))
 
 
+class IneligibleIssueTests(unittest.TestCase):
+    def test_equal_timestamp_option_correction_surfaces_reason_without_changing_activity(self):
+        import options_activity
+        at = '2026-11-16T21:00:00Z'
+        contract = dict(contract_id='DEMO-20261218-C-50', underlying_id='fictional-issuer:A',
+                        expiry='2026-12-18', strike='50', right='call', multiplier='10', currency='USD',
+                        premium_unit='currency_per_multiplier_unit', deliverable='10 DEMO class A shares',
+                        feed_id='fictional-feed')
+        original = record('print', 'option_print', dict(contract, print_id='event-1',
+            event_at='2026-11-16T20:30:00Z', contracts='5', quantity_unit='contracts', price='2.40',
+            price_basis='actual_print', bid='2.30', ask='2.50', quote_at='2026-11-16T20:29:59Z'), available=at)
+        chain = record('chain', 'option_chain', dict(contract, observed_at='2026-11-16T20:30:00Z',
+            volume_contracts='1200', volume_date='2026-11-16', open_interest_contracts='200',
+            open_interest_date='2026-11-13', bid='2.30', ask='2.50', quote_at='2026-11-16T20:30:00Z',
+            last_price='2.40'), available=at)
+        correction = deepcopy(original)
+        correction.update(id='print-corrected', action='replace', supersedes='print')
+        correction['payload'].update(price='2.60', strike='50.0', multiplier='10.0')
+        for row in (original, chain, correction):row['source']['retrieved_at'] = at
+        baseline = {'schema_version': 1, 'as_of': at, 'records': [original, chain]}
+        d = deepcopy(baseline);d['records'].append(correction);before = deepcopy(d)
+        out, active = options_activity.analyze(d), options_activity.analyze(baseline)
+        self.assertEqual(out['issues'], [{'record_id': 'print-corrected',
+            'code': 'INELIGIBLE_OPTION_RECORD: REVISION_ORDER_UNRESOLVED'}])
+        for field in ('prints', 'chains', 'summary'):self.assertEqual(out[field], active[field])
+        self.assertEqual(out['prints'][0]['price'], 2.4)
+        self.assertEqual(out['prints'][0]['actual_print_premium'], 120)
+        rejected = out['evidence']['records'][-1]
+        self.assertFalse(rejected['eligible'])
+        self.assertEqual(rejected['exclusion_reasons'], ['REVISION_ORDER_UNRESOLVED'])
+        self.assertEqual(d, before)
+
+    def test_future_direct_positioning_kinds_surface_reasons_and_remain_excluded(self):
+        late = '2026-11-12T00:00:00Z'
+        for kind in ('short_interest', 'borrow', 'short_sale_volume', 'ftd'):
+            with self.subTest(kind=kind):
+                row = record('si-late', kind, {}, available=late)
+                row['source'].pop('observed_at')
+                row['source']['retrieved_at'] = late
+                d = document([row]);before = deepcopy(d)
+                out = market_flow.positioning(d)
+                self.assertEqual(out['issues'], [{'record_id': 'si-late',
+                    'code': 'INELIGIBLE_POSITIONING_RECORD: NOT_YET_AVAILABLE'}])
+                for field in ('short_interest', 'borrow', 'short_sale_volume', 'failures_to_deliver'):
+                    self.assertEqual(out[field], [])
+                self.assertFalse(out['evidence']['records'][0]['eligible'])
+                self.assertEqual(out['evidence']['records'][0]['exclusion_reasons'], ['NOT_YET_AVAILABLE'])
+                self.assertEqual(d, before)
+
+    def test_unrelated_ineligible_kinds_do_not_emit_positioning_or_option_issues(self):
+        import options_activity
+        d = pressure_document();baseline = market_flow.positioning(d)
+        late = '2026-11-12T00:00:00Z'
+        for kind in ('trade', 'bar', 'float', 'option_print', 'option_chain'):
+            row = record('unrelated-' + kind, kind, {}, available=late)
+            row['source']['retrieved_at'] = late;d['records'].append(row)
+        out = market_flow.positioning(d)
+        for field in ('short_interest', 'borrow', 'short_sale_volume', 'failures_to_deliver', 'issues'):
+            self.assertEqual(out[field], baseline[field])
+        non_options = document([row for row in d['records'] if row['kind'] not in ('option_print', 'option_chain')])
+        self.assertEqual(options_activity.analyze(non_options)['issues'], [])
+
+
 class SqueezeTests(unittest.TestCase):
     def test_no_default_rule_or_probability(self):
         d = pressure_document(); del d['settings']

@@ -2237,6 +2237,42 @@
           "prompt": "Analyze the supplied earnings or event documents. If a referenced exhibit or essential observation cannot be accessed, complete the supported parts and state exactly what remains unknown. Review the whole answer and keep those limitations visible rather than inventing the missing contents or treating the research as fully verified."
         }
       ]
+    },
+    {
+      "id": "research-updates-options-and-setup",
+      "title": "Research updates, options evidence and host setup",
+      "audience": "Researchers refreshing earlier work or assessing event evidence on their chosen host",
+      "guides": [
+        "references/research-refresh.md",
+        "references/options-activity.md",
+        "references/workflow-setup.md"
+      ],
+      "prompts": [
+        {
+          "title": "Update previous research on demand",
+          "prompt": "Update this retained research bundle as of [cutoff]. Recheck the relevant permitted sources, preserve the earlier answer, recompute affected calculations and explain what changed. Distinguish verified unchanged information from anything you could not recheck. Handle the tools and review yourself."
+        },
+        {
+          "title": "Handle a corrected or withdrawn source",
+          "prompt": "Revisit this research using the attached corrected announcement and source-check evidence. Identify the affected facts and calculations, preserve the superseded analysis, and explain which conclusions changed or remain unresolved. Review the complete updated answer."
+        },
+        {
+          "title": "Analyze supplied options activity",
+          "prompt": "Analyze these permitted options-chain and trade-print exports as of [cutoff]. Preserve contract terms, multipliers, currencies and timestamps; separate quotes from trades, corrections from additional volume, and daily volume from dated open interest. Explain supported observations without inferring buyer intent or dealer positioning."
+        },
+        {
+          "title": "Reassess squeeze evidence with dated float",
+          "prompt": "Use these dated float-share and short-interest observations, borrow snapshots and market records to reassess the squeeze hypothesis for [ticker]. Reconcile security identity, share basis and reporting dates before calculating ratios. Keep conflicts and missing evidence visible; free sources first, paid access only if already supplied and useful."
+        },
+        {
+          "title": "Set up this workflow on the current host",
+          "prompt": "Prepare this skill for [earnings research/event research/research refresh/options activity] on the current host. Check the tools and dependencies actually available, run a bounded representative exercise when permitted, and resolve recoverable setup issues. Report any missing capability and supported fallback without requiring a backend."
+        },
+        {
+          "title": "Recover from unavailable tools or sources",
+          "prompt": "Complete the supported parts of this research with the tools and supplied files available here. Diagnose the missing dependency or source access, choose a supported fallback, and preserve the failed attempt and remaining limitations. Do not claim another host or unavailable capability has been tested."
+        }
+      ]
     }
   ]
 }

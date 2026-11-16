@@ -187,3 +187,7 @@ performed; never invent tool success or imply identical host capabilities.
   primary sources and tell me what remains uncertain."
 - "Assess the event described in this 13D and 8-K. Separate what the documents
   actually say from possible investment interpretations, then review your answer."
+
+## Updating a retained answer
+
+For “Update this research,” use [research refresh](research-refresh.md) to bind the previous completed session, the new request and explicit source checks. Preserve the prior answer and evidence; identify revisions, retractions, unavailable checks and unchecked sources. Recompute affected calculations and review the complete updated answer with the retained change summary. Use [workflow setup](workflow-setup.md) for the current host, and [options activity](options-activity.md) when the event question includes permitted chain, print or dated float-share records.
