@@ -2205,6 +2205,38 @@
           "prompt": "Read every supplied institutional reporting period and filing. Resolve only explicit unambiguous same-scope amendment chains, retain superseded originals and availability dates, calculate scoped snapshot differences, and explain entity, security and current-position limits in the complete replayed answer. Keep unrelated insider currencies and identities unresolved."
         }
       ]
+    },
+    {
+      "id": "ordinary-research-experience",
+      "title": "Ordinary research with review and correction",
+      "audience": "Investors and researchers asking complete questions without managing internal tools",
+      "guides": [
+        "references/ordinary-research-workflows.md",
+        "references/research-review-cycle.md",
+        "references/filing-documents.md"
+      ],
+      "prompts": [
+        {
+          "title": "Analyze an earnings announcement",
+          "prompt": "Analyze [company] using the attached current report, earnings-release exhibit and earlier outlook. Explain the reported results and what changed in guidance, retaining periods, currencies and GAAP/non-GAAP distinctions. Handle the research tools and review yourself, correct material errors before delivery, and make missing evidence clear."
+        },
+        {
+          "title": "Investigate an event and squeeze hypothesis",
+          "prompt": "Investigate [ticker] and [event] as of [cutoff]. Read the actual announcement and available supporting filings, then assess the dated price/volume, short-interest, float and borrow evidence. Separate supported facts from the squeeze hypothesis, check the complete answer yourself and show the remaining gaps. Use free sources first; optional paid access only if already available and useful."
+        },
+        {
+          "title": "Review and correct the complete research answer",
+          "prompt": "Check your complete draft against my original question and supplied sources. Review factual support, omitted topics, periods, units and contradictory conclusions; correct identified material problems and rerun affected calculations. Preserve the initial draft, use an independent reviewer if the host supports one, and show unresolved findings without asking me to fill out technical review forms."
+        },
+        {
+          "title": "Read reported ownership from the actual filing",
+          "prompt": "Read this Schedule 13D or 13G document and its supplied amendments. Explain the supported facts for each reporting person, the reported security class and ownership/voting/dispositive fields, with precise source passages or XML locations. Keep missing facts and unresolved amendment relationships explicit; do not infer today's holdings or add overlapping reporting-person totals."
+        },
+        {
+          "title": "Complete research when an exhibit is unavailable",
+          "prompt": "Analyze the supplied earnings or event documents. If a referenced exhibit or essential observation cannot be accessed, complete the supported parts and state exactly what remains unknown. Review the whole answer and keep those limitations visible rather than inventing the missing contents or treating the research as fully verified."
+        }
+      ]
     }
   ]
 }

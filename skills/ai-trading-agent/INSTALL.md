@@ -52,6 +52,7 @@ does not establish a Linux CPython3.12 artifact lock/clean-install receipt,
 macOS qualification, or successful feature use on Muse, Claude, Instinct or any
 other model host. Cross-host first responses and feature qualification require
 separate observed evidence under [release acceptance](references/release-acceptance.md).
+Find the public [validation workflow and run history](https://github.com/ajitsutar/AI-Skills/actions/workflows/validate.yml) in [AI-Skills](https://github.com/ajitsutar/AI-Skills). Match the published commit and skill version/manifest to the package being used, then inspect that commit's job results; a newer green run does not verify an older or modified package. The workflow configuration is available [in the repository](https://github.com/ajitsutar/AI-Skills/blob/main/.github/workflows/validate.yml).
 Record install failures, actual package versions, preflight gaps and test results
 for the environment used. No dependency installation occurred merely by reading
 this recipe.

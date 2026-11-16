@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-390 examples across 53 workflows, from first-time investing to quantitative research.
+395 examples across 54 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -72,6 +72,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Exact-source information coverage](#exact-source-information-coverage) | Researchers mapping supplied evidence to original requested topics | 1 |
 | [Metric-specific analyst revision delivery](#metric-specific-analyst-revision-delivery) | Researchers comparing original analyst events and target histories | 2 |
 | [Source-bound insider and institution disclosure delivery](#source-bound-insider-and-institution-disclosure-delivery) | Researchers reviewing supplied transaction rows and institutional snapshots | 2 |
+| [Ordinary research with review and correction](#ordinary-research-with-review-and-correction) | Investors and researchers asking complete questions without managing internal tools | 5 |
 
 ## Keep readable and structured research consistent
 
@@ -1896,6 +1897,31 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 ### 390. Compare reported snapshots and amendments
 
 > Read every supplied institutional reporting period and filing. Resolve only explicit unambiguous same-scope amendment chains, retain superseded originals and availability dates, calculate scoped snapshot differences, and explain entity, security and current-position limits in the complete replayed answer. Keep unrelated insider currencies and identities unresolved.
+
+
+## Ordinary research with review and correction
+
+**Audience:** Investors and researchers asking complete questions without managing internal tools. Guides: [ordinary research workflows](references/ordinary-research-workflows.md), [research review cycle](references/research-review-cycle.md), [filing documents](references/filing-documents.md).
+
+### 391. Analyze an earnings announcement
+
+> Analyze [company] using the attached current report, earnings-release exhibit and earlier outlook. Explain the reported results and what changed in guidance, retaining periods, currencies and GAAP/non-GAAP distinctions. Handle the research tools and review yourself, correct material errors before delivery, and make missing evidence clear.
+
+### 392. Investigate an event and squeeze hypothesis
+
+> Investigate [ticker] and [event] as of [cutoff]. Read the actual announcement and available supporting filings, then assess the dated price/volume, short-interest, float and borrow evidence. Separate supported facts from the squeeze hypothesis, check the complete answer yourself and show the remaining gaps. Use free sources first; optional paid access only if already available and useful.
+
+### 393. Review and correct the complete research answer
+
+> Check your complete draft against my original question and supplied sources. Review factual support, omitted topics, periods, units and contradictory conclusions; correct identified material problems and rerun affected calculations. Preserve the initial draft, use an independent reviewer if the host supports one, and show unresolved findings without asking me to fill out technical review forms.
+
+### 394. Read reported ownership from the actual filing
+
+> Read this Schedule 13D or 13G document and its supplied amendments. Explain the supported facts for each reporting person, the reported security class and ownership/voting/dispositive fields, with precise source passages or XML locations. Keep missing facts and unresolved amendment relationships explicit; do not infer today's holdings or add overlapping reporting-person totals.
+
+### 395. Complete research when an exhibit is unavailable
+
+> Analyze the supplied earnings or event documents. If a referenced exhibit or essential observation cannot be accessed, complete the supported parts and state exactly what remains unknown. Review the whole answer and keep those limitations visible rather than inventing the missing contents or treating the research as fully verified.
 
 ## Keeping this catalog current
 

@@ -1,5 +1,7 @@
 # AI Trading Agent
 
+For ordinary earnings/guidance and event-driven stock questions, the [assistant-operated research workflow](references/ordinary-research-workflows.md) handles internal inputs, filing/exhibit reading, supported calculations and the complete answer. The [review and correction cycle](references/research-review-cycle.md) retains first drafts, records actual review and corrects identified material problems within a bounded run. Unresolved findings remain visible; the user does not fill out technical review forms. [Filing content](references/filing-documents.md) preserves the selected document bytes and extracts supported event items, passages and ownership facts. Semantic interpretation, source authenticity and overall completeness remain matters for actual review.
+
 [Source-bound insider and institution disclosure delivery](references/insider-disclosures.md) keeps currency and identity local to each original row. Native mechanisms, dates, conditional listed-row arithmetic and explicit institutional amendment chains remain separate from actual cash, current holdings and motive claims in the complete replayed answer.
 
 [Source-bound analyst revision delivery](references/analyst-revisions.md) compares rating, target, EPS and revenue on their own dimensions, retains earlier-coverage conflicts and raw/structured gaps, and regenerates the complete answer from pinned original records. Conditional differences never become verified genuine revisions.
@@ -21,7 +23,7 @@ Source-first analyst reports deliver explicit range width, IQR and the quartile 
 
 The package is a self-contained skill for supported hosts such as Muse, Claude and Instinct. It requires no local backend or background service. Bundled commands run only when invoked in a host that supports them; host tools, execution and data access remain capability-dependent. A backend is outside this architecture unless explicitly requested.
 
-Version **5.11.6** includes [production research operations](references/research-operations.md)
+Version **5.12.0** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
