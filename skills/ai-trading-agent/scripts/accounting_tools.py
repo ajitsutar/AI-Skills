@@ -79,6 +79,11 @@ def select_lots(lots, quantity, method="FIFO", specific=None):
         held, cost = nonnegative(lot["quantity"]), nonnegative(lot["cost_per_share"])
         acquired = timestamp(lot["acquired_at"])
         prepared.append((lot, held, cost, acquired))
+    return _select_validated_lots(prepared, quantity, method, specific)
+
+
+def _select_validated_lots(prepared, quantity, method, specific=None):
+    """Shared selection kernel; callers validate quantity, identity and date type."""
     if method == "FIFO":
         prepared.sort(key=lambda item: (item[3], item[0]["lot_ref"]))
     elif method == "HIFO":
@@ -106,11 +111,24 @@ def wash_sale_review(symbol, proposed_sale_at, loss_expected, transactions, iden
                      external_account_coverage_complete=False, trade_timezone="America/New_York"):
     zone = ZoneInfo(trade_timezone)
     day = timestamp(proposed_sale_at).astimezone(zone).date()
+    def calendar_transactions():
+        # Defer even iter(transactions) until after the kernel's original group
+        # validation, preserving public error order for malformed inputs.
+        for entry in transactions:
+            yield dict(entry, calendar_day=timestamp(entry["at"]).astimezone(zone).date())
+    prepared = calendar_transactions() if loss_expected else []
+    return _wash_sale_calendar_review(symbol, day, loss_expected, prepared,
+                                     identity_groups, external_account_coverage_complete)
+
+
+def _wash_sale_calendar_review(symbol, day, loss_expected, transactions,
+                               identity_groups=None, external_account_coverage_complete=False):
+    """Date-screen kernel only; no disposition matching or tax disallowance."""
     group = {symbol} | set((identity_groups or {}).get(symbol, []))
     potential = []
     if loss_expected:
         for entry in transactions:
-            distance = (timestamp(entry["at"]).astimezone(zone).date() - day).days
+            distance = (entry["calendar_day"] - day).days
             if entry["side"] == "buy" and entry["symbol"] in group and abs(distance) <= 30:
                 potential.append({"local_ref": entry["local_ref"], "symbol": entry["symbol"],
                                   "days_from_sale": distance, "quantity": str(positive(entry["quantity"]))})

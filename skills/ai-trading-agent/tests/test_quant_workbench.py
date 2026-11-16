@@ -351,7 +351,8 @@ class ReplayTests(unittest.TestCase):
                              'planning.source_alternatives', 'planning.settlement_transfer_sweep',
                              'planning.recommendation_context', 'evidence.price_comparison',
                              'planning.source_budget_sizing', 'planning.employer_diversification_baseline',
-                             'financial.equity_cash_comparison', 'planning.source_allocation_context'}
+                             'financial.equity_cash_comparison', 'planning.source_allocation_context',
+                             'planning.fund_comparison_report'}  # Dedicated bound-report freeze/replay fixture.
         self.assertTrue(source_operations <= set(workbench.OPERATIONS))
         # Portable extensions have their own frozen fixture and integration tests.
         # Enumerate them explicitly so moving a legacy operation into this group

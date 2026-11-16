@@ -31,7 +31,7 @@ Source-first analyst reports deliver explicit range width, IQR and the quartile 
 
 The package is a self-contained skill for supported hosts such as Muse, Claude and Instinct. It requires no local backend or background service. Bundled commands run only when invoked in a host that supports them; host tools, execution and data access remain capability-dependent. A backend is outside this architecture unless explicitly requested.
 
-Version **5.13.4** includes [production research operations](references/research-operations.md)
+Version **5.13.8** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
@@ -559,3 +559,8 @@ conventions and source metadata. Missing inputs stay unresolved; do not substitu
 a European price or import example assumptions.
 
 Target-only chronological coverage is included in [native analyst revision delivery](references/analyst-revisions.md): every original target-list record receives a source-bound disposition, including changed or unknown literal horizons and same-time conflicts. No horizon equivalence or independent revision count is inferred.
+
+For supplied tax-aware sale comparisons, the [tax-lot report](references/tax-lot-report.md)
+keeps exact signed gain components, an explicit analytical calendar convention and
+selected versus remaining quantities together in verified generated artifacts.
+Unknown tax treatment, currency and external account facts remain scoped.

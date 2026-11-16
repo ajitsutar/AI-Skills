@@ -1,5 +1,13 @@
 # Long-term portfolio management
 
+For fund comparisons with role/horizon or existing portfolio context, use
+`planning.fund_comparison_report` and the [native bound report contract](fund-comparison-report.md).
+Bind original prose spans or structured source fields, retain current holdings,
+and preserve its generated comparison, JSON and summary. Honor any required
+response envelope while retaining the exact native artifacts separately. Partial mapping
+limits completeness claims; it does not permit omitting supplied context.
+
+
 ## Investment objectives and ownership
 
 Record objective, horizon, liquidity needs, contributions/withdrawals, benchmark,
@@ -66,11 +74,28 @@ small sale. Keep unknown residual assets distinct from identified holdings and c
 
 ## Taxes and lot-aware selling
 
+For supplied tax-aware sale comparisons, use the [source-bound tax-lot report](tax-lot-report.md)
+to deliver holding-period components and proposal-specific retained quantities
+alongside native selection and purchase-date flags. Preserve source currency scope
+and exact quantities; generated projections do not certify legal tax treatment.
+
 Use supplied tax lots, or available broker lots when the task authorizes access,
 for a taxable-sale comparison. Missing lots allow a conditional comparison with
 unknown tax results; they do not create a new execution gate. Consider holding period,
 embedded gain, loss carryovers supplied by the user, and user-approved tax budgets.
 Do not assume a tax-lot selection tool exists or silently switch the broker method.
+
+Bind currency labels for sale price, lot basis, proceeds and gains to their source
+fields or an explicit shared currency scope that applies to those records. Currency
+in a separate cash ledger, a market convention or a ticker does not establish the
+sale or lot currency. Keep the cash ledger's supplied currency within its own scope.
+If currency is absent, label it unspecified; mechanical arithmetic can be shown in
+unspecified source monetary units under an explicit common-unit assumption, without
+calling that assumption a supplied fact. For explicitly different currencies or
+unresolved unit compatibility, keep amounts separate or calculations conditional;
+do not invent FX rates or claim a converted realized gain. Honor a genuinely
+applicable shared currency declaration. Numerical helper output alone is not
+currency evidence.
 
 Check possible wash-sale interactions across core/tactical sleeves, dividend
 reinvestment, and other known household/retirement accounts. Missing external

@@ -1,5 +1,13 @@
 # Portfolio calculation routing
 
+For fund comparisons with role/horizon or existing portfolio context, use
+`planning.fund_comparison_report` and the [native bound report contract](fund-comparison-report.md).
+Bind original prose spans or structured source fields, retain current holdings,
+and preserve its generated comparison, JSON and summary. Honor any required
+response envelope while retaining the exact native artifacts separately. Partial mapping
+limits completeness claims; it does not permit omitting supplied context.
+
+
 Read this guide for allocation, budget, exposure, sleeve, dated funding,
 employer diversification, withdrawal, recommendation-context and equity/cash
 comparisons. The operation-specific source and accounting instructions below
@@ -118,3 +126,12 @@ primary comparison unresolved, beside a separately labeled price sensitivity.
 An unrelated session close cannot establish a terminal price's timestamp. The
 per-share reference is an accounting unit, not a whole-share execution rule.
 
+
+## Supplied tax-lot comparisons
+
+Use the [source-bound tax-lot report](tax-lot-report.md) for tax-aware sale
+comparisons with supported original accounting records. Keep the named calendar
+assumption, signed term components, known selected/remaining quantities and
+unknown external/future scope in the delivered answer, not only an annex.
+Preserve native artifacts separately when an existing host output contract
+requires a metadata envelope; no generated status certifies added prose.

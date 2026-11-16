@@ -1,5 +1,13 @@
 # Complete source context before allocation exposure
 
+For fund comparisons with role/horizon or existing portfolio context, use
+`planning.fund_comparison_report` and the [native bound report contract](fund-comparison-report.md).
+Bind original prose spans or structured source fields, retain current holdings,
+and preserve its generated comparison, JSON and summary. Honor any required
+response envelope while retaining the exact native artifacts separately. Partial mapping
+limits completeness claims; it does not permit omitting supplied context.
+
+
 `source_exposure.source_allocation_context(document)` is the implementation for
 `planning.source_allocation_context`. It composes the existing
 `portfolio_decision.allocation_context`; the caller must supply scenario gross

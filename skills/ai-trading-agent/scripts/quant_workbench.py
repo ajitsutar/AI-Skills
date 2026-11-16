@@ -40,6 +40,7 @@ import recommendation_report
 import employer_reference
 import equity_cash_comparison
 import source_exposure
+import fund_comparison
 import technical_toolkit
 import fundamental_toolkit
 import sentiment_toolkit
@@ -125,6 +126,7 @@ OPERATIONS = {
     'planning.source_budget_sizing': portfolio_decision.source_budget_sizing,
     'planning.allocation_context': portfolio_decision.allocation_context,
     'planning.source_allocation_context': source_exposure.source_allocation_context,
+    'planning.fund_comparison_report': fund_comparison.fund_comparison_report,
     'planning.friction_context': portfolio_decision.friction_context,
     'planning.input_roles': planning_roles.input_roles,
     'planning.source_roles': planning_roles.source_roles,
@@ -252,7 +254,7 @@ MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
            'horizon_review.py', 'cash_benchmark.py', 'trading_calendar.py', 'allocation_policy.py',
            'portfolio_decision.py', 'planning_roles.py', 'portfolio_projection.py', 'planning_comparison.py', 'concentration_bounds.py',
            'flow_normalization.py', 'price_comparison.py', 'recommendation_report.py', 'employer_reference.py',
-           'equity_cash_comparison.py', 'source_exposure.py', 'technical_toolkit.py',
+           'equity_cash_comparison.py', 'source_exposure.py', 'fund_comparison.py', 'technical_toolkit.py',
            'fundamental_toolkit.py', 'sentiment_toolkit.py', 'factor_research.py',
            'derivatives_toolkit.py', 'paper_exchange.py', 'platform_readiness.py', 'time_series_toolkit.py',
                'portable_quant.py', 'point_in_time_data.py', 'vintage_eligibility.py', 'terminal_return_coverage.py', 'costed_bar_replay.py', 'monthly_experiment.py',
