@@ -1,7 +1,9 @@
 """Complete retained-source mapping for advisory allocation_context; no selection."""
 from copy import deepcopy
-from decimal import Decimal
+from decimal import Context, Decimal, InvalidOperation, localcontext, ROUND_HALF_EVEN
+from fractions import Fraction
 import hashlib
+import json
 
 from quant_common import digest, require
 from report_facts import pointer, strict_json
@@ -23,6 +25,134 @@ def _known_label(value, field):
     return value.casefold() != 'unknown'
 
 
+TOTAL_FUND_WEIGHT = 'TOTAL_FUND_WEIGHT'
+SUPPLIED_WEIGHT_SUM = 'SUPPLIED_IMMEDIATE_HOLDINGS_WEIGHT_SUM'
+
+
+def _weight_decimal(value):
+    """Bound exact source number/string operands without passing through float."""
+    if isinstance(value, bool) or not isinstance(value, (str, Decimal, int)):
+        return None, 'WEIGHT_MISSING_OR_NOT_DECIMAL'
+    text = str(value)
+    if len(text) > 256 or text != text.strip():
+        return None, 'WEIGHT_DECIMAL_BOUND_EXCEEDED'
+    try:
+        number = Decimal(text)
+    except InvalidOperation:
+        return None, 'WEIGHT_NOT_DECIMAL'
+    if not number.is_finite() or number < 0 or number > 1:
+        return None, 'WEIGHT_OUTSIDE_FINITE_UNIT_INTERVAL'
+    if len(number.as_tuple().digits) > 128 or abs(number.as_tuple().exponent) > 128:
+        return None, 'WEIGHT_DECIMAL_BOUND_EXCEEDED'
+    return number, None
+
+
+def _weight_fraction(numerator, denominator, basis, reason=None):
+    if reason is not None:
+        return {'basis': basis, 'status': 'UNAVAILABLE', 'reason': reason,
+                'numerator': None, 'denominator': None, 'fraction': None,
+                'percent': None, 'fraction_rounded': None, 'percent_rounded': None}
+    with localcontext(Context(prec=512)) as exact_context:
+        scaled_numerator = numerator * 100
+    with localcontext(Context(prec=34, rounding=ROUND_HALF_EVEN)) as context:
+        fraction = numerator / denominator
+        percent = scaled_numerator / denominator
+    exact = Fraction(numerator) / Fraction(denominator)
+    return {'basis': basis, 'status': 'COMPUTED', 'reason': None,
+            'numerator': str(numerator), 'denominator': str(denominator),
+            'fraction': str(fraction), 'percent': str(percent),
+            'fraction_rounded': Fraction(fraction) != exact,
+            'percent_rounded': Fraction(percent) != exact * 100,
+            'display_precision_significant_digits': 34, 'rounding': 'ROUND_HALF_EVEN'}
+
+
+def _fund_weight_basis(records, conflicted):
+    """Source-only immediate-row weights; never account or terminal-issuer weights."""
+    bindings = [deepcopy(item['binding']) for item in records]
+    first = records[0]
+    result = {'schema_interpretation': 'Supplied holding.weight is a fraction of the total fund.',
+              'scope': 'Immediate supplied holdings rows, including cash and opaque nested fund wrappers; not terminal issuer coverage or account exposure.',
+              'account_notional_added': False, 'source_bindings': bindings,
+              'holdings_as_of': first['record'].get('holdings_as_of') if isinstance(first['record'].get('holdings_as_of'), str) else None,
+              'holdings_as_of_pointer': first['binding']['pointer']+'/holdings_as_of',
+              'source_authenticity_verified': False, 'rows': []}
+    if conflicted or any(item['record'] != first['record'] for item in records[1:]):
+        return {**result, 'holdings_as_of': None, 'holdings_as_of_pointer': None,
+                'status': 'UNRESOLVED', 'reason': 'CONFLICTING_FUND_RECORDS', 'coverage': None}
+    record, binding = first['record'], first['binding']
+    holdings = record.get('holdings')
+    if holdings is None:
+        return {**result, 'status': 'UNRESOLVED', 'reason': 'HOLDINGS_NOT_SUPPLIED', 'coverage': None}
+    if len(holdings) > 10000:
+        return {**result, 'status': 'UNRESOLVED', 'reason': 'HOLDINGS_COUNT_BOUND_EXCEEDED', 'coverage': None}
+    parsed = [_weight_decimal(row.get('weight')) for row in holdings]
+    known = [value for value, reason in parsed if reason is None]
+    with localcontext(Context(prec=512)) as context:
+        # Exact sum within the stated operand/count bounds.
+        known_sum = sum(known, Decimal(0))
+        missing_fraction = Decimal(1) - known_sum
+    complete = len(known) == len(holdings)
+    declared, declared_reason = _weight_decimal(record.get('holdings_coverage'))
+    declared_present = record.get('holdings_coverage') is not None
+    if not declared_present:
+        coverage_status = 'NOT_SUPPLIED'
+    elif declared_reason:
+        coverage_status = 'INVALID_DECLARED_COVERAGE'
+    elif not complete:
+        coverage_status = 'UNKNOWN_INCOMPLETE_WEIGHTS'
+    elif declared != known_sum:
+        coverage_status = 'DECLARED_COVERAGE_WEIGHT_MISMATCH'
+    else:
+        coverage_status = 'MATCH'
+    reason = ('INCOMPLETE_OR_INVALID_HOLDING_WEIGHTS' if not complete else
+              'SUPPLIED_WEIGHT_SUM_EXCEEDS_ONE' if known_sum > 1 else
+              'ZERO_SUPPLIED_WEIGHT_SUM' if known_sum == 0 else
+              coverage_status if coverage_status in {'INVALID_DECLARED_COVERAGE', 'DECLARED_COVERAGE_WEIGHT_MISMATCH'} else None)
+    result['coverage'] = {'status': coverage_status, 'declared': str(declared) if declared is not None else None,
+                          'declared_unavailable_reason': declared_reason if declared_present else 'NOT_SUPPLIED',
+                          'observed_known_weight_sum': str(known_sum), 'all_supplied_weights_usable': complete,
+                          'unusable_weight_count': len(holdings)-len(known),
+                          'unrepresented_total_fund_fraction': str(missing_fraction) if complete and 0 <= known_sum <= 1 and coverage_status in {'MATCH','NOT_SUPPLIED'} else None,
+                          'declared_pointer': binding['pointer']+'/holdings_coverage',
+                          'supplied_holdings_pointer': binding['pointer']+'/holdings'}
+    for index, (holding, (weight, weight_reason)) in enumerate(zip(holdings, parsed)):
+        row_binding = {**binding, 'pointer': binding['pointer']+'/holdings/'+str(index)+'/weight'}
+        result['rows'].append({'symbol': holding['symbol'], 'source_binding': row_binding,
+            'total_fund_fraction': _weight_fraction(weight, Decimal(1), TOTAL_FUND_WEIGHT, weight_reason),
+            'supplied_slice_fraction': _weight_fraction(weight, known_sum, SUPPLIED_WEIGHT_SUM, reason or weight_reason)})
+    result.update(status='COMPUTED' if reason is None else 'UNRESOLVED', reason=reason)
+    return result
+
+
+def _fund_weight_report(fund_context):
+    """Render only freshly calculated fields, not caller-authored metric text."""
+    lines = ['Fund composition: total-fund and supplied immediate-holdings bases.',
+             'These source facts add no account notional. Immediate rows are not terminal identified issuers.']
+    for fund in fund_context:
+        basis = fund['weight_basis_evidence']
+        lines.append('Fund '+json.dumps(fund['symbol'], ensure_ascii=True)+': '+basis['status']+'.')
+        if basis['reason']:
+            lines.append('Unresolved basis: '+basis['reason']+'.')
+        coverage = basis['coverage']
+        if coverage is not None:
+            lines.append('Coverage '+coverage['status']+'; declared='+str(coverage['declared'])+
+                         '; observed usable weight sum='+coverage['observed_known_weight_sum']+
+                         '; unusable rows='+str(coverage['unusable_weight_count'])+'.')
+        for row in basis['rows']:
+            parts = []
+            for key in ['total_fund_fraction', 'supplied_slice_fraction']:
+                value = row[key]
+                if value['status'] == 'COMPUTED':
+                    text = value['basis']+': '+value['numerator']+' / '+value['denominator']+' = '+value['percent']+'%'
+                    if value['percent_rounded']:
+                        text += ' (rounded to 34 significant digits, half-even)'
+                else:
+                    text = value['basis']+': unavailable ('+value['reason']+')'
+                parts.append(text)
+            lines.append(json.dumps(row['symbol'], ensure_ascii=True)+'; '+'; '.join(parts)+'.')
+    return '\n'.join(lines)+'\n'
+
+
 def source_allocation_context(document):
     """Merge all declared source collections before exposing selected gross rows.
 
@@ -42,6 +172,7 @@ def source_allocation_context(document):
     require(isinstance(sources, list) and sources, 'WHOLE_SOURCES_REQUIRED')
     identities, funds, retained, consumed, conflicts, gaps = {}, {}, [], [], [], []
     seen_source_ids = set()
+    fund_basis_records = {}
 
     def merge(symbol, values, binding):
         require(isinstance(symbol, str) and symbol.strip() == symbol and symbol,
@@ -74,6 +205,9 @@ def source_allocation_context(document):
         raw = source['text'].encode('utf-8')
         require(hashlib.sha256(raw).hexdigest() == source.get('sha256'), 'SOURCE_BYTES_HASH_MISMATCH')
         parsed = strict_json(raw)
+        # Supplemental ratios use exact original JSON numeric lexemes; legacy
+        # mapping and account arithmetic retain their existing parsed values.
+        exact_parsed = json.loads(raw.decode('utf-8-sig'), parse_float=Decimal, parse_int=Decimal)
         bindings = source.get('bindings')
         require(isinstance(bindings, dict) and 'root' in bindings, 'EXPLICIT_ROOT_BINDING_REQUIRED')
         root_path = bindings['root']
@@ -160,6 +294,8 @@ def source_allocation_context(document):
                 symbol, fund_path = fund.get('symbol'), path + '/' + str(index)
                 require(isinstance(symbol, str) and symbol, 'FUND_SYMBOL_REQUIRED')
                 entry = {'record': deepcopy(fund), 'binding': evidence(fund_path)}
+                fund_basis_records.setdefault(symbol, []).append(
+                    {'record': pointer(exact_parsed, fund_path), 'binding': evidence(fund_path)})
                 if symbol in funds and digest(funds[symbol]['record']) != digest(fund):
                     conflicts.append({'symbol': symbol, 'field': 'fund', 'observations': [funds[symbol], entry]})
                     funds[symbol]['conflicted'] = True
@@ -265,7 +401,8 @@ def source_allocation_context(document):
     # Build complete context for unselected fund alternatives too: these are
     # retained source facts, never additional account notional or selections.
     fund_context = [{'symbol': symbol, 'source_record': deepcopy(entry['record']),
-                     'source_binding': deepcopy(entry['binding']), 'mapped_context': enrich(symbol)}
+                     'source_binding': deepcopy(entry['binding']), 'mapped_context': enrich(symbol),
+                     'weight_basis_evidence': _fund_weight_basis(fund_basis_records[symbol], entry.get('conflicted', False))}
                     for symbol, entry in funds.items()]
     rows = []
     for row in document['rows']:
@@ -287,6 +424,7 @@ def source_allocation_context(document):
             'currency': document['currency'], 'input_role': document['role'], 'input_sha256': digest(document),
             'retained_input': deepcopy(document), 'sources': retained,
             'identity_context': list(identities.values()), 'fund_context': fund_context,
+            'fund_weight_report': _fund_weight_report(fund_context),
             'normalized_allocation_input': normalized, 'allocation_result': result,
             'mapping_status': mapping_status, 'mapping_gaps': gaps, 'mapping_conflicts': conflicts,
             'missing_classification_fields': missing,

@@ -2,6 +2,89 @@
 
 The host assistant operates this workflow from the user's ordinary research request. Do not ask the user to write review JSON, find defects in the assistant's answer, or become the reviewer. This is an on-demand portable workflow: no local service, model API, subscription, credentials or background worker is required. Python, where available, retains evidence and checks bindings; the native host assistant performs the semantic review.
 
+## Start the review without a supplied protocol
+
+For a research route that adopts this cycle, the host assistant owns setup as
+well as review. The original request and available source bytes are the starting
+inputs, not a prewritten `answer_review` protocol. Before drafting, the assistant
+identifies material review units and a whole-request coverage unit, locates their
+actual request spans, and assigns the required source IDs. For original files,
+use the pinned-file bootstrap below: it ingests the entire allowlisted manifest,
+adds a whole-request coverage unit and writes the real protocol/head. Adopt any
+additional native-authored material units before that call. Existing `create_run`
+(or CLI `create`) remains available for already retained in-memory bytes and
+units. Keep the returned protocol and head pins in the coordinating session.
+The lower-level `answer_review.assess` consumes this protocol later; it does not
+create it or dispatch the native review.
+
+If an externally adopted protocol is supplied, preserve its scope and pins and
+check applicability; do not silently replace it. If none is supplied, create the
+assistant-owned protocol above. Neither a missing attachment nor the standalone
+assessor's optional status makes an adopted review cycle optional. An unavailable
+independent reviewer selects `self_native`; an unavailable Python helper selects
+the native artifact fallback below. Neither condition removes the actual second
+pass over the complete draft and original evidence. Record a real remaining
+obstacle and incomplete disposition if that review cannot be completed; never
+populate favorable findings merely to finish the record.
+
+## Pinned-file bootstrap
+
+The host can initialize the review directly from original files without writing
+an intermediate JSON job that copies or normalizes their text:
+
+```sh
+python -B scripts/research_revision.py bootstrap --run PRIVATE_NEW_RUN --request ORIGINAL_REQUEST.txt --request-sha256 REQUEST_SHA256 --source-manifest SOURCE-INGRESS.json --manifest-sha256 MANIFEST_SHA256 --source-root ORIGINAL_SOURCE_ROOT --adopted-at ISO_TIMESTAMP
+```
+
+The assistant supplies actual paths, externally retained hashes and adoption time
+using its permitted native tools. These are internal workflow inputs, not forms
+the user must prepare. `PRIVATE_NEW_RUN` must not exist, its parent must exist,
+and it must be outside the installed skill. There is no source-subset option.
+The explicit manifest uses exactly this existing shape:
+
+```json
+{"schema_version":1,"sources":[{"id":"release","path":"release.txt","sha256":"ACTUAL_SOURCE_SHA256","format":"text"}]}
+```
+
+Every row is ingested; `format` is `text` or `json`, with nonempty readable UTF-8
+bytes. JSON source bodies remain original evidence, not automatically interpreted
+or certified facts. Source IDs and relative forward-slash paths must be unique
+including case aliases; escape paths, reparse points, authentication-store names,
+missing files, unexpected manifest fields and hash mismatches are rejected.
+The externally retained manifest pin prevents silently substituting a subset.
+Completeness is only relative to that explicit allowlist, not proof that it
+contains every possible source. CRLF, non-ASCII characters and an optional UTF-8
+BOM are retained byte-for-byte; request spans are UTF-8 byte offsets.
+
+The deterministic `whole-request` unit spans the entire original request and
+requires all original sources. It explicitly asks the native reviewer to identify
+material omissions in both the draft and unit roster. It is a review obligation,
+not an inferred semantic rubric or evidence that the request is fully understood.
+To add material units identified by the host, pass `--units NATIVE_UNITS.json
+--units-sha256 UNITS_SHA256` before initialization. The file is a list of the
+existing unit objects (`id`, `requirement`, `request_spans`,
+`required_source_ids`); it cannot override the whole-request unit or supply
+review statuses. No favorable judgments, source dispositions or findings are
+created. The host must review the complete original request even if it uses only
+the minimum whole-request scaffold.
+
+The output preserves `request.md`, every `sources/ID.bin`, the exact original
+`bootstrap-manifest.json` with reversible original-path/ID mapping, `protocol.json`
+and `run.json`. Optional bootstrap provenance is bound into the new run's hash;
+legacy runs and their hashes are unchanged. Replay needs only the retained run,
+not original machine paths. The input hashes are checked before writing and
+again after staging; an observed concurrent source change raises and leaves the
+failed run intact for inspection.
+
+Initialization returns `DRAFT_REQUIRED`; freezing the complete pair returns
+`REVIEW_REQUIRED`. Perform a real second-pass native review and record it through
+`review` with the actual protocol and current head. `self_native` is available
+when an independent native reviewer is unavailable. `REVIEW_RECORDED` is not a
+semantic pass: retain adverse and incomplete findings, correct within the budget,
+and select the exact latest reviewed pair with its notice. `final` without a
+review is rejected. `verify` replays these states and the original inventory;
+none proves source authenticity, reviewer honesty or whole-answer correctness.
+
 ## Native workflow
 
 1. Retain the exact original request. Interpret its material subtasks, including requested alternatives, valuation/period/currency assumptions, source freshness and remaining unknowns. Obtain permitted sources using the host's actual tools; preserve the evidence corpus. Generated numerical annexes can be distinct supporting sources. Before drafting, freeze explicit review units with request byte spans and required source IDs. Include a whole-request coverage unit: the reviewer must read the original request and identify any material requirement missing from the draft or from the unit roster. Never silently narrow the request to what the calculator supports.
@@ -19,6 +102,9 @@ Final labels are `REVIEWED_DELIVERY` when the real binding assessor reports a co
 Import `scripts/research_revision.py` using the chosen host's available Python environment. The assistant supplies these artifacts internally; the user does not need to author forms.
 
 ```python
+bootstrap_run(root, request_path, request_sha256, source_manifest_path,
+              manifest_sha256, source_root, adopted_at, *, material_units=None,
+              max_corrections=2)
 create_run(root, request_bytes, sources, units, adopted_at, max_corrections=2)
 freeze_draft(root, markdown_bytes, response_bytes, captured_at,
              *, expected_head_sha256, parent_draft_id=None)

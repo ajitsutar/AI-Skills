@@ -653,7 +653,8 @@
       "audience": "Intermediate",
       "guides": [
         "references/research-methods.md",
-        "references/screening-and-value-traps.md"
+        "references/screening-and-value-traps.md",
+        "references/disclosure-claims.md"
       ],
       "prompts": [
         {

@@ -630,7 +630,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ## Social hypotheses, ownership and disclosure context
 
-**Audience:** Intermediate. Guides: [research methods](references/research-methods.md), [screening and value traps](references/screening-and-value-traps.md).
+**Audience:** Intermediate. Guides: [research methods](references/research-methods.md), [screening and value traps](references/screening-and-value-traps.md), [disclosure claims](references/disclosure-claims.md).
 
 ### 123. Research competing public narratives
 

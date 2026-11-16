@@ -1,7 +1,13 @@
 # Source-bound insider and institution disclosure delivery
 
-For supplied insider transaction rows or institution snapshots, adopt `analysis_profile:
-INSIDER_DISCLOSURES` in the externally pinned [coverage scope](source-coverage.md).
+When the requested analysis is covered by the insider-row or institution-snapshot
+capabilities below, adopt `analysis_profile: INSIDER_DISCLOSURES` in the externally
+pinned [coverage scope](source-coverage.md). The presence of such rows in a mixed
+source is not sufficient to select this profile. Public claims about an official
+or household trade, event proximity, advance knowledge or motive require
+[disclosure claim analysis](disclosure-claims.md). For those requests, deliver the
+complete authored assessment; use this profile only for relevant supported
+subtasks as a clearly scoped annex. Source quotations do not assess the claim.
 Keep the original request, literal topic spans, every original source and explicit
 topic gaps. The native profile generates the actual complete Markdown/JSON pair;
 verify and deliver those exact files with an artifact status/link-only cover note.

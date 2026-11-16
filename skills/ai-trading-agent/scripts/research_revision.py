@@ -9,7 +9,7 @@ from __future__ import annotations
 import argparse
 import copy
 import json
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 
 import answer_review as review
 
@@ -18,6 +18,133 @@ require = evidence.require
 METHOD = 'native-research-revision-1'
 MODES = ('independent_native', 'self_native')
 SKILL_ROOT = Path(__file__).resolve().parents[1]
+BOOTSTRAP_METHOD = 'pinned-review-inputs-1'
+WHOLE_REQUEST_ID = 'whole-request'
+
+
+def _workflow(state):
+    if state['final'] is not None:
+        return {'workflow_state': 'DELIVERY_SELECTED', 'next_action': 'Deliver the exact selected pair and its review notice; retain any unresolved findings.'}
+    if not state['drafts']:
+        return {'workflow_state': 'DRAFT_REQUIRED', 'next_action': 'Author and freeze the complete draft pair. An actual second-pass native review is still required.'}
+    if len(state['reviews']) < len(state['drafts']):
+        return {'workflow_state': 'REVIEW_REQUIRED', 'next_action': 'Perform an actual native second-pass review of the whole latest draft against the original request and all adopted units/sources; then record that review.'}
+    return {'workflow_state': 'REVIEW_RECORDED', 'next_action': 'Correct fixable findings within the retained budget and review the new complete pair, or select the latest reviewed pair with its explicit limitations.'}
+
+
+def _readable(raw):
+    _raw(raw)
+    text = raw.decode('utf8')
+    require(bool(text.strip()) and all(ord(c) >= 32 or c in '\t\r\n' for c in text),
+            'READABLE_UTF8_INPUT_REQUIRED')
+    return raw
+
+
+def _input_path(path):
+    path = Path(path).absolute()
+    # Explicit allowlisting is not permission to read host authentication stores.
+    denied = {'.ssh', '.aws', '.azure', '.env', 'credentials', 'credentials.json',
+              'login data', 'cookies', 'local state', 'web data', 'id_rsa', 'id_ed25519'}
+    require(not any(part.casefold() in denied for part in path.parts), 'AUTHENTICATION_INPUT_EXCLUDED')
+    return evidence._path(path.parent, path.name)
+
+
+def _pinned_input(path, expected):
+    evidence.sha(expected)
+    path = _input_path(path)
+    require(path.stat().st_size <= evidence.MAX_BYTES, 'ARTIFACT_SIZE_LIMIT')
+    raw = _raw(path.read_bytes())
+    require(review.sha(raw) == expected, 'ORIGINAL_INPUT_HASH_MISMATCH')
+    return path, raw
+
+
+def _source_manifest(raw):
+    manifest = evidence._json(raw)
+    evidence.exact(manifest, ('schema_version', 'sources'), 'bootstrap_source_manifest')
+    require(type(manifest['schema_version']) is int and manifest['schema_version'] == 1, 'SCHEMA_VERSION')
+    rows = manifest['sources']
+    require(type(rows) is list and 0 < len(rows) <= review.MAX_SOURCES, 'NONEMPTY_BOUNDED_SOURCE_ALLOWLIST')
+    ids, paths = set(), set()
+    for row in rows:
+        evidence.exact(row, ('id', 'path', 'sha256', 'format'), 'bootstrap_source')
+        sid = review.identifier(row['id']); evidence.sha(row['sha256'])
+        name = row['path']; require(type(name) is str and name, 'SOURCE_PATH_REQUIRED')
+        p = PurePosixPath(name)
+        require(not p.is_absolute() and '\\' not in name and ':' not in name
+                and all(part not in ('', '.', '..') for part in name.split('/')), 'UNSAFE_SOURCE_PATH')
+        require(sid.casefold() not in ids and name.casefold() not in paths, 'DUPLICATE_SOURCE_ID_OR_PATH')
+        require(row['format'] in ('text', 'json'), 'READABLE_SOURCE_FORMAT_REQUIRED')
+        ids.add(sid.casefold()); paths.add(name.casefold())
+    return manifest
+
+
+def _whole_request(request, source_ids):
+    return {'id': WHOLE_REQUEST_ID,
+            'requirement': 'Review coverage of the entire original request. Identify material requirements or source qualifications omitted from the draft or adopted unit roster; assess them explicitly rather than treating this scaffold as proof of semantic completeness.',
+            'request_spans': [{'start_byte': 0, 'end_byte': len(request), 'sha256': review.sha(request)}],
+            'required_source_ids': list(source_ids)}
+
+
+def _bootstrap_check(value, plan, reader):
+    evidence.exact(value, ('method', 'manifest', 'request_sha256', 'whole_request_unit_id'), 'bootstrap_provenance')
+    require(value['method'] == BOOTSTRAP_METHOD and value['whole_request_unit_id'] == WHOLE_REQUEST_ID,
+            'BOOTSTRAP_METHOD')
+    require(value['manifest']['path'] == 'bootstrap-manifest.json', 'BOOTSTRAP_MANIFEST_PATH')
+    manifest = _source_manifest(reader.read(value['manifest']))
+    request = _readable(reader.read(plan['original_request']))
+    require(value['request_sha256'] == review.sha(request), 'BOOTSTRAP_REQUEST_PIN')
+    ids = [row['id'] for row in manifest['sources']]
+    require([row['id'] for row in plan['sources']] == ids, 'COMPLETE_MANIFEST_SOURCE_INVENTORY_REQUIRED')
+    for source, original in zip(plan['sources'], manifest['sources']):
+        require(source['artifact'] == {'path': 'sources/' + original['id'] + '.bin', 'sha256': original['sha256']},
+                'BOOTSTRAP_SOURCE_ASSOCIATION')
+        _readable(reader.read(source['artifact']))
+    require(plan['units'][0] == _whole_request(request, ids), 'WHOLE_REQUEST_REVIEW_UNIT_REQUIRED')
+
+
+def bootstrap_run(root, request_path, request_sha256, source_manifest_path,
+                  manifest_sha256, source_root, adopted_at, *, material_units=None,
+                  max_corrections=2):
+    """Create actual review state from externally pinned readable original files.
+
+    The whole allowlist is ingested, with no source-selection argument. The host
+    authors any additional material units before protocol freeze. Neither this
+    scaffold nor its next-action label is a review or a completeness certificate.
+    """
+    request_path, request = _pinned_input(request_path, request_sha256); _readable(request)
+    manifest_path, manifest_raw = _pinned_input(source_manifest_path, manifest_sha256)
+    manifest = _source_manifest(manifest_raw)
+    sources, retained = {}, [(request_path, request), (manifest_path, manifest_raw)]
+    source_root = Path(source_root).absolute()
+    for row in manifest['sources']:
+        # Validate lexical scope and all ancestors before opening the listed file.
+        path = evidence._path(source_root, row['path'])
+        path, raw = _pinned_input(path, row['sha256']); sources[row['id']] = _readable(raw)
+        retained.append((path, raw))
+        require(sum(len(b) for b in sources.values()) + len(request) < review.MAX_TOTAL // 2,
+                'SOURCE_CORPUS_SIZE_LIMIT')
+    require(material_units is None or type(material_units) is list, 'MATERIAL_UNITS_LIST_REQUIRED')
+    units = [_whole_request(request, sources)] + copy.deepcopy(material_units or [])
+    # Validate the complete native-authored roster before creating any output.
+    artifacts = {'request.md': request, **{'sources/' + sid + '.bin': raw for sid, raw in sources.items()}}
+    class MemoryReader:
+        def read(self, ref):
+            raw = artifacts[ref['path']]
+            require(review.sha(raw) == ref['sha256'], 'PREFLIGHT_ARTIFACT_PIN')
+            return raw
+    plan = {'schema_version': 1, 'id': 'research-review', 'adopted_at': adopted_at,
+            'original_request': {'path': 'request.md', 'sha256': review.sha(request)},
+            'sources': [{'id': sid, 'artifact': {'path': 'sources/' + sid + '.bin', 'sha256': review.sha(raw)}}
+                        for sid, raw in sources.items()], 'units': units, 'max_material_error_units': 0}
+    review.protocol(encode(plan), MemoryReader())
+    require(type(max_corrections) is int and 0 <= max_corrections <= 5, 'MAX_CORRECTIONS_0_TO_5')
+    for path, raw in retained:
+        require(_input_path(path).read_bytes() == raw, 'ORIGINAL_INPUT_CHANGED_DURING_BOOTSTRAP')
+    result = create_run(root, request, sources, units, adopted_at, max_corrections,
+                        _bootstrap_manifest=manifest_raw)
+    for path, raw in retained:
+        require(_input_path(path).read_bytes() == raw, 'ORIGINAL_INPUT_CHANGED_DURING_BOOTSTRAP')
+    return result
 
 
 def encode(value):
@@ -57,10 +184,10 @@ def _write(root, name, raw):
 def _receipt(state, **extra):
     return {'method': METHOD, 'run_sha256': state['run_sha256'],
             'head_sha256': state['head_sha256'], 'protocol': copy.deepcopy(state['run']['protocol']),
-            **extra}
+            **_workflow(state), **extra}
 
 
-def create_run(root, request_bytes, sources, units, adopted_at, max_corrections=2):
+def create_run(root, request_bytes, sources, units, adopted_at, max_corrections=2, *, _bootstrap_manifest=None):
     """Freeze exact request/sources and assistant-authored answer_review units.
 
     ``root`` must not exist, its parent must exist, and its resolved path must
@@ -97,6 +224,10 @@ def create_run(root, request_bytes, sources, units, adopted_at, max_corrections=
     protocol_ref = _write(root, 'protocol.json', plan_raw)
     run = {'schema_version': 1, 'method': METHOD, 'protocol': protocol_ref,
            'max_corrections': max_corrections, 'delivery_scope': 'complete_user_delivery'}
+    if _bootstrap_manifest is not None:
+        run['bootstrap'] = {'method': BOOTSTRAP_METHOD,
+                            'manifest': _write(root, 'bootstrap-manifest.json', _bootstrap_manifest),
+                            'request_sha256': review.sha(request_bytes), 'whole_request_unit_id': WHOLE_REQUEST_ID}
     _write(root, 'run.json', encode(run))
     return _receipt(verify(root))
 
@@ -142,12 +273,15 @@ def verify(root, expected_head_sha256=None):
     """Replay the actual verifier and all preserved events; optionally bind a caller pin."""
     root = _root(root)
     run_raw = _read(root, 'run.json'); run = evidence._json(run_raw)
-    evidence.exact(run, ('schema_version', 'method', 'protocol', 'max_corrections', 'delivery_scope'), 'revision_run')
+    fields = ('schema_version', 'method', 'protocol', 'max_corrections', 'delivery_scope')
+    evidence.exact(run, fields + (('bootstrap',) if 'bootstrap' in run else ()), 'revision_run')
     require(type(run['schema_version']) is int and run['schema_version'] == 1
             and run['method'] == METHOD and run['delivery_scope'] == 'complete_user_delivery', 'REVISION_RUN_METHOD')
     require(type(run['max_corrections']) is int and 0 <= run['max_corrections'] <= 5, 'MAX_CORRECTIONS_0_TO_5')
     reader = review.Reader(root)
     plan, _ = review.protocol(reader.read(run['protocol']), reader)
+    if 'bootstrap' in run:
+        _bootstrap_check(run['bootstrap'], plan, reader)
     require(plan['max_material_error_units'] == 0, 'ZERO_MATERIAL_ERROR_REVIEW_POLICY_REQUIRED')
     known = {'run.json', *reader.files}
     state = {'run': run, 'run_sha256': review.sha(run_raw), 'head_sha256': review.sha(run_raw),
@@ -219,6 +353,7 @@ def verify(root, expected_head_sha256=None):
     if expected_head_sha256 is not None:
         evidence.sha(expected_head_sha256)
         require(state['head_sha256'] == expected_head_sha256, 'EXTERNAL_HEAD_PIN_MISMATCH')
+    state.update(_workflow(state))
     return state
 
 
@@ -287,12 +422,37 @@ def select_final(root, draft_id, *, expected_head_sha256):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument('action', choices=('create', 'freeze', 'review', 'final', 'verify'))
+    parser.add_argument('action', choices=('bootstrap', 'create', 'freeze', 'review', 'final', 'verify'))
     parser.add_argument('--run', type=Path, required=True)
     parser.add_argument('--job', type=Path, help='Explicit bounded JSON; byte inputs use UTF-8 text fields.')
     parser.add_argument('--expected-head-sha256')
+    parser.add_argument('--request', type=Path)
+    parser.add_argument('--request-sha256')
+    parser.add_argument('--source-manifest', type=Path)
+    parser.add_argument('--manifest-sha256')
+    parser.add_argument('--source-root', type=Path)
+    parser.add_argument('--adopted-at')
+    parser.add_argument('--max-corrections', type=int)
+    parser.add_argument('--units', type=Path, help='Optional native-authored material-unit list, before protocol freeze.')
+    parser.add_argument('--units-sha256')
     args = parser.parse_args(argv)
     try:
+        bootstrap_args = (args.request, args.request_sha256, args.source_manifest, args.manifest_sha256,
+                          args.source_root, args.adopted_at, args.max_corrections, args.units, args.units_sha256)
+        if args.action == 'bootstrap':
+            require(args.job is None and args.expected_head_sha256 is None, 'BOOTSTRAP_OPTION_CONFLICT')
+            require(all(x is not None for x in bootstrap_args[:6]), 'PINNED_BOOTSTRAP_INPUTS_REQUIRED')
+            require((args.units is None) == (args.units_sha256 is None), 'MATERIAL_UNITS_EXTERNAL_PIN_REQUIRED')
+            units = None
+            if args.units is not None:
+                _, unit_raw = _pinned_input(args.units, args.units_sha256)
+                units = evidence._json(unit_raw)
+            result = bootstrap_run(args.run, args.request, args.request_sha256, args.source_manifest,
+                                   args.manifest_sha256, args.source_root, args.adopted_at,
+                                   material_units=units, max_corrections=2 if args.max_corrections is None else args.max_corrections)
+            print(encode(result).decode('utf8'), end='')
+            return 0
+        require(all(x is None for x in bootstrap_args), 'BOOTSTRAP_OPTIONS_REQUIRE_BOOTSTRAP_ACTION')
         job = {}
         if args.job:
             job = evidence._json(_read(args.job.absolute().parent, args.job.name))

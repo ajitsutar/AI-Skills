@@ -2,7 +2,13 @@
 
 [Update earlier research](references/research-refresh.md) on demand while preserving its original answer, source bytes and review. Recheck selected evidence, recompute affected results and explain changes, retractions and unchecked information. [Options activity](references/options-activity.md) adds contract-level chain/print diagnostics and dated float-share inputs for existing positioning calculations. [Workflow setup](references/workflow-setup.md) checks the selected task against observed host tools and dependencies, with supported recovery paths. These helpers run only when invoked; paid data remains optional.
 
-For ordinary earnings/guidance and event-driven stock questions, the [assistant-operated research workflow](references/ordinary-research-workflows.md) handles internal inputs, filing/exhibit reading, supported calculations and the complete answer. The [review and correction cycle](references/research-review-cycle.md) retains first drafts, records actual review and corrects identified material problems within a bounded run. Unresolved findings remain visible; the user does not fill out technical review forms. [Filing content](references/filing-documents.md) preserves the selected document bytes and extracts supported event items, passages and ownership facts. Semantic interpretation, source authenticity and overall completeness remain matters for actual review.
+For ordinary earnings/guidance and event-driven stock questions, the [assistant-operated research workflow](references/ordinary-research-workflows.md) handles internal inputs, filing/exhibit reading, supported calculations and the complete answer. The [review and correction cycle](references/research-review-cycle.md) retains first drafts, records actual review and corrects identified material problems within a bounded run. The assistant 
+creates the request-bound protocol before drafting. Its pinned-file bootstrap reads the exact original request and complete supplied source allowlist, preserves their bytes, and returns real protocol/head pins with explicit next steps; it never supplies review judgments. The assistant performs a native self-review if an independent native 
+reviewer is unavailable. Unresolved findings remain visible; the user does not supply technical review forms. [Filing content](references/filing-documents.md) preserves the selected document bytes and extracts supported event items, passages and ownership facts. Semantic interpretation, source authenticity and overall completeness remain matters for actual review.
+
+Fund composition comparisons retain [source-bound denominator evidence](references/source-exposure.md#fund-composition-denominators): total-fund weights and shares of the supplied immediate holdings slice stay distinct in structured results and readable text, including unheld alternatives. Missing or conflicting coverage remains explicit.
+
+[Disclosure claim analysis](references/disclosure-claims.md) investigates public trading allegations through a complete authored assessment of the claim, disclosure history, event chronology and evidentiary limits. Mixed-source insider rows do not select the answer scope.
 
 [Source-bound insider and institution disclosure delivery](references/insider-disclosures.md) keeps currency and identity local to each original row. Native mechanisms, dates, conditional listed-row arithmetic and explicit institutional amendment chains remain separate from actual cash, current holdings and motive claims in the complete replayed answer.
 
@@ -25,7 +31,7 @@ Source-first analyst reports deliver explicit range width, IQR and the quartile 
 
 The package is a self-contained skill for supported hosts such as Muse, Claude and Instinct. It requires no local backend or background service. Bundled commands run only when invoked in a host that supports them; host tools, execution and data access remain capability-dependent. A backend is outside this architecture unless explicitly requested.
 
-Version **5.13.0** includes [production research operations](references/research-operations.md)
+Version **5.13.4** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private

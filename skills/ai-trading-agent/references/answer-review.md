@@ -1,15 +1,19 @@
-# Optional review of the delivered answer
+# Review records for the delivered answer
 
-Use `scripts/answer_review.py` when a researcher or buyer wants a retained,
-itemized review of an actual answer. Ordinary research and delivery require no
-reviewer, purchase, subscription or additional approval. The helper runs offline,
-reads only explicitly named evidence and writes its result to stdout. It does not
-dispatch a reviewer, run a study, grade campaign cases or authorize trades.
+Use `scripts/answer_review.py` to assess retained, itemized review declarations
+against an actual answer. As a standalone tool, adoption of this assessor is
+optional. When a research route calls for the [review and correction cycle](research-review-cycle.md),
+that route still requires the assistant to perform the native review and prepare
+its protocol and records; standalone optionality does not turn that step off.
+No external reviewer, user-authored protocol, purchase, subscription or additional
+approval is required. The helper runs offline, reads only explicitly named
+evidence and writes its result to stdout. It does not dispatch a reviewer, run a
+study, grade campaign cases or authorize trades.
 
 The existing [final report](final-report.md) and
 [complete-delivery route](source-access.md#missing-access-and-useful-completion)
 already verify their readable/structured bytes and supported calculations. This
-optional layer records **declared judgments** against those exact delivered bytes
+record layer captures **declared judgments** against those exact delivered bytes
 and a frozen request-bound unit list. It cannot decide whether arbitrary prose is
 true, whether a source is authentic, or whether that list covers all user intent.
 
@@ -55,7 +59,12 @@ later than review. These declarations do not prove prospective registration.
 
 ## Adopt units and an absolute tolerance
 
-The separate protocol file has exactly:
+In the review cycle, the assistant authors the material units from the original
+request and sources, then calls `research_revision.create_run` to create this
+protocol before freezing a draft. Use the returned protocol reference and retain
+its hash externally; do not wait for a protocol attachment from the user. If a
+valid externally adopted protocol already governs the task, retain its scope and
+pins instead of silently replacing it. The separate protocol file has exactly:
 
 ```json
 {

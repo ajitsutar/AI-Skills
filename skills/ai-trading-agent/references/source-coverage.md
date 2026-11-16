@@ -134,4 +134,6 @@ current source facts; do not invent missing source content, claim a completed
 search, or require a paid account. The whole original request, source inventory,
 first pair and negative review remain preserved.
 
-For supplied insider-row questions, `analysis_profile: INSIDER_DISCLOSURES` invokes [source-bound insider disclosure delivery](insider-disclosures.md) in the complete pair. It preserves original row-local units and mechanisms without importing currency or ownership from other original contexts.
+For requested insider-row or institution-snapshot analysis covered by the native profile (not merely mixed inputs containing those rows), `analysis_profile: INSIDER_DISCLOSURES` invokes [source-bound insider disclosure delivery](insider-disclosures.md) in the complete pair. It preserves original row-local units and mechanisms without importing currency or ownership from other original contexts.
+
+For political or other public claims about a disclosed trade, follow [disclosure claim analysis](disclosure-claims.md). Neither exact source quotation nor the insider profile assesses unsupported claim components. Deliver the complete authored analysis through the existing review cycle, retaining any relevant native output as an annex.

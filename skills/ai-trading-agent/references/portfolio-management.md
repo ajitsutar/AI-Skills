@@ -40,6 +40,12 @@ intraday stops for long-term holdings merely because a tactical model uses them.
 Aggregate sector/theme, country, currency, factor and underlying issuer exposure.
 Review ETF constituents and overlapping funds. Classification quality matters; ETF fund labels are not corporate sectors. Use
 constituent look-through and disclose uncovered exposures.
+When comparing a fund's composition with current holdings or an unheld alternative,
+use the complete-source adapter's [fund composition denominators](source-exposure.md#fund-composition-denominators).
+Its structured evidence and readable projection distinguish total-fund weights from
+shares of the supplied immediate holdings slice. Preserve the basis labels, dated
+coverage and unknowns; a slice percentage does not add an account position or prove
+complete terminal-issuer coverage.
 
 Where sufficient aligned point-in-time return data exist, review covariance,
 correlation clusters and component risk contributions. Distinguish estimation

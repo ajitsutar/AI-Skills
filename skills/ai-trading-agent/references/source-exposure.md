@@ -100,5 +100,44 @@ missing volume units remain visible. A coverage sum mismatch is reported without
 renormalizing weights or inventing a residual asset label. Existing allocation
 arithmetic alone computes exposure and notional-to-volume ratios.
 
+## Fund composition denominators
+
+When discussing a fund's composition, including an unheld alternative beside current
+holdings, use `fund_context[].weight_basis_evidence` and `fund_weight_report` from
+this whole-source operation. Keep both denominator labels in the discussion:
+`TOTAL_FUND_WEIGHT` uses the original constituent weight over one;
+`SUPPLIED_IMMEDIATE_HOLDINGS_WEIGHT_SUM` uses that weight over the sum of every
+usable weight in the complete supplied immediate holdings list. For example,
+weights 0.21 and 0.14 give 21% of the total fund and 60% of the supplied 0.35 slice.
+The unrepresented 0.65 remains outside that slice. A slice fraction does not
+renormalize total-fund or account exposure and is not an additional holding.
+
+Each row retains exact original JSON numeric/string decimal operands, the source
+ID/hash/role/provenance and weight pointer. Coverage retains the complete holdings
+pointer, declared coverage, observed usable sum and unusable-row count. The source
+record and holdings date remain available. Fractions and percentages render to
+34 significant digits with half-even rounding; separate flags disclose whether
+those displays are rounded, while numerator and denominator remain exact within
+the supported bounds (128 decimal digits/exponent magnitude, 10,000 immediate
+rows). Values outside those bounds remain unavailable; legacy source/account
+validation may reject malformed inputs before this supplementary output.
+
+A missing/invalid weight, zero or over-one sum, invalid declared coverage or a
+coverage mismatch withholds the supplied-slice fraction. A valid individual
+whole-fund weight remains visible with its original basis. When declared coverage
+is absent but every listed weight is usable, only the explicitly labeled supplied
+list-sum fraction is computed; no declared coverage is inferred. Conflicting fund
+records, including distinctions hidden by legacy floating-point parsing, have no
+preferred fraction or date. Duplicate identical records retain all source bindings.
+Immediate rows can include cash and opaque nested fund wrappers; their weight sum
+is not necessarily identified terminal-issuer coverage.
+
+The readable report is regenerated from the same source-derived fields on each
+invocation. It does not accept a caller-authored summary, certify surrounding
+prose, establish source authenticity, or prove a comparison participant followed
+the route. Keep actual account rows and denominator explicit; do not invent an
+allocation merely to discuss an unheld fund. Existing `normalized_allocation_input`
+and `allocation_result` arithmetic are unchanged by these supplemental fractions.
+
 Dependencies: Python standard library, `quant_common`, `report_facts`, and
 `portfolio_decision` (its existing allocation dependencies are unchanged).
