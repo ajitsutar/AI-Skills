@@ -53,6 +53,35 @@ explicit denominators. Freeze sensitivity cases before inspecting them; preserve
 failures and revised hypotheses. A variance forecast supplies no expected return
 or probability of achieving a spending target.
 
+### Concentration scope in native allocation comparisons
+
+Use `portfolio.construct` and `portfolio.sensitivity`'s generated
+`concentration_summary` with their `concentration_diagnostics`; retain every
+prespecified alternative and failed result without selecting a winner. Existing
+weights, covariance risk, costs and optimality certificates are separate facts.
+The diagnostic's `nav_squared_weight_sum_excluding_cash` is the sum of squared
+initial-NAV weights for the supplied risky asset IDs. It is a partial squared sum,
+not a normalized HHI, and its reciprocal is not an effective asset count.
+
+`risky_position_gross_distribution` normalizes each absolute weight by the stated
+`denominator_value = sum(abs(weight))`. Its HHI is the sum of those normalized
+shares squared; `effective_equal_weight_count` is the reciprocal of that HHI.
+State the denominator and cash exclusion when quoting either metric. Compare
+normalized shares when gross exposure changes between scenarios. The nonzero
+supplied-position count is separate: the effective count does not establish actual
+holdings, independent bets, issuer/sector diversification or covariance risk.
+For signed positions the scope is absolute gross exposure, not net ownership;
+zero gross exposure leaves HHI and effective count unavailable.
+
+No cash bucket, collateral or borrow reserve is added to this risky distribution.
+`whole_account_concentration` is explicitly `NOT_COMPUTED`. A supplied asset ID
+literally named CASH is still an asset ID, not an inferred cash balance. Do not
+relabel these values as whole-account concentration or infer that lower variance
+means broader diversification. Failed constructions retain unavailable weights
+and the sensitivity summary reports concentration unavailable for those cases.
+The calculation remains advisory and grants no execution permission.
+
+
 [Analyst source extraction](analyst-source-adapter.md) supports
 `analyst.extract_table` and `analyst.earnings_basis`. Preserve source text and
 every accepted/excluded row. An aggregate target table is not a full analyst

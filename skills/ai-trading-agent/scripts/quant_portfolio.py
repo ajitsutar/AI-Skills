@@ -9,8 +9,59 @@ import numpy as np
 from scipy.optimize import minimize, linprog
 from copy import deepcopy
 from types import SimpleNamespace
+from math import fsum
 
 from quant_common import cli, covariance, digest, require, scalar, timestamp, vector
+
+
+def weight_concentration(weights):
+    """Describe risky-position weight concentration, not covariance diversification.
+
+    Weights are fractions of initial portfolio NAV. Cash is not a member of this
+    distribution. Absolute gross normalization also supports signed positions;
+    it must not be relabeled as a long-only ownership or independent-risk count.
+    """
+    require(isinstance(weights, dict) and 0 < len(weights) <= 500, 'CONCENTRATION_WEIGHT_MAP_REQUIRED')
+    require(all(isinstance(k, str) for k in weights), 'CONCENTRATION_MEMBER_IDS')
+    values = {k: scalar(v, 'concentration_weight') for k, v in weights.items()}
+    gross = fsum(abs(v) for v in values.values())
+    raw = fsum(v*v for v in values.values())
+    require(np.isfinite(gross) and np.isfinite(raw), 'FINITE_CONCENTRATION_AGGREGATES_REQUIRED')
+    shares = {k: abs(v)/gross for k, v in values.items()} if gross > 0 else None
+    hhi = fsum(v*v for v in shares.values()) if shares is not None else None
+    signed = any(v < 0 for v in values.values())
+    return {'schema_version': 1, 'signed_input_weights': values,
+            'input_weight_unit': 'fraction_of_initial_nav',
+            'nav_squared_weight_sum_excluding_cash': raw,
+            'raw_sum_unit': 'fraction_of_initial_nav_squared',
+            'raw_sum_interpretation': 'Partial NAV-weight squared sum; not a normalized HHI. Its reciprocal is not an effective asset count.',
+            'risky_position_gross_distribution': {
+                'status': 'NORMALIZED_ABSOLUTE_GROSS' if gross > 0 else 'ZERO_GROSS_UNAVAILABLE',
+                'members': list(values), 'nonzero_member_count': sum(v != 0 for v in values.values()),
+                'cash_included': False, 'negative_weights_present': signed,
+                'scope': 'absolute_gross_signed_positions' if signed else 'long_only_risky_sleeve',
+                'denominator_value': gross, 'denominator_unit': 'fraction_of_initial_nav',
+                'denominator_formula': 'sum(abs(weight)) over supplied risky asset IDs; excludes cash',
+                'normalized_shares': shares, 'hhi': hhi,
+                'hhi_formula': 'sum((abs(weight)/sum(abs(weight)))**2)',
+                'effective_equal_weight_count': 1/hhi if hhi is not None else None,
+                'count_interpretation': 'Equivalent equally weighted gross positions, not actual holdings, issuers, independent bets or risk factors.'},
+            'whole_account_concentration': {'status': 'NOT_COMPUTED',
+                'reason': 'Cash, collateral and borrow reserves are excluded; no whole-account ownership distribution is inferred.'},
+            'limitation': 'Concentration describes supplied position weights, not covariance risk, issuer/sector look-through, observed holdings or execution permission.'}
+
+
+def concentration_summary(record):
+    """Render denominator and count from the same native concentration record."""
+    d = record['risky_position_gross_distribution']
+    lines = [f"Risky-position concentration ({d['scope']}): cash excluded; denominator sum(abs(weight)) = {d['denominator_value']:.12g} of initial NAV; {d['nonzero_member_count']} nonzero supplied positions."]
+    if d['hhi'] is None:
+        lines.append('Zero gross exposure: normalized HHI and effective equal-weight count are unavailable.')
+    else:
+        lines.append(f"Normalized HHI = {d['hhi']:.12g}; effective equal-weight gross-position count = {d['effective_equal_weight_count']:.12g}.")
+    lines.append(f"Raw NAV-weight squared sum excluding cash = {record['nav_squared_weight_sum_excluding_cash']:.12g}; its reciprocal is not an effective asset count.")
+    lines.append('This is not the actual holding count, independent risk-factor count or whole-account concentration. No cash bucket or issuer/sector aggregation is inferred; lower variance does not imply broader diversification.')
+    return '\n'.join(lines)
 
 
 def _linear_minimum_risk_problem(assets, previous, low, high, capacity, p, scenarios):
@@ -270,7 +321,7 @@ def construct(document):
         delta = w-v('benchmark_weight')
         slack['tracking_variance_cap_squared'] = float(p['tracking_volatility_cap']**2-delta @ sigma @ delta)
         slack_units['tracking_variance_cap_squared'] = 'variance_over_covariance_horizon'
-    return {'status': 'RESEARCH_PROPOSAL', 'weights': dict(zip(ids, w.tolist())),
+    output = {'status': 'RESEARCH_PROPOSAL', 'weights': dict(zip(ids, w.tolist())),
             'gross_exposure': float(abs(w).sum()), 'net_exposure': float(w.sum()),
             'gross_turnover': float(abs(w-previous).sum()), 'estimated_cost_fraction': float(total_cost(actual)),
             'entry_transaction_cost_fraction': float(cost(actual)),
@@ -298,6 +349,9 @@ def construct(document):
             'risk_diagnostics': risk_detail, 'independent_optimality_certificate': certificate,
             'execution_authorized': False, 'calibration_verified': False,
             'limitation': 'Continuous planning weights. Borrow/recall, collateral, taxes, lots and actual settlement need separate broker checks. Covariance horizon is explicit; no automatic annualization.'}
+    output['concentration_diagnostics'] = weight_concentration(output['weights'])
+    output['concentration_summary'] = concentration_summary(output['concentration_diagnostics'])
+    return output
 
 
 def sensitivity(document):
@@ -364,12 +418,17 @@ def sensitivity(document):
         constraint_outputs.append({'id': case['id'], 'changed_fields': changes, 'hypothesis_changed': bool(changes),
                                    'new_registry_attempt_required_for_research_claim': bool(changes),
                                    'result': result, 'gross_weight_change_from_baseline': difference})
-    return {'status': 'COVARIANCE_SENSITIVITY_COMPARISON', 'input_sha256': digest(document),
+    comparison = {'status': 'COVARIANCE_SENSITIVITY_COMPARISON', 'input_sha256': digest(document),
             'comparison_scope': 'prespecified_covariance_and_constraint_scenarios',
             'baseline': baseline, 'cases': output, 'constraint_cases': constraint_outputs,
             'selected_case': None, 'execution_authorized': False,
             'registry_note': 'Changed cap hypotheses require a distinct disclosed research attempt before making selection/performance claims; this is not a trade-approval requirement.',
             'limitation': 'Prespecified sensitivity is not evidence of forward performance. Covariance cases retain baseline constraints; cap cases explicitly retain every changed field. No post-hoc winner is selected.'}
+    concentration_rows = [('baseline', baseline)] + [(row['id'], row['result']) for row in output+constraint_outputs]
+    comparison['concentration_summary'] = '\n\n'.join(
+        str(label) + ':\n' + result.get('concentration_summary', 'Concentration unavailable: no verified feasible weights.')
+        for label, result in concentration_rows)
+    return comparison
 
 
 if __name__ == '__main__':
