@@ -74,6 +74,85 @@ For a fictional contribution calculation:
 python scripts/portfolio_manager.py examples/recurring-fractional.json --recurring
 ```
 
+## An unmapped dollar-intent artifact
+
+For a portable recurring contribution handoff, use the source-bound adapter:
+
+```text
+python scripts/recurring_intent_report.py REQUEST.json > PRIVATE-REPORT.json
+```
+
+Retain the full original instruction, calculation fixture and supplied companion
+context, not a paraphrase of selected details. The output retains private source
+text/routing without redaction; keep it in private storage. Deliver its generated
+`summary` with the economic record. Review the complete instruction for currency,
+scope, negation and order preferences before selecting source evidence. A code
+explicitly supplied in the instruction is evidence even when the fixture has no
+currency field. Do not infer a code from the bare word dollar, a ticker or account.
+
+`REQUEST.json` has these fields (all selections are explicit, never inferred):
+
+- `sources`: an object keyed by your source IDs. Each entry has `text` containing
+  the exact original UTF-8 text, `sha256` of its UTF-8 bytes, and a nonempty `roles`
+  list drawn from `instruction`, `recurring_request`, `companion_context`, and
+  `currency_evidence`. Retain line endings and any BOM in the source text. Multiple
+  roles and instruction sources are supported. Inventory completeness and roles
+  remain caller declarations; hashes do not authenticate them.
+- `recurring_request`: `{"source_id":"fixture","json_pointer":""}` selects the
+  unchanged recurring object using RFC6901. The selected source must have the
+  `recurring_request` role. Original decimal-number lexemes become strings for the
+  economic record; full source bytes remain available for exact inspection.
+- Optional `companion_context`: the same source/pointer structure, with a source
+  bearing that role. A null selection is retained as a null field observation.
+- Optional `currency_selections`: a list of objects with `source_id`, an explicit
+  nonempty `intent_symbols` list, and exactly one of `json_pointer` or `utf8_span`.
+  A span is `[start, end]` in zero-based UTF-8 bytes, end exclusive; it must select
+  one complete standalone three-letter code, not a substring inside another word.
+  A JSON pointer selects a three-letter string or explicit null. A selection's
+  scope applies only to the named intent keys. Bind shared scope explicitly; do
+  not copy a currency to unrelated intents or convert currencies. The syntax
+  check is not an ISO registry or semantic validation.
+
+For example, bind the original instruction bytes first, then select their actual
+currency token's offsets and name the affected intent keys. Do not type a new
+currency override into the request: the adapter derives each value from the
+selected source. Use the original source documents for account, plan, occurrence,
+purpose, cadence and explicit limit instructions. The API is
+`recurring_intent_report.build(request_spec)`; `summary(record)` renders the same
+record. The adapter reuses `handoff_report`'s accepted strict hash/pointer binding.
+
+Each intent records selected observations and its currency status. `SOURCE_SELECTED`
+means byte correspondence, not verified semantic applicability. Conflicting
+selections remain `CONFLICTING_SOURCE_SELECTIONS`, with no arbitrary winner.
+`SOURCE_FIELD_NULL` describes only the selected field. Missing selection is
+`CURRENCY_MAPPING_UNRESOLVED`, or `REQUEST_CONTEXT_UNBOUND` if no original
+instruction is bound; neither establishes absent user currency. Even a valid
+span can quote a negated or historical code: retain and review surrounding context.
+The adapter does not parse prose, authenticate sources, prove complete coverage,
+or choose a currency automatically. Missing/conflicting facts still produce an
+informational artifact; invalid provenance rejects a receipt, not host execution.
+
+The result contains `economic_intents`, `original_recurring_request`, full
+`original_sources`, selected `companion_context`, source bindings, limitations and
+a generated `summary`. It is independent of sizing and funding. The broker schema
+basis stays `UNMAPPED`: economic fields are not broker argument names, no tool is
+selected, and host capability is not verified. Requested amounts remain original;
+no share quantity, submission, future schedule or permission is invented.
+
+The lower-level `execution_handoff.recurring_dollar_intent` and
+`portfolio_manager.py INPUT.json --recurring-handoff` remain available for supplied
+economic objects. They do not bind original instruction bytes. Their optional
+`currency` is caller-supplied; missing currency is `NOT_SUPPLIED_TO_CONSTRUCTOR`,
+not a claim that the user's full request omitted it. The portfolio wrapper retains
+unchanged legacy sizing separately as `sizing_observation`; the source-bound
+adapter adds no sizing run. Legacy `--recurring` calculation behavior is unchanged.
+
+If an actual supplied broker contract is available, the separate optional
+`broker_bridge.build_request` adapter can map its explicit bindings; identify that
+contract as supplied, not automatically host-verified. Generic
+`execution_handoff.handoff` remains a pure formatter. None of these research
+artifacts grants/refuses execution or verifies a live order or fill.
+
 This produces one occurrence's proposal. It does not install a schedule or trade.
 Stable plan/occurrence identifiers help distinguish repeated reports; the skill
 maintains no execution ticket, duplicate-submission lock or reservation ledger.

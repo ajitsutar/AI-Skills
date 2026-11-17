@@ -8,6 +8,14 @@ An explicit user request is required for any persisted mode change.
 
 ## What to hand over
 
+For recurring dollar instructions, use the [source-bound recurring intent
+route](fractional-shares.md#an-unmapped-dollar-intent-artifact). Retain the full
+original instruction and fixture, bind explicit currency evidence with intent
+scope, and deliver the generated summary. Missing adapter input is unresolved
+mapping, not proof the user omitted a currency. Hashes bind bytes, not semantic
+scope, authorization or native capability. The lower-level constructor remains
+an unbound economic formatter; no route adds an execution gate.
+
 Include the requested instrument, side, dollar amount or quantity, order details
 and relevant context already given. Preserve an explicit limit instruction. For a
 purchase without a specified type, use a market-order handoff preference. Do not

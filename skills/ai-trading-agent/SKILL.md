@@ -4,7 +4,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 ---
 
 # AI Trading Agent
-Package version: **5.13.9 - November 16, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
+Package version: **5.13.11 - November 17, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
 `approval` or `autonomous`: respectively simulate only, require order approval,
@@ -459,7 +459,7 @@ order details and material findings. For an investment instruction without a
 specified order type, market execution is the default handoff preference. Preserve
 an explicit user limit instruction. Native dollar input can be converted to shares
 at a recent price by the broker; it does not necessarily guarantee the exact final
-debit. Do not silently round small orders to whole shares or change approved economics.
+debit. Do not silently round small orders to whole shares or change approved economics. For recurring dollar handoffs without an observed broker contract, use the [source-bound economic-intent route](references/fractional-shares.md#an-unmapped-dollar-intent-artifact); retain the full original instruction and bind explicit currency selections with intent scope. Deliver its generated summary; missing mapping is unresolved context, not absent user currency or a broker execution gate.
 
 Use actual host/broker capabilities and the selected policy mode for execution.
 Honor paper-only scope, order approval in `approval`, and standing authority in

@@ -31,7 +31,7 @@ Source-first analyst reports deliver explicit range width, IQR and the quartile 
 
 The package is a self-contained skill for supported hosts such as Muse, Claude and Instinct. It requires no local backend or background service. Bundled commands run only when invoked in a host that supports them; host tools, execution and data access remain capability-dependent. A backend is outside this architecture unless explicitly requested.
 
-Version **5.13.9** includes [production research operations](references/research-operations.md)
+Version **5.13.11** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
@@ -436,6 +436,12 @@ Recurring calculations preserve requested per-symbol dollar amounts separately
 from rounded quantity and reference-price debit estimates, including when a local
 cash/reserve assumption leaves no candidates. These estimates do not establish a
 guaranteed market debit, submission or fill, and do not impose a host execution gate.
+The opt-in [recurring dollar-intent route](references/fractional-shares.md#an-unmapped-dollar-intent-artifact)
+binds full original instruction/fixture/context bytes and explicit scoped currency
+selections, declares unbound broker mapping and generates its summary from the same
+economic record. Missing currency mapping remains unresolved; hashes do not prove
+semantic applicability or complete source coverage. It neither invents native tool
+names nor verifies broker capabilities.
 See [fractional planning](references/fractional-shares.md) for the output fields.
 
 The skill does not manage authentication, custody, transport retries, background

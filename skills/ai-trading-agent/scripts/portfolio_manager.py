@@ -138,6 +138,17 @@ def recurring_buys(plan_id, occurrence_id, account_alias, amounts, prices, avail
             "next_step": "Use these estimates for the requested occurrence; preserve the user's amounts and order type in the native host/broker handoff. The host and broker own submission, duplicate handling and any explicitly requested recurring schedule."}
 
 
+def recurring_handoff(recurring_request, *, currency=None, companion_context=None):
+    """Return unmapped economic intent alongside unchanged sizing observations."""
+    from execution_handoff import recurring_dollar_intent
+    result = recurring_dollar_intent(recurring_request, currency=currency,
+                                    companion_context=companion_context)
+    result['sizing_observation'] = recurring_buys(**recurring_request)
+    result['sizing_basis'] = ('Calculation only; do not replace requested dollar amounts with estimated quantities. '
+                              'Funding or sizing status does not establish broker schema support or execution permission.')
+    return result
+
+
 def performance(equity_path, net_flows):
     """Daily chain-linked return, with external flows at end of each period.
 
@@ -166,10 +177,26 @@ def performance(equity_path, net_flows):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("input", type=Path)
-    parser.add_argument("--recurring", action="store_true", help="Prepare one explicitly scheduled dollar contribution occurrence")
+    operations = parser.add_mutually_exclusive_group()
+    operations.add_argument("--recurring", action="store_true", help="Prepare one explicitly scheduled dollar contribution occurrence")
+    operations.add_argument("--recurring-handoff", action="store_true", help="Describe unmapped recurring dollar intent and separate sizing observations")
     args = parser.parse_args()
-    operation = recurring_buys if args.recurring else rebalance
-    print(json.dumps(operation(**json.loads(args.input.read_text(encoding="utf-8"))), indent=2))
+    if args.recurring_handoff:
+        from execution_handoff import redact_private
+        def unique_fields(pairs):
+            result = {}
+            for key, value in pairs:
+                if key in result:
+                    raise ValueError('Duplicate JSON key in recurring handoff input')
+                result[key] = value
+            return result
+        # Only this new route preserves JSON fractional-number lexemes as strings.
+        request = json.loads(args.input.read_text(encoding="utf-8"), parse_float=str,
+                             object_pairs_hook=unique_fields)
+        print(json.dumps(redact_private(recurring_handoff(**request)), indent=2, allow_nan=False))
+    else:
+        operation = recurring_buys if args.recurring else rebalance
+        print(json.dumps(operation(**json.loads(args.input.read_text(encoding="utf-8"))), indent=2))
 
 
 if __name__ == "__main__":
