@@ -162,6 +162,7 @@ class PurchaseEvidence(unittest.TestCase):
 
 class ArtifactDelivery(unittest.TestCase):
     def make(self, root):
+        root = Path(root).resolve()
         source = root / "input.json"; source.write_text(json.dumps(document()), encoding="utf8")
         output = root / "result"; receipt = report.compose(source, output)
         return source, output, receipt
