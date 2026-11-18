@@ -24,6 +24,7 @@ from arch.univariate import EGARCH
 from statsmodels.stats.diagnostic import acorr_ljungbox, het_arch
 
 from price_audit import audit_prices
+from volatility_baselines import ewma_predictions as baseline_ewma_predictions
 
 
 def model_specification(family, observations, distribution="normal"):
@@ -117,13 +118,7 @@ def holdout_validation(observations, family, train, test, distribution="normal",
         score, reference = variance_loss(actual, expected), variance_loss(actual, baseline)
         # Initialization uses only training data. Each held-out return updates
         # the next forecast AFTER its prediction, never its own prediction.
-        state = float(baseline[0])
-        for value in data[:train]:
-            state = ewma_decay * state + (1-ewma_decay) * float(value)**2
-        ewma_predictions = []
-        for value in data[train:train+test]:
-            ewma_predictions.append(max(state, 1e-12))
-            state = ewma_decay * state + (1-ewma_decay) * float(value)**2
+        ewma_predictions = baseline_ewma_predictions(data, train, test, ewma_decay, float(baseline[0]))
         ewma_score = variance_loss(actual, ewma_predictions)
         return {"status": "ok", "n": test, "qlike": score,
                 "mse": float(np.square(actual - expected).mean()),

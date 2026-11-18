@@ -7975,6 +7975,90 @@
         "denominator": "sum(abs(supplied risky position weights)); cash excluded",
         "metric": "Native denominator-explicit concentration summary",
         "unit": "text"
+      },
+      "risk_contribution_summary": {
+        "basis": "Generated from the same total-portfolio covariance record; surrounding authored prose is not verified.",
+        "denominator": "Each metric keeps its own native denominator",
+        "metric": "Native risk contribution summary with units and denominators",
+        "unit": "text"
+      },
+      "risk_contributions/covariance_horizon_id": {
+        "basis": "Actual covariance measurement horizon; no automatic annualization or contract-period substitution.",
+        "denominator": null,
+        "metric": "Declared covariance horizon for risk attribution",
+        "unit": "text"
+      },
+      "risk_contributions/euler_volatility_contributions/denominator_value": {
+        "basis": "Retained native volatility denominator; availability is governed by normalization_status.",
+        "denominator": "square root of portfolio variance",
+        "metric": "Euler volatility contribution denominator",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "risk_contributions/euler_volatility_contributions/sum": {
+        "basis": "Signed components sum to portfolio volatility, not to one; null when normalization unavailable.",
+        "denominator": "sqrt(portfolio variance) over the declared covariance horizon",
+        "metric": "Sum of Euler volatility contributions",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "risk_contributions/euler_volatility_contributions/values/*": {
+        "basis": "Signed variance contribution divided by portfolio volatility; sum equals portfolio volatility. Unavailable when variance is not above1e-20.",
+        "denominator": "sqrt(portfolio variance) over the declared covariance horizon",
+        "metric": "Euler contribution to portfolio volatility",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "risk_contributions/normalization_minimum_variance": {
+        "basis": "Normalized shares and Euler contributions require variance strictly greater than this threshold.",
+        "denominator": "none; numerical threshold, not a trading rule",
+        "metric": "Strict minimum variance for risk normalization",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "risk_contributions/normalized_variance_shares/denominator_value": {
+        "basis": "Raw denominator retained even when normalization is unavailable.",
+        "denominator": "none; portfolio variance",
+        "metric": "Normalized variance share denominator",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "risk_contributions/normalized_variance_shares/sum": {
+        "basis": "Signed shares sum to one when available; unavailable for nonpositive/nearzero variance.",
+        "denominator": "portfolio variance w.T @ Sigma @ w over the declared covariance horizon",
+        "metric": "Sum of normalized variance shares",
+        "unit": "fraction_of_portfolio_variance"
+      },
+      "risk_contributions/normalized_variance_shares/values/*": {
+        "basis": "Total-portfolio covariance attribution over the supplied covariance horizon; signed hedge shares may be negative or above one; not benchmark tracking risk or standalone asset risk.",
+        "denominator": "portfolio variance w.T @ Sigma @ w over the declared covariance horizon",
+        "metric": "Normalized share of portfolio variance",
+        "unit": "fraction_of_portfolio_variance"
+      },
+      "risk_contributions/portfolio_variance": {
+        "basis": "Supplied covariance horizon; not annualized, forecast-validated or an execution limit.",
+        "denominator": "none; variance of the supplied NAV-weighted portfolio return",
+        "metric": "Portfolio variance for risk attribution",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "risk_contributions/portfolio_volatility": {
+        "basis": "Legacy display clamps nonpositive variance to zero; normalization status remains explicit and zero display does not prove zero risk.",
+        "denominator": "square root of portfolio variance",
+        "metric": "Portfolio volatility for risk attribution",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "risk_contributions/signed_variance_contributions/sum": {
+        "basis": "Numerical sum of signed components over supplied covariance asset IDs.",
+        "denominator": "none; portfolio variance",
+        "metric": "Sum of signed variance contributions",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "risk_contributions/signed_variance_contributions/values/*": {
+        "basis": "Signed components retain covariance cross terms; negative hedging terms are not clipped. Not normalized shares or tracking risk.",
+        "denominator": "none; w_i * (Sigma @ w)_i; components sum to portfolio variance",
+        "metric": "Signed contribution to portfolio variance",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "risk_diagnostics/variance_contribution_fraction/*": {
+        "basis": "Total-portfolio covariance attribution over the supplied covariance horizon; signed hedge shares may be negative or above one; not benchmark tracking risk or standalone asset risk.",
+        "denominator": "portfolio variance w.T @ Sigma @ w over the declared covariance horizon",
+        "metric": "Normalized share of portfolio variance",
+        "unit": "fraction_of_portfolio_variance"
       }
     },
     "portfolio.sensitivity": {
@@ -8043,6 +8127,90 @@
         "denominator": "initial portfolio equity",
         "metric": "baseline gross turnover",
         "unit": "fraction"
+      },
+      "baseline/risk_contribution_summary": {
+        "basis": "Generated from the same total-portfolio covariance record; surrounding authored prose is not verified.",
+        "denominator": "Each metric keeps its own native denominator",
+        "metric": "Native risk contribution summary with units and denominators",
+        "unit": "text"
+      },
+      "baseline/risk_contributions/covariance_horizon_id": {
+        "basis": "Actual covariance measurement horizon; no automatic annualization or contract-period substitution.",
+        "denominator": null,
+        "metric": "Declared covariance horizon for risk attribution",
+        "unit": "text"
+      },
+      "baseline/risk_contributions/euler_volatility_contributions/denominator_value": {
+        "basis": "Retained native volatility denominator; availability is governed by normalization_status.",
+        "denominator": "square root of portfolio variance",
+        "metric": "Euler volatility contribution denominator",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "baseline/risk_contributions/euler_volatility_contributions/sum": {
+        "basis": "Signed components sum to portfolio volatility, not to one; null when normalization unavailable.",
+        "denominator": "sqrt(portfolio variance) over the declared covariance horizon",
+        "metric": "Sum of Euler volatility contributions",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "baseline/risk_contributions/euler_volatility_contributions/values/*": {
+        "basis": "Signed variance contribution divided by portfolio volatility; sum equals portfolio volatility. Unavailable when variance is not above1e-20.",
+        "denominator": "sqrt(portfolio variance) over the declared covariance horizon",
+        "metric": "Euler contribution to portfolio volatility",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "baseline/risk_contributions/normalization_minimum_variance": {
+        "basis": "Normalized shares and Euler contributions require variance strictly greater than this threshold.",
+        "denominator": "none; numerical threshold, not a trading rule",
+        "metric": "Strict minimum variance for risk normalization",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "baseline/risk_contributions/normalized_variance_shares/denominator_value": {
+        "basis": "Raw denominator retained even when normalization is unavailable.",
+        "denominator": "none; portfolio variance",
+        "metric": "Normalized variance share denominator",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "baseline/risk_contributions/normalized_variance_shares/sum": {
+        "basis": "Signed shares sum to one when available; unavailable for nonpositive/nearzero variance.",
+        "denominator": "portfolio variance w.T @ Sigma @ w over the declared covariance horizon",
+        "metric": "Sum of normalized variance shares",
+        "unit": "fraction_of_portfolio_variance"
+      },
+      "baseline/risk_contributions/normalized_variance_shares/values/*": {
+        "basis": "Total-portfolio covariance attribution over the supplied covariance horizon; signed hedge shares may be negative or above one; not benchmark tracking risk or standalone asset risk.",
+        "denominator": "portfolio variance w.T @ Sigma @ w over the declared covariance horizon",
+        "metric": "Normalized share of portfolio variance",
+        "unit": "fraction_of_portfolio_variance"
+      },
+      "baseline/risk_contributions/portfolio_variance": {
+        "basis": "Supplied covariance horizon; not annualized, forecast-validated or an execution limit.",
+        "denominator": "none; variance of the supplied NAV-weighted portfolio return",
+        "metric": "Portfolio variance for risk attribution",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "baseline/risk_contributions/portfolio_volatility": {
+        "basis": "Legacy display clamps nonpositive variance to zero; normalization status remains explicit and zero display does not prove zero risk.",
+        "denominator": "square root of portfolio variance",
+        "metric": "Portfolio volatility for risk attribution",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "baseline/risk_contributions/signed_variance_contributions/sum": {
+        "basis": "Numerical sum of signed components over supplied covariance asset IDs.",
+        "denominator": "none; portfolio variance",
+        "metric": "Sum of signed variance contributions",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "baseline/risk_contributions/signed_variance_contributions/values/*": {
+        "basis": "Signed components retain covariance cross terms; negative hedging terms are not clipped. Not normalized shares or tracking risk.",
+        "denominator": "none; w_i * (Sigma @ w)_i; components sum to portfolio variance",
+        "metric": "Signed contribution to portfolio variance",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "baseline/risk_diagnostics/variance_contribution_fraction/*": {
+        "basis": "Total-portfolio covariance attribution over the supplied covariance horizon; signed hedge shares may be negative or above one; not benchmark tracking risk or standalone asset risk.",
+        "denominator": "portfolio variance w.T @ Sigma @ w over the declared covariance horizon",
+        "metric": "Normalized share of portfolio variance",
+        "unit": "fraction_of_portfolio_variance"
       },
       "baseline/weights/*": {
         "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
@@ -8121,6 +8289,90 @@
         "denominator": "initial portfolio equity",
         "metric": "cases * result gross turnover",
         "unit": "fraction"
+      },
+      "cases/*/result/risk_contribution_summary": {
+        "basis": "Generated from the same total-portfolio covariance record; surrounding authored prose is not verified.",
+        "denominator": "Each metric keeps its own native denominator",
+        "metric": "Native risk contribution summary with units and denominators",
+        "unit": "text"
+      },
+      "cases/*/result/risk_contributions/covariance_horizon_id": {
+        "basis": "Actual covariance measurement horizon; no automatic annualization or contract-period substitution.",
+        "denominator": null,
+        "metric": "Declared covariance horizon for risk attribution",
+        "unit": "text"
+      },
+      "cases/*/result/risk_contributions/euler_volatility_contributions/denominator_value": {
+        "basis": "Retained native volatility denominator; availability is governed by normalization_status.",
+        "denominator": "square root of portfolio variance",
+        "metric": "Euler volatility contribution denominator",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "cases/*/result/risk_contributions/euler_volatility_contributions/sum": {
+        "basis": "Signed components sum to portfolio volatility, not to one; null when normalization unavailable.",
+        "denominator": "sqrt(portfolio variance) over the declared covariance horizon",
+        "metric": "Sum of Euler volatility contributions",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "cases/*/result/risk_contributions/euler_volatility_contributions/values/*": {
+        "basis": "Signed variance contribution divided by portfolio volatility; sum equals portfolio volatility. Unavailable when variance is not above1e-20.",
+        "denominator": "sqrt(portfolio variance) over the declared covariance horizon",
+        "metric": "Euler contribution to portfolio volatility",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "cases/*/result/risk_contributions/normalization_minimum_variance": {
+        "basis": "Normalized shares and Euler contributions require variance strictly greater than this threshold.",
+        "denominator": "none; numerical threshold, not a trading rule",
+        "metric": "Strict minimum variance for risk normalization",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "cases/*/result/risk_contributions/normalized_variance_shares/denominator_value": {
+        "basis": "Raw denominator retained even when normalization is unavailable.",
+        "denominator": "none; portfolio variance",
+        "metric": "Normalized variance share denominator",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "cases/*/result/risk_contributions/normalized_variance_shares/sum": {
+        "basis": "Signed shares sum to one when available; unavailable for nonpositive/nearzero variance.",
+        "denominator": "portfolio variance w.T @ Sigma @ w over the declared covariance horizon",
+        "metric": "Sum of normalized variance shares",
+        "unit": "fraction_of_portfolio_variance"
+      },
+      "cases/*/result/risk_contributions/normalized_variance_shares/values/*": {
+        "basis": "Total-portfolio covariance attribution over the supplied covariance horizon; signed hedge shares may be negative or above one; not benchmark tracking risk or standalone asset risk.",
+        "denominator": "portfolio variance w.T @ Sigma @ w over the declared covariance horizon",
+        "metric": "Normalized share of portfolio variance",
+        "unit": "fraction_of_portfolio_variance"
+      },
+      "cases/*/result/risk_contributions/portfolio_variance": {
+        "basis": "Supplied covariance horizon; not annualized, forecast-validated or an execution limit.",
+        "denominator": "none; variance of the supplied NAV-weighted portfolio return",
+        "metric": "Portfolio variance for risk attribution",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "cases/*/result/risk_contributions/portfolio_volatility": {
+        "basis": "Legacy display clamps nonpositive variance to zero; normalization status remains explicit and zero display does not prove zero risk.",
+        "denominator": "square root of portfolio variance",
+        "metric": "Portfolio volatility for risk attribution",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "cases/*/result/risk_contributions/signed_variance_contributions/sum": {
+        "basis": "Numerical sum of signed components over supplied covariance asset IDs.",
+        "denominator": "none; portfolio variance",
+        "metric": "Sum of signed variance contributions",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "cases/*/result/risk_contributions/signed_variance_contributions/values/*": {
+        "basis": "Signed components retain covariance cross terms; negative hedging terms are not clipped. Not normalized shares or tracking risk.",
+        "denominator": "none; w_i * (Sigma @ w)_i; components sum to portfolio variance",
+        "metric": "Signed contribution to portfolio variance",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "cases/*/result/risk_diagnostics/variance_contribution_fraction/*": {
+        "basis": "Total-portfolio covariance attribution over the supplied covariance horizon; signed hedge shares may be negative or above one; not benchmark tracking risk or standalone asset risk.",
+        "denominator": "portfolio variance w.T @ Sigma @ w over the declared covariance horizon",
+        "metric": "Normalized share of portfolio variance",
+        "unit": "fraction_of_portfolio_variance"
       },
       "cases/*/result/weights/*": {
         "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",
@@ -8217,6 +8469,90 @@
         "denominator": "initial portfolio equity",
         "metric": "constraint cases * result gross turnover",
         "unit": "fraction"
+      },
+      "constraint_cases/*/result/risk_contribution_summary": {
+        "basis": "Generated from the same total-portfolio covariance record; surrounding authored prose is not verified.",
+        "denominator": "Each metric keeps its own native denominator",
+        "metric": "Native risk contribution summary with units and denominators",
+        "unit": "text"
+      },
+      "constraint_cases/*/result/risk_contributions/covariance_horizon_id": {
+        "basis": "Actual covariance measurement horizon; no automatic annualization or contract-period substitution.",
+        "denominator": null,
+        "metric": "Declared covariance horizon for risk attribution",
+        "unit": "text"
+      },
+      "constraint_cases/*/result/risk_contributions/euler_volatility_contributions/denominator_value": {
+        "basis": "Retained native volatility denominator; availability is governed by normalization_status.",
+        "denominator": "square root of portfolio variance",
+        "metric": "Euler volatility contribution denominator",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "constraint_cases/*/result/risk_contributions/euler_volatility_contributions/sum": {
+        "basis": "Signed components sum to portfolio volatility, not to one; null when normalization unavailable.",
+        "denominator": "sqrt(portfolio variance) over the declared covariance horizon",
+        "metric": "Sum of Euler volatility contributions",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "constraint_cases/*/result/risk_contributions/euler_volatility_contributions/values/*": {
+        "basis": "Signed variance contribution divided by portfolio volatility; sum equals portfolio volatility. Unavailable when variance is not above1e-20.",
+        "denominator": "sqrt(portfolio variance) over the declared covariance horizon",
+        "metric": "Euler contribution to portfolio volatility",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "constraint_cases/*/result/risk_contributions/normalization_minimum_variance": {
+        "basis": "Normalized shares and Euler contributions require variance strictly greater than this threshold.",
+        "denominator": "none; numerical threshold, not a trading rule",
+        "metric": "Strict minimum variance for risk normalization",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "constraint_cases/*/result/risk_contributions/normalized_variance_shares/denominator_value": {
+        "basis": "Raw denominator retained even when normalization is unavailable.",
+        "denominator": "none; portfolio variance",
+        "metric": "Normalized variance share denominator",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "constraint_cases/*/result/risk_contributions/normalized_variance_shares/sum": {
+        "basis": "Signed shares sum to one when available; unavailable for nonpositive/nearzero variance.",
+        "denominator": "portfolio variance w.T @ Sigma @ w over the declared covariance horizon",
+        "metric": "Sum of normalized variance shares",
+        "unit": "fraction_of_portfolio_variance"
+      },
+      "constraint_cases/*/result/risk_contributions/normalized_variance_shares/values/*": {
+        "basis": "Total-portfolio covariance attribution over the supplied covariance horizon; signed hedge shares may be negative or above one; not benchmark tracking risk or standalone asset risk.",
+        "denominator": "portfolio variance w.T @ Sigma @ w over the declared covariance horizon",
+        "metric": "Normalized share of portfolio variance",
+        "unit": "fraction_of_portfolio_variance"
+      },
+      "constraint_cases/*/result/risk_contributions/portfolio_variance": {
+        "basis": "Supplied covariance horizon; not annualized, forecast-validated or an execution limit.",
+        "denominator": "none; variance of the supplied NAV-weighted portfolio return",
+        "metric": "Portfolio variance for risk attribution",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "constraint_cases/*/result/risk_contributions/portfolio_volatility": {
+        "basis": "Legacy display clamps nonpositive variance to zero; normalization status remains explicit and zero display does not prove zero risk.",
+        "denominator": "square root of portfolio variance",
+        "metric": "Portfolio volatility for risk attribution",
+        "unit": "return_fraction_over_covariance_horizon"
+      },
+      "constraint_cases/*/result/risk_contributions/signed_variance_contributions/sum": {
+        "basis": "Numerical sum of signed components over supplied covariance asset IDs.",
+        "denominator": "none; portfolio variance",
+        "metric": "Sum of signed variance contributions",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "constraint_cases/*/result/risk_contributions/signed_variance_contributions/values/*": {
+        "basis": "Signed components retain covariance cross terms; negative hedging terms are not clipped. Not normalized shares or tracking risk.",
+        "denominator": "none; w_i * (Sigma @ w)_i; components sum to portfolio variance",
+        "metric": "Signed contribution to portfolio variance",
+        "unit": "return_fraction_squared_over_covariance_horizon"
+      },
+      "constraint_cases/*/result/risk_diagnostics/variance_contribution_fraction/*": {
+        "basis": "Total-portfolio covariance attribution over the supplied covariance horizon; signed hedge shares may be negative or above one; not benchmark tracking risk or standalone asset risk.",
+        "denominator": "portfolio variance w.T @ Sigma @ w over the declared covariance horizon",
+        "metric": "Normalized share of portfolio variance",
+        "unit": "fraction_of_portfolio_variance"
       },
       "constraint_cases/*/result/weights/*": {
         "basis": "Supplied prespecified covariance/constraint scenario; allocation fractions use the initial portfolio equity denominator, before modeled costs.",

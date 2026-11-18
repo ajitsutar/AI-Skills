@@ -13,6 +13,7 @@ sys.path.insert(0, str(Path(__file__).resolve().parents[1]/'scripts'))
 import garch_volatility as garch
 import risk_diagnostics as risk
 import quant_portfolio as portfolio
+import volatility_baselines as baselines
 
 
 def allocation():
@@ -108,6 +109,23 @@ class GarchExtensions(unittest.TestCase):
         state = self.x[:300].var(ddof=1)
         for r in self.x[:300]:state=.94*state+.06*r*r
         self.assertAlmostEqual(a['ewma_predicted_variance_percent_squared'][0], state)
+
+    def test_shared_ewma_preserves_legacy_native_float_operations(self):
+        seed=max(float(self.x[:300].var(ddof=1)),1e-8)
+        state=seed
+        for value in self.x[:300]:state=.94*state+(1-.94)*float(value)**2
+        legacy=[]
+        for value in self.x[300:330]:
+            legacy.append(max(state,1e-12));state=.94*state+(1-.94)*float(value)**2
+        shared=baselines.ewma_predictions(self.x,300,30,.94,seed)
+        self.assertEqual(shared,legacy)
+        with patch('garch_volatility.fit_model',return_value=SimpleNamespace(params=[.1,.1,.8])):
+            native=garch.holdout_validation(self.x,'garch',300,30)
+        self.assertEqual(native['ewma_predicted_variance_percent_squared'],legacy)
+        self.assertEqual(native['ewma_qlike'],garch.variance_loss(np.square(self.x[300:330]),legacy))
+        portable=baselines.baseline_comparison(self.x,300,30)
+        np.testing.assert_allclose(portable['ewma_predicted_variance_percent_squared'],legacy,rtol=1e-14,atol=1e-14)
+        self.assertAlmostEqual(portable['ewma_qlike'],native['ewma_qlike'],places=13)
 
     def test_autocorrelated_standardized_residuals_flagged(self):
         fixed = garch.model_specification('garch', self.x).fix([.1, .1, .8])

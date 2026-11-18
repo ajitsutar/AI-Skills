@@ -31,7 +31,7 @@ Source-first analyst reports deliver explicit range width, IQR and the quartile 
 
 The package is a self-contained skill for supported hosts such as Muse, Claude and Instinct. It requires no local backend or background service. Bundled commands run only when invoked in a host that supports them; host tools, execution and data access remain capability-dependent. A backend is outside this architecture unless explicitly requested.
 
-Version **5.13.12** includes [production research operations](references/research-operations.md)
+Version **5.13.14** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
@@ -265,7 +265,7 @@ Final reporting retains source and scenario checks for factual claims.
 | Planning tradeoffs | Preference-free conditional proposals; separate settlement, transfer and arrival dates, a shared timing reference and unresolved cutoff timing | [Planning comparisons](references/planning-comparison.md) |
 | Tactical research | Completed-bar setups, catalysts, liquidity, cost assumptions, stops/targets and holding-period scenarios | [Short-term research](references/short-term-trading.md) |
 | Volatility analysis | GARCH, GJR-GARCH, supported EGARCH and stock-relative interval-move diagnostics | [Volatility models](references/garch-volatility.md) |
-| Quant construction | Constrained allocation, covariance sensitivity, denominator-explicit risky-position concentration, empirical tail loss and multi-asset scenarios | [Quant workbench](references/quant-workbench.md) |
+| Quant construction | Constrained allocation, covariance sensitivity, denominator-explicit risky-position concentration, distinct signed variance and Euler volatility components and normalized variance shares, empirical tail loss and multi-asset scenarios | [Quant workbench](references/quant-workbench.md) |
 | Strategy evaluation | Causal splits, purging, HAC, block bootstrap, multiple-testing review and retained evidence | [Quant research](references/quant-research.md) |
 | Performance accounting | Execution shortfall, cash ladders, TWR/XIRR, attribution and portfolio simulation | [Manager workflow](references/institutional-manager.md) |
 | Reproducibility | Frozen contracts/data, explicit calculation defaults, runtime receipts, numerical replay and separate acquisition comparisons | [Model-independent research](references/model-independent-research.md) |

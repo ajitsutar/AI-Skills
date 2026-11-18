@@ -1,6 +1,7 @@
 """Generic denominator identities; not investment forecasts or case answers."""
 import copy
 import json
+import math
 from pathlib import Path
 import subprocess
 import sys
@@ -10,6 +11,7 @@ import unittest
 ROOT=Path(__file__).resolve().parents[1]
 sys.path.insert(0,str(ROOT/'scripts'))
 import quant_portfolio as portfolio
+import numpy as np
 
 
 def allocation():
@@ -144,6 +146,133 @@ class ConcentrationTests(unittest.TestCase):
             self.assertEqual(result.returncode,0,result.stderr)
             out=json.loads(result.stdout)
             self.assertEqual(out['concentration_summary'],portfolio.concentration_summary(out['concentration_diagnostics']))
+
+
+class RiskContributionTests(unittest.TestCase):
+    def record(self, weights, sigma, horizon='P1M'):
+        return portfolio._risk_contributions(list(weights),np.array(list(weights.values()),dtype=float),
+                                            np.array(sigma,dtype=float),horizon)
+
+    def test_diagonal_units_and_three_different_additive_identities(self):
+        r=self.record({'PINE':.2,'ELM':.3},[[.025,0],[0,.08]])
+        terms=r['signed_variance_contributions'];euler=r['euler_volatility_contributions'];shares=r['normalized_variance_shares']
+        expected={'PINE':.001,'ELM':.0072};variance=.0082
+        for name in expected:
+            self.assertAlmostEqual(terms['values'][name],expected[name])
+            self.assertAlmostEqual(euler['values'][name],expected[name]/math.sqrt(variance))
+            self.assertAlmostEqual(shares['values'][name],expected[name]/variance)
+        self.assertAlmostEqual(terms['sum'],variance)
+        self.assertAlmostEqual(euler['sum'],math.sqrt(variance))
+        self.assertAlmostEqual(shares['sum'],1)
+        self.assertNotEqual(terms['unit'],euler['unit']);self.assertNotEqual(shares['unit'],terms['unit'])
+        self.assertEqual(r['covariance_horizon_id'],'P1M')
+        self.assertEqual(r['scope'],'total_portfolio_covariance_risk')
+
+    def test_signed_hedge_preserves_negative_components_and_shares_above_one(self):
+        r=self.record({'PINE':.8,'ELM':-.2},[[.04,.018],[.018,.01]])
+        self.assertAlmostEqual(r['portfolio_variance'],.02024)
+        self.assertAlmostEqual(r['signed_variance_contributions']['values']['PINE'],.02272)
+        self.assertAlmostEqual(r['signed_variance_contributions']['values']['ELM'],-.00248)
+        self.assertGreater(r['normalized_variance_shares']['values']['PINE'],1)
+        self.assertLess(r['normalized_variance_shares']['values']['ELM'],0)
+        self.assertLess(r['euler_volatility_contributions']['values']['ELM'],0)
+        self.assertAlmostEqual(r['normalized_variance_shares']['sum'],1)
+
+    def test_negative_covariance_can_hedge_even_without_short_positions(self):
+        r=self.record({'PINE':.9,'ELM':.1},[[.04,-.05],[-.05,.09]])
+        self.assertLess(r['signed_variance_contributions']['values']['ELM'],0)
+        self.assertAlmostEqual(r['signed_variance_contributions']['sum'],r['portfolio_variance'])
+
+    def test_weight_and_covariance_scaling_preserve_unit_relationships(self):
+        r=self.record({'PINE':.12,'ELM':.28},[[.03,.01],[.01,.06]])
+        doubled=self.record({'PINE':.24,'ELM':.56},[[.03,.01],[.01,.06]])
+        covariance_scaled=self.record({'PINE':.12,'ELM':.28},[[.12,.04],[.04,.24]])
+        for other in (doubled,covariance_scaled):
+            for name in ('PINE','ELM'):
+                self.assertAlmostEqual(other['signed_variance_contributions']['values'][name],4*r['signed_variance_contributions']['values'][name])
+                self.assertAlmostEqual(other['euler_volatility_contributions']['values'][name],2*r['euler_volatility_contributions']['values'][name])
+                self.assertAlmostEqual(other['normalized_variance_shares']['values'][name],r['normalized_variance_shares']['values'][name])
+
+    def test_zero_tiny_and_tolerated_negative_variance_are_not_normalized(self):
+        for sigma,status in [([[0.,0.],[0.,0.]],'ZERO_VARIANCE_UNAVAILABLE'),
+                             ([[1e-22,0.],[0.,1e-22]],'NEAR_ZERO_VARIANCE_UNAVAILABLE'),
+                             ([[-1e-13,0.],[0.,0.]],'NEGATIVE_VARIANCE_UNAVAILABLE')]:
+            with self.subTest(status=status):
+                # The final example is accepted by the existing PSD tolerance;
+                # reporting must not silently turn it into certified zero risk.
+                portfolio.covariance(sigma,2)
+                r=self.record({'PINE':.3,'ELM':.2},sigma)
+                self.assertEqual(r['normalization_status'],status)
+                self.assertIsNone(r['normalized_variance_shares']['values'])
+                self.assertIsNone(r['euler_volatility_contributions']['values'])
+                self.assertIsNone(r['normalized_variance_shares']['sum'])
+                self.assertIsNotNone(r['signed_variance_contributions']['values'])
+                self.assertTrue(r['unavailable_reason'])
+                json.dumps(r,allow_nan=False)
+        self.assertLess(r['portfolio_variance'],0)
+
+    def test_threshold_matches_legacy_strict_greater_than_rule(self):
+        for variance,available in [(1e-20,False),(1.01e-20,True)]:
+            r=self.record({'PINE':1.},[[variance]])
+            self.assertEqual(r['normalized_variance_shares']['values'] is not None,available)
+
+    def test_construct_preserves_legacy_fraction_and_uses_declared_horizon(self):
+        d=allocation();before=copy.deepcopy(d);out=portfolio.construct(d)
+        self.assertEqual(d,before)
+        r=out['risk_contributions']
+        self.assertEqual(r['normalized_variance_shares']['values'],out['risk_diagnostics']['variance_contribution_fraction'])
+        self.assertEqual(r['portfolio_variance'],out['risk_diagnostics']['variance_over_covariance_horizon'])
+        self.assertEqual(r['portfolio_volatility'],out['volatility_over_covariance_horizon'])
+        self.assertEqual(r['covariance_horizon_id'],d['covariance_horizon_id'])
+        self.assertEqual(out['risk_contribution_summary'],portfolio.risk_contribution_summary(r))
+        text=out['risk_contribution_summary']
+        self.assertIn('Normalized variance shares (dimensionless fraction of portfolio variance',text)
+        self.assertIn('Euler volatility contributions (return fraction',text)
+        self.assertIn('Signed variance contributions (return fraction squared',text)
+        self.assertFalse(out['execution_authorized'])
+
+    def test_sensitivity_uses_each_retained_covariance_and_omits_failed_results(self):
+        base=allocation();sigma=[[.06,0,0],[0,.12,0],[0,0,.18]]
+        request={'base':base,'covariance_scenarios':[{'id':'revised','covariance_ids':base['covariance_ids'],
+            'horizon_id':'P1M','estimated_at':base['risk_estimated_at'],'covariance':sigma}],
+            'constraint_scenarios':[{'id':'infeasible','constraint_overrides':{'group_gross_caps':{'basket':.1}}}]}
+        out=portfolio.sensitivity(request)
+        result=out['cases'][0]['result'];weights=np.array(list(result['weights'].values()))
+        expected=float(weights@np.array(sigma)@weights)
+        self.assertAlmostEqual(result['risk_contributions']['signed_variance_contributions']['sum'],expected)
+        self.assertNotIn('risk_contributions',out['constraint_cases'][0]['result'])
+        self.assertIsNone(out['selected_case'])
+
+    def test_generated_report_preserves_three_metric_units_and_native_values(self):
+        import quant_report, report_facts
+        d=allocation()
+        request={'schema_version':1,'contract':{'prompt':'Synthetic covariance attribution','purpose':'offline research',
+            'base_currency':'CAD','horizon_id':'P1M','as_of':d['decision_at']},
+            'jobs':[{'id':'allocate','operation':'portfolio.construct','inputs':{'document':d}}]}
+        artifacts=quant_report.build(quant_report.encoded(request),lambda path,index:self.fail('Unexpected source read'))
+        facts=json.loads(artifacts['facts.json'])
+        wanted={'Signed contribution to portfolio variance':'return_fraction_squared_over_covariance_horizon',
+                'Euler contribution to portfolio volatility':'return_fraction_over_covariance_horizon',
+                'Normalized share of portfolio variance':'fraction_of_portfolio_variance'}
+        for metric,unit in wanted.items():
+            found=[f for f in facts['facts'] if f['metric']==metric and '/risk_contributions/' in f['source']['pointer']]
+            self.assertEqual(len(found),3)
+            self.assertTrue(all(f['unit']==unit for f in found))
+        self.assertEqual(report_facts.verify_projection(artifacts['bundle.json'],'quant',artifacts['facts.json'])['status'],'VERIFIED_PROJECTION')
+        changed=copy.deepcopy(facts)
+        next(f for f in changed['facts'] if f['metric']=='Normalized share of portfolio variance')['unit']='return_fraction_squared'
+        self.assertEqual(report_facts.verify_projection(artifacts['bundle.json'],'quant',quant_report.encoded(changed))['status'],'PROJECTION_MISMATCH')
+
+    def test_report_semantics_cover_nested_sensitivity_and_legacy_fractions(self):
+        import report_facts
+        for operation,prefix in [('portfolio.construct',''),('portfolio.sensitivity','baseline/'),
+                                 ('portfolio.sensitivity','cases/0/result/'),('portfolio.sensitivity','constraint_cases/1/result/')]:
+            with self.subTest(operation=operation,prefix=prefix):
+                new=report_facts.extended_spec(operation,prefix+'risk_contributions/normalized_variance_shares/values/PINE')
+                legacy=report_facts.extended_spec(operation,prefix+'risk_diagnostics/variance_contribution_fraction/PINE')
+                self.assertEqual(new,legacy)
+                self.assertEqual(new[1],'fraction_of_portfolio_variance')
+                self.assertIn('portfolio variance',new[2])
 
 
 if __name__=='__main__':unittest.main()

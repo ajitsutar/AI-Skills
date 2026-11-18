@@ -64,6 +64,79 @@ def concentration_summary(record):
     return '\n'.join(lines)
 
 
+def _risk_contributions(ids, w, sigma, horizon):
+    """Report three distinct units from already validated portfolio inputs.
+
+    This is total-portfolio covariance attribution, not benchmark tracking risk.
+    Signed hedge contributions are retained; normalization never uses abs().
+    The denominator threshold matches the existing variance-fraction diagnostic.
+    """
+    terms = w * (sigma @ w)
+    variance = float(w @ sigma @ w)
+    volatility = float(np.sqrt(max(0., variance)))
+    supported = variance > 1e-20
+    status = ('AVAILABLE' if supported else 'NEGATIVE_VARIANCE_UNAVAILABLE' if variance < 0
+              else 'ZERO_VARIANCE_UNAVAILABLE' if variance == 0 else 'NEAR_ZERO_VARIANCE_UNAVAILABLE')
+    reason = None if supported else ('Variance is not above 1e-20; normalized shares and Euler volatility contributions are unavailable. '
+                                     'A zero/clamped volatility display is not proof of zero risk.')
+    def values(array):
+        return dict(zip(ids, array.tolist())) if array is not None else None
+    shares = terms / variance if supported else None
+    euler = terms / volatility if supported else None
+    return {'schema_version': 1, 'scope': 'total_portfolio_covariance_risk',
+            'covariance_ids': list(ids), 'covariance_horizon_id': horizon,
+            'input_weight_unit': 'fraction_of_initial_nav',
+            'cash_scope': 'Only supplied covariance asset IDs; no additional cash bucket.',
+            'portfolio_variance': variance, 'portfolio_volatility': volatility,
+            'variance_unit': 'return_fraction_squared_over_covariance_horizon',
+            'volatility_unit': 'return_fraction_over_covariance_horizon',
+            'normalization_status': status, 'normalization_minimum_variance': 1e-20,
+            'unavailable_reason': reason,
+            'signed_variance_contributions': {
+                'formula': 'w_i * (Sigma @ w)_i',
+                'unit': 'return_fraction_squared_over_covariance_horizon',
+                'denominator': 'none; signed components sum to portfolio variance',
+                'values': values(terms), 'sum': fsum(float(x) for x in terms)},
+            'euler_volatility_contributions': {
+                'formula': 'w_i * (Sigma @ w)_i / sqrt(w.T @ Sigma @ w)',
+                'unit': 'return_fraction_over_covariance_horizon',
+                'denominator_value': volatility,
+                'denominator_unit': 'return_fraction_over_covariance_horizon',
+                'values': values(euler), 'sum': fsum(float(x) for x in euler) if supported else None},
+            'normalized_variance_shares': {
+                'formula': 'w_i * (Sigma @ w)_i / (w.T @ Sigma @ w)',
+                'unit': 'fraction_of_portfolio_variance',
+                'denominator_value': variance,
+                'denominator_unit': 'return_fraction_squared_over_covariance_horizon',
+                'values': values(shares), 'sum': fsum(float(x) for x in shares) if supported else None},
+            'limitation': 'Signed components and shares can be negative or exceed one because of hedging; do not clip or take absolute values. '
+                          'These are not weights, standalone asset risks, tracking-risk contributions, forecast validation or execution permission. '
+                          'No annualization is applied; near-zero variance can make normalized shares unstable.'}
+
+
+def risk_contribution_summary(record):
+    """Keep metric labels, denominators and horizon with the native values."""
+    def members(values):
+        return ', '.join(f'{name!r}={value:.12g}' for name, value in values.items())
+    lines = [f"Total-portfolio covariance risk over {record['covariance_horizon_id']}; no annualization. "
+             f"Portfolio variance={record['portfolio_variance']:.12g} (return fraction squared); "
+             f"portfolio volatility={record['portfolio_volatility']:.12g} (return fraction; square root with nonpositive variance clamped for display).",
+             'Signed variance contributions (return fraction squared; sum to portfolio variance): '
+             + members(record['signed_variance_contributions']['values']) + '.']
+    if record['normalization_status'] == 'AVAILABLE':
+        lines.extend([
+            'Euler volatility contributions (return fraction; sum to portfolio volatility; denominator sqrt(portfolio variance)='
+            + f"{record['euler_volatility_contributions']['denominator_value']:.12g}): "
+            + members(record['euler_volatility_contributions']['values']) + '.',
+            'Normalized variance shares (dimensionless fraction of portfolio variance; sum to 1; denominator portfolio variance='
+            + f"{record['normalized_variance_shares']['denominator_value']:.12g}): "
+            + members(record['normalized_variance_shares']['values']) + '.'])
+    else:
+        lines.append(record['normalization_status'] + ': ' + record['unavailable_reason'])
+    lines.append(record['limitation'])
+    return '\n'.join(lines)
+
+
 def _linear_minimum_risk_problem(assets, previous, low, high, capacity, p, scenarios):
     """Equivalent long-only zero-cost constraints, with constant rows eliminated.
 
@@ -351,6 +424,8 @@ def construct(document):
             'limitation': 'Continuous planning weights. Borrow/recall, collateral, taxes, lots and actual settlement need separate broker checks. Covariance horizon is explicit; no automatic annualization.'}
     output['concentration_diagnostics'] = weight_concentration(output['weights'])
     output['concentration_summary'] = concentration_summary(output['concentration_diagnostics'])
+    output['risk_contributions'] = _risk_contributions(ids, w, sigma, document['covariance_horizon_id'])
+    output['risk_contribution_summary'] = risk_contribution_summary(output['risk_contributions'])
     return output
 
 

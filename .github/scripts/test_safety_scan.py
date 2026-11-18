@@ -214,5 +214,80 @@ class PythonFixtureTests(unittest.TestCase):
         self.assertFalse(any('personal email' in row for row in found))
 
 
+class PythonMatrixOperatorTests(unittest.TestCase):
+    def setUp(self):
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name).resolve()
+
+    def findings(self, text, suffix='.py'):
+        path = self.root / ('calculation' + suffix)
+        path.write_text(text, encoding='utf-8')
+        with patch.object(safety_scan, 'ROOT', self.root):
+            return safety_scan.scan()
+
+    def emails(self, text, suffix='.py'):
+        return [row for row in self.findings(text, suffix) if 'personal email' in row]
+
+    def test_original_chained_numpy_expression_is_math(self):
+        self.assertEqual(self.emails('expected = float(weights' + '@' + 'np.array(sigma)' + '@' + 'weights)\n'), [])
+
+    def test_nested_parenthesized_and_multiline_operators(self):
+        for text in ('value = (left' + '@' + 'np.array(x))' + '@' + 'np.array(y)\n',
+                     'value = (left\n' + '@' + 'np.array(x))\n'):
+            with self.subTest(text=text):
+                self.assertEqual(self.emails(text), [])
+
+    def test_plain_strings_docstrings_comments_and_fstrings_remain_findings(self):
+        contact = 'person' + '@' + 'company.test'
+        for text in ('value = ' + repr(contact), '"""' + contact + '"""', '# ' + contact,
+                     'value = f' + repr(contact), 'value = f"{left' + '@' + 'np.array(x)}"'):
+            with self.subTest(text=text):
+                self.assertTrue(self.emails(text))
+
+    def test_decorators_receive_no_exception(self):
+        for text in ('@person' + '@' + 'company.test\ndef f(): pass\n',
+                     '@(left' + '@' + 'np.array(x))\nclass C: pass\n',
+                     '@(left' + '@' + 'np.array(x))\nasync def f(): pass\n'):
+            with self.subTest(text=text):
+                self.assertTrue(self.emails(text))
+
+    def test_invalid_python_and_nonpython_remain_findings(self):
+        expression = 'left' + '@' + 'np.array(x)'
+        self.assertTrue(self.emails('value = (' + expression))
+        self.assertTrue(self.emails('value = ' + expression, '.txt'))
+
+    def test_mixed_matches_on_same_line_only_exempt_operator(self):
+        text = 'value = left' + '@' + 'np.array(x); contact = ' + repr('person' + '@' + 'company.test')
+        self.assertEqual(len(self.emails(text)), 1)
+
+    def test_comment_between_operands_is_not_operator(self):
+        text = 'value = (left # person' + '@' + 'company.test\n ' + '@' + 'np.array(x))\n'
+        self.assertEqual(len(self.emails(text)), 1)
+
+    def test_operand_string_is_not_exempt(self):
+        text = 'value = left' + '@' + 'np.array(' + repr('person' + '@' + 'company.test') + ')\n'
+        self.assertEqual(len(self.emails(text)), 1)
+
+    def test_unicode_byte_and_character_offsets(self):
+        contact = 'person' + '@' + 'company.test'
+        text = "label = 'é😀'; value = café.left" + '@' + 'np.array(x); contact = ' + repr(contact) + '\n'
+        found = safety_scan.python_matmul_email_spans(text, 'calculation.py')
+        self.assertEqual([text[a:b] for a, b in found], ['.left' + '@' + 'np.array'])
+        self.assertEqual(len(self.emails(text)), 1)
+
+    def test_unicode_prefix_with_ascii_left_operand(self):
+        text = "label = 'é😀'; value = left" + '@' + 'np.array(x); contact = ' + repr('person' + '@' + 'company.test') + '\n'
+        spans = safety_scan.python_matmul_email_spans(text, 'calculation.py')
+        self.assertEqual([text[a:b] for a, b in spans], ['left' + '@' + 'np.array'])
+        self.assertEqual(len(self.emails(text)), 1)
+
+    def test_other_secret_detectors_are_not_exempt(self):
+        text = 'value = left' + '@' + 'np.array(x)\nsecret = ' + repr('sk-' + 'a' * 24)
+        findings = self.findings(text)
+        self.assertTrue(any('OpenAI-style key' in row for row in findings))
+        self.assertFalse(any('personal email' in row for row in findings))
+
+
 if __name__ == "__main__":
     unittest.main()

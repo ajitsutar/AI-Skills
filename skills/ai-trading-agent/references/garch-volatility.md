@@ -16,6 +16,39 @@ conditional mean. Gaussian innovations remain the default; `--distribution t`
 explicitly requests standardized Student-t innovations. Percent log returns
 improve numerical scale. Do not label these variants the same model.
 
+## Portable elementary baselines
+
+When reporting constant-variance or EWMA benchmarks, use the bundled
+`scripts/volatility_baselines.py`. It runs with the Python standard library and
+the bundled price-audit helper; it does not import the optional GARCH runtime.
+
+```text
+python -B scripts/volatility_baselines.py prices.csv --data-audit prices.audit.json
+```
+
+Defaults match the adapter: 250 minimum training returns, 40 holdout returns,
+EWMA decay0.94 and252 periods/year. The CSV and audit remain unchanged. Explicit
+options are `--min-observations`, `--validation-test`, `--ewma-decay`,
+`--periods-per-year`, `--close-column` and `--timestamp-column`.
+
+Both baselines use percentage log returns. The constant variance is training
+sample variance with ddof1, floored at1e-8. EWMA starts at that value, processes
+**every training return**, then predicts each holdout variance before updating
+with its target return. Starting the first holdout directly at sample variance
+is a different benchmark. The helper exposes initialization, warm-up count,
+units, all predictions and QLIKE; its shared recursion preserves the native
+adapter's calculation. Standard-library and numerical-library reductions can
+differ at floating-point precision.
+
+The result is `BASELINES_ONLY_NO_GARCH_FIT`. One-step predictions describe the
+historical holdout; they are not a forward GARCH forecast. If `arch` or another
+native dependency is absent, preserve that actual limitation and leave native
+convergence, parameters, GARCH QLIKE and forecast unavailable. Elementary
+benchmarks do not replace the requested fit or establish sizing permission.
+If deliberately using another initialization or return convention, name the
+difference instead of calling it the bundled baseline. Audit declarations
+remain caller supplied and do not authenticate prices or exchange sessions.
+
 ## Correct recursion
 
 For GARCH, the first forecast uses the last observed squared return. Later forecasts

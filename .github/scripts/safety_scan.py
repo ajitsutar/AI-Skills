@@ -217,6 +217,47 @@ def python_fixture_spans(text: str, relative_path: str) -> dict[str, list[tuple[
     return spans
 
 
+def python_matmul_email_spans(text: str, relative_path: str) -> list[tuple[int, int]]:
+    """Exempt email-shaped math only at a parsed binary matrix operator.
+
+    An OP token must lie between the exact AST operands. Strings, comments,
+    decorators and invalid Python receive no matrix-operator exception.
+    """
+    if not relative_path.endswith('.py'):
+        return []
+    try:
+        tree = ast.parse(text)
+        tokens = list(tokenize.generate_tokens(io.StringIO(text).readline))
+    except (SyntaxError, ValueError, RecursionError, tokenize.TokenError):
+        return []
+    lines = text.splitlines(keepends=True)
+    offsets = [0]
+    for line in lines:
+        offsets.append(offsets[-1] + len(line))
+
+    def position(line: int, byte_column: int) -> int:
+        return offsets[line - 1] + len(lines[line - 1].encode('utf-8')[:byte_column].decode('utf-8'))
+
+    decorators = [(position(d.lineno, d.col_offset), position(d.end_lineno, d.end_col_offset))
+                  for node in ast.walk(tree)
+                  if isinstance(node, (ast.FunctionDef, ast.AsyncFunctionDef, ast.ClassDef))
+                  for d in node.decorator_list]
+    strings = [(position(node.lineno, node.col_offset), position(node.end_lineno, node.end_col_offset))
+               for node in ast.walk(tree) if isinstance(node, ast.JoinedStr)]
+    operators = {offsets[t.start[0] - 1] + t.start[1]
+                 for t in tokens if t.type == tokenize.OP and t.string == '@'}
+    matrix_operators = set()
+    for node in ast.walk(tree):
+        if isinstance(node, ast.BinOp) and isinstance(node.op, ast.MatMult):
+            start = position(node.left.end_lineno, node.left.end_col_offset)
+            end = position(node.right.lineno, node.right.col_offset)
+            matrix_operators.update(p for p in operators if start <= p < end
+                                    and not any(a <= p < b for a, b in decorators + strings))
+    email_pattern = next(pattern for label, pattern in TEXT_PATTERNS if label == 'personal email')
+    return [match.span() for match in email_pattern.finditer(text)
+            if match.start() + match.group().index('@') in matrix_operators]
+
+
 def scan() -> list[str]:
     findings: list[str] = []
     for path in sorted(ROOT.rglob("*")):
@@ -236,12 +277,15 @@ def scan() -> list[str]:
         text = path.read_text(encoding="utf-8")
         identifier_spans = sbom_package_identifier_spans(text, rel.as_posix())
         fixture_spans = python_fixture_spans(text, rel.as_posix())
+        matrix_spans = python_matmul_email_spans(text, rel.as_posix())
         for label, pattern in TEXT_PATTERNS:
             if (label == "personal email"
                     and PUBLIC_LICENSE_EMAIL_EXCEPTIONS.get(rel.as_posix())
                     == hashlib.sha256(text.encode("utf-8")).hexdigest()):
                 continue
             for match in pattern.finditer(text):
+                if label == 'personal email' and match.span() in matrix_spans:
+                    continue
                 if any(a <= match.start() and match.end() <= b for a, b in fixture_spans.get(label, [])):
                     continue
                 if label == 'personal email' and any(a <= match.start() and match.end() <= b for a, b in identifier_spans):

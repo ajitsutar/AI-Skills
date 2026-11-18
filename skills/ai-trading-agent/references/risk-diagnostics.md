@@ -139,11 +139,32 @@ is relaxed. Original actual-weight constraints, capacity and bounds are checked
 again with the existing 1e-7 feasibility tolerance. Solver attempts and certificate
 states remain visible. Infeasibility emits no weights.
 
-Diagnostics show covariance conditioning, variance contributions, constraint
+Diagnostics show covariance conditioning, normalized variance shares, constraint
 slacks and binding stock/group/cash/turnover limits. Singular covariance is
 disclosed rather than silently repaired. Active caps expose dependence on
 judgment-based risk budgets. Low estimated variance does not establish a
 recession-proof portfolio or a likely spending-goal return.
+
+`risk_contributions` distinguishes three metrics over the declared covariance
+horizon. For `V = w.T @ Sigma @ w`, signed variance contributions are
+`w_i * (Sigma @ w)_i`, in squared return fractions, and sum to `V`. Euler
+volatility contributions divide those terms by `sqrt(V)`, use return fractions
+and sum to portfolio volatility. Normalized variance shares divide by `V`, are
+dimensionless fractions of portfolio variance and sum to one. The legacy
+`risk_diagnostics.variance_contribution_fraction` retains these normalized
+shares; it is not a nonnormalized variance amount or an asset's standalone risk.
+
+Use the metric labels, units and denominators in the native
+`risk_contribution_summary` when describing these values in an authored answer.
+Do not shorten normalized variance shares to an unlabeled "variance contribution"
+number. Negative hedging components and shares above one are valid; do not take
+absolute values or clip them. With variance at or below `1e-20`, normalized
+shares and Euler volatility contributions are unavailable with an explicit
+reason; a clamped zero volatility display is not proof of zero risk. Near-zero
+positive variance can make shares unstable. These diagnostics describe total
+portfolio covariance risk, not benchmark tracking risk, and do not annualize or
+authenticate the supplied covariance. A native summary does not verify arbitrary
+surrounding prose.
 
 ## Prespecified covariance and cap sensitivity
 

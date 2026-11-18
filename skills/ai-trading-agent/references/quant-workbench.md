@@ -211,6 +211,14 @@ trials. Calibration is a declaration to verify, not engine-proven alpha. The sol
 audits actual weights and returns infeasibility rather than relaxing constraints.
 Continuous weights still need lot, settlement, tax and broker feasibility checks.
 
+For allocation risk attribution, retain the native `risk_contributions` metric
+names, units and denominator, or use its `risk_contribution_summary`. See
+[risk contribution units](risk-diagnostics.md#numerically-robust-constrained-allocation)
+for signed variance components, Euler volatility components and normalized
+variance shares. They are different quantities; total-portfolio attribution is
+not tracking-risk attribution. Authored output remains separate from the native
+report's calculation and replay evidence.
+
 Cash events may declare `reservation_release` only against a matching debit,
 up to that debit and the remaining opening reservation in the same currency.
 This consumes an existing hold without charging it twice. Retain order-to-hold

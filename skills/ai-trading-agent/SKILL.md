@@ -4,7 +4,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 ---
 
 # AI Trading Agent
-Package version: **5.13.12 - November 17, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
+Package version: **5.13.14 - November 18, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
 `approval` or `autonomous`: respectively simulate only, require order approval,
@@ -405,14 +405,14 @@ For historical monthly stock reselection or changing portfolio weights, read
 Distinguish actual archived decisions from retrospective model narration, fixed
 holdings from reselection, and a frozen price-rule control from an AI test.
 
-GARCH, GJR-GARCH and supported EGARCH are included in
-`scripts/garch_volatility.py`; see [garch-volatility.md](references/garch-volatility.md).
-They describe conditional risk, not direction or undervaluation. Explain model,
-frequency, horizon, price basis, observations, holdout evaluation and sizing
-implications. Missing `arch`, a failed fit or insufficient history is a disclosed
-research limitation, never an execution gate. Optional stock-relative interval
-movement diagnostics likewise describe evidence and uncertainty; they neither
-approve nor veto an order. Never claim an unrun model was computed.
+GARCH, GJR-GARCH and supported EGARCH are included in `scripts/garch_volatility.py`;
+see [garch-volatility.md](references/garch-volatility.md). They describe conditional risk, not direction or undervaluation.
+Explain model, frequency, horizon, price basis, observations, holdout evaluation and sizing implications.
+Missing `arch`, a failed fit or insufficient history is a disclosed research limitation, never an execution gate.
+Optional stock-relative interval movement diagnostics describe evidence and uncertainty; they neither approve nor veto an order.
+Never claim an unrun model was computed. Use `scripts/volatility_baselines.py` for elementary constant/EWMA benchmarks,
+with the training warm-up and units in the volatility reference. Keep benchmarks separate from an unavailable GARCH fit;
+disclose deliberately different benchmark methods.
 
 ## Portable quantitative extensions
 
