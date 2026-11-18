@@ -53,6 +53,13 @@ PUBLIC_LICENSE_EMAIL_EXCEPTIONS = {
     "skills/ai-trading-agent/ARCH-LICENSE.txt": "c6e622bd89db4e13315f4e91605ff96fcbb9012d78ee74e429855870b203eed6",
 }
 
+# Only these exact reviewed public listing images may bypass the binary check.
+# Changed artwork or a different path requires a new review and digest.
+PUBLIC_LISTING_IMAGE_EXCEPTIONS = {
+    "docs/ai-trading-agent/assets/fictional-ticker.png": "4de924d80ff7a47c837977cc842ecb4c20131006e174f3fa7e4a83b04f48a273",
+    "docs/ai-trading-agent/assets/fictional-ticker-dark.png": "b2653b26406ead682682b121581555c6d2b5027b47a93a73cca2feae376136d5",
+}
+
 
 TEXT_PATTERNS = [
     (
@@ -230,6 +237,9 @@ def scan() -> list[str]:
             continue
 
         if not is_probably_text(path):
+            if (PUBLIC_LISTING_IMAGE_EXCEPTIONS.get(rel.as_posix())
+                    == hashlib.sha256(path.read_bytes()).hexdigest()):
+                continue
             findings.append(f"binary or non-utf8 file: {rel}")
             continue
 

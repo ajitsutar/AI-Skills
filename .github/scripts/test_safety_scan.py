@@ -49,6 +49,63 @@ class PublicNoticeTests(unittest.TestCase):
             self.assertTrue(any("OpenAI-style key" in s for s in self.findings(modified)))
 
 
+class PublicListingImageTests(unittest.TestCase):
+    def setUp(self):
+        names = (
+            'docs/ai-trading-agent/assets/fictional-ticker.png',
+            'docs/ai-trading-agent/assets/fictional-ticker-dark.png',
+        )
+        self.images = {name: (safety_scan.ROOT / name).read_bytes() for name in names}
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name).resolve()
+        self.scan_number = 0
+
+    def findings(self, files):
+        self.scan_number += 1
+        root = self.root / str(self.scan_number)
+        for name, content in files.items():
+            path = root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+        with patch.object(safety_scan, 'ROOT', root):
+            return safety_scan.scan()
+
+    def test_exact_reviewed_listing_images_are_allowed(self):
+        self.assertEqual(set(safety_scan.PUBLIC_LISTING_IMAGE_EXCEPTIONS), set(self.images))
+        self.assertEqual(self.findings(self.images), [])
+
+    def test_modified_listing_image_bytes_remain_blocked(self):
+        for name, content in self.images.items():
+            with self.subTest(name=name):
+                self.assertEqual(self.findings({name: content + b'\x00'}),
+                                 [f'binary or non-utf8 file: {Path(name)}'])
+
+    def test_reviewed_image_at_renamed_path_is_not_exempt(self):
+        for name, content in self.images.items():
+            renamed = name + '.backup'
+            with self.subTest(name=name):
+                self.assertEqual(self.findings({renamed: content}),
+                                 [f'binary or non-utf8 file: {Path(renamed)}'])
+
+    def test_unrelated_binary_and_unreviewed_png_remain_blocked(self):
+        files = {'other.png': next(iter(self.images.values())), 'other.dat': b'\xff\x00\xfe'}
+        self.assertEqual(self.findings(files),
+                         [f'binary or non-utf8 file: {Path(name)}' for name in sorted(files)])
+
+    def test_text_secret_at_listing_path_is_still_scanned(self):
+        secret = ('sk-' + 'a' * 24).encode()
+        for name in self.images:
+            with self.subTest(name=name):
+                self.assertTrue(any('OpenAI-style key' in row
+                                    for row in self.findings({name: secret})))
+
+    def test_forbidden_extension_with_reviewed_bytes_remains_blocked(self):
+        name = 'unreviewed.zip'
+        self.assertEqual(self.findings({name: next(iter(self.images.values()))}),
+                         [f'forbidden extension: {Path(name)}'])
+
+
 class SbomIdentifierTests(unittest.TestCase):
     def test_only_consistent_structured_identifiers_are_recognized(self):
         component = {'name': 'python-dateutil', 'version': '2.9.0.post0',
