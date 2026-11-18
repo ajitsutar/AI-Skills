@@ -1,2 +1,0 @@
-# Optional compressed columnar storage; gzip storage uses Python's standard library.
-pyarrow==26.0.0

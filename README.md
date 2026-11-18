@@ -151,16 +151,34 @@ skills/
     references/                  That skill's supporting guidance, when needed
     ...                          Skill-specific data, tests and dependencies
 .claude-plugin/                   Optional full-repository plugin metadata
-.agents/plugins/marketplace.json  Repository plugin marketplace catalog
-plugins/ai-trading-agent/         Generated self-contained trading plugin package
 .github/scripts/                  Repository maintenance and validation only
 .github/workflows/                Continuous integration
 ```
 
 There are no repository-root `scripts/` or `agents/` directories. No skill needs
 `.github/`, `.claude-plugin/`, another skill, or the root README at runtime.
-The optional Claude plugin manifest points directly to each skill-local plugin agent
+The optional plugin manifest points directly to each skill-local plugin agent
 using Claude Code's [custom agent paths](https://code.claude.com/docs/en/plugins-reference#path-only-fields).
+
+## Install with the skills CLI
+
+With Node.js 22.20 or later and Git installed, run this from the project where
+you want to use AI Trading Agent:
+
+```bash
+npx skills add ajitsutar/AI-Skills --skill ai-trading-agent
+```
+
+Choose your supported agent when prompted. The CLI installs into the current
+project by default. The skill includes its Python helpers and references;
+see its [installation guide](skills/ai-trading-agent/INSTALL.md) for workflow
+dependencies and host requirements.
+
+The [skills CLI documentation](https://github.com/vercel-labs/skills) covers
+other agents and installation options. The manual installation routes below
+remain available.
+
+View [AI Trading Agent on skills.sh](https://www.skills.sh/ajitsutar/ai-skills/ai-trading-agent).
 
 ## Use With Codex
 
@@ -179,28 +197,6 @@ cp -R "skills/<skill-name>" "$HOME/.agents/skills/"
 ```
 
 Some older Codex desktop installations discover personal skills from `$CODEX_HOME/skills` (commonly `~/.codex/skills`). Use that as a legacy fallback only when it is the location shown by the running app; do not install the same skill name in both roots. Codex does not merge duplicate skill names, so duplicate copies can both appear in selectors. Restart Codex only if a newly copied skill does not appear automatically.
-
-## Optional: install AI Trading Agent from the GitHub marketplace
-
-In a Codex release that supports repository plugin marketplaces:
-
-```bash
-codex plugin marketplace add ajitsutar/AI-Skills --ref main
-codex plugin add ai-trading-agent@ajitsutar-ai-skills
-```
-
-The marketplace is **Ajit Sutar AI Skills** and the plugin is **AI Trading Agent**.
-This entry loads the generated `plugins/ai-trading-agent/` package, containing the
-full trading skill and its bundled resources. The catalog also retains the
-existing `ai-skills` entry for the full repository bundle. AI Trading Agent requires
-no backend or background service; Python helpers need the runtime and dependencies
-for the requested workflow. Installation does not provide broker access or trading
-permission.
-
-See the [installation guide and starter prompts](docs/ai-trading-agent/README.md#install-from-the-github-repository-marketplace)
-for desktop discovery, host checks and updates. This is a GitHub-hosted plugin
-catalog, separate from GitHub Marketplace apps/Actions and OpenAI public-directory
-approval. The Claude Code installation below continues to load all seven skills.
 
 ## Optional: install all skills as a Claude Code plugin
 
@@ -308,10 +304,6 @@ Before publishing or updating this repository:
 python .github/scripts/validate_portability.py
 ```
 
-After accepted trading-skill or listing changes, follow the
-[plugin package maintenance steps](docs/ai-trading-agent/README.md#maintain-the-repository-plugin-package)
-to regenerate and check the distributed copy before publication.
-
 5. Test one-folder portability and run the safety scan:
 
 ```powershell
@@ -342,7 +334,7 @@ The repository's CI runs the portability checks and focused helper tests on both
 
 - Shared `SKILL.md` files use only the portable `name` and `description` frontmatter fields and avoid host-specific command substitution.
 - Supporting resources are resolved relative to the directory containing `SKILL.md`, not the caller's working directory.
-- Standalone Codex presentation metadata lives in each skill's `agents/openai.yaml`; the generated AI Trading Agent plugin has separate presentation metadata in `plugins/ai-trading-agent/plugin.json`.
+- Codex-specific presentation metadata lives only in each skill's `agents/openai.yaml`.
 - Each skill contains both its standalone Claude agent and its namespaced plugin variant. The repository plugin manifest explicitly lists only the plugin variants.
 - Optional browser, web, messaging, media, or model capabilities are declared as runtime prerequisites in prose; neither host is assumed to provide them automatically.
 

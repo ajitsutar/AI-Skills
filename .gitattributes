@@ -8,4 +8,3 @@
 
 # Preserve the exact reviewed bytes covered by the trading skill's SHA256 manifest.
 skills/ai-trading-agent/** -text
-plugins/ai-trading-agent/skills/ai-trading-agent/** -text

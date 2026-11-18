@@ -53,13 +53,6 @@ PUBLIC_LICENSE_EMAIL_EXCEPTIONS = {
     "skills/ai-trading-agent/ARCH-LICENSE.txt": "c6e622bd89db4e13315f4e91605ff96fcbb9012d78ee74e429855870b203eed6",
 }
 
-# Only these exact reviewed public listing images may bypass the binary check.
-# Changed artwork or a different path requires a new review and digest.
-PUBLIC_LISTING_IMAGE_EXCEPTIONS = {
-    "docs/ai-trading-agent/assets/fictional-ticker.png": "4de924d80ff7a47c837977cc842ecb4c20131006e174f3fa7e4a83b04f48a273",
-    "docs/ai-trading-agent/assets/fictional-ticker-dark.png": "b2653b26406ead682682b121581555c6d2b5027b47a93a73cca2feae376136d5",
-}
-
 
 TEXT_PATTERNS = [
     (
@@ -224,30 +217,6 @@ def python_fixture_spans(text: str, relative_path: str) -> dict[str, list[tuple[
     return spans
 
 
-def scan_provenance(path: Path, relative: Path) -> str:
-    """Apply existing rules to verified copies without skipping their contents."""
-    name = relative.as_posix()
-    skill_prefix = "plugins/ai-trading-agent/skills/ai-trading-agent/"
-    image_prefix = "plugins/ai-trading-agent/assets/"
-    if name.startswith(skill_prefix):
-        source_name = "skills/ai-trading-agent/" + name[len(skill_prefix):]
-    elif name.startswith(image_prefix):
-        source_name = "docs/ai-trading-agent/assets/" + name[len(image_prefix):]
-        if source_name not in PUBLIC_LISTING_IMAGE_EXCEPTIONS:
-            return name
-    else:
-        return name
-    source = ROOT / source_name
-    for candidate in (path, source):
-        while candidate != ROOT:
-            if candidate.is_symlink():
-                return name
-            candidate = candidate.parent
-    if source.is_file() and path.read_bytes() == source.read_bytes():
-        return source_name
-    return name
-
-
 def scan() -> list[str]:
     findings: list[str] = []
     for path in sorted(ROOT.rglob("*")):
@@ -255,25 +224,21 @@ def scan() -> list[str]:
             continue
 
         rel = path.relative_to(ROOT)
-        provenance = scan_provenance(path, rel)
         suffixes = {suffix.lower() for suffix in path.suffixes}
         if suffixes & FORBIDDEN_EXTENSIONS and not path.name.casefold().endswith(".env.example"):
             findings.append(f"forbidden extension: {rel}")
             continue
 
         if not is_probably_text(path):
-            if (PUBLIC_LISTING_IMAGE_EXCEPTIONS.get(provenance)
-                    == hashlib.sha256(path.read_bytes()).hexdigest()):
-                continue
             findings.append(f"binary or non-utf8 file: {rel}")
             continue
 
         text = path.read_text(encoding="utf-8")
-        identifier_spans = sbom_package_identifier_spans(text, provenance)
-        fixture_spans = python_fixture_spans(text, provenance)
+        identifier_spans = sbom_package_identifier_spans(text, rel.as_posix())
+        fixture_spans = python_fixture_spans(text, rel.as_posix())
         for label, pattern in TEXT_PATTERNS:
             if (label == "personal email"
-                    and PUBLIC_LICENSE_EMAIL_EXCEPTIONS.get(provenance)
+                    and PUBLIC_LICENSE_EMAIL_EXCEPTIONS.get(rel.as_posix())
                     == hashlib.sha256(text.encode("utf-8")).hexdigest()):
                 continue
             for match in pattern.finditer(text):
