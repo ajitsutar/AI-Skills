@@ -1,0 +1,51 @@
+{
+  "operation": "rebalance",
+  "inputs": {
+    "document": {
+      "target_document": {
+        "as_of": "2026-01-03T00:00:00Z",
+        "currency": "USD",
+        "max_position_weight": 0.5,
+        "sleeves": [{
+          "id": "fictional-disclosure-sleeve",
+          "subject_id": "fictional-investor-not-a-real-person",
+          "mode": "events",
+          "budget_weight": 0.5,
+          "current_weights": {"AAA": 1},
+          "source_status": "verified",
+          "checked_at": "2026-01-03T00:00:00Z",
+          "max_age_days": 30,
+          "allocation_policy": "user_weights",
+          "user_weights": {"BBB": 1},
+          "partial_sell_policy": "hold",
+          "records": [
+            {"subject_id": "fictional-investor-not-a-real-person", "event_id": "fictional-exit", "security_id": "AAA", "action": "SELL", "sale_scope": "full", "event_at": "2026-01-01T00:00:00Z", "published_at": "2026-01-02T00:00:00Z", "available_at": "2026-01-02T00:00:00Z", "revision": 0, "withdrawn": false, "source_ref": "fictional-fixture", "qualifying": true, "eligible_common": true},
+            {"subject_id": "fictional-investor-not-a-real-person", "event_id": "fictional-buy", "security_id": "BBB", "action": "BUY", "sale_scope": "unknown", "event_at": "2026-01-01T00:00:00Z", "published_at": "2026-01-02T00:00:00Z", "available_at": "2026-01-02T00:00:00Z", "revision": 0, "withdrawn": false, "source_ref": "fictional-fixture", "qualifying": true, "eligible_common": true}
+          ]
+        }]
+      },
+      "currency": "USD",
+      "open_orders": [],
+      "holdings_at": "2026-01-03T00:00:00Z",
+      "max_holdings_age_seconds": 60,
+      "max_quote_age_seconds": 60,
+      "account_nav": "1000",
+      "settled_cash": "200",
+      "pending_receivables": "100",
+      "cash_floor": "50",
+      "reserved_cash": "0",
+      "fixed_fee_per_trade": "1",
+      "cost_bps": "100",
+      "min_trade_notional": "1",
+      "holdings": [
+        {"security_id": "AAA", "quantity": "10", "follower_quantity": "6"},
+        {"security_id": "OUT", "quantity": "10", "follower_quantity": "0"}
+      ],
+      "quotes": {
+        "AAA": {"price": "50", "quantity_step": "1", "observed_at": "2026-01-03T00:00:00Z", "available_at": "2026-01-03T00:00:00Z", "source_ref": "fictional-fixture", "price_basis": "unadjusted"},
+        "BBB": {"price": "25", "quantity_step": "1", "observed_at": "2026-01-03T00:00:00Z", "available_at": "2026-01-03T00:00:00Z", "source_ref": "fictional-fixture", "price_basis": "unadjusted"},
+        "OUT": {"price": "20", "quantity_step": "1", "observed_at": "2026-01-03T00:00:00Z", "available_at": "2026-01-03T00:00:00Z", "source_ref": "fictional-fixture", "price_basis": "unadjusted"}
+      }
+    }
+  }
+}

@@ -1,0 +1,211 @@
+{
+  "schema_version": 1,
+  "environment": "paper",
+  "base_currency": "USD",
+  "initial_cash": {
+    "USD": "100000"
+  },
+  "instruments": [
+    {
+      "id": "ABC",
+      "kind": "equity",
+      "currency": "USD",
+      "multiplier": "1",
+      "quantity_step": "1",
+      "price_tick": "0.01"
+    },
+    {
+      "id": "BOND",
+      "kind": "bond",
+      "currency": "USD",
+      "multiplier": "1",
+      "quantity_step": "1",
+      "price_tick": "0.01",
+      "expiry": "2026-10-23T14:00:20Z"
+    },
+    {
+      "id": "COIN",
+      "kind": "crypto",
+      "currency": "USD",
+      "multiplier": "1",
+      "quantity_step": "0.001",
+      "price_tick": "0.01"
+    },
+    {
+      "id": "FUT",
+      "kind": "future",
+      "currency": "USD",
+      "multiplier": "1",
+      "quantity_step": "1",
+      "price_tick": "0.01",
+      "expiry": "2026-10-23T14:00:20Z",
+      "margin_per_contract": "100"
+    }
+  ],
+  "as_of": "2026-10-23T14:00:25Z",
+  "max_quote_age_seconds": 60,
+  "max_fx_age_seconds": 60,
+  "events": [
+    {
+      "id": "q",
+      "type": "quote",
+      "at": "2026-10-23T14:00:00Z",
+      "instrument": "ABC",
+      "bid": "9",
+      "ask": "10",
+      "bid_size": "100",
+      "ask_size": "100"
+    },
+    {
+      "id": "o",
+      "type": "order",
+      "at": "2026-10-23T14:00:01Z",
+      "order_id": "o1",
+      "instrument": "ABC",
+      "side": "buy",
+      "quantity": "10",
+      "order_type": "market"
+    },
+    {
+      "id": "f",
+      "type": "fill",
+      "at": "2026-10-23T14:00:02Z",
+      "order_id": "o1",
+      "quantity": "10",
+      "price": "10",
+      "fee": "1",
+      "settle_at": "2026-10-23T14:00:02Z"
+    },
+    {
+      "id": "qBOND",
+      "type": "quote",
+      "at": "2026-10-23T14:00:03Z",
+      "instrument": "BOND",
+      "bid": "100",
+      "ask": "100",
+      "bid_size": "100",
+      "ask_size": "100"
+    },
+    {
+      "id": "oBOND",
+      "type": "order",
+      "at": "2026-10-23T14:00:04Z",
+      "order_id": "BOND",
+      "instrument": "BOND",
+      "side": "buy",
+      "quantity": "10",
+      "order_type": "market"
+    },
+    {
+      "id": "fBOND",
+      "type": "fill",
+      "at": "2026-10-23T14:00:05Z",
+      "order_id": "BOND",
+      "quantity": "10",
+      "price": "100",
+      "fee": "1",
+      "settle_at": "2026-10-23T14:00:05Z"
+    },
+    {
+      "id": "qCOIN",
+      "type": "quote",
+      "at": "2026-10-23T14:00:06Z",
+      "instrument": "COIN",
+      "bid": "200",
+      "ask": "200",
+      "bid_size": "100",
+      "ask_size": "100"
+    },
+    {
+      "id": "oCOIN",
+      "type": "order",
+      "at": "2026-10-23T14:00:07Z",
+      "order_id": "COIN",
+      "instrument": "COIN",
+      "side": "buy",
+      "quantity": "0.1",
+      "order_type": "market"
+    },
+    {
+      "id": "fCOIN",
+      "type": "fill",
+      "at": "2026-10-23T14:00:08Z",
+      "order_id": "COIN",
+      "quantity": "0.1",
+      "price": "200",
+      "fee": "1",
+      "settle_at": "2026-10-23T14:00:08Z"
+    },
+    {
+      "id": "qFUT",
+      "type": "quote",
+      "at": "2026-10-23T14:00:09Z",
+      "instrument": "FUT",
+      "bid": "50",
+      "ask": "50",
+      "bid_size": "100",
+      "ask_size": "100"
+    },
+    {
+      "id": "oFUT",
+      "type": "order",
+      "at": "2026-10-23T14:00:10Z",
+      "order_id": "FUT",
+      "instrument": "FUT",
+      "side": "buy",
+      "quantity": "2",
+      "order_type": "market"
+    },
+    {
+      "id": "fFUT",
+      "type": "fill",
+      "at": "2026-10-23T14:00:11Z",
+      "order_id": "FUT",
+      "quantity": "2",
+      "price": "50",
+      "fee": "1",
+      "settle_at": "2026-10-23T14:00:11Z"
+    },
+    {
+      "id": "fx",
+      "type": "fx_convert",
+      "at": "2026-10-23T14:00:13Z",
+      "from_currency": "USD",
+      "to_currency": "EUR",
+      "amount": "1000",
+      "rate": "0.9",
+      "fee": "1"
+    },
+    {
+      "id": "fxmark",
+      "type": "fx_rate",
+      "at": "2026-10-23T14:00:14Z",
+      "currency": "EUR",
+      "rate_to_base": "1.1"
+    },
+    {
+      "id": "coupon",
+      "type": "distribution",
+      "at": "2026-10-23T14:00:19Z",
+      "instrument": "BOND",
+      "entitled_quantity": "10",
+      "amount_per_unit": "1"
+    },
+    {
+      "id": "mature",
+      "type": "bond_redemption",
+      "at": "2026-10-23T14:00:20Z",
+      "instrument": "BOND",
+      "principal_per_unit": "100"
+    },
+    {
+      "id": "futures_final",
+      "type": "futures_settlement",
+      "at": "2026-10-23T14:00:20Z",
+      "instrument": "FUT",
+      "price": "55",
+      "margin_per_contract": "100",
+      "final": true
+    }
+  ]
+}

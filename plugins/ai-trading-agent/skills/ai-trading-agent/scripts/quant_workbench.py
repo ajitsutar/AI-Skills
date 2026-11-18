@@ -1,0 +1,551 @@
+"""Versioned, replayable offline quant jobs with an explicit operation allowlist.
+
+No input-supplied imports, expressions, executable code, URLs or order actions.
+Cross-model agreement means identical inputs/contracts plus verified calculations.
+"""
+from __future__ import annotations
+
+import argparse
+import copy
+import importlib.metadata
+import inspect
+import json
+import math
+import platform
+from pathlib import Path
+from numpy.linalg import LinAlgError
+
+import investment_ops
+import multi_asset_risk
+import primary_financial_data
+import quant_portfolio
+import quant_validation
+import portfolio_backtest
+import manager_monitor
+import analysis_checks
+import planning_alignment
+import financial_alignment
+import strategy_research
+import forward_evidence
+import evidence_semantics
+import ranking_alignment
+import allocation_policy
+import portfolio_decision
+import planning_roles
+import portfolio_projection
+import planning_comparison
+import flow_normalization
+import price_comparison
+import recommendation_report
+import employer_reference
+import equity_cash_comparison
+import source_exposure
+import fund_comparison
+import technical_toolkit
+import fundamental_toolkit
+import sentiment_toolkit
+import factor_research
+import derivatives_toolkit
+import paper_exchange
+import platform_readiness
+import time_series_toolkit
+import portable_quant
+import point_in_time_data
+import vintage_eligibility
+import terminal_return_coverage
+import costed_bar_replay
+import monthly_experiment
+import research_readiness
+import source_strategy_readiness
+import security_master
+import price_refresh
+import holdings_ledger
+import analyst_adapter
+import risk_diagnostics
+import experiment_registry
+import release_acceptance
+import portfolio_follower
+import portfolio_disclosures
+import market_sources
+import market_flow
+import options_activity
+import institutional_research
+from quant_common import digest, require
+
+ROOT = Path(__file__).resolve().parents[1]
+
+
+def technical_analysis(request, data_available_at):
+    """Bind completed-bar availability explicitly, including open-labelled/date-only bars."""
+    from price_audit import timestamp
+    available = timestamp(data_available_at)
+    for bar in technical_toolkit.validate_bars(request['bars']):
+        stamp = bar['timestamp']
+        if len(stamp) == 10:
+            require(stamp <= available.date().isoformat(), 'BAR_DATE_AFTER_DATA_AVAILABILITY')
+        else:
+            require(timestamp(stamp) <= available, 'BAR_AFTER_DATA_AVAILABILITY')
+    if 'depth_snapshot' in request:
+        require(timestamp(request['depth_snapshot']['as_of']) <= available, 'DEPTH_AFTER_DATA_AVAILABILITY')
+    result = technical_toolkit.analyze(request)
+    result['data_available_at'] = data_available_at
+    result['availability_basis'] = 'Caller-declared completed-bar availability, not inferred from open timestamps or independently verified.'
+    return result
+
+
+OPERATIONS = {
+    'data.vintage_eligibility': vintage_eligibility.assess,
+    'data.terminal_return_coverage': terminal_return_coverage.assess,
+    'validation.folds': quant_validation.purged_walk_forward,
+    'validation.tail': quant_validation.tail_risk,
+    'validation.hac': quant_validation.hac_mean,
+    'validation.holm': quant_validation.holm,
+    'validation.sharpe': quant_validation.sharpe_evidence,
+    'validation.bootstrap': quant_validation.block_bootstrap,
+    'validation.factors': quant_validation.factor_attribution,
+    'validation.promotion': quant_validation.promotion_evidence,
+    'portfolio.construct': quant_portfolio.construct,
+    'risk.option': multi_asset_risk.european_option,
+    'risk.bond': multi_asset_risk.fixed_cashflow_bond,
+    'risk.scenarios': multi_asset_risk.scenario_book,
+    'ops.cash_ladder': investment_ops.cash_ladder,
+    'ops.shortfall': investment_ops.implementation_shortfall,
+    'ops.xirr': investment_ops.xirr,
+    'ops.attribution': investment_ops.brinson,
+    'data.sec_extract': primary_financial_data.extract,
+    'data.coverage': primary_financial_data.coverage_plan,
+    'data.normalize_flows': flow_normalization.normalize_flows,
+    'backtest.portfolio': portfolio_backtest.simulate,
+    'monitor.assess': manager_monitor.assess,
+    'analysis.covariance_comparison': analysis_checks.covariance_comparison,
+    'analysis.hedge_scenarios': analysis_checks.hedge_scenarios,
+    'analysis.compare_claim': analysis_checks.compare_claim,
+    'planning.trade_costs': planning_alignment.trade_costs,
+    'planning.allocate': allocation_policy.allocate,
+    'planning.budget_sizing': portfolio_decision.budget_sizing,
+    'planning.source_budget_sizing': portfolio_decision.source_budget_sizing,
+    'planning.allocation_context': portfolio_decision.allocation_context,
+    'planning.source_allocation_context': source_exposure.source_allocation_context,
+    'planning.fund_comparison_report': fund_comparison.fund_comparison_report,
+    'planning.friction_context': portfolio_decision.friction_context,
+    'planning.input_roles': planning_roles.input_roles,
+    'planning.source_roles': planning_roles.source_roles,
+    'planning.reference_comparison': planning_roles.reference_comparison,
+    'planning.dated_projection': portfolio_projection.dated_projection,
+    'planning.source_projection': portfolio_projection.source_projection,
+    'planning.tax_sensitivity': portfolio_projection.tax_sensitivity,
+    'planning.alternative_comparison': planning_comparison.alternative_comparison,
+    'planning.source_alternatives': planning_comparison.source_alternatives,
+    'planning.employer_diversification_baseline': employer_reference.employer_diversification_baseline,
+    'financial.equity_cash_comparison': equity_cash_comparison.equity_cash_comparison,
+    'planning.settlement_transfer_paths': planning_comparison.settlement_transfer_paths,
+    'planning.settlement_transfer_sweep': planning_comparison.settlement_transfer_sweep,
+    'planning.cash_plan': planning_alignment.cash_plan,
+    'planning.cash_projection': planning_alignment.cash_projection,
+    'planning.vest_reconciliation': planning_alignment.vest_reconciliation,
+    'planning.portfolio_reconciliation': planning_alignment.portfolio_reconciliation,
+    'planning.cash_reconciliation': planning_alignment.cash_reconciliation,
+    'planning.trade_history_costs': planning_alignment.trade_history_costs,
+    'planning.session_pnl': planning_alignment.session_pnl,
+    'financial.owner_cash_bridge': financial_alignment.owner_cash_bridge,
+    'financial.reit_reconciliation': financial_alignment.reit_reconciliation,
+    'financial.acquisition_cash': financial_alignment.acquisition_cash,
+    'financial.terminal_scenarios': financial_alignment.terminal_scenarios,
+    'financial.price_scenarios': financial_alignment.price_scenarios,
+    'financial.corporate_action_return': financial_alignment.corporate_action_return,
+    'backtest.dual_sma': strategy_research.dual_sma,
+    'backtest.dual_sma_variants': strategy_research.dual_sma_variants,
+    'backtest.opening_range': strategy_research.opening_range,
+    'validation.forward_observations': forward_evidence.assess,
+    'validation.paper_study_forward': forward_evidence.paper_study,
+    'evidence.operand_compatibility': evidence_semantics.operand_compatibility,
+    'evidence.event_window': evidence_semantics.event_window,
+    'evidence.states': evidence_semantics.evidence_states,
+    'evidence.price_comparison': price_comparison.compare_prices,
+    'planning.recommendation_context': recommendation_report.recommendation_context,
+    'ranking.route': ranking_alignment.route_ranking,
+    'ranking.replay': ranking_alignment.replay_ranking,
+    'ranking.compare': ranking_alignment.compare_rankings,
+}
+ANALYSIS_OPERATIONS = {
+    'technical.analyze': technical_analysis,
+    'fundamental.calculate': fundamental_toolkit.run,
+    'sentiment.analyze': sentiment_toolkit.analyze,
+    'sentiment.trend': sentiment_toolkit.trend,
+    'sentiment.fuse': sentiment_toolkit.fuse,
+    'sentiment.calibrate': sentiment_toolkit.calibrate,
+    'sentiment.backtest': sentiment_toolkit.backtest,
+    **factor_research.OPERATIONS,
+}
+OPERATIONS.update(ANALYSIS_OPERATIONS)
+MULTIASSET_OPERATIONS = {
+    'derivatives.calculate': derivatives_toolkit.run,
+    'paper.replay': paper_exchange.replay,
+    'platform.assess': platform_readiness.assess,
+    'timeseries.run': time_series_toolkit.run,
+}
+OPERATIONS.update(MULTIASSET_OPERATIONS)
+PORTABLE_OPERATIONS = {
+    'portable.arima': portable_quant.arima,
+    'portable.cointegration': portable_quant.cointegration,
+    'portable.european': portable_quant.european,
+    'portable.vader': portable_quant.vader,
+    'data.asof_snapshot': point_in_time_data.snapshot,
+    'backtest.costed_bars': costed_bar_replay.simulate,
+}
+OPERATIONS.update(PORTABLE_OPERATIONS)
+MONTHLY_OPERATIONS = {
+    'portfolio.capped_inverse_volatility': monthly_experiment.capped_inverse_volatility,
+    'backtest.monthly_targets': monthly_experiment.monthly_targets,
+    'experiment.freeze': monthly_experiment.freeze_experiment,
+    'experiment.rank_stage': monthly_experiment.rank_stage,
+}
+OPERATIONS.update(MONTHLY_OPERATIONS)
+ASSURANCE_OPERATIONS = {
+    'data.strategy_readiness': research_readiness.assess,
+    'data.source_strategy_readiness': source_strategy_readiness.assess,
+    'data.security_snapshot': security_master.snapshot,
+    'data.source_features': security_master.adapt_records,
+    'data.price_refresh': price_refresh.reconcile,
+    'backtest.holdings_ledger': holdings_ledger.replay,
+    'analyst.extract_table': analyst_adapter.extract,
+    'analyst.earnings_basis': analyst_adapter.earnings_basis,
+    'risk.empirical_tail': risk_diagnostics.empirical_tail,
+    'risk.conditional_portfolio': risk_diagnostics.conditional_portfolio,
+    'portfolio.sensitivity': quant_portfolio.sensitivity,
+    'experiment.validate_attempt': experiment_registry.validate_attempt,
+    'experiment.overlap_review': experiment_registry.overlap_review,
+    'release.rights_inventory': release_acceptance.rights_inventory,
+    'release.grade_response': release_acceptance.grade_response,
+}
+# Only pure operations belong here: registry mutations and file-writing release
+# runners must never be invoked again by freeze/verify.
+OPERATIONS.update(ASSURANCE_OPERATIONS)
+FOLLOWER_OPERATIONS = {
+    'follower.normalize': portfolio_disclosures.normalize,
+    'follower.targets': portfolio_follower.build_targets,
+    'follower.rebalance': portfolio_follower.rebalance,
+}
+OPERATIONS.update(FOLLOWER_OPERATIONS)
+MARKET_RESEARCH_OPERATIONS = {
+    'market.normalize': market_sources.normalize,
+    'market.parse': market_sources.parse,
+    'market.flow': market_flow.analyze,
+    'market.positioning': market_flow.positioning,
+    'market.squeeze': market_flow.squeeze,
+    'market.options_parse': options_activity.parse,
+    'market.options_activity': options_activity.analyze,
+    'market.bind_float': options_activity.bind_float,
+    'institutional.plan': institutional_research.plan,
+    'institutional.brief': institutional_research.brief,
+    'institutional.evaluate': institutional_research.evaluate,
+}
+# Acquisition and journal mutation remain explicit CLI actions, outside replay.
+OPERATIONS.update(MARKET_RESEARCH_OPERATIONS)
+MODULES = ('quant_workbench.py', 'quant_common.py', 'quant_validation.py',
+           'quant_portfolio.py', 'multi_asset_risk.py', 'investment_ops.py',
+           'primary_financial_data.py', 'price_audit.py', 'financial_normalize.py',
+           'filing_extract.py', 'deterministic_rank.py', 'portfolio_backtest.py', 'manager_monitor.py',
+           'analysis_checks.py', 'planning_alignment.py', 'financial_alignment.py', 'reit_provenance.py', 'reit_sources.py', 'source_lineage.py',
+           'portfolio_analytics.py', 'accounting_tools.py', 'strategy_research.py',
+           'strategy_lab.py', 'risk_engine.py', 'forward_evidence.py', 'report_facts.py',
+           'research_analytics.py', 'evidence_semantics.py', 'ranking_alignment.py',
+           'vqm_research.py', 'public_research.py', 'research_bundle.py', 'screen_review.py',
+           'horizon_review.py', 'cash_benchmark.py', 'trading_calendar.py', 'allocation_policy.py',
+           'portfolio_decision.py', 'planning_roles.py', 'portfolio_projection.py', 'planning_comparison.py', 'concentration_bounds.py',
+           'flow_normalization.py', 'price_comparison.py', 'recommendation_report.py', 'employer_reference.py',
+           'equity_cash_comparison.py', 'source_exposure.py', 'fund_comparison.py', 'technical_toolkit.py',
+           'fundamental_toolkit.py', 'sentiment_toolkit.py', 'factor_research.py',
+           'derivatives_toolkit.py', 'paper_exchange.py', 'platform_readiness.py', 'time_series_toolkit.py',
+               'portable_quant.py', 'point_in_time_data.py', 'vintage_eligibility.py', 'terminal_return_coverage.py', 'costed_bar_replay.py', 'monthly_experiment.py',
+               'research_contracts.py', 'quant_data_contracts.py', 'research_readiness.py', 'source_strategy_readiness.py', 'security_master.py',
+               'price_refresh.py', 'holdings_ledger.py', 'analyst_adapter.py',
+               'risk_diagnostics.py', 'garch_volatility.py', 'experiment_registry.py', 'release_acceptance.py',
+               'portfolio_follower.py', 'portfolio_disclosures.py',
+               'market_sources.py', 'market_flow.py', 'institutional_research.py', 'options_activity.py')
+
+
+def implementation_hash():
+    sources = {f: (ROOT/'scripts'/f).read_text(encoding='utf-8') for f in MODULES}
+    sources['financial-normalization-v1.json'] = (ROOT/'profiles/financial-normalization-v1.json').read_text(encoding='utf-8')
+    sources['report-facts-v2.json'] = (ROOT/'profiles/report-facts-v2.json').read_text(encoding='utf-8')
+    for name in ('vqm-fundamental-v1.json', 'public-vqm-discovery-v1.json'):
+        sources[name] = (ROOT/'profiles'/name).read_text(encoding='utf-8')
+    sources['event-research-pilot.json'] = (ROOT/'profiles/event-research-pilot.json').read_text(encoding='utf-8')
+    sources['market-source-catalog.json'] = (ROOT/'references/market-source-catalog.json').read_text(encoding='utf-8')
+    return digest(sources)
+
+
+def operation_catalog():
+    """Describe actual allowlisted interfaces; no guessed model-specific defaults."""
+    operations = {}
+    for name, function in sorted(OPERATIONS.items()):
+        parameters = inspect.signature(function).parameters
+        operations[name] = {
+            'required': [k for k, p in parameters.items() if p.default is inspect.Parameter.empty],
+            'defaults': {k: p.default for k, p in parameters.items() if p.default is not inspect.Parameter.empty}}
+    return {'implementation_sha256': implementation_hash(), 'operations': operations,
+            'scope': 'Offline computations only; required observations are not supplied by these defaults.'}
+
+
+def resolved_inputs(operation, inputs):
+    require(operation in OPERATIONS, 'OPERATION_NOT_ALLOWED:'+operation)
+    require(isinstance(inputs, dict), 'JOB_INPUT_OBJECT_REQUIRED')
+    bound = inspect.signature(OPERATIONS[operation]).bind(**inputs)
+    bound.apply_defaults()
+    resolved = copy.deepcopy(dict(bound.arguments))
+    if operation == 'technical.analyze':
+        resolved['request'] = technical_toolkit.resolve_request(resolved['request'])
+    if operation.startswith('sentiment.'):
+        resolved['document'] = sentiment_toolkit.resolve_document(operation.split('.')[1], resolved['document'])
+    return resolved
+
+
+def prepare(document):
+    """Make helper defaults explicit before models compute or exchange a job."""
+    result = copy.deepcopy(document)
+    require(result.get('schema_version') == 1, 'WORKBENCH_SCHEMA')
+    jobs = result.get('jobs')
+    require(isinstance(jobs, list) and jobs and
+            len({j['id'] for j in jobs}) == len(jobs), 'UNIQUE_JOB_IDS')
+    for job in jobs:
+        job['inputs'] = resolved_inputs(job['operation'], job['inputs'])
+    return result
+
+
+def run(document):
+    require(document.get('schema_version') == 1, 'WORKBENCH_SCHEMA')
+    contract = document['contract']
+    require(set(contract) >= {'prompt', 'purpose', 'base_currency', 'horizon_id', 'as_of'}, 'CONTRACT_REQUIRED')
+    require(all(isinstance(contract[k], str) and contract[k].strip() for k in
+                ('prompt', 'purpose', 'base_currency', 'horizon_id', 'as_of')), 'CONTRACT_FIELDS')
+    from price_audit import timestamp
+    timestamp(contract['as_of'])
+    jobs = document['jobs']
+    require(jobs and len({j['id'] for j in jobs}) == len(jobs), 'UNIQUE_JOB_IDS')
+    results = []
+    for job in jobs:
+        require(job['operation'] in OPERATIONS, 'OPERATION_NOT_ALLOWED:'+job['operation'])
+        require(isinstance(job['inputs'], dict), 'JOB_INPUT_OBJECT_REQUIRED')
+        try:
+            inputs = resolved_inputs(job['operation'], job['inputs'])
+            if job['operation'] in MARKET_RESEARCH_OPERATIONS:
+                payload = inputs['document']
+                require(timestamp(payload['as_of']) <= timestamp(contract['as_of']), 'FUTURE_MARKET_RESEARCH_CUTOFF')
+                if 'currency' in payload:
+                    require(payload['currency'] == contract['base_currency'], 'MARKET_RESEARCH_CURRENCY_MISMATCH')
+                if job['operation'].startswith('institutional.'):
+                    # These helpers do not convert currency. Reconcile nested
+                    # monetary and return declarations even without a top-level
+                    # document currency. Missing fields stay with the helper's
+                    # own partial-input diagnostics.
+                    currencies = []
+                    for key in ('portfolio', 'proposed_trade', 'cost_contract', 'liquidity'):
+                        item = payload.get(key)
+                        if isinstance(item, dict) and item.get('currency') is not None:
+                            currencies.append(item['currency'])
+                    portfolio = payload.get('portfolio')
+                    if isinstance(portfolio, dict) and isinstance(portfolio.get('positions'), list):
+                        currencies += [p['currency'] for p in portfolio['positions']
+                                       if isinstance(p, dict) and p.get('currency') is not None]
+                    evaluation = payload.get('evaluation')
+                    if isinstance(evaluation, dict) and isinstance(evaluation.get('cases'), list):
+                        for case in evaluation['cases']:
+                            returns = case.get('paper_return') if isinstance(case, dict) else None
+                            if isinstance(returns, dict):
+                                if returns.get('currency') is not None:
+                                    currencies.append(returns['currency'])
+                                benchmark = returns.get('benchmark')
+                                if isinstance(benchmark, dict) and benchmark.get('currency') is not None:
+                                    currencies.append(benchmark['currency'])
+                    require(all(currency == contract['base_currency'] for currency in currencies),
+                            'INSTITUTIONAL_CURRENCY_MISMATCH_NO_FX_MODEL')
+            if job['operation'] in FOLLOWER_OPERATIONS:
+                payload = inputs['document']
+                decision = payload['target_document'] if job['operation'] == 'follower.rebalance' else payload
+                require(timestamp(decision['as_of']) <= timestamp(contract['as_of']), 'FUTURE_FOLLOWER_CUTOFF')
+                if 'currency' in payload:
+                    require(payload['currency'] == contract['base_currency'], 'FOLLOWER_CURRENCY_MISMATCH')
+            if job['operation'] in ASSURANCE_OPERATIONS:
+                payload = inputs['document']
+                if job['operation'] == 'data.strategy_readiness':
+                    for decision in payload['decisions']:
+                        require(all(timestamp(decision[key]) <= timestamp(contract['as_of'])
+                                    for key in ('decision_at', 'valuation_at', 'execution_at')), 'FUTURE_READINESS_CLOCK')
+                if job['operation'] == 'data.source_strategy_readiness':
+                    study = payload['study_request']
+                    for decision in study['decisions']:
+                        require(all(timestamp(decision[key]) <= timestamp(contract['as_of'])
+                                    for key in ('decision_at', 'valuation_at', 'execution_at')), 'FUTURE_READINESS_CLOCK')
+                    for query in study.get('symbol_queries', []):
+                        require(timestamp(query['as_of']) <= timestamp(contract['as_of']), 'FUTURE_READINESS_CLOCK')
+                if 'as_of' in payload:
+                    require(timestamp(payload['as_of']) <= timestamp(contract['as_of']), 'FUTURE_ASSURANCE_CUTOFF')
+                if 'currency' in payload:
+                    require(payload['currency'] == contract['base_currency'], 'ASSURANCE_CURRENCY_MISMATCH')
+                if job['operation'] == 'analyst.earnings_basis':
+                    require(payload['quote']['currency'] == contract['base_currency'], 'ASSURANCE_CURRENCY_MISMATCH')
+                if job['operation'] == 'data.price_refresh':
+                    require(timestamp(payload['acquired_at']) <= timestamp(contract['as_of']), 'FUTURE_REFRESH_CAPTURE')
+                if job['operation'] == 'portfolio.sensitivity':
+                    base = payload['base']
+                    require(base['currency'] == contract['base_currency'] and base['horizon_id'] == contract['horizon_id'], 'WORKBENCH_PORTFOLIO_CONTRACT')
+                    require(timestamp(base['decision_at']) <= timestamp(contract['as_of']), 'FUTURE_DECISION')
+            if job['operation'] in PORTABLE_OPERATIONS:
+                payload = inputs['document']
+                require(timestamp(payload['as_of']) <= timestamp(contract['as_of']), 'FUTURE_PORTABLE_CUTOFF')
+                if job['operation'] != 'data.asof_snapshot':
+                    require(payload['currency'] == contract['base_currency'], 'PORTABLE_CURRENCY_MISMATCH')
+            if job['operation'] in MULTIASSET_OPERATIONS:
+                payload = inputs['document']
+                if job['operation'] in ('paper.replay', 'platform.assess'):
+                    require(timestamp(payload['as_of']) <= timestamp(contract['as_of']), 'FUTURE_MULTI_ASSET_CUTOFF')
+                if job['operation'] == 'paper.replay':
+                    require(payload['base_currency'] == contract['base_currency'], 'PAPER_CURRENCY_MISMATCH')
+                if job['operation'] == 'derivatives.calculate':
+                    require(payload['currency'] == contract['base_currency'], 'DERIVATIVES_CURRENCY_MISMATCH')
+                    require(timestamp(payload['information_cutoff']) <= timestamp(contract['as_of']), 'FUTURE_DERIVATIVES_CUTOFF')
+                if job['operation'] == 'timeseries.run':
+                    require(timestamp(payload['inputs']['as_of']) <= timestamp(contract['as_of']), 'FUTURE_TIME_SERIES_CUTOFF')
+            if job['operation'] in ANALYSIS_OPERATIONS:
+                cutoff = timestamp(contract['as_of'])
+                if job['operation'] == 'technical.analyze':
+                    require(timestamp(inputs['data_available_at']) <= cutoff, 'FUTURE_TECHNICAL_DATA')
+                if job['operation'] == 'fundamental.calculate':
+                    require(inputs['d']['currency'] == contract['base_currency'], 'FUNDAMENTAL_CURRENCY_MISMATCH')
+                if job['operation'] in ('factor.normalize', 'sentiment.analyze', 'sentiment.fuse'):
+                    payload = inputs.get('document',inputs)
+                    require(timestamp(payload['as_of']) <= cutoff, 'FUTURE_ANALYSIS_CUTOFF')
+                if job['operation'] == 'factor.fama_french':
+                    require(all(timestamp(r['timestamp']) <= cutoff for r in inputs['rows']), 'FUTURE_FACTOR_OBSERVATION')
+                if job['operation'] == 'sentiment.trend':
+                    require(all(timestamp(t) <= cutoff for t in inputs['document']['cutoffs']), 'FUTURE_TREND_CUTOFF')
+                if job['operation'] == 'sentiment.backtest':
+                    require(all(timestamp(r['end']) <= cutoff for r in inputs['document']['periods']), 'FUTURE_BACKTEST_DATA')
+                if job['operation'] == 'sentiment.calibrate':
+                    require(all(timestamp(r['predicted_at']) <= cutoff and timestamp(r['label_available_at']) <= cutoff
+                                for r in inputs['document']['rows']), 'FUTURE_CALIBRATION_DATA')
+            if job['operation'] == 'portfolio.construct':
+                require(inputs['document']['horizon_id'] == contract['horizon_id'] and
+                        inputs['document']['currency'] == contract['base_currency'], 'WORKBENCH_PORTFOLIO_CONTRACT')
+                require(timestamp(inputs['document']['decision_at']) <= timestamp(contract['as_of']), 'FUTURE_DECISION')
+            if job['operation'] in {'backtest.monthly_targets', 'experiment.freeze', 'experiment.rank_stage'}:
+                field = 'as_of' if job['operation'] == 'backtest.monthly_targets' else 'sealed_at'
+                require(timestamp(inputs['document'][field]) <= timestamp(contract['as_of']), 'FUTURE_EXPERIMENT_CUTOFF')
+            if job['operation'] == 'data.sec_extract':
+                require(timestamp(inputs['information_cutoff']) <= timestamp(contract['as_of']), 'FUTURE_INFORMATION_CUTOFF')
+            if job['operation'] == 'validation.factors':
+                require(all(timestamp(r['timestamp']) <= timestamp(contract['as_of']) for r in inputs['observations']), 'FUTURE_OBSERVATIONS')
+            if job['operation'] == 'validation.promotion':
+                require(timestamp(inputs['evidence']['test_end']) <= timestamp(contract['as_of']), 'FUTURE_TEST_EVIDENCE')
+            if job['operation'] in {'monitor.assess', 'ops.cash_ladder'}:
+                require(timestamp(inputs['as_of']) <= timestamp(contract['as_of']), 'FUTURE_STATE_SNAPSHOT')
+            if job['operation'] == 'backtest.portfolio':
+                require(all(timestamp(r['end']) <= timestamp(contract['as_of']) for r in inputs['document']['periods']), 'FUTURE_BACKTEST_DATA')
+            if job['operation'] in {'backtest.dual_sma', 'backtest.dual_sma_variants',
+                                     'backtest.opening_range', 'validation.paper_study_forward'}:
+                require(timestamp(inputs['as_of']) <= timestamp(contract['as_of']), 'FUTURE_ANALYSIS_CUTOFF')
+            if job['operation'] in {'validation.forward_observations', 'planning.cash_plan',
+                                     'planning.vest_reconciliation', 'planning.session_pnl'}:
+                if inputs['document'].get('as_of') is not None:
+                    require(timestamp(inputs['document']['as_of']) <= timestamp(contract['as_of']), 'FUTURE_STATE_SNAPSHOT')
+            result = OPERATIONS[job['operation']](**inputs)
+            result['execution_authorized'] = False
+            results.append({'id': job['id'], 'operation': job['operation'], 'status': 'COMPUTED', 'result': result,
+                            'resolved_inputs_sha256': digest(inputs),
+                            'defaults_used': {k: v for k, v in inputs.items() if k not in job['inputs']}})
+        except LinAlgError as exc:
+            results.append({'id': job['id'], 'operation': job['operation'], 'status': 'CALCULATION_FAILED',
+                            'reason': 'NUMERICAL_ERROR:'+str(exc), 'execution_authorized': False})
+        except (ValueError, KeyError, TypeError, OverflowError, ZeroDivisionError) as exc:
+            results.append({'id': job['id'], 'operation': job['operation'], 'status': 'REJECTED_INPUT',
+                            'reason': type(exc).__name__+':'+str(exc), 'execution_authorized': False})
+    return {'schema_version': 1, 'skill_version': (ROOT/'VERSION').read_text().strip(),
+            'implementation_sha256': implementation_hash(), 'input_sha256': digest(document),
+            'contract_sha256': digest(contract), 'results': results,
+            'execution_authorized': False,
+            'limitation': 'Execution success is not evidence validity, investment performance or model approval.'}
+
+
+def differences(left, right, path='$', absolute=1e-8, relative=1e-7):
+    if type(left) in (float, int) and type(right) in (float, int):
+        return [] if math.isclose(left, right, abs_tol=absolute, rel_tol=relative) else [path]
+    if type(left) != type(right):
+        return [path]
+    if isinstance(left, dict):
+        if set(left) != set(right):
+            return [path+':keys']
+        return [p for k in sorted(left) for p in differences(left[k], right[k], path+'.'+k, absolute, relative)]
+    if isinstance(left, list):
+        if len(left) != len(right):
+            return [path+':length']
+        return [p for i, (a, b) in enumerate(zip(left, right)) for p in differences(a, b, path+'['+str(i)+']', absolute, relative)]
+    return [] if left == right else [path]
+
+
+def freeze(document):
+    result = run(document)
+    versions = {}
+    for name in ('numpy', 'scipy', 'pandas', 'arch', 'exchange_calendars', 'tzdata', 'statsmodels', 'QuantLib', 'vaderSentiment'):
+        try:
+            versions[name] = importlib.metadata.version(name)
+        except importlib.metadata.PackageNotFoundError:
+            versions[name] = 'UNAVAILABLE'
+    return {'input': document, 'result': result, 'result_sha256': digest(result),
+            'environment': {**versions, 'python': platform.python_version(),
+                            'platform': platform.system(), 'machine': platform.machine()}}
+
+
+def verify(bundle):
+    require(bundle['result_sha256'] == digest(bundle['result']), 'RESULT_HASH_MISMATCH')
+    require(bundle['result']['implementation_sha256'] == implementation_hash(), 'IMPLEMENTATION_MISMATCH')
+    actual = run(bundle['input'])
+    mismatches = differences(actual, bundle['result'])
+    require(not mismatches, 'REPLAY_MISMATCH:'+','.join(mismatches[:10]))
+    return {'status': 'REPLAY_MATCH', 'input_sha256': actual['input_sha256'],
+            'jobs_verified': len(actual['results']), 'execution_authorized': False}
+
+
+def compare(left, right):
+    verify(left)
+    verify(right)
+    require(left['result']['input_sha256'] == right['result']['input_sha256'], 'DIFFERENT_INPUTS_NOT_A_CALCULATION_COMPATIBILITY_TEST')
+    mismatches = differences(left['result'], right['result'])
+    return {'status': 'MATCH' if not mismatches else 'MISMATCH', 'differences': mismatches,
+            'jobs_compared': len(left['result']['results']), 'absolute_tolerance': 1e-8,
+            'relative_tolerance': 1e-7, 'execution_authorized': False,
+            'limitation': 'Tests calculation/rejection compatibility only; does not test model-selected data, narrative, strategy alpha or future investment results.'}
+
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument('command', choices=['operations', 'prepare', 'run', 'verify', 'compare'])
+    parser.add_argument('input', nargs='?', type=Path)
+    parser.add_argument('other', nargs='?', type=Path)
+    parser.add_argument('--output', type=Path)
+    args = parser.parse_args()
+    if args.command != 'operations':
+        require(args.input is not None, 'INPUT_REQUIRED')
+        document = json.loads(args.input.read_text(encoding='utf-8-sig'))
+    if args.command == 'operations':
+        result = operation_catalog()
+    elif args.command == 'prepare':
+        result = prepare(document)
+    elif args.command == 'run':
+        result = freeze(document)
+    elif args.command == 'verify':
+        result = verify(document)
+    else:
+        require(args.other is not None, 'SECOND_BUNDLE_REQUIRED')
+        result = compare(document, json.loads(args.other.read_text(encoding='utf-8-sig')))
+    if args.output:
+        require(not args.output.resolve().is_relative_to(ROOT), 'OUTPUT_OUTSIDE_SKILL_REQUIRED')
+        with args.output.open('x', encoding='utf-8') as f:
+            json.dump(result, f, indent=2, allow_nan=False)
+            f.write('\n')
+    else:
+        print(json.dumps(result, indent=2, allow_nan=False))
+
+
+if __name__ == '__main__':
+    main()

@@ -1,0 +1,1256 @@
+{
+  "bomFormat": "CycloneDX",
+  "specVersion": "1.6",
+  "version": 1,
+  "metadata": {
+    "timestamp": "2026-11-02T06:16:51.912499+00:00",
+    "properties": [
+      {
+        "name": "scope",
+        "value": "Observed Python environment; platform-specific, not a legal or security certification"
+      }
+    ]
+  },
+  "components": [
+    {
+      "type": "library",
+      "bom-ref": "arch@8.0.0",
+      "name": "arch",
+      "version": "8.0.0",
+      "purl": "pkg:pypi/arch@8.0.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "NCSA"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "8b13d261e0a681b3a8a2f9c588ab37a35500bca9f3bbcc6ca1ce2d999322651d"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "attrs@26.1.0",
+      "name": "attrs",
+      "version": "26.1.0",
+      "purl": "pkg:pypi/attrs@26.1.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c647aa4a12dfbad9333ca4e71fe62ddc36f4e63b2d260a37a8b83d2f043ac309"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "beautifulsoup4@4.15.0",
+      "name": "beautifulsoup4",
+      "version": "4.15.0",
+      "purl": "pkg:pypi/beautifulsoup4@4.15.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d6f88de62e1d4e38ecb1077eb9724cd0eff29d2a08ca16a401e9b9e93f117cf9"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "certifi@2026.10.19",
+      "name": "certifi",
+      "version": "2026.10.19",
+      "purl": "pkg:pypi/certifi@2026.10.19",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "42d35340cc5b9ba78e818ddbff0c5b1c2b779de448a340fd1b989f5fa8670e1b"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "cffi@2.1.1",
+      "name": "cffi",
+      "version": "2.1.1",
+      "purl": "pkg:pypi/cffi@2.1.1",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT-0"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "f53e442b08449d42821fa4a4fba000095af9f62742a500f978a9f557ec44339a"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "charset-normalizer@3.5.2",
+      "name": "charset-normalizer",
+      "version": "3.5.2",
+      "purl": "pkg:pypi/charset-normalizer@3.5.2",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "780fbe7cab297b81dad9fb8dc5eb003c0468ffb0d9e5f65068c53a34661a96bc"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "curl-cffi@0.16.3",
+      "name": "curl-cffi",
+      "version": "0.16.3",
+      "purl": "pkg:pypi/curl-cffi@0.16.3",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "fe87b66e324ed7318166698e02169f3208dbda32b872a27d2bc61a9c19b335eb"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "exchange-calendars@4.13.2",
+      "name": "exchange-calendars",
+      "version": "4.13.2",
+      "purl": "pkg:pypi/exchange-calendars@4.13.2",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "Apache-2.0"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "fc5a2ad0d61b5c3a6539a3061cd4cbb55c59f4a903455cec7926e4b798919996"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "formulaic@1.2.2",
+      "name": "formulaic",
+      "version": "1.2.2",
+      "purl": "pkg:pypi/formulaic@1.2.2",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "0f84ff49e3fc9dc0e68ab08a0a9427874021aa6c558e66b44dc634a35739b09b"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "idna@3.20",
+      "name": "idna",
+      "version": "3.20",
+      "purl": "pkg:pypi/idna@3.20",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "BSD-3-Clause"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "ab7ae7122974553370f0bdb919e1a960b2cd1bc1ef0276416d896db81c14582c"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "interface-meta@2.0.1",
+      "name": "interface-meta",
+      "version": "2.0.1",
+      "purl": "pkg:pypi/interface-meta@2.0.1",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "f38016bef9a4429b6d0792d809be7b65e9781820c674bf7f463999086b6e6323"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "jsonschema@4.26.0",
+      "name": "jsonschema",
+      "version": "4.26.0",
+      "purl": "pkg:pypi/jsonschema@4.26.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d489f15263b8d200f8387e64b4c3a75f06629559fb73deb8fdfb525f2dab50ce"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "jsonschema-specifications@2025.9.1",
+      "name": "jsonschema-specifications",
+      "version": "2025.9.1",
+      "purl": "pkg:pypi/jsonschema-specifications@2025.9.1",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "98802fee3a11ee76ecaca44429fda8a41bff98b00a0f2838151b113f210cc6fe"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "korean-lunar-calendar@0.4.0",
+      "name": "korean-lunar-calendar",
+      "version": "0.4.0",
+      "purl": "pkg:pypi/korean-lunar-calendar@0.4.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c042e20de0bb702add6bec8d0f6da1ea8d3b170838e63846f70420cf341fe4e7"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "lxml@6.1.3",
+      "name": "lxml",
+      "version": "6.1.3",
+      "purl": "pkg:pypi/lxml@6.1.3",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "3e9a00d1c2c30936f7add097c41afc5da6556c580909104aafd382cac92a855c"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "multitasking@0.0.13",
+      "name": "multitasking",
+      "version": "0.0.13",
+      "purl": "pkg:pypi/multitasking@0.0.13",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "ec9243af140c67bfe52dc98d7173c294512735a88e8425c458b250db99dc2b48"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "narwhals@2.27.1",
+      "name": "narwhals",
+      "version": "2.27.1",
+      "purl": "pkg:pypi/narwhals@2.27.1",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d057df13f5852b8e157596e82eb5e955fad267425df5e420e0ee9863da483b31"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "numpy@2.4.6",
+      "name": "numpy",
+      "version": "2.4.6",
+      "purl": "pkg:pypi/numpy@2.4.6",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "BSD-3-Clause AND 0BSD AND MIT AND Zlib AND CC0-1.0"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d8e8286dd7cea7895157318d1b91cdacac64c479f3cbc8dce548331728484751"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "packaging@26.3",
+      "name": "packaging",
+      "version": "26.3",
+      "purl": "pkg:pypi/packaging@26.3",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "Apache-2.0 OR BSD-2-Clause"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d7193f7c8e4e93f444fde0262bf90af30e16fa0ad0ad44cb553c87339b23cd1c"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pandas@3.0.6",
+      "name": "pandas",
+      "version": "3.0.6",
+      "purl": "pkg:pypi/pandas@3.0.6",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "3ef908d28590b3f42d7070e7ad8f9b34b442b260b7f3c1afb57e0040c58cdb1b"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "patsy@1.0.3",
+      "name": "patsy",
+      "version": "1.0.3",
+      "purl": "pkg:pypi/patsy@1.0.3",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "d3dbebe8fd5f46e29912d030b63c6268647b59bf788a99e2af28a30234cf357c"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "peewee@4.5.3",
+      "name": "peewee",
+      "version": "4.5.3",
+      "purl": "pkg:pypi/peewee@4.5.3",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "4c5db9d2a3c4ae9a5725b229c29af51dbd063193f3a6c03b837974a90e44548c"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "platformdirs@4.13.5",
+      "name": "platformdirs",
+      "version": "4.13.5",
+      "purl": "pkg:pypi/platformdirs@4.13.5",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "53d3ec4280b815c1e0b02edad7f9ee8fda1ba9c0865dd9c2e6e63849ce82fc1e"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "protobuf@7.36.2",
+      "name": "protobuf",
+      "version": "7.36.2",
+      "purl": "pkg:pypi/protobuf@7.36.2",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "a300819d441e078a5608c0d3c709796bb548136058fda017ae51d425b44fd353"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pyarrow@26.0.0",
+      "name": "pyarrow",
+      "version": "26.0.0",
+      "purl": "pkg:pypi/pyarrow@26.0.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "Apache-2.0"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "cc903e1069e9dd5e9dcf780324c0112e27e051e422ecfaff574fb33ed65d9160"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pycparser@3.11",
+      "name": "pycparser",
+      "version": "3.11",
+      "purl": "pkg:pypi/pycparser@3.11",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "BSD-3-Clause"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "51d5a8ba2be0bbe440b99d2112604c95bbbc3c2748a64260186c541e1729cd80"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pyluach@2.3.0",
+      "name": "pyluach",
+      "version": "2.3.0",
+      "purl": "pkg:pypi/pyluach@2.3.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "4497b731aef59508b079dbf5f00bc5bf4329ac45090a6cd37b5a83756f0e69ab"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "python-dateutil@2.9.0.post0",
+      "name": "python-dateutil",
+      "version": "2.9.0.post0",
+      "purl": "pkg:pypi/python-dateutil@2.9.0.post0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "a8b2bc7bffae282281c8140a97d3aa9c14da0b136dfe83f850eea9a5f7470427"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "pytz@2026.5",
+      "name": "pytz",
+      "version": "2026.5",
+      "purl": "pkg:pypi/pytz@2026.5",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "e658af3757f9e26a9d25dd2aff38335acd92bc9104f890a894b2c1ba28311b03"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "quantlib@1.43",
+      "name": "quantlib",
+      "version": "1.43",
+      "purl": "pkg:pypi/quantlib@1.43",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "61fcb95e8d7e15dfd23e83104d24ce28d45582a645e7dbce0c248216bf51913b"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "referencing@0.37.0",
+      "name": "referencing",
+      "version": "0.37.0",
+      "purl": "pkg:pypi/referencing@0.37.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "381329a9f99628c9069361716891d34ad94af76e461dcb0335825aecc7692231"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "requests@2.34.2",
+      "name": "requests",
+      "version": "2.34.2",
+      "purl": "pkg:pypi/requests@2.34.2",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "2a0d60c172f83ac6ab31e4554906c0f3b3588d37b5cb939b1c061f4907e278e0"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "rpds-py@2026.9.1",
+      "name": "rpds-py",
+      "version": "2026.9.1",
+      "purl": "pkg:pypi/rpds-py@2026.9.1",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "5ce8943f79c2210f7abcc28e86367b03b28d95027fd01c46d2472373ae70c86f"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "scipy@1.17.1",
+      "name": "scipy",
+      "version": "1.17.1",
+      "purl": "pkg:pypi/scipy@1.17.1",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "41b71f4a3a4cab9d366cd9065b288efc4d4f3c0b37a91a8e0947fb5bd7f31d87"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "six@1.17.0",
+      "name": "six",
+      "version": "1.17.0",
+      "purl": "pkg:pypi/six@1.17.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "4721f391ed90541fddacab5acf947aa0d3dc7d27b2e1e8eda2be8970586c3274"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "soupsieve@3.0.3",
+      "name": "soupsieve",
+      "version": "3.0.3",
+      "purl": "pkg:pypi/soupsieve@3.0.3",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "fa30e3ba4809cb81ce1f3209f2fbe3e779fc445f0439bc147a0d7c4601743f21"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "statsmodels@0.15.0",
+      "name": "statsmodels",
+      "version": "0.15.0",
+      "purl": "pkg:pypi/statsmodels@0.15.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "BSD-3-Clause"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "ba89eb3ccb1c9c1e400d5081157305495b09350b3a65f2d66d3424ad1d3c4209"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "toolz@1.2.0",
+      "name": "toolz",
+      "version": "1.2.0",
+      "purl": "pkg:pypi/toolz@1.2.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "BSD-3-Clause"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "890f820b1cb8152785aaf9386d8707770110809035800985ca65cb24ce1120ef"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "typing-extensions@4.16.0",
+      "name": "typing-extensions",
+      "version": "4.16.0",
+      "purl": "pkg:pypi/typing-extensions@4.16.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "PSF-2.0"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "481caa481374e813c1b176ada14e97f1f67a4539ce9cfeb3f350d78d6370c2e8"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "tzdata@2026.5",
+      "name": "tzdata",
+      "version": "2026.5",
+      "purl": "pkg:pypi/tzdata@2026.5",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "b683bd1b6659ddcd810ff02ad09ba821d4bf1065072805063eb35c49617905ac"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "urllib3@2.8.0",
+      "name": "urllib3",
+      "version": "2.8.0",
+      "purl": "pkg:pypi/urllib3@2.8.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "MIT"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "0cf3cae568d36aa9576b28dfb35f11328f1cb974ca7647d9475ebb86c75ac6e3"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "vadersentiment@3.3.2",
+      "name": "vadersentiment",
+      "version": "3.3.2",
+      "purl": "pkg:pypi/vadersentiment@3.3.2",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "3bf1d243b98b1afad575b9f22bc2cb1e212b94ff89ca74f8a23a588d024ea311"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "websockets@17.3",
+      "name": "websockets",
+      "version": "17.3",
+      "purl": "pkg:pypi/websockets@17.3",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "BSD-3-Clause"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "6644eecd99c4e8cdf72e646e17b391bb70b054f44becde37dcdc48cbec7e1527"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "wrapt@2.5.1",
+      "name": "wrapt",
+      "version": "2.5.1",
+      "purl": "pkg:pypi/wrapt@2.5.1",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "licenses": [
+        {
+          "expression": "BSD-2-Clause"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "c39c7130ea0702c4ab0faf12da1df1e02d5174305c17edf02309e2f058c4114f"
+        }
+      ]
+    },
+    {
+      "type": "library",
+      "bom-ref": "yfinance@1.7.0",
+      "name": "yfinance",
+      "version": "1.7.0",
+      "purl": "pkg:pypi/yfinance@1.7.0",
+      "properties": [
+        {
+          "name": "license-review",
+          "value": "not-performed"
+        }
+      ],
+      "hashes": [
+        {
+          "alg": "SHA-256",
+          "content": "91281ecd1f71069a37155ff8653aff2d3085f3492bd8721f18b70955da62911a"
+        }
+      ]
+    }
+  ],
+  "dependencies": [
+    {
+      "ref": "arch@8.0.0",
+      "dependsOn": [
+        "numpy@2.4.6",
+        "packaging@26.3",
+        "pandas@3.0.6",
+        "scipy@1.17.1",
+        "statsmodels@0.15.0"
+      ]
+    },
+    {
+      "ref": "attrs@26.1.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "beautifulsoup4@4.15.0",
+      "dependsOn": [
+        "soupsieve@3.0.3",
+        "typing-extensions@4.16.0"
+      ]
+    },
+    {
+      "ref": "certifi@2026.10.19",
+      "dependsOn": []
+    },
+    {
+      "ref": "cffi@2.1.1",
+      "dependsOn": [
+        "pycparser@3.11"
+      ]
+    },
+    {
+      "ref": "charset-normalizer@3.5.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "curl-cffi@0.16.3",
+      "dependsOn": [
+        "certifi@2026.10.19",
+        "cffi@2.1.1"
+      ]
+    },
+    {
+      "ref": "exchange-calendars@4.13.2",
+      "dependsOn": [
+        "korean-lunar-calendar@0.4.0",
+        "numpy@2.4.6",
+        "pandas@3.0.6",
+        "pyluach@2.3.0",
+        "toolz@1.2.0",
+        "tzdata@2026.5"
+      ]
+    },
+    {
+      "ref": "formulaic@1.2.2",
+      "dependsOn": [
+        "interface-meta@2.0.1",
+        "narwhals@2.27.1",
+        "numpy@2.4.6",
+        "pandas@3.0.6",
+        "scipy@1.17.1",
+        "typing-extensions@4.16.0",
+        "wrapt@2.5.1"
+      ]
+    },
+    {
+      "ref": "idna@3.20",
+      "dependsOn": []
+    },
+    {
+      "ref": "interface-meta@2.0.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "jsonschema@4.26.0",
+      "dependsOn": [
+        "attrs@26.1.0",
+        "jsonschema-specifications@2025.9.1",
+        "referencing@0.37.0",
+        "rpds-py@2026.9.1"
+      ]
+    },
+    {
+      "ref": "jsonschema-specifications@2025.9.1",
+      "dependsOn": [
+        "referencing@0.37.0"
+      ]
+    },
+    {
+      "ref": "korean-lunar-calendar@0.4.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "lxml@6.1.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "multitasking@0.0.13",
+      "dependsOn": []
+    },
+    {
+      "ref": "narwhals@2.27.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "numpy@2.4.6",
+      "dependsOn": []
+    },
+    {
+      "ref": "packaging@26.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "pandas@3.0.6",
+      "dependsOn": [
+        "numpy@2.4.6",
+        "python-dateutil@2.9.0.post0",
+        "tzdata@2026.5"
+      ]
+    },
+    {
+      "ref": "patsy@1.0.3",
+      "dependsOn": [
+        "numpy@2.4.6",
+        "packaging@26.3"
+      ]
+    },
+    {
+      "ref": "peewee@4.5.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "platformdirs@4.13.5",
+      "dependsOn": []
+    },
+    {
+      "ref": "protobuf@7.36.2",
+      "dependsOn": []
+    },
+    {
+      "ref": "pyarrow@26.0.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "pycparser@3.11",
+      "dependsOn": []
+    },
+    {
+      "ref": "pyluach@2.3.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "python-dateutil@2.9.0.post0",
+      "dependsOn": [
+        "six@1.17.0"
+      ]
+    },
+    {
+      "ref": "pytz@2026.5",
+      "dependsOn": []
+    },
+    {
+      "ref": "quantlib@1.43",
+      "dependsOn": []
+    },
+    {
+      "ref": "referencing@0.37.0",
+      "dependsOn": [
+        "attrs@26.1.0",
+        "rpds-py@2026.9.1",
+        "typing-extensions@4.16.0"
+      ]
+    },
+    {
+      "ref": "requests@2.34.2",
+      "dependsOn": [
+        "certifi@2026.10.19",
+        "charset-normalizer@3.5.2",
+        "idna@3.20",
+        "urllib3@2.8.0"
+      ]
+    },
+    {
+      "ref": "rpds-py@2026.9.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "scipy@1.17.1",
+      "dependsOn": [
+        "numpy@2.4.6"
+      ]
+    },
+    {
+      "ref": "six@1.17.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "soupsieve@3.0.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "statsmodels@0.15.0",
+      "dependsOn": [
+        "formulaic@1.2.2",
+        "numpy@2.4.6",
+        "packaging@26.3",
+        "pandas@3.0.6",
+        "patsy@1.0.3",
+        "scipy@1.17.1"
+      ]
+    },
+    {
+      "ref": "toolz@1.2.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "typing-extensions@4.16.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "tzdata@2026.5",
+      "dependsOn": []
+    },
+    {
+      "ref": "urllib3@2.8.0",
+      "dependsOn": []
+    },
+    {
+      "ref": "vadersentiment@3.3.2",
+      "dependsOn": [
+        "requests@2.34.2"
+      ]
+    },
+    {
+      "ref": "websockets@17.3",
+      "dependsOn": []
+    },
+    {
+      "ref": "wrapt@2.5.1",
+      "dependsOn": []
+    },
+    {
+      "ref": "yfinance@1.7.0",
+      "dependsOn": [
+        "beautifulsoup4@4.15.0",
+        "curl-cffi@0.16.3",
+        "lxml@6.1.3",
+        "multitasking@0.0.13",
+        "numpy@2.4.6",
+        "pandas@3.0.6",
+        "peewee@4.5.3",
+        "platformdirs@4.13.5",
+        "protobuf@7.36.2",
+        "pytz@2026.5",
+        "requests@2.34.2",
+        "websockets@17.3"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,36 @@
+{
+  "as_of": "2026-01-01T14:00:00Z",
+  "half_life_hours": 1,
+  "entities": {
+    "ACME": [
+      "Acme"
+    ],
+    "BETA": [
+      "Beta"
+    ]
+  },
+  "required_aspects": [
+    "revenue",
+    "balance_sheet"
+  ],
+  "source_weights": {
+    "issuer": 1,
+    "wire": 1
+  },
+  "records": [
+    {
+      "id": "release-1",
+      "text": "Acme revenue beat expectations; Acme debt rises.",
+      "source": "issuer",
+      "published_at": "2026-01-01T12:00:00Z",
+      "available_at": "2026-01-01T12:00:00Z"
+    },
+    {
+      "id": "release-2",
+      "text": "Acme revenue misses expectations.",
+      "source": "wire",
+      "published_at": "2026-01-01T13:00:00Z",
+      "available_at": "2026-01-01T13:00:00Z"
+    }
+  ]
+}

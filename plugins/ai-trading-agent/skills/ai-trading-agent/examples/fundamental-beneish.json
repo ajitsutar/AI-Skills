@@ -1,0 +1,40 @@
+{
+  "currency": "USD",
+  "amount_unit": "USD millions",
+  "example_context": "Fictional offline assumptions; not observed issuer data.",
+  "operation": "beneish",
+  "company_type": "nonfinancial",
+  "annual_periods_comparable": true,
+  "current": {
+    "sales": 100,
+    "cogs": 60,
+    "receivables": 10,
+    "current_assets": 40,
+    "net_ppe": 40,
+    "assets": 100,
+    "depreciation": 4,
+    "depreciation_amortization": 4,
+    "sga": 10,
+    "current_liabilities": 20,
+    "long_term_debt": 20,
+    "cash": 5,
+    "current_maturities_ltd": 5,
+    "tax_payable": 2
+  },
+  "prior": {
+    "sales": 100,
+    "cogs": 60,
+    "receivables": 10,
+    "current_assets": 40,
+    "net_ppe": 40,
+    "assets": 100,
+    "depreciation": 4,
+    "depreciation_amortization": 4,
+    "sga": 10,
+    "current_liabilities": 20,
+    "long_term_debt": 20,
+    "cash": 5,
+    "current_maturities_ltd": 5,
+    "tax_payable": 2
+  }
+}

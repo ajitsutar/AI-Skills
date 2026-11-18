@@ -1,0 +1,348 @@
+{
+  "universe": {
+    "name": "Configurable fictional learning universe",
+    "source": "Locally invented example; not S&P 500 constituents",
+    "as_of": "2026-10-07T16:00:00Z",
+    "symbols": [
+      "FICTION_VALUE",
+      "FICTION_EVENT",
+      "FICTION_TRAP",
+      "FICTION_WATCH",
+      "FICTION_MISSING",
+      "FICTION_EXCLUDED",
+      "FICTION_DEFERRED"
+    ],
+    "scope_and_filters": "Schema example only; no fixed output count or real selection"
+  },
+  "screening": [
+    {
+      "symbol": "FICTION_VALUE",
+      "outcome": "retained",
+      "reason": "Artificial discovery candidate",
+      "evidence": [
+        "offline fixture only"
+      ]
+    },
+    {
+      "symbol": "FICTION_EVENT",
+      "outcome": "retained",
+      "reason": "Artificial discovery candidate",
+      "evidence": [
+        "offline fixture only"
+      ]
+    },
+    {
+      "symbol": "FICTION_TRAP",
+      "outcome": "retained",
+      "reason": "Artificial discovery candidate",
+      "evidence": [
+        "offline fixture only"
+      ]
+    },
+    {
+      "symbol": "FICTION_WATCH",
+      "outcome": "retained",
+      "reason": "Artificial discovery candidate",
+      "evidence": [
+        "offline fixture only"
+      ]
+    },
+    {
+      "symbol": "FICTION_MISSING",
+      "outcome": "missing_data",
+      "reason": "Simulated provider data gap"
+    },
+    {
+      "symbol": "FICTION_EXCLUDED",
+      "outcome": "excluded",
+      "reason": "Simulated out-of-scope instrument",
+      "evidence": [
+        "offline fixture only"
+      ]
+    },
+    {
+      "symbol": "FICTION_DEFERRED",
+      "outcome": "not_advanced",
+      "reason": "Artificial initial observations exist; deeper review deferred under the fixture priority rule, no fundamental verdict",
+      "evidence": [
+        "offline fixture only"
+      ]
+    }
+  ],
+  "candidates": [
+    {
+      "symbol": "FICTION_VALUE",
+      "checks": {
+        "earnings_quality": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "cash_support": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "balance_sheet": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "cycle_normalization": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "structural_health": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "valuation_growth": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "analyst_evidence": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        }
+      },
+      "event_review": {
+        "status": "clear",
+        "reason": "Artificial event review, no real calendar",
+        "evidence": [
+          "offline fixture only"
+        ]
+      }
+    },
+    {
+      "symbol": "FICTION_EVENT",
+      "checks": {
+        "earnings_quality": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "cash_support": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "balance_sheet": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "cycle_normalization": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "structural_health": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "valuation_growth": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "analyst_evidence": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        }
+      },
+      "event_review": {
+        "status": "blocked",
+        "reason": "Fictional event within the illustrative strategy blackout",
+        "evidence": [
+          "offline fixture only"
+        ]
+      }
+    },
+    {
+      "symbol": "FICTION_TRAP",
+      "checks": {
+        "earnings_quality": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "cash_support": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "balance_sheet": {
+          "status": "fail",
+          "reason": "Fictional refinancing need unsupported by cash capacity",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "cycle_normalization": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "structural_health": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "valuation_growth": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "analyst_evidence": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        }
+      },
+      "event_review": {
+        "status": "blocked",
+        "reason": "Artificial event review, no real calendar",
+        "evidence": [
+          "offline fixture only"
+        ]
+      }
+    },
+    {
+      "symbol": "FICTION_WATCH",
+      "checks": {
+        "earnings_quality": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "cash_support": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "balance_sheet": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "cycle_normalization": {
+          "status": "unresolved",
+          "reason": "Fictional synergy bridge not yet supported",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "structural_health": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "valuation_growth": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        },
+        "analyst_evidence": {
+          "status": "pass",
+          "reason": "Artificial passing judgment for schema demonstration",
+          "evidence": [
+            "offline fixture; not a filing or market observation"
+          ]
+        }
+      },
+      "event_review": {
+        "status": "clear",
+        "reason": "Artificial event review, no real calendar",
+        "evidence": [
+          "offline fixture only"
+        ]
+      }
+    }
+  ],
+  "run_spec": {
+    "schema_version": 1,
+    "run_id": "fictional-method-demo",
+    "methodology_version": "demo-1",
+    "defined_at": "2026-10-07T15:00:00Z",
+    "mandate": "Fictional long-term moderate-risk comparison; no account, money or real recommendation",
+    "input_snapshot": [
+      "This file contains synthetic declarations only; no external quotes or financial observations"
+    ],
+    "field_definitions": {
+      "fixture_review_status": "Artificial pass/unresolved/fail evidence checks, not market metrics"
+    },
+    "peer_policy": "No market peers or valuation metric; fixture-only classification example",
+    "discovery_policy": "Synthetic retained/excluded/not_advanced/missing rows demonstrate coverage; no real stock filter",
+    "deep_review_policy": "Review VALUE, EVENT, TRAP and WATCH; leave DEFERRED for later and MISSING unresolved; stop after the schema cases",
+    "ranking_policy": "Qualitative research priority: VALUE first for complete fixture evidence, WATCH next to resolve its missing cycle bridge; not an investment ranking",
+    "valuation_policy": "No valuation performed; do not infer any fair value from fixture statuses",
+    "changes": []
+  },
+  "report": {
+    "kind": "screened_hypotheses",
+    "ranked_symbols": [
+      "FICTION_VALUE",
+      "FICTION_WATCH"
+    ],
+    "selection_rationale": {
+      "FICTION_VALUE": "First: complete artificial reviews; no real investment claim",
+      "FICTION_WATCH": "Second research priority: cycle-normalization gap remains; not a buy"
+    }
+  }
+}

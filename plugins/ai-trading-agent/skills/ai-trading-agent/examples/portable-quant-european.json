@@ -1,0 +1,13 @@
+{
+  "as_of": "2025-01-01T00:00:00Z",
+  "currency": "USD",
+  "spot": 100,
+  "strike": 100,
+  "rate": 0.05,
+  "dividend_yield": 0.02,
+  "volatility": 0.2,
+  "evaluation_date": "2025-01-01",
+  "maturity_date": "2026-01-01",
+  "option_type": "call",
+  "day_count": "Actual365Fixed"
+}

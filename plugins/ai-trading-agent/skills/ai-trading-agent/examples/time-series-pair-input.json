@@ -1,0 +1,44 @@
+{
+  "schema_version": 1,
+  "operation": "pair_ols",
+  "inputs": {
+    "x_symbol": "X",
+    "y_symbol": "Y",
+    "x_unit": "USD/share",
+    "y_unit": "USD/share",
+    "price_basis": "split_adjusted",
+    "train_cutoff": "2026-01-03T00:00:00Z",
+    "as_of": "2026-01-06T00:00:00Z",
+    "standard_deviation": "population_training_residual",
+    "minimum_x_variance": 1e-12,
+    "minimum_spread_std": 1e-12,
+    "train_rows": [
+      {
+        "timestamp": "2026-01-01T00:00:00Z",
+        "available_at": "2026-01-01T00:00:00Z",
+        "x": 1,
+        "y": 3
+      },
+      {
+        "timestamp": "2026-01-02T00:00:00Z",
+        "available_at": "2026-01-02T00:00:00Z",
+        "x": 2,
+        "y": 3
+      },
+      {
+        "timestamp": "2026-01-03T00:00:00Z",
+        "available_at": "2026-01-03T00:00:00Z",
+        "x": 3,
+        "y": 6
+      }
+    ],
+    "test_rows": [
+      {
+        "timestamp": "2026-01-04T00:00:00Z",
+        "available_at": "2026-01-04T00:00:00Z",
+        "x": 4,
+        "y": 8
+      }
+    ]
+  }
+}

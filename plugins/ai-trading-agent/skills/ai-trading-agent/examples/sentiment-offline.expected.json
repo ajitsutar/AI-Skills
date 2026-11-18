@@ -1,0 +1,187 @@
+{
+  "schema": "sentiment-toolkit/1",
+  "tool_version": "1.0.0",
+  "input_sha256": "d44683dfd2f34a87202198eaff67aa76810fc93f22069b4fd599ea2186d6d752",
+  "as_of": "2026-01-01T14:00:00Z",
+  "scores": [
+    {
+      "record_id": "release-1",
+      "entity": "ACME",
+      "aspect": "revenue",
+      "span": "Acme revenue beat expectations",
+      "start": 0,
+      "end": 30,
+      "binding_sha256": "b18215b65b7366466baeae734cf9756aed321cbfebfdd0a3d05f161b8709f9f6",
+      "group": "exact:75ea618f5d089e4d1bd2d9e0661f70089b214072374242cd07678773a789fe02",
+      "source": "issuer",
+      "published_at": "2026-01-01T12:00:00Z",
+      "available_at": "2026-01-01T12:00:00Z",
+      "weight": 0.25,
+      "method": "deterministic_context_rules_v1",
+      "model": null,
+      "attribution": "unambiguous_clause_rule",
+      "polarity": 1.0,
+      "probabilities": null,
+      "status": "SCORED_LOW_ASSURANCE",
+      "hits": [
+        {
+          "word": "beat",
+          "sign": 1,
+          "token_index": 2
+        }
+      ]
+    },
+    {
+      "record_id": "release-1",
+      "entity": "ACME",
+      "aspect": "balance_sheet",
+      "span": " Acme debt rises",
+      "start": 31,
+      "end": 47,
+      "binding_sha256": "8ceba186ca5cc54b2900003ef5d6c6c94047ae118b531d7aa14ead28908b1913",
+      "group": "exact:788201a7cf0c03b203791bd8a0cfd2253a1f6d369cb6b71f743aed70f4e66da6",
+      "source": "issuer",
+      "published_at": "2026-01-01T12:00:00Z",
+      "available_at": "2026-01-01T12:00:00Z",
+      "weight": 0.25,
+      "method": "deterministic_context_rules_v1",
+      "model": null,
+      "attribution": "unambiguous_clause_rule",
+      "polarity": -1.0,
+      "probabilities": null,
+      "status": "SCORED_LOW_ASSURANCE",
+      "hits": [
+        {
+          "word": "rises",
+          "sign": -1,
+          "token_index": 2
+        }
+      ]
+    },
+    {
+      "record_id": "release-2",
+      "entity": "ACME",
+      "aspect": "revenue",
+      "span": "Acme revenue misses expectations",
+      "start": 0,
+      "end": 32,
+      "binding_sha256": "51c13f6512dfc8c1cc0ef38e74b7edc1ddd50bd9803987c554e8627b29109fa9",
+      "group": "exact:cad3ed280475115fec1f16c32bb149a0ea1148023c86e743a809bc978202344d",
+      "source": "wire",
+      "published_at": "2026-01-01T13:00:00Z",
+      "available_at": "2026-01-01T13:00:00Z",
+      "weight": 0.5,
+      "method": "deterministic_context_rules_v1",
+      "model": null,
+      "attribution": "unambiguous_clause_rule",
+      "polarity": -1.0,
+      "probabilities": null,
+      "status": "SCORED_LOW_ASSURANCE",
+      "hits": [
+        {
+          "word": "misses",
+          "sign": -1,
+          "token_index": 2
+        }
+      ]
+    }
+  ],
+  "events": [
+    {
+      "entity": "ACME",
+      "aspect": "balance_sheet",
+      "group": "exact:788201a7cf0c03b203791bd8a0cfd2253a1f6d369cb6b71f743aed70f4e66da6",
+      "record_ids": [
+        "release-1"
+      ],
+      "polarity": -1.0,
+      "weight": 0.25,
+      "contradictory": false
+    },
+    {
+      "entity": "ACME",
+      "aspect": "revenue",
+      "group": "exact:75ea618f5d089e4d1bd2d9e0661f70089b214072374242cd07678773a789fe02",
+      "record_ids": [
+        "release-1"
+      ],
+      "polarity": 1.0,
+      "weight": 0.25,
+      "contradictory": false
+    },
+    {
+      "entity": "ACME",
+      "aspect": "revenue",
+      "group": "exact:cad3ed280475115fec1f16c32bb149a0ea1148023c86e743a809bc978202344d",
+      "record_ids": [
+        "release-2"
+      ],
+      "polarity": -1.0,
+      "weight": 0.5,
+      "contradictory": false
+    }
+  ],
+  "summary": [
+    {
+      "entity": "ACME",
+      "aspect": "balance_sheet",
+      "polarity": -1.0,
+      "status": "SCORED",
+      "distinct_event_count": 1,
+      "scored_event_count": 1,
+      "contradictory": false
+    },
+    {
+      "entity": "ACME",
+      "aspect": "revenue",
+      "polarity": -0.3333333333333333,
+      "status": "SCORED",
+      "distinct_event_count": 2,
+      "scored_event_count": 2,
+      "contradictory": true
+    },
+    {
+      "entity": "BETA",
+      "aspect": "balance_sheet",
+      "polarity": null,
+      "status": "MISSING",
+      "distinct_event_count": 0,
+      "scored_event_count": 0,
+      "contradictory": false
+    },
+    {
+      "entity": "BETA",
+      "aspect": "revenue",
+      "polarity": null,
+      "status": "MISSING",
+      "distinct_event_count": 0,
+      "scored_event_count": 0,
+      "contradictory": false
+    }
+  ],
+  "excluded_records": [],
+  "omitted_spans": [],
+  "possible_duplicates": [],
+  "coverage": {
+    "record_count": 2,
+    "eligible_record_count": 2,
+    "scored_span_count": 3,
+    "unscored_span_count": 0,
+    "missing_entity_aspects": [
+      {
+        "entity": "BETA",
+        "aspect": "balance_sheet"
+      },
+      {
+        "entity": "BETA",
+        "aspect": "revenue"
+      }
+    ]
+  },
+  "limitations": [
+    "Source weights and event IDs are supplied judgments, not learned reliability.",
+    "Rule scores are low-assurance lexical evidence, not calibrated probabilities or forecasts.",
+    "Supplied timestamps, provenance and target/aspect annotations are not independently verified.",
+    "No predictive advantage or execution authorization is established."
+  ]
+}

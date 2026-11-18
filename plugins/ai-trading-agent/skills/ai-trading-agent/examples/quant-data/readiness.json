@@ -1,0 +1,168 @@
+{
+  "schema_version": 1,
+  "strategy_id": "fictional-month-end",
+  "universe_mode": "historical_membership",
+  "sessions": [
+    "2026-01-02",
+    "2026-01-05",
+    "2026-01-06"
+  ],
+  "sources": [
+    {
+      "id": "fixture",
+      "uri": "urn:fictional:fixture",
+      "source_role": "native_json",
+      "retrieved_at": "2026-01-06T22:00:00Z",
+      "body": [
+        {
+          "security_id": "s1",
+          "session": "2026-01-02",
+          "field": "close",
+          "value": 100,
+          "status": "observed",
+          "unit": "USD/share",
+          "currency": "USD",
+          "available_at": "2026-01-02T21:00:00Z",
+          "executable": true
+        },
+        {
+          "security_id": "s1",
+          "session": "2026-01-05",
+          "field": "close",
+          "value": 102,
+          "status": "observed",
+          "unit": "USD/share",
+          "currency": "USD",
+          "available_at": "2026-01-05T21:00:00Z",
+          "executable": true
+        },
+        {
+          "security_id": "s1",
+          "session": "2026-01-06",
+          "field": "open",
+          "value": 103,
+          "status": "observed",
+          "unit": "USD/share",
+          "currency": "USD",
+          "available_at": "2026-01-06T14:30:00Z",
+          "executable": true
+        }
+      ],
+      "body_sha256": "7d1e287ebcd7ed2dd3803c130a8aaeafd2c24e6dbc4089187afc2d77134affb0"
+    }
+  ],
+  "scope_evidence_ids": [
+    "fixture"
+  ],
+  "securities": [
+    {
+      "security_id": "s1",
+      "identity_status": "source_bound",
+      "evidence_ids": [
+        "fixture"
+      ],
+      "listing_intervals": [
+        {
+          "start_inclusive": "2025-01-01",
+          "end_exclusive": null
+        }
+      ],
+      "membership_intervals": [
+        {
+          "start_inclusive": "2026-01-05",
+          "end_exclusive": null
+        }
+      ]
+    }
+  ],
+  "requirements": [
+    {
+      "id": "signal",
+      "field": "close",
+      "purpose": "signal",
+      "scope": "eligible",
+      "lookback_sessions": 2,
+      "unit": "USD/share",
+      "currency": "USD",
+      "numeric_domain": "positive"
+    },
+    {
+      "id": "nav",
+      "field": "close",
+      "purpose": "valuation",
+      "scope": "held",
+      "lookback_sessions": 1,
+      "unit": "USD/share",
+      "currency": "USD",
+      "numeric_domain": "positive"
+    },
+    {
+      "id": "fill",
+      "field": "open",
+      "purpose": "execution",
+      "scope": "eligible",
+      "lookback_sessions": 1,
+      "unit": "USD/share",
+      "currency": "USD",
+      "numeric_domain": "positive"
+    }
+  ],
+  "observations": [
+    {
+      "security_id": "s1",
+      "session": "2026-01-02",
+      "field": "close",
+      "value": 100,
+      "status": "observed",
+      "unit": "USD/share",
+      "currency": "USD",
+      "available_at": "2026-01-02T21:00:00Z",
+      "executable": true,
+      "source_id": "fixture",
+      "source_record_pointer": "/0"
+    },
+    {
+      "security_id": "s1",
+      "session": "2026-01-05",
+      "field": "close",
+      "value": 102,
+      "status": "observed",
+      "unit": "USD/share",
+      "currency": "USD",
+      "available_at": "2026-01-05T21:00:00Z",
+      "executable": true,
+      "source_id": "fixture",
+      "source_record_pointer": "/1"
+    },
+    {
+      "security_id": "s1",
+      "session": "2026-01-06",
+      "field": "open",
+      "value": 103,
+      "status": "observed",
+      "unit": "USD/share",
+      "currency": "USD",
+      "available_at": "2026-01-06T14:30:00Z",
+      "executable": true,
+      "source_id": "fixture",
+      "source_record_pointer": "/2"
+    }
+  ],
+  "valuation_policy": {
+    "allow_reference": false,
+    "allow_modeled": false
+  },
+  "decisions": [
+    {
+      "id": "d1",
+      "decision_at": "2026-01-05T21:01:00Z",
+      "valuation_at": "2026-01-05T21:01:00Z",
+      "execution_at": "2026-01-06T14:30:00Z",
+      "signal_session": "2026-01-05",
+      "execution_session": "2026-01-06",
+      "held_security_ids": [
+        "s1"
+      ]
+    }
+  ]
+}

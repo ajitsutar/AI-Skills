@@ -1,0 +1,119 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-01-05T21:01:00Z",
+  "on": "2026-01-05",
+  "sources": [
+    {
+      "id": "fixture",
+      "uri": "urn:fictional:fixture",
+      "source_role": "native_json",
+      "retrieved_at": "2026-01-06T22:00:00Z",
+      "body": {
+        "entity": {
+          "issuer_id": "fictional:issuer1",
+          "share_class_id": "fictional:common1",
+          "instrument_type": "equity",
+          "currency": "USD"
+        },
+        "episodes": [
+          {
+            "issuer_id": "fictional:issuer1",
+            "share_class_id": "fictional:common1",
+            "kind": "listing",
+            "value": "XNYS",
+            "start_inclusive": "2025-01-01",
+            "end_exclusive": null,
+            "announced_at": "2026-01-02T12:00:00Z",
+            "available_at": "2026-01-02T12:01:00Z",
+            "revision_id": "original"
+          },
+          {
+            "issuer_id": "fictional:issuer1",
+            "share_class_id": "fictional:common1",
+            "kind": "symbol",
+            "value": "DEMO",
+            "start_inclusive": "2025-01-01",
+            "end_exclusive": null,
+            "announced_at": "2026-01-02T12:00:00Z",
+            "available_at": "2026-01-02T12:01:00Z",
+            "revision_id": "original"
+          },
+          {
+            "issuer_id": "fictional:issuer1",
+            "share_class_id": "fictional:common1",
+            "kind": "membership",
+            "value": "fictional-index",
+            "start_inclusive": "2026-01-05",
+            "end_exclusive": null,
+            "announced_at": "2026-01-02T12:00:00Z",
+            "available_at": "2026-01-02T12:01:00Z",
+            "revision_id": "original"
+          }
+        ]
+      },
+      "body_sha256": "65f51a626624cbc41e6ab66a1af436a7e6b566c7382d88eeb2432bdba8d3da89"
+    }
+  ],
+  "entities": [
+    {
+      "source_id": "fixture",
+      "bindings": {
+        "issuer_id": "/entity/issuer_id",
+        "share_class_id": "/entity/share_class_id",
+        "instrument_type": "/entity/instrument_type",
+        "currency": "/entity/currency"
+      },
+      "security_id": "s1"
+    }
+  ],
+  "episodes": [
+    {
+      "source_id": "fixture",
+      "bindings": {
+        "issuer_id": "/episodes/0/issuer_id",
+        "share_class_id": "/episodes/0/share_class_id",
+        "kind": "/episodes/0/kind",
+        "value": "/episodes/0/value",
+        "start_inclusive": "/episodes/0/start_inclusive",
+        "end_exclusive": "/episodes/0/end_exclusive",
+        "announced_at": "/episodes/0/announced_at",
+        "available_at": "/episodes/0/available_at",
+        "revision_id": "/episodes/0/revision_id"
+      },
+      "security_id": "s1",
+      "episode_id": "ep0"
+    },
+    {
+      "source_id": "fixture",
+      "bindings": {
+        "issuer_id": "/episodes/1/issuer_id",
+        "share_class_id": "/episodes/1/share_class_id",
+        "kind": "/episodes/1/kind",
+        "value": "/episodes/1/value",
+        "start_inclusive": "/episodes/1/start_inclusive",
+        "end_exclusive": "/episodes/1/end_exclusive",
+        "announced_at": "/episodes/1/announced_at",
+        "available_at": "/episodes/1/available_at",
+        "revision_id": "/episodes/1/revision_id"
+      },
+      "security_id": "s1",
+      "episode_id": "ep1"
+    },
+    {
+      "source_id": "fixture",
+      "bindings": {
+        "issuer_id": "/episodes/2/issuer_id",
+        "share_class_id": "/episodes/2/share_class_id",
+        "kind": "/episodes/2/kind",
+        "value": "/episodes/2/value",
+        "start_inclusive": "/episodes/2/start_inclusive",
+        "end_exclusive": "/episodes/2/end_exclusive",
+        "announced_at": "/episodes/2/announced_at",
+        "available_at": "/episodes/2/available_at",
+        "revision_id": "/episodes/2/revision_id"
+      },
+      "security_id": "s1",
+      "episode_id": "ep2"
+    }
+  ]
+}

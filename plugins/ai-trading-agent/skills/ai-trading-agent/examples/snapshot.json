@@ -1,0 +1,36 @@
+{
+  "account_alias": "demo-agentic",
+  "as_of": "2026-10-06T14:00:00Z",
+  "equity": "100000",
+  "cash": "100000",
+  "settled_cash": "100000",
+  "buying_power": "100000",
+  "agent_tradable": true,
+  "reconciled": true,
+  "restricted": false,
+  "maintenance_deficit": "0",
+  "risk_metrics_verified": true,
+  "day_start_equity": "100000",
+  "week_start_equity": "100000",
+  "flow_adjusted_high_water_equity": "100000",
+  "flow_adjusted_equity": "100000",
+  "day_pnl_ex_flows": "0",
+  "week_pnl_ex_flows": "0",
+  "kill_switch": false,
+  "positions": [],
+  "open_orders": [],
+  "session": {
+    "is_trading_day": true,
+    "open": "2026-10-06T13:30:00Z",
+    "close": "2026-10-06T20:00:00Z"
+  },
+  "quotes": {
+    "DEMO": {
+      "asset_type": "equity",
+      "as_of": "2026-10-06T14:00:00Z", "bid": "99.98", "ask": "100.02",
+      "tick_size": "0.01", "tradable": true, "halted": false,
+      "sector": "technology", "average_daily_dollar_volume": "100000000",
+      "event_clear": true
+    }
+  }
+}

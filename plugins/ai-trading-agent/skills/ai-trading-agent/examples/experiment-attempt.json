@@ -1,0 +1,44 @@
+{
+  "schema_version": 2,
+  "attempt_id": "trial-1",
+  "campaign_id": "fictional",
+  "parent_attempt_id": null,
+  "revision_reason": null,
+  "model": {
+    "host": "fixture",
+    "name": "none",
+    "version": "none",
+    "settings": {}
+  },
+  "prompt_sha256": "e564b9aa7e6e59880a7e6c6c48ad2a66309d31784f52c139d6a0ea0a0b9962e9",
+  "package_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+  "runtime_sha256": "bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb",
+  "data_vintages": [
+    {
+      "id": "fixture-data",
+      "sha256": "cccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccccc",
+      "available_at": "2025-01-01T00:00:00Z"
+    }
+  ],
+  "universe_sha256": "dddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddddd",
+  "constraints": {
+    "max_weight": 0.2
+  },
+  "selection": {
+    "rule": "fictional"
+  },
+  "train_start": "2024-01-01T00:00:00Z",
+  "train_end": "2024-12-31T00:00:00Z",
+  "evaluation_start": "2025-01-02T00:00:00Z",
+  "evaluation_end": "2025-12-31T00:00:00Z",
+  "label_end": "2026-01-02T00:00:00Z",
+  "embargo_seconds": 86400,
+  "purpose": "development",
+  "conventions": {
+    "accounting": "USD marked-to-market NAV; no contributions",
+    "benchmark": "Fictional total-return benchmark with matching calendar",
+    "cash": "Zero fictional cash interest",
+    "dividends": "Reinvested on payment date",
+    "costs": "Zero costs in this fictional fixture only"
+  }
+}

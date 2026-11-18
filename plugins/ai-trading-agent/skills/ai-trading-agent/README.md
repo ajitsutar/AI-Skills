@@ -1,0 +1,572 @@
+# AI Trading Agent
+
+[Update earlier research](references/research-refresh.md) on demand while preserving its original answer, source bytes and review. Recheck selected evidence, recompute affected results and explain changes, retractions and unchecked information. [Options activity](references/options-activity.md) adds contract-level chain/print diagnostics and dated float-share inputs for existing positioning calculations. [Workflow setup](references/workflow-setup.md) checks the selected task against observed host tools and dependencies, with supported recovery paths. These helpers run only when invoked; paid data remains optional.
+
+For ordinary earnings/guidance and event-driven stock questions, the [assistant-operated research workflow](references/ordinary-research-workflows.md) handles internal inputs, filing/exhibit reading, supported calculations and the complete answer. The [review and correction cycle](references/research-review-cycle.md) retains first drafts, records actual review and corrects identified material problems within a bounded run. The assistant 
+creates the request-bound protocol before drafting. Its pinned-file bootstrap reads the exact original request and complete supplied source allowlist, preserves their bytes, and returns real protocol/head pins with explicit next steps; it never supplies review judgments. The assistant performs a native self-review if an independent native 
+reviewer is unavailable. Unresolved findings remain visible; the user does not supply technical review forms. [Filing content](references/filing-documents.md) preserves the selected document bytes and extracts supported event items, passages and ownership facts. Semantic interpretation, source authenticity and overall completeness remain matters for actual review.
+
+Fund composition comparisons retain [source-bound denominator evidence](references/source-exposure.md#fund-composition-denominators): total-fund weights and shares of the supplied immediate holdings slice stay distinct in structured results and readable text, including unheld alternatives. Missing or conflicting coverage remains explicit.
+
+[Disclosure claim analysis](references/disclosure-claims.md) investigates public trading allegations through a complete authored assessment of the claim, disclosure history, event chronology and evidentiary limits. Mixed-source insider rows do not select the answer scope.
+
+[Source-bound insider and institution disclosure delivery](references/insider-disclosures.md) keeps currency and identity local to each original row. Native mechanisms, dates, conditional listed-row arithmetic and explicit institutional amendment chains remain separate from actual cash, current holdings and motive claims in the complete replayed answer.
+
+[Source-bound analyst revision delivery](references/analyst-revisions.md) compares rating, target, EPS and revenue on their own dimensions, retains earlier-coverage conflicts and raw/structured gaps, and regenerates the complete answer from pinned original records. Conditional differences never become verified genuine revisions.
+
+[Exact-source coverage delivery](references/source-coverage.md) generates the whole information map and structured answer from unchanged original source text. It binds literal requested topics and the complete corpus, keeps missing evidence unresolved and replays the exact delivered pair without numeric paraphrase. Relevance, access and lineage remain declared judgments.
+
+[Source-bound issuer facts](references/issuer-evidence.md) and the
+[canonical response export](references/final-report.md) derive readable and
+structured results from the same retained calculations. The generated-only
+contract rejects free-form analytical overrides and preserves diagnostic labels
+and unknowns. Rejected terminal calculations retain preparation evidence before
+any final answer is created; a new preparation can correct declared inputs without
+overwriting the failure. Both final outputs verify after relocation. These checks
+do not certify source truth, investment correctness or complete task coverage.
+
+Source-bound analyst requests preserve the original cohort dimensions and age policy, rejecting contradictory manual filters. Record-only corpora retain explicit declared filters. See [request binding](references/analyst-sources.md).
+
+Source-first analyst reports deliver explicit range width, IQR and the quartile method. Canonical provider pools retain same-record source metadata, separate populations and unknown issue dates; their means are never averaged. See [analyst research](references/analyst-research.md#delivered-dispersion-and-provider-context).
+
+The package is a self-contained skill for supported hosts such as Muse, Claude and Instinct. It requires no local backend or background service. Bundled commands run only when invoked in a host that supports them; host tools, execution and data access remain capability-dependent. A backend is outside this architecture unless explicitly requested.
+
+Version **5.13.12** includes [production research operations](references/research-operations.md)
+for configured supervised research: immutable workflow registration, bounded
+public-file collection, restart reconciliation, traceable event briefs, freshness
+reporting and retained-record verification. The operating commands use private
+output roots and explicit source choices. See [institutional research](references/institutional-research.md)
+for event-driven U.S.-stock briefs and separate usefulness/net-return evaluation.
+Source-bound plan/evaluate reports export per-observation inclusion decisions,
+exclusion reasons and aggregates from the same retained calculations, keeping
+usefulness and return evidence separate in both readable and structured results.
+
+[Answer review](references/answer-review.md) binds itemized reviewer findings to the actual delivered artifacts and derives coverage and declared error-tolerance results. Complete authored Markdown/JSON pairs can be reviewed against exact original text and source inputs without inventing a native producer contract; this mode binds bytes and reviewer declarations, not numerical replay or semantic consistency. [Buyer qualification](references/buyer-qualification.md) organizes the purchased scope, comparison costs, data rights, deployment and support evidence. Reviewer judgments and buyer evidence remain explicit; these tools do not establish semantic truth or institutional approval.
+
+[Offline review packets](references/review-packet.md) seal complete criterion dependencies and separate participant inputs from evaluator evidence. [Institutional deployment evidence](references/institutional-acceptance.md) joins actual retained platform, data, rights and control inputs with a prespecified matched workflow-value comparison. Scope identities, time cutoffs, fixed review units and registered cohorts remain explicit. These tools report evidence gaps and negative outcomes without granting execution permission or certifying a firm deployment.
+
+Portfolio scenarios and reported total costs now include holding-period short-borrow expense; holdings arithmetic is isolated from ambient decimal settings. Covariance inputs enforce the documented simple-return domain, preserve undefined correlation cells as null and refuse unrepresentable numerical ranges. Unknown flow bases and ambiguous amendment branches cannot support affirmative squeeze triage, and malformed SEC jobs remain isolated from independent valid jobs.
+
+Cutoff changes recompute amendment ambiguity from eligible revision records, so normalized source reuse preserves the raw-record result. [Typed allocation and holdings facts](references/report-facts.md) retain cost, reserve and return units, payment timing and unknown tax evidence in canonical quantitative reports. Offline packet publication uses compact unique temporary names and checks actual output destinations before publishing packet artifacts; inaccessible destinations produce an actionable path error.
+
+[Public-source intake](references/market-sources.md) diagnoses ambiguous columns;
+the SEC index route preserves observed header/date variants and qualifies
+complete versus uncertain transport without inferring publication time.
+[flow and squeeze diagnostics](references/market-flow.md) preserve dated short
+interest, short-sale volume, borrow snapshots and inferred pressure separately.
+Source-bound market-flow reports replay retained native input documents and export
+readable and structured results together, preserving unknowns, compatibility
+statuses and unreconciled quotients. The report checks local consistency; it does
+not authenticate sources or replace parser and institutional-brief coverage.
+Source-specific access and intended-use terms apply. Every paid subscription is
+optional; public X posts remain research leads requiring primary verification.
+No paid Unusual Whales adapter is included.
+
+Current source intake includes SEC issuer-symbol snapshots with conservative CIK
+mapping, explicit-calendar OHLCV exports and the documented shared-public IBKR
+inventory file. Indicative borrow quantities, lower bounds and unverified rate
+units stay distinct. Configure independent automated technical review when that
+work is delegated; deliver ready-to-read findings and preserve the reviewer type.
+Automated quality diagnostics do not establish human benefit or trading profit.
+
+Dated cash benchmarks retain source applicability separately from computable
+projections. Partial event calendars preserve feasible descriptive research
+and explicit forecast limits. Retained news ledgers can check excerpt-supported
+issuer candidates while keeping semantic attribution unresolved. Existing
+proposals retain their exact terms and provenance through approval review.
+The [final news-ledger provenance audit](references/news-and-guidance.md#audit-provenance-in-the-final-ledger)
+checks retained declarations without certifying source authenticity.
+
+[Integrated original-source research](references/supplied-research.md) derives
+supported analyst records and binds REIT operands before calculating and replaying
+the saved report. Unknown metadata and conditional results remain explicit.
+Terminal reports distinguish after-cost capital preservation from DCF closure;
+these paths do not authenticate sources or certify arbitrary final prose.
+REIT reports retain source-known property-fraction meaning alongside unknown
+scope and attribution. [Final artifact composition](references/final-report.md)
+executes supported producers and checks the exact saved answer against their
+complete reports. Typed objective conclusions retain the requested comparator and supplied-row scope, separate actual conditional minima from larger-multiple probes, and leave uncomputed DCF closure unresolved. Necessary extra prose stays explicitly unaudited; replay does
+not establish investment correctness or complete task coverage. Fractional JSON
+inputs retain decimal precision through normalized calculation hashing, while
+original raw bytes remain separately pinned.
+
+Research claim repairs add [objective-bound scenario checks](references/scenario-claims.md),
+[source and corpus claim checks](references/source-claims.md), and
+[source-bound news comparisons](references/news-evidence.md). They retain counterexamples,
+unknown metadata and arithmetic-only outcomes, with exact saved-output attribution.
+[Retained halt review](references/halt-review.md) selects notices within a supplied
+publication cutoff, preserves later updates separately and distinguishes scheduled
+quote/trade resumption from observed activity. Unknown observation and broker state
+remain unknown.
+Retained guidance preserves fiscal labels separately from exact date boundaries.
+Source-bound withdrawals keep missing dimensions and prior ranges unknown, and
+bounded archive issuer context remains distinct from document identity proof.
+These checks do not authenticate sources or certify arbitrary prose.
+[Bound report drafting](references/report-claims.md) now renders typed claims from retained outputs and audits the exact saved draft, exposing edited claims and every unaudited prose span before first-response publication.
+
+Every paid subscription is optional across all skill tools and research workflows.
+Use relevant accessible free sources first; user-provided paid access can add
+fresher data or materially better coverage. Missing access leaves explicit gaps
+while supported research continues. See [source access](references/source-access.md). Mixed briefings retain every original requested category and the complete authored source plan, with verified calculations attached as supporting reports. Structured requests without a category list can use [original-object briefings](references/source-bound-workflow.md#complete-original-object-briefings): the complete request and linked context members retain authored meaning, limitations and separately checked native annexes. Both modes check structural coverage; source authenticity and the substance of authored judgments remain unverified.
+
+Retained-text parser reports automatically assess supported historical descriptors
+in their bound clock-source context. The findings identify metadata limits; they
+do not certify point-in-time data or complete historical coverage.
+
+Each upgrade also reviews example prompts and P1/P2/P3 case impact, updating
+applicable coverage while preserving frozen evidence. See
+[documentation and case maintenance](references/maintaining-the-skill.md).
+
+Supplied-data research includes [scoped event coverage](references/research-capability-scope.md),
+[cross-tool horizon consistency](references/horizon-consistency.md), and optional
+[pinned original-leaf lineage](references/original-source-lineage.md). These distinguish
+what the evidence supports from forecasts, clock conflicts and derived metadata;
+they do not authenticate sources or certify final prose.
+
+[Execution policy](references/execution-modes.md) selects `paper`, `approval` or
+`autonomous` in a separate persistent JSON file for each task, including each
+scheduled task. New task policies default to `paper`; no global policy applies.
+Each file is bound to the current task's stable `task_id`. Only an explicit user
+instruction changes that task's saved mode; other tasks remain unchanged. Prompts define tasks, rules and limits; the
+model may clarify missing intent but cannot silently change the policy mode.
+On a permitted Muse host, `autonomous` carries out in-scope orders under standing
+authority without an extra per-order ask. `approval` requires order approval;
+`paper` stays simulated. The host supplies broker tools, scheduling and permissions.
+
+Saved-research [verification and refresh planning](references/research-memory.md)
+separate archive integrity from primary-source freshness. Matching hashes or
+unchanged snapshot values permit historical replay, but do not establish a
+current issuer/release check or completion of a new-cutoff refresh.
+
+The [portfolio-following subskill](subskills/portfolio-following/SKILL.md) refreshes
+public investor disclosures on demand, normalizes supplied source records, and
+calculates follower targets and cash-funded buy/sell proposals. Its public source
+catalog distinguishes reporting managers, family transactions, stale portfolios
+and unavailable proprietary weights. Reverse Cramer supports long-only inverse
+signals. Source acquisition uses the host's public research tools; the calculation
+helpers do not log into Autopilot, place orders or start a recurring monitor.
+
+The [quantitative assurance workflow](references/quant-research-assurance.md)
+adds strategy-specific data readiness, historical identity/source adapters,
+corporate-action and tax/settlement accounting, Student-t GARCH and portfolio tail
+diagnostics, independently checked constrained allocation, retained experiment
+history, semantic analyst extraction and artifact-locked release verification.
+Its capability claims distinguish implemented calculations, tested environments,
+actual host responses, external data coverage and future investment outcomes.
+
+Source study composition joins supplied security episodes, feature vintages and
+observation status through the readiness assessor, retaining purpose-specific
+cutoffs and historical lookback gaps. Holdings results expose declared tax sources
+and unresolved amounts separately. Conditional portfolio risk can include a
+withdrawal goal and an explicit cash-only sensitivity without inferring actual
+cash access or a probability from variance alone. Experiment results are written
+after execution and retain rejected calls alongside successful state changes.
+
+The [vintage eligibility audit](references/vintage-eligibility.md) separates a
+value's first publication, supersession and applicable share/metric basis.
+Date-only release days stay unresolved; a conditional date window does not
+certify historical provider coverage or intraday availability. The separate
+[terminal-return coverage audit](references/terminal-return-coverage.md) requires
+event inclusion evidence before skipping or separately applying a delisting
+return; a final price date alone cannot resolve that decision.
+
+For unspecified stock-discovery requests, use the full U.S. exchange-listed
+stock universe. An applicable explicit user scope overrides this default;
+analyst-news shortlists and incomplete acquisition do not. See
+[the universe rule](SKILL.md#mandatory-default-stock-universe).
+
+The skill includes a retained qualitative sentiment review alongside
+the existing deterministic news triage. It distinguishes unscored language from
+missing research, preserves contrary and stale evidence, and records coverage
+across news, analysts, price/volume, positioning and social sources. It does not
+add a trained sentiment model or change the discovery score. See
+[sentiment review](references/news-and-guidance.md#complete-the-sentiment-review).
+
+Full fetch remains the default. [Optional partial fetch](references/partial-fetch.md)
+can reuse unchanged quarterly statements from an explicitly supplied, sealed
+portable bundle after current source-index and revision checks. It refreshes
+membership, quotes and full price/action history; estimates, news and events still
+need current review. Codex, Muse and Claude use the same opt-in interface and
+fall back to fresh acquisition when the bundle or required checks are unavailable.
+Hidden model caches are neither assumed nor inspected; no speedup is guaranteed.
+
+For separately supplied price snapshots, the optional
+[revision-aware price reconciler](references/quant-data-contracts.md) can reuse a
+prefix only when its current evidence proves that prefix unchanged. Otherwise it
+requests a full refresh. It is a reconciliation adapter, not a new downloader;
+the existing statement-fetch workflow above continues to refresh full prices.
+
+Historical research also has an explicit-root [compressed data store](references/backtest-data-storage.md)
+for source manifests, bounded captures, same-contract checkpoints, coverage gaps
+and verified archive cleanup. Its portable inventory is usable across hosts;
+it does not infer freshness from a hidden cache or certify point-in-time data.
+Use [compact evidence](references/compact-evidence.md) for large source-bound
+calculations to retain replayable evidence without repeatedly expanding shared
+inputs in reports.
+
+For [monthly portfolio experiments](references/monthly-portfolio-validation.md),
+choose fixed composition with changing weights, equal-weight resets or actual
+reselection explicitly. Reusable capped inverse-volatility targets and frozen
+staged rankings support the first two controls. Native portfolio accounting
+remains authoritative; a weighting rule is not historical AI stock selection.
+An optional [history-first collection mode](references/research-campaign.md#optional-history-first-acquisition)
+keeps the full universe while avoiding fresh statement requests only after a valid
+price response establishes the profile's missing-history exclusion. Full financial
+collection remains the default; provider failures never count as that proof.
+
+A self-contained skill for investment recommendations, reproducible stock research,
+portfolio analysis and quantitative work across arbitrary holding periods. It
+combines public evidence with replayable calculations and hands requested trades
+to the host's available broker tools.
+
+Research diagnostics and payload formatting remain advisory. They do not require
+an execution policy or add numerical risk gates, grants or tickets. Actual host
+execution separately follows the selected policy mode and the user's instructions.
+A configured mode is not proof of host permissions or an active monitoring job.
+
+Start with [example prompts](EXAMPLE-PROMPTS.md), [installation](INSTALL.md), or
+[agent instructions](SKILL.md). Research can cover investments beyond any one
+broker or data provider. Actual trading support depends on the host's available
+broker tools; linked provider documentation does not establish account access.
+
+Source-bound workflows retain decimal-valued evidence as JSON numbers through
+export and replay. Portfolio comparisons require a separate final review of
+goal/loss implications, applicable source metadata and actual cost-sized
+exposures; successful numerical replay alone does not establish recommendation
+coverage or comparative diversification.
+
+Allocation results explicitly count distinct known issuers, merge share classes,
+and separate cash from unresolved issuer exposure. A total count remains unknown
+when identity coverage is incomplete. These counts do not establish correlation
+or a diversification ranking; conclusions must retain that distinction.
+Unspecified fractional increments use a labeled shared analytical sensitivity,
+while actual broker precision stays unknown. Comparison checks retain each
+operand's provenance rather than turning matching declarations into source facts.
+Affordability retains dated close-price semantics, computes per-contribution
+sensitivities separately from forecasts, and refreshes exposure after final sizing.
+Budget and allocation outputs include scoped, evidence-linked conclusion facts:
+gross exposure, fees and cash remain distinct, and unknown comparative evidence
+stays unknown when assembling a recommendation.
+Settlement summaries preserve every conditional arrival path, and funding sizing
+distinguishes exact rational thresholds from displayed decimal approximations.
+Final reporting retains source and scenario checks for factual claims.
+
+## Capabilities
+
+| Workflow | What the skill provides | Guide |
+|---|---|---|
+| Stock recommendations | Whole-universe discovery, shared factor ranking, primary evidence, valuation, catalysts and downside | [Research campaign](references/research-campaign.md) |
+| Holding-period decisions | Arbitrary dated and flexible horizons, matching events and scenarios, and cash comparisons on the same capital after entry costs | [Holding periods](references/holding-period-planning.md), [equity versus cash](references/equity-cash-comparison.md) |
+| Financial diligence | Sector-relative valuation, normalized earnings/FCF, explicit raw-observation mapping, balance-sheet and value-trap analysis | [Investment review](references/screening-and-value-traps.md), [flow normalization](references/flow-normalization.md) |
+| News and guidance | Dynamic source discovery, public feed polling, between-quarter projections and deterministic text triage | [News and guidance](references/news-and-guidance.md) |
+| Analyst evidence | Accessible reports, forward target distributions, revisions, sourced track records and population-specific source lineage | [Analyst research](references/analyst-research.md) |
+| Portfolio decisions | Contributions, fractional allocation, full-source ETF look-through and share-class joins, concentration, volume context, rebalance proposals, tax-lot review and explicit comparisons with missing allocations | [Portfolio management](references/portfolio-management.md), [source exposure](references/source-exposure.md), [allocation baseline](references/allocation-policy.md), [decision calculations](references/portfolio-decision-calculations.md), [input roles](references/planning-input-roles.md) |
+| Dated portfolio scenarios | Net vests, withdrawals, tax earmarks versus payments, conditional tax treatments and consistent post-flow denominators | [Dated portfolio projections](references/portfolio-projection.md), [shared employer reference](references/employer-reference.md) |
+| Planning tradeoffs | Preference-free conditional proposals; separate settlement, transfer and arrival dates, a shared timing reference and unresolved cutoff timing | [Planning comparisons](references/planning-comparison.md) |
+| Tactical research | Completed-bar setups, catalysts, liquidity, cost assumptions, stops/targets and holding-period scenarios | [Short-term research](references/short-term-trading.md) |
+| Volatility analysis | GARCH, GJR-GARCH, supported EGARCH and stock-relative interval-move diagnostics | [Volatility models](references/garch-volatility.md) |
+| Quant construction | Constrained allocation, covariance sensitivity, denominator-explicit risky-position concentration, empirical tail loss and multi-asset scenarios | [Quant workbench](references/quant-workbench.md) |
+| Strategy evaluation | Causal splits, purging, HAC, block bootstrap, multiple-testing review and retained evidence | [Quant research](references/quant-research.md) |
+| Performance accounting | Execution shortfall, cash ladders, TWR/XIRR, attribution and portfolio simulation | [Manager workflow](references/institutional-manager.md) |
+| Reproducibility | Frozen contracts/data, explicit calculation defaults, runtime receipts, numerical replay and separate acquisition comparisons | [Model-independent research](references/model-independent-research.md) |
+| Optional partial collection | Explicit sealed research bundle, source-checked unchanged statements, original times and parent hashes; full fetch by default | [Partial fetch](references/partial-fetch.md) |
+| Report facts | Private JSON facts and readable Markdown from retained quant/public-VQM results, with source pointers, supported units and denominators, explicit unknowns and separately declared custom labels | [Report facts](references/report-facts.md) |
+| Run and report | Execute explicit quant jobs or analyst cohorts and retain their inputs, results and reports; inspect exact handoff payload differences without execution gates | [Run and report](references/run-and-report.md) |
+| Research alignment | Bind request roles and records, distinguish unknown evidence, preserve flexible horizons and ranking methods, and reconcile cash, fees, valuation and causal strategies | [Research alignment](references/research-alignment.md) |
+| Source-bound workflow | Prepare explicit requests without recopying their arguments, run source-bound tasks, retain assumptions, verify results and project exact claims and coverage | [Source-bound workflow](references/source-bound-workflow.md) |
+| Evidence interpretation | Preserve partial event dates, check operand identities and share bases, and distinguish unknown facts from negative or equal facts | [Evidence semantics](references/evidence-semantics.md) |
+| Execution handoff | Preserve the user's order instructions, surface findings as advisory and pass the payload to the host | [Execution handoff](references/execution-handoff.md) |
+
+Stock discovery defaults to **all U.S. exchange-listed stocks including listed
+ADRs**. S&P 500, custom lists and other universes are explicit choices. Report
+actual membership, coverage, exclusions and unresolved data; do not call a subset
+a full-market screen. There is no fixed number of picks or maximum holding period.
+Instrument-specific calculations remain limited by their implemented models.
+
+For supplied-data numerical work, start with `scripts/research_workflow.py`.
+Its `prepare` command retains an explicit request and source bytes without changing
+arguments; `run`, `verify` and `summary` produce and check the calculation and its
+reported claims together. Report verification catches altered or incomplete
+projections, including type changes in literal claims. Free-form business
+judgment and source selection still require review. Matching calculations alone
+does not establish matching recommendations or universal model independence.
+Source preservation and report inventories are distinct from helper processing.
+Claims that a helper retained or excluded an item require the actual input and
+result pointers; omitted bindings remain calculation omissions. See
+[evidence semantics](references/evidence-semantics.md#source-preservation-and-helper-processing).
+
+Small-account comparisons address the supplied goal, loss scenarios and recurring
+contributions alongside initial affordability. They distinguish pre-cost targets
+from cost-sized exposures and identify omitted assumptions. Narrative coverage
+requires review even when the numerical artifacts replay successfully; see
+[small-account research](references/small-account-research.md).
+
+Source-aware portfolio helpers carry the original obligations, withdrawals,
+vesting events and unknowns into dated projections and comparable alternatives.
+Source-bound budget sizing keeps the entire supplied fee/slippage model together
+and separates unresolved quote bases from named full-cost sensitivities.
+The settlement/transfer sweep evaluates every supplied sale date. Typed price
+comparisons retain both the reference-price discount and the quote-based upside
+with their formulas. Financial pointer bindings preserve absent reporting
+precision. Final recommendation context joins the selected names and amounts to
+their supplied concentration, monetary volume and fixed-exit risks. Use these
+operations when the linked input schema fits; other schemas require an explicit
+mapping with the same source facts preserved.
+
+## Recommendations and evidence
+
+The shared Value–Quality–Momentum profile produces a reproducible research queue,
+followed by primary-source, horizon and portfolio review. Keep numerical rank,
+valuation evidence and recommendation confidence distinct. A relative factor score
+is not an expected return. Research labels describe the evidence; they do not
+approve, deny or restrict a broker order.
+
+When an ordered candidate set is supplied without weights or supported optimizer
+inputs, the allocation fallback divides the notional budget equally across the
+selected set. It preserves explicit user selections, weights and counts; it does
+not invent a portfolio size or turn scores into expected returns. Alternatives
+that each use the full budget remain separate scenarios. This is a reproducible
+baseline, not a return-maximizing strategy. Fees, all-in debit and suitability
+require their own evidence and calculations.
+
+Cash-budget comparisons calculate quantities, entry costs, total debit and residual
+together for each supplied whole-share or fractional increment. Quoted bid-ask
+spread stays separate from an explicit one-way slippage assumption. Allocation
+context retains the stated denominator, issuer/sector/industry exposure, supplied
+fund holdings and monetary-volume units, including unknown coverage. These are
+planning estimates and source disclosures, not broker permissions or guarantees
+of the amount a market order will spend.
+
+Use SEC filings, issuer releases and appropriate accessible finance providers.
+Yahoo is one acquisition adapter. Record source dates, accounting basis and
+changes between quarterly filings. Analyst targets and track records are sourced
+opinions/statistics, not guaranteed outcomes. News headlines, accessible reports,
+paywalls and missing sources have different evidentiary value.
+
+The package has no demonstrated universal alpha or calibrated Strong Buy
+classifier. Make recommendations proportional to the evidence and state material
+uncertainty. A completed calculation or matching model output establishes neither
+investment performance nor professional-manager equivalence.
+
+For calculations, retain material values from the current request and its context
+alongside file inputs, with their units and provenance. A value is not missing
+merely because it is absent from a JSON file. Distinguish declared assumptions
+from source observations and disclose conflicts; apply helper defaults only to
+unresolved optional fields. See [input provenance](references/model-independent-research.md#reconcile-request-and-file-inputs).
+
+## Installation and research setup
+
+Keep the entire folder together: scripts, references, profiles, templates and tests
+are self-contained. No repository-root files or other skills are required. See
+[INSTALL.md](INSTALL.md) for Codex, Agent Skills and Claude Code locations.
+
+Use Python 3.11 or newer. From the extracted skill directory:
+
+```powershell
+python -m venv ..\trading-env
+..\trading-env\Scripts\python.exe -m pip install -r requirements-tested.txt
+..\trading-env\Scripts\python.exe scripts/research_preflight.py
+..\trading-env\Scripts\python.exe -m unittest discover -s tests -v
+```
+
+Choose an unused environment directory; on macOS/Linux use `python3` and
+`bin/python`. Dependency and integrity findings describe research availability,
+not execution permission. The requirements file pins direct dependencies, not a
+complete transitive environment; retest after changes. Missing optional research
+models should be disclosed without inventing substitute results.
+
+Keep personal source archives, reports and existing broker/runtime records outside
+the installed skill. Installing or upgrading the package does not change an
+account or erase old execution state. Optional local runtime helpers organize
+research; they do not activate, approve or gate trading.
+
+## Examples and handoff
+
+Run fictional research examples:
+
+```text
+python scripts/screen_review.py examples/fictional-horizon-screen.json
+python scripts/quant_workbench.py operations
+python scripts/quant_workbench.py prepare examples/fictional-quant-campaign.json --output <research-folder>/quant.inputs.json
+python scripts/quant_workbench.py run <research-folder>/quant.inputs.json --output <research-folder>/quant.bundle.json
+python scripts/quant_workbench.py verify <research-folder>/quant.bundle.json
+```
+
+For a source-bound calculation and report, use:
+
+```text
+python scripts/research_workflow.py prepare REQUEST.json --private-output-dir <research-folder>/prepared --request-role "supplied research request"
+python scripts/research_workflow.py run <research-folder>/prepared/plan.json --private-output-dir <research-folder>/run
+python scripts/research_workflow.py summary <research-folder>/run
+```
+
+The request supplies its own contract, jobs, requested-work checklist and claims.
+External source files need explicit roles; see the [workflow guide](references/source-bound-workflow.md).
+The summary verifies the complete retained run before projecting exact values.
+For an already bound request, `quant_report.py run` and `verify` remain available.
+`analyst_report.py` renders separate analyst cohorts without pooling provider
+consensus, fair value or historical ranges. See [run and report](references/run-and-report.md)
+for the input contracts, private artifacts and limitations. These helpers preserve
+selected inputs; they do not infer which source or strategy the user intended.
+
+For supplied-data analysis, `research_contracts.py` records selected/unused inputs,
+source roles, evidence availability, horizon mode and ranking-method identity.
+The workbench also covers explicit trade costs and affordability, dated cash,
+vesting shares, portfolio denominators, session P&L, cash/valuation bridges,
+corporate actions, dual-SMA/opening-range simulations and forward-study evidence.
+These contracts reduce silent model substitutions. They do not guarantee identical
+interpretation, independent data acquisition, arbitrary prose or future stock picks.
+
+The [prompt catalog](EXAMPLE-PROMPTS.md) covers novice investing through advanced
+quant research, diagnostics, accounting and host handoff. Example values are not
+personal recommendations or default constraints on the user's orders.
+
+`scripts/execution_handoff.py` preserves a supplied instruction/payload and advisory
+findings for the host. It performs no broker call and requires no local approval
+record or risk clearance. The host uses its real broker tools, selected policy mode and existing user
+instructions. A recommendation-only request is still a recommendation-only request.
+Market execution is the default handoff preference when the user requests a buy
+without specifying an order type; preserve explicit limit instructions.
+
+Fractional/native-dollar support depends on the actual broker. A dollar input can
+be converted to shares at a recent price and therefore need not guarantee exact
+spending or a hard final debit. Report actual responses and outcomes, including
+uncertainty. Do not turn an empty tool result into a claimed fill or rejection.
+Recurring calculations preserve requested per-symbol dollar amounts separately
+from rounded quantity and reference-price debit estimates, including when a local
+cash/reserve assumption leaves no candidates. These estimates do not establish a
+guaranteed market debit, submission or fill, and do not impose a host execution gate.
+The opt-in [recurring dollar-intent route](references/fractional-shares.md#an-unmapped-dollar-intent-artifact)
+binds full original instruction/fixture/context bytes and explicit scoped currency
+selections, declares unbound broker mapping and generates its summary from the same
+economic record. Missing currency mapping remains unresolved; hashes do not prove
+semantic applicability or complete source coverage. It neither invents native tool
+names nor verifies broker capabilities.
+See [fractional planning](references/fractional-shares.md) for the output fields.
+
+The skill does not manage authentication, custody, transport retries, background
+execution or broker order-state transitions.
+
+## Quant and operational limits
+
+Public news polling is not guaranteed high-frequency data. Sentiment triage is a
+deterministic research helper, not a calibrated return model. Historical validation
+needs appropriate vintages, realistic costs and untouched evaluation data.
+News triage rechecks disclosure and observation timestamps in imported reports so
+an earlier availability claim cannot admit information from after the cutoff.
+Continuous-weight allocation is not comprehensive multi-period tax/margin
+optimization; unsupported derivatives and pricing assumptions remain explicit.
+
+Host tools, data rights, entitlements, accounts and reliable infrastructure are
+external. The skill helps with investment-manager analysis but does not establish
+hedge-fund-manager replacement.
+
+## Provenance and license
+
+Read [PROVENANCE.md](PROVENANCE.md), [SOURCES.md](SOURCES.md) and
+[THIRD-PARTY-NOTICES.md](THIRD-PARTY-NOTICES.md). Repository-authored code and
+prose use the [MIT License](LICENSE); keep it and the notices with standalone
+copies. Dependencies retain their terms, including [arch](ARCH-LICENSE.txt).
+Publisher reports and market data retain their own permissions.
+
+Execution-time price changes, quote age and research-to-market price drift do not
+trigger a skill threshold, pause or repeat approval. Preserve the user's accepted
+market-price uncertainty; state the research as-of time without making it a
+condition for the host handoff.
+
+Conditional proposal summaries retain an explicit comparator for target-distance
+direction and reconcile each final branch with the complete timing paths and
+scenario assumptions. Numerical replay alone does not validate recommendation prose.
+
+Funding comparison coverage distinguishes the held-asset universe from sampled
+quantities, and optional scenarios retain separate source opening conventions.
+
+Source-context evidence distinguishes supplied analytical marks and cost
+assumptions from unverified actual execution terms.
+
+## Expanded analysis toolkit (5.0)
+
+The [analysis contracts](references/analysis-contracts.md) route reproducible offline calculations:
+
+- [Technical](references/technical-toolkit.md): explicit OHLCV indicators, sessions, chart geometry,
+  SVG charts and costed next-bar replay. Supplied market-depth snapshots are not a live feed.
+- [Fundamental](references/fundamental-toolkit.md): ratios and accounting screens, reconciled
+  simplified forecasts, FCFF/FCFE DCF, reverse DCF, DDM, residual income, SOTP and seeded scenarios.
+  Financial-statement explanations retain period-weighted EPS evidence, separate SBC
+  expense from evidenced share issuance, and distinguish analytical leverage from
+  contractual covenant definitions; see the [statement evidence contract](references/fundamental-toolkit.md#financial-statement-evidence).
+  Ratios can derive midpoint balance denominators and COGS from separately bound
+  raw operands, retaining the calculation instead of relying on a typed average.
+  Historical financial trends also retain separate current/prior evidence for
+  each metric; conclusions cannot infer profit or cash growth from another measure.
+- [Sentiment](references/sentiment-toolkit.md): entity/aspect evidence, weighted time decay,
+  duplicate review, polarity trends, calibration and causal costed replay. An optional pinned
+  local transformer adapter requires separately permitted model weights and dependencies.
+- [Factors](references/factor-toolkit.md): sector winsorization/z-scores, FF3/FF5 attribution,
+  generic exposure risk and neutralization, training-only PCA and seeded clustering.
+
+All four expose versioned calculations through `quant_workbench.py`. Formula conventions,
+missing-data treatment and full input packets are retained for cross-model replay. Independent
+language-model agreement and profitable trading are not established by software tests.
+Quantum sentiment, proprietary Barra replication and unvalidated RL/recurrent forecasting are
+not bundled. Earlier news/sentiment review and all prior workflows remain available.
+
+## Multi-asset research and paper platform (5.0)
+
+Read [platform scope](references/multiasset-platform.md) for the supported instrument conventions,
+[derivatives](references/derivatives-toolkit.md) for explicit valuation models,
+[paper ledger](references/paper-exchange.md) for hypothetical event accounting and
+[platform evidence](references/platform-readiness.md) for scoped host qualification evidence.
+The package supports bounded research across equities/ETFs, options, futures, FX, bonds and
+spot crypto; live capability and production readiness must be established on the actual host.
+It does not bundle a live order service or claim that every modeled asset is tradable there.
+
+The [time-series research tools](references/time-series-toolkit.md) add seeded
+GBM scenarios, timestamp-aware backward trend derivatives and fixed-pair train-only
+OLS spread normalization. Their [examples](EXAMPLE-PROMPTS.md) require explicit
+units, model assumptions and cutoffs. They do not establish ARMA support,
+cointegration, calibrated forecasts or an executable arbitrage strategy.
+
+## Portable research extensions
+
+The skill is self-contained: no dedicated backend, server, service or separate
+client is required. New bundled scripts provide revision-aware as-of snapshots
+and a costed next-open bar simulation using the Python standard library.
+Optional local libraries provide ARIMA/cointegration, QuantLib European pricing
+and a named VADER baseline. See [portable methods](references/portable-quant.md)
+and [bar replay](references/costed-bar-replay.md). The optional dependency file is
+`requirements-optional-quant.txt`; installing it is not necessary for the original
+workflows. Report missing host capabilities explicitly. No package upload alone
+proves those calculations work in Muse or Claude.
+
+## Checked numerical answers
+
+Use the [single-command offline workflow](references/model-alignment-hardening.md)
+for explicit requests. It retains execution and verification evidence and renders
+supported numeric fields with fixed metric and scenario labels. Concentration
+bounds and hash comparisons retain their scope and assumptions. Export availability
+is reported separately from calculations; no backend or additional service is needed.
+
+## Historical coverage recovery
+
+Use [historical coverage recovery](references/historical-coverage-recovery.md) to
+resolve former ticker, membership and publication gaps before a backtest.
+`scripts/historical_coverage.py` audits explicit issuer/share-class mappings and
+per-security eligible dates, rejects corporate-event shortcuts, and distinguishes
+single-source coverage from a multi-source date union. Its filings mode joins
+exact issuer/accession pairs and preserves conflicting or missing acceptance
+metadata. It does not fetch or
+stitch prices, authenticate caller reviews, or certify unbiased historical data.
+
+For option model selection, the European-only `risk.option` helper rejects American
+exercise. The [derivatives toolkit](references/derivatives-toolkit.md) separately
+supports bounded vanilla American CRR valuation with explicit grid, rate/dividend
+conventions and source metadata. Missing inputs stay unresolved; do not substitute
+a European price or import example assumptions.
+
+Target-only chronological coverage is included in [native analyst revision delivery](references/analyst-revisions.md): every original target-list record receives a source-bound disposition, including changed or unknown literal horizons and same-time conflicts. No horizon equivalence or independent revision count is inferred.
+
+For supplied tax-aware sale comparisons, the [tax-lot report](references/tax-lot-report.md)
+keeps exact signed gain components, an explicit analytical calendar convention and
+selected versus remaining quantities together in verified generated artifacts.
+Unknown tax treatment, currency and external account facts remain scoped.

@@ -1,0 +1,72 @@
+{
+  "basis": "Independent hand calculations; tolerance combines abs=1e-9 rel=1e-9. No display rounding in evaluation.",
+  "cases": [
+    {
+      "input": "fundamental-dcf.json",
+      "expected": {
+        "cash_flow_value": 100,
+        "equity_value": 84,
+        "per_share": 8.4
+      },
+      "derivation": "10/1.1 + 10/1.1^2 + (10/.1)/1.1^2 = 100; +5+2-20-3 = 84"
+    },
+    {
+      "input": "fundamental-forecast.json",
+      "expected": {
+        "annual.0.revenue": 110,
+        "annual.0.ebit": 27,
+        "annual.0.net_income": 18,
+        "annual.0.cfo": 23,
+        "annual.0.fcff": 15.25,
+        "annual.0.fcfe": 8,
+        "annual.0.balance_sheet.cash": 24,
+        "annual.0.balance_residual": 0
+      },
+      "derivation": "EBIT=110-55-22-6; NI=(27-3)*.75; delta WC=1; CFO=18+6-1; FCFF=27*.75+6-10-1; cash=20+23-10-5-4"
+    },
+    {
+      "input": "fundamental-beneish.json",
+      "expected": {
+        "score": -2.66716,
+        "indices.TATA": -0.04
+      },
+      "derivation": "All seven indices=1, TATA=-4/100; -4.840+.920+.528+.404+.892+.115-.172-.327+4.679*(-.04)"
+    },
+    {
+      "input": "fundamental-altman.json",
+      "expected": {
+        "score": 2.61
+      },
+      "derivation": "1.2*.2+1.4*.1+3.3*.1+.6*1.5+1*1"
+    },
+    {
+      "input": "fundamental-piotroski.json",
+      "expected": {
+        "score": 9
+      },
+      "derivation": "Each of nine independent binary conditions is true"
+    },
+    {
+      "input": "fundamental-wacc.json",
+      "expected": {
+        "wacc": 0.075
+      },
+      "derivation": ".6*.1+.4*.05*.75"
+    },
+    {
+      "input": "fundamental-ddm.json",
+      "expected": {
+        "per_share": 25
+      },
+      "derivation": "2/(.1-.02)"
+    },
+    {
+      "input": "fundamental-sotp.json",
+      "expected": {
+        "equity_value": 110,
+        "per_share": 11
+      },
+      "derivation": "100+50-10+5+2-30-7=110; /10=11"
+    }
+  ]
+}

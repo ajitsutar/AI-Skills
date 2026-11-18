@@ -1,0 +1,15 @@
+{
+  "allocations_usd": {
+    "FICTION_A": 166.67,
+    "FICTION_B": 166.67,
+    "FICTION_C": 166.66
+  },
+  "allocation_total_usd": 500,
+  "unallocated_budget_usd": 0,
+  "outside_cash_terminal_usd": 104,
+  "universe_count": 3,
+  "all_us_universe_covered": false,
+  "stock_return_forecast_percent": null,
+  "live_trade_executed": false,
+  "production_readiness_established": false
+}

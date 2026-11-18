@@ -1,0 +1,9 @@
+{
+  "currency": "USD",
+  "amount_unit": "USD per share",
+  "example_context": "Fictional offline assumptions; not observed issuer data.",
+  "operation": "ddm",
+  "cost_equity": 0.1,
+  "growth": 0.02,
+  "next_dividend_per_share": 2
+}

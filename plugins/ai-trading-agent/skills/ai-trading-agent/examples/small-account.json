@@ -1,0 +1,7 @@
+{
+  "equity": "500", "cash": "500", "holdings": {},
+  "targets": {"GROWTH_A": "0.10", "GROWTH_B": "0.10"},
+  "prices": {"GROWTH_A": "45", "GROWTH_B": "70"},
+  "cash_floor": "0.05", "band": "0.02", "min_trade": "5",
+  "max_turnover": "0.80", "allow_sales": false
+}

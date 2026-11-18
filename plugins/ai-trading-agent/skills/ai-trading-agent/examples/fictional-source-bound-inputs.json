@@ -1,0 +1,26 @@
+{
+  "returns": [
+    0.02,
+    -0.01,
+    0.005,
+    -0.03,
+    0.01
+  ],
+  "valuation_operands": [
+    {
+      "id": "share-price",
+      "security_id": "fictional:ACME-common",
+      "currency": "USD",
+      "share_basis": "after-split"
+    },
+    {
+      "id": "earnings-per-share",
+      "security_id": "fictional:ACME-common",
+      "currency": "USD",
+      "share_basis": "before-split"
+    }
+  ],
+  "event": "2031",
+  "holding_start": "2030-11-01",
+  "holding_end": "2031-02-15"
+}

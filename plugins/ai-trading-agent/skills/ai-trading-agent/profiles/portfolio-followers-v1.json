@@ -1,0 +1,483 @@
+{
+  "schema_version": "portfolio-followers-v1",
+  "as_of": "2026-11-02",
+  "refresh_mode": "on_demand_only",
+  "recurring_schedule": null,
+  "purpose": "Public-source research profiles; not live brokerage orders or proof of replication.",
+  "defaults": {
+    "mode": "research_and_proposals",
+    "reverse_cramer": "long_only_inverse",
+    "partial_fetch": "optional_only_when_cache_identity_dates_and_hashes_validate",
+    "missing_source": "preserve_last_known_as_stale_no_invented_trade",
+    "retention": "compressed_source_snapshots_outside_skill_package"
+  },
+  "profiles": [
+    {
+      "profile_id": "pelosi-family",
+      "display_name": "Pelosi family disclosures",
+      "source_kind": "congressional_ptr",
+      "source_entity": "Nancy Pelosi (filer); preserve each record's spouse/self/joint owner",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://disclosures-clerk.house.gov/FinancialDisclosure",
+          "checked_on": "2026-11-02"
+        },
+        {
+          "url": "https://disclosures-clerk.house.gov/public_disc/ptr-pdfs/2026/20035553.pdf",
+          "checked_on": "2026-11-02"
+        },
+        {
+          "url": "https://disclosures-clerk.house.gov/public_disc/ptr-pdfs/2026/20035143.pdf",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "dated_primary_ptrs_verified",
+      "copy_eligibility": "transaction_signal_only",
+      "limitations": [
+        "Latest observed October2,2026 report is spouse-owned private real-estate LLC, not stock.",
+        "August21,2026 report separates spouse BE and INTC shares from options.",
+        "Amounts are ranges; transaction records are not complete current holdings or exact weights.",
+        "Commercial-use restrictions apply; do not package raw filings for sale."
+      ]
+    },
+    {
+      "profile_id": "donald-trump",
+      "display_name": "Donald Trump disclosures",
+      "source_kind": "executive_disclosure",
+      "source_entity": "Donald J. Trump; do not substitute Donald Trump Jr. or Eric Trump",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://www.oge.gov/web/oge.nsf/Officials%20Individual%20Disclosures%20Search%20Collection?OpenForm=",
+          "checked_on": "2026-11-02"
+        },
+        {
+          "url": "https://www.whitehouse.gov/wp-content/uploads/2026/04/President-Donald-J.-Trump-Periodic-Transaction-Report-4.20.26.pdf",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "official_collection_verified_no_current_allocation_extracted",
+      "copy_eligibility": "transaction_signal_only",
+      "limitations": [
+        "OGE collection requires dynamic retrieval; April20,2026 PDF opened but text extraction was empty.",
+        "June2026 primary report exceeded web-tool size limit; no latest complete portfolio verified.",
+        "Disclosures include bonds/private businesses; do not turn all instruments into stock tickers.",
+        "Preserve annual versus periodic reports, transaction dates, owner and amount ranges; commercial-use restrictions apply."
+      ]
+    },
+    {
+      "profile_id": "berkshire-hathaway",
+      "display_name": "Berkshire Hathaway (Buffett-associated)",
+      "source_kind": "13f",
+      "source_entity": "Berkshire Hathaway Inc",
+      "cik": "1067983",
+      "primary_sources": [
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1067983/000119312526352200/xslForm13F_X02/primary_doc.xml",
+          "checked_on": "2026-11-02"
+        },
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1067983/000119312526352200/xslForm13F_X02/56757.xml",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "2026q2_complete_disclosed_table_reconciled",
+      "copy_eligibility": "disclosed_long_equity_subset",
+      "limitations": [
+        "Institutional holdings, not Warren Buffett personal portfolio or an exclusively Buffett-selected book.",
+        "ReportJune30,2026 filedAugust14,2026; 89 rows aggregate29CUSIPs; dollars reconcile to299253556246.",
+        "Reported-book weights exclude undisclosed/non13F assets, operating businesses and cash."
+      ]
+    },
+    {
+      "profile_id": "scion-asset-management",
+      "display_name": "Scion / Michael Burry",
+      "source_kind": "13f",
+      "source_entity": "Scion Asset Management, LLC",
+      "cik": "1649339",
+      "primary_sources": [
+        {
+          "url": "https://data.sec.gov/submissions/CIK0001649339.json",
+          "checked_on": "2026-11-02"
+        },
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1649339/000164933925000007/xslForm13F_X02/infotable.xml",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "historical_only_latest_observed_2025q3",
+      "copy_eligibility": "disclosed_long_equity_subset",
+      "limitations": [
+        "Submissions list checked November2,2026 shows latest13F November3,2025 for September30,2025.",
+        "Do not assume positions remain held or infer closure solely from absence.",
+        "Eight rows include puts/calls and preferred; option underlying notionals are not premiums, short positions or equity weights.",
+        "Registration withdrawal alone would not establish exemption from13F."
+      ]
+    },
+    {
+      "profile_id": "taleb-universa",
+      "display_name": "Taleb / Universa research watch",
+      "source_kind": "research_only",
+      "source_entity": "Nassim Nicholas Taleb research; Universa is a separate fund manager",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://fooledbyrandomness.com/CV.htm",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "no_replicable_personal_allocation_verified",
+      "copy_eligibility": "watch_only",
+      "limitations": [
+        "Taleb's own CV describes scientific-adviser role and entirely passive Universa involvement sinceJanuary2010.",
+        "Universa site returned403 in this run; no portfolio weights verified.",
+        "Do not label a generic barbell, tail hedge, Universa returns or stock screen as Taleb's personal portfolio."
+      ]
+    },
+    {
+      "profile_id": "inverse-cramer",
+      "display_name": "Reverse Cramer (long-only)",
+      "source_kind": "public_recommendation",
+      "source_entity": "Jim Cramer attributed public recommendations",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://www.cnbc.com/mad-money/",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "source_route_known_direct_access_robots_denied",
+      "copy_eligibility": "long_only_inverse_signals",
+      "limitations": [
+        "Exact dated original recommendation required before deriving signal; no signal from headline sentiment, jokes, questions or thirdparty paraphrase alone.",
+        "Default inverse explicit sell=eligible buy proposal; explicit buy=reduce/exit existing long; never short.",
+        "CNBC fetch denied by robots this run; public clips/transcripts may be fallback only with attributable timestamp/context.",
+        "This is a configurable research rule, not verified Autopilot weights, a portfolio held by Cramer, or proven alpha."
+      ]
+    },
+    {
+      "profile_id": "renaissance-technologies",
+      "display_name": "Renaissance Technologies (Jim Simons-associated)",
+      "source_kind": "13f",
+      "source_entity": "Renaissance Technologies LLC",
+      "cik": "1037389",
+      "primary_sources": [
+        {
+          "url": "https://www.rentec.com/Home.action?index=true",
+          "checked_on": "2026-11-02"
+        },
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1037389",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "primary_identity_and_directory_verified_table_not_retrieved",
+      "copy_eligibility": "disclosed_long_equity_subset",
+      "limitations": [
+        "Current firm disclosure is not Jim Simons personal holdings or Medallion strategy.",
+        "CIK1037389 directory exposes August13,2026 accession000103738926000052; table access failed this run.",
+        "No real-time positions or short/derivative trading model inferred."
+      ]
+    },
+    {
+      "profile_id": "point72",
+      "display_name": "Point72 / Steve Cohen",
+      "source_kind": "13f",
+      "source_entity": "Point72 Asset Management, L.P.",
+      "cik": "1603466",
+      "primary_sources": [
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1603466/000090266426001100/0000902664-26-001100-index.htm",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "primary_identity_verified_current_table_pending",
+      "copy_eligibility": "disclosed_long_equity_subset",
+      "limitations": [
+        "Primary sample December31,2025 filedFebruary17,2026 verified; do not call it latest.",
+        "Q2 2026 discovered via secondary listings but not yet primary-table reconciled.",
+        "Firm's aggregated holdings are not Steve Cohen's personal portfolio; multi-strategy hedges absent."
+      ]
+    },
+    {
+      "profile_id": "citadel-advisors",
+      "display_name": "Citadel Advisors / Ken Griffin",
+      "source_kind": "13f",
+      "source_entity": "Citadel Advisors LLC",
+      "cik": "1423053",
+      "primary_sources": [
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1423053/000110465926104387/xslForm13F_X02/primary_doc.xml",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "2026q2_amendment_cover_verified_table_not_reconciled",
+      "copy_eligibility": "disclosed_long_equity_subset",
+      "limitations": [
+        "June30,2026 amendment1 is restatement; do not append both original and restatement as separate holdings.",
+        "Cover lists included-manager Citadel Securities GP LLC CIK1721695; preserve attribution and avoid generic entity conflation.",
+        "16122 table entries and875011794337 reported dollars include instruments not suitable as longonly equity weights.",
+        "Not Ken Griffin's personal portfolio; short and hedging books incomplete."
+      ]
+    },
+    {
+      "profile_id": "pershing-square",
+      "display_name": "Pershing Square / Bill Ackman",
+      "source_kind": "13f",
+      "source_entity": "Pershing Square Inc (current parent reporting manager)",
+      "cik": "2026053",
+      "primary_sources": [
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1336528/000117266126003777/xslForm13F_X02/primary_doc.xml",
+          "checked_on": "2026-11-02"
+        },
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/2026053/000117266126003790/xslForm13F_X02/primary_doc.xml",
+          "checked_on": "2026-11-02"
+        },
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/2026053/000117266126003790/xslForm13F_X02/infotable.xml",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "2026q2_complete_disclosed_table_reconciled",
+      "copy_eligibility": "disclosed_long_equity_subset",
+      "limitations": [
+        "LegacyCapitalManagement CIK1336528 filed13F-NT; holdings now reported by parent2026053.",
+        "Report June30,2026 filed August14,2026;15rows aggregate14CUSIPs;reported total19465692772USD.",
+        "Related funds/closed-end holdings need look-through before diversification claims; avoid duplicate manager copies.",
+        "Not Bill Ackman's complete personal holdings."
+      ]
+    },
+    {
+      "profile_id": "duquesne-family-office",
+      "display_name": "Duquesne / Stanley Druckenmiller",
+      "source_kind": "13f",
+      "source_entity": "Duquesne Family Office LLC",
+      "cik": "1536411",
+      "primary_sources": [
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1536411/0001536411-26-000006-index.html",
+          "checked_on": "2026-11-02"
+        },
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1536411/000153641126000006/xslForm13F_X02/form13f_20260630.xml",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "2026q2_primary_table_available_units_need_reconciliation",
+      "copy_eligibility": "disclosed_long_equity_subset",
+      "limitations": [
+        "ReportJune30,2026 filedAugust14,2026.",
+        "Rendered header says nearest-dollar values but values/share magnitudes suggest potential unit anomaly; do not silently multiplyby1000.",
+        "Preserve calls separately from shares; full allocation normalization not certified in this run."
+      ]
+    },
+    {
+      "profile_id": "ark-invest",
+      "display_name": "ARK / Cathie Wood",
+      "source_kind": "fund_holdings",
+      "source_entity": "ARK Investment Management named fund (default ARKK)",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://www.ark-funds.com/funds/arkk",
+          "checked_on": "2026-11-02"
+        },
+        {
+          "url": "https://helpcenter.ark-funds.com/where-can-i-download-the-latest-etf-holdings",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "daily_holdings_route_verified_current_bytes_not_retrieved",
+      "copy_eligibility": "named_fund_holdings",
+      "limitations": [
+        "Official help says holdings update endoftradingday; verify file's own date.",
+        "ARKK page exposes holdings downloads but current CSV inaccessible and PDF unsupported contenttype in this run.",
+        "Do not substitute cached April2026 indexed PDF as current allocation.",
+        "Fund holdings are not Cathie Wood personal holdings; choose each fund explicitly, avoid combining fundweights without sleeves."
+      ]
+    },
+    {
+      "profile_id": "bridgewater",
+      "display_name": "Bridgewater Associates",
+      "source_kind": "13f",
+      "source_entity": "Bridgewater Associates, LP",
+      "cik": "1350694",
+      "primary_sources": [
+        {
+          "url": "https://www.sec.gov/Archives/edgar/data/1350694/000135069426000003/0001350694-26-000003-index.html",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "2026q2_primary_index_verified",
+      "copy_eligibility": "disclosed_long_equity_subset",
+      "limitations": [
+        "ReportJune30,2026 filedAugust14,2026; full table not normalized in thisrun.",
+        "Firm disclosure is not Ray Dalio personal portfolio, All Weather or Pure Alpha complete strategy.",
+        "Macro/futures/short/foreign exposures cannot be reconstructed from13F alone."
+      ]
+    },
+    {
+      "profile_id": "autopilot-claude",
+      "display_name": "Claude Portfolio",
+      "source_kind": "proprietary_unavailable",
+      "source_entity": "Autopilot public marketing tracker",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://www.joinautopilot.com/landing",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "discovery_only_no_public_exact_weights_verified",
+      "copy_eligibility": "watch_only",
+      "limitations": [
+        "Public listing establishes name only, not success or independently verified returns.",
+        "No account requested; no proprietary allocation inferred.",
+        "Congressional labels require fresh primary identity/source binding before signals."
+      ]
+    },
+    {
+      "profile_id": "autopilot-gpt",
+      "display_name": "GPT Portfolio",
+      "source_kind": "proprietary_unavailable",
+      "source_entity": "Autopilot public marketing tracker",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://www.joinautopilot.com/landing",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "discovery_only_no_public_exact_weights_verified",
+      "copy_eligibility": "watch_only",
+      "limitations": [
+        "Public listing establishes name only, not success or independently verified returns.",
+        "No account requested; no proprietary allocation inferred.",
+        "Congressional labels require fresh primary identity/source binding before signals."
+      ]
+    },
+    {
+      "profile_id": "autopilot-inthemoney",
+      "display_name": "Actively Managed / InTheMoney",
+      "source_kind": "proprietary_unavailable",
+      "source_entity": "Autopilot public marketing tracker",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://www.joinautopilot.com/landing",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "discovery_only_no_public_exact_weights_verified",
+      "copy_eligibility": "watch_only",
+      "limitations": [
+        "Public listing establishes name only, not success or independently verified returns.",
+        "No account requested; no proprietary allocation inferred.",
+        "Congressional labels require fresh primary identity/source binding before signals."
+      ]
+    },
+    {
+      "profile_id": "autopilot-wolff",
+      "display_name": "Wolff's Flagship Fund / Peter Wolff",
+      "source_kind": "proprietary_unavailable",
+      "source_entity": "Autopilot public marketing tracker",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://www.joinautopilot.com/landing",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "discovery_only_no_public_exact_weights_verified",
+      "copy_eligibility": "watch_only",
+      "limitations": [
+        "Public listing establishes name only, not success or independently verified returns.",
+        "No account requested; no proprietary allocation inferred.",
+        "Congressional labels require fresh primary identity/source binding before signals."
+      ]
+    },
+    {
+      "profile_id": "autopilot-world-war",
+      "display_name": "AI World War III Portfolio",
+      "source_kind": "proprietary_unavailable",
+      "source_entity": "Autopilot public marketing tracker",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://www.joinautopilot.com/landing",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "discovery_only_no_public_exact_weights_verified",
+      "copy_eligibility": "watch_only",
+      "limitations": [
+        "Public listing establishes name only, not success or independently verified returns.",
+        "No account requested; no proprietary allocation inferred.",
+        "Congressional labels require fresh primary identity/source binding before signals."
+      ]
+    },
+    {
+      "profile_id": "autopilot-tristan",
+      "display_name": "Tristan's Flagship / Tristan Thompson",
+      "source_kind": "proprietary_unavailable",
+      "source_entity": "Autopilot public marketing tracker",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://www.joinautopilot.com/landing",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "discovery_only_no_public_exact_weights_verified",
+      "copy_eligibility": "watch_only",
+      "limitations": [
+        "Public listing establishes name only, not success or independently verified returns.",
+        "No account requested; no proprietary allocation inferred.",
+        "Congressional labels require fresh primary identity/source binding before signals."
+      ]
+    },
+    {
+      "profile_id": "autopilot-mullin",
+      "display_name": "Mullin Tracker",
+      "source_kind": "proprietary_unavailable",
+      "source_entity": "Autopilot public marketing tracker",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://www.joinautopilot.com/landing",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "discovery_only_no_public_exact_weights_verified",
+      "copy_eligibility": "watch_only",
+      "limitations": [
+        "Public listing establishes name only, not success or independently verified returns.",
+        "No account requested; no proprietary allocation inferred.",
+        "Congressional labels require fresh primary identity/source binding before signals."
+      ]
+    },
+    {
+      "profile_id": "autopilot-crenshaw",
+      "display_name": "Crenshaw Tracker",
+      "source_kind": "proprietary_unavailable",
+      "source_entity": "Autopilot public marketing tracker",
+      "cik": null,
+      "primary_sources": [
+        {
+          "url": "https://www.joinautopilot.com/landing",
+          "checked_on": "2026-11-02"
+        }
+      ],
+      "availability": "discovery_only_no_public_exact_weights_verified",
+      "copy_eligibility": "watch_only",
+      "limitations": [
+        "Public listing establishes name only, not success or independently verified returns.",
+        "No account requested; no proprietary allocation inferred.",
+        "Congressional labels require fresh primary identity/source binding before signals."
+      ]
+    }
+  ]
+}

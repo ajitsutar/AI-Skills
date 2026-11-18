@@ -1,0 +1,428 @@
+{
+  "schema_version": 1,
+  "contract": {
+    "prompt": "Fictional fixed-stock monthly target and staged design demonstration",
+    "purpose": "offline research example, not a recommendation",
+    "base_currency": "USD",
+    "horizon_id": "P1Y",
+    "as_of": "2026-10-31T11:00:00Z"
+  },
+  "jobs": [
+    {
+      "id": "weights",
+      "operation": "portfolio.capped_inverse_volatility",
+      "inputs": {
+        "document": {
+          "volatilities": {
+            "A": 0.01,
+            "B": 0.2,
+            "C": 0.2
+          },
+          "equity_weight": 0.99,
+          "cap": 0.4
+        }
+      }
+    },
+    {
+      "id": "targets",
+      "operation": "backtest.monthly_targets",
+      "inputs": {
+        "document": {
+          "composition_mode": "fixed_adaptive",
+          "symbols": [
+            "A",
+            "B"
+          ],
+          "as_of": "2024-02-02T22:00:00Z",
+          "start": "2024-01-31",
+          "end": "2024-01-31",
+          "calendar": [
+            {
+              "session_date": "2024-01-25",
+              "close_utc": "2024-01-25T21:00:00Z"
+            },
+            {
+              "session_date": "2024-01-26",
+              "close_utc": "2024-01-26T21:00:00Z"
+            },
+            {
+              "session_date": "2024-01-29",
+              "close_utc": "2024-01-29T21:00:00Z"
+            },
+            {
+              "session_date": "2024-01-30",
+              "close_utc": "2024-01-30T21:00:00Z"
+            },
+            {
+              "session_date": "2024-01-31",
+              "close_utc": "2024-01-31T21:00:00Z"
+            },
+            {
+              "session_date": "2024-02-01",
+              "close_utc": "2024-02-01T21:00:00Z"
+            },
+            {
+              "session_date": "2024-02-02",
+              "close_utc": "2024-02-02T21:00:00Z"
+            }
+          ],
+          "calendar_evidence": "FICTIONAL_EXPLICIT_SESSIONS",
+          "lookback": 3,
+          "ddof": 1,
+          "equity_weight": 0.99,
+          "cap": 0.6,
+          "observations": [
+            {
+              "session_date": "2024-01-25",
+              "available_at": "2024-01-25T21:00:00Z",
+              "prices": {
+                "A": 100,
+                "B": 100
+              }
+            },
+            {
+              "session_date": "2024-01-26",
+              "available_at": "2024-01-26T21:00:00Z",
+              "prices": {
+                "A": 101,
+                "B": 104
+              }
+            },
+            {
+              "session_date": "2024-01-29",
+              "available_at": "2024-01-29T21:00:00Z",
+              "prices": {
+                "A": 104,
+                "B": 102
+              }
+            },
+            {
+              "session_date": "2024-01-30",
+              "available_at": "2024-01-30T21:00:00Z",
+              "prices": {
+                "A": 102,
+                "B": 110
+              }
+            },
+            {
+              "session_date": "2024-01-31",
+              "available_at": "2024-01-31T21:00:00Z",
+              "prices": {
+                "A": 105,
+                "B": 106
+              }
+            },
+            {
+              "session_date": "2024-02-01",
+              "available_at": "2024-02-01T21:00:00Z",
+              "prices": {
+                "A": 210,
+                "B": 212
+              }
+            },
+            {
+              "session_date": "2024-02-02",
+              "available_at": "2024-02-02T21:00:00Z",
+              "prices": {
+                "A": 231,
+                "B": 233.2
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "freeze",
+      "operation": "experiment.freeze",
+      "inputs": {
+        "document": {
+          "composition_mode": "fixed_adaptive",
+          "candidates": [
+            {
+              "candidate_id": "P1",
+              "symbols": [
+                "A",
+                "B"
+              ]
+            },
+            {
+              "candidate_id": "P2",
+              "symbols": [
+                "A",
+                "B"
+              ]
+            },
+            {
+              "candidate_id": "P3",
+              "symbols": [
+                "A",
+                "B"
+              ]
+            }
+          ],
+          "counts": {
+            "screen": 3,
+            "finalists": 2,
+            "selected": 1
+          },
+          "screen_window": {
+            "start": "2025-10-30",
+            "end": "2026-10-30"
+          },
+          "final_window": {
+            "start": "2021-10-29",
+            "end": "2026-10-30"
+          },
+          "weighting_rule": {
+            "method": "capped_inverse_volatility",
+            "lookback": 60,
+            "ddof": 1,
+            "equity_weight": 0.99,
+            "cap": 0.6
+          },
+          "benchmark": {
+            "symbol": "FICTIONAL_INDEX",
+            "entry": "matched-next-close",
+            "policy": "buy-and-hold"
+          },
+          "execution_convention": "next_session_close",
+          "cash_treatment": "1%pre-fee target;zero interest",
+          "tax_treatment": "excluded",
+          "universe_vintage": "current_names_retrospective",
+          "source_contract": {
+            "provider": "fictional",
+            "prices_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+          },
+          "base_one_way_cost_bps": 10,
+          "stress_one_way_cost_bps": [
+            25
+          ],
+          "sealed_at": "2026-10-31T10:00:00Z"
+        }
+      }
+    },
+    {
+      "id": "screen",
+      "operation": "experiment.rank_stage",
+      "inputs": {
+        "document": {
+          "frozen": {
+            "status": "FROZEN_EXPERIMENT",
+            "contract": {
+              "composition_mode": "fixed_adaptive",
+              "candidates": [
+                {
+                  "candidate_id": "P1",
+                  "symbols": [
+                    "A",
+                    "B"
+                  ]
+                },
+                {
+                  "candidate_id": "P2",
+                  "symbols": [
+                    "A",
+                    "B"
+                  ]
+                },
+                {
+                  "candidate_id": "P3",
+                  "symbols": [
+                    "A",
+                    "B"
+                  ]
+                }
+              ],
+              "counts": {
+                "screen": 3,
+                "finalists": 2,
+                "selected": 1
+              },
+              "screen_window": {
+                "start": "2025-10-30",
+                "end": "2026-10-30"
+              },
+              "final_window": {
+                "start": "2021-10-29",
+                "end": "2026-10-30"
+              },
+              "weighting_rule": {
+                "method": "capped_inverse_volatility",
+                "lookback": 60,
+                "ddof": 1,
+                "equity_weight": 0.99,
+                "cap": 0.6
+              },
+              "benchmark": {
+                "symbol": "FICTIONAL_INDEX",
+                "entry": "matched-next-close",
+                "policy": "buy-and-hold"
+              },
+              "execution_convention": "next_session_close",
+              "cash_treatment": "1%pre-fee target;zero interest",
+              "tax_treatment": "excluded",
+              "universe_vintage": "current_names_retrospective",
+              "source_contract": {
+                "provider": "fictional",
+                "prices_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+              },
+              "base_one_way_cost_bps": 10.0,
+              "stress_one_way_cost_bps": [
+                25.0
+              ],
+              "sealed_at": "2026-10-31T10:00:00Z",
+              "score": {
+                "cagr": 0.5,
+                "sharpe": 0.25,
+                "max_drawdown": 0.25
+              },
+              "tie_break": [
+                "lower_annual_gross_turnover",
+                "candidate_id"
+              ]
+            },
+            "contract_sha256": "1548e80a20c66a73ff820c448ddf7411c03073efe5a64428a1b951bdb5176073",
+            "windows_overlap": true,
+            "untouched_holdout_established": false,
+            "precommitment_timing_independently_verified": false,
+            "limitation": "Hashes bind supplied design, not proof no one saw outcomes. Current constituents, source vintage, prior knowledge, trial selection and overlapping periods retain retrospective/hindsight limitations."
+          },
+          "stage": "screen",
+          "results": [
+            {
+              "candidate_id": "P1",
+              "status": "COMPUTED",
+              "window": {
+                "start": "2025-10-30",
+                "end": "2026-10-30"
+              },
+              "one_way_cost_bps": 10,
+              "result_sha256": "156f98b4ef71d78f3fc46d6c92a9f338fa7f0f8a33d02ce0f2c542bf4a34a63f",
+              "accounting_input_sha256": "4a4403c810cc7e00a7a185482ba808f9719e53b68e0b60a445ac98bf1c55decd",
+              "result_contract": {
+                "experiment_contract_sha256": "1548e80a20c66a73ff820c448ddf7411c03073efe5a64428a1b951bdb5176073",
+                "symbols": [
+                  "A",
+                  "B"
+                ],
+                "weighting_rule": {
+                  "method": "capped_inverse_volatility",
+                  "lookback": 60,
+                  "ddof": 1,
+                  "equity_weight": 0.99,
+                  "cap": 0.6
+                },
+                "execution_convention": "next_session_close",
+                "cash_treatment": "1%pre-fee target;zero interest",
+                "tax_treatment": "excluded",
+                "benchmark": {
+                  "symbol": "FICTIONAL_INDEX",
+                  "entry": "matched-next-close",
+                  "policy": "buy-and-hold"
+                },
+                "source_contract": {
+                  "provider": "fictional",
+                  "prices_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "metrics": {
+                "cagr": 0.1,
+                "sharpe": 1.0,
+                "max_drawdown": 0.2,
+                "annual_gross_turnover": 1.0
+              }
+            },
+            {
+              "candidate_id": "P2",
+              "status": "COMPUTED",
+              "window": {
+                "start": "2025-10-30",
+                "end": "2026-10-30"
+              },
+              "one_way_cost_bps": 10,
+              "result_sha256": "434020c26a17ad91bc20101db6d9c007ba19f6843a3177c2afd89878fe997247",
+              "accounting_input_sha256": "6fb142a83cf83be0968ce90a8750a36b1945500eff6459316a8ef5f5bff26076",
+              "result_contract": {
+                "experiment_contract_sha256": "1548e80a20c66a73ff820c448ddf7411c03073efe5a64428a1b951bdb5176073",
+                "symbols": [
+                  "A",
+                  "B"
+                ],
+                "weighting_rule": {
+                  "method": "capped_inverse_volatility",
+                  "lookback": 60,
+                  "ddof": 1,
+                  "equity_weight": 0.99,
+                  "cap": 0.6
+                },
+                "execution_convention": "next_session_close",
+                "cash_treatment": "1%pre-fee target;zero interest",
+                "tax_treatment": "excluded",
+                "benchmark": {
+                  "symbol": "FICTIONAL_INDEX",
+                  "entry": "matched-next-close",
+                  "policy": "buy-and-hold"
+                },
+                "source_contract": {
+                  "provider": "fictional",
+                  "prices_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "metrics": {
+                "cagr": 0.11,
+                "sharpe": 1.01,
+                "max_drawdown": 0.19,
+                "annual_gross_turnover": 1.0
+              }
+            },
+            {
+              "candidate_id": "P3",
+              "status": "COMPUTED",
+              "window": {
+                "start": "2025-10-30",
+                "end": "2026-10-30"
+              },
+              "one_way_cost_bps": 10,
+              "result_sha256": "13fe4efff52ec7a82e9d9989afe7ecc21bf9fbf5711532db8954888f9cc92a5b",
+              "accounting_input_sha256": "3783f40cf4425ffadeb8b851e2285aa9c977d4a1f41c8fdb9562af9855e67e03",
+              "result_contract": {
+                "experiment_contract_sha256": "1548e80a20c66a73ff820c448ddf7411c03073efe5a64428a1b951bdb5176073",
+                "symbols": [
+                  "A",
+                  "B"
+                ],
+                "weighting_rule": {
+                  "method": "capped_inverse_volatility",
+                  "lookback": 60,
+                  "ddof": 1,
+                  "equity_weight": 0.99,
+                  "cap": 0.6
+                },
+                "execution_convention": "next_session_close",
+                "cash_treatment": "1%pre-fee target;zero interest",
+                "tax_treatment": "excluded",
+                "benchmark": {
+                  "symbol": "FICTIONAL_INDEX",
+                  "entry": "matched-next-close",
+                  "policy": "buy-and-hold"
+                },
+                "source_contract": {
+                  "provider": "fictional",
+                  "prices_sha256": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+                }
+              },
+              "metrics": {
+                "cagr": 0.12000000000000001,
+                "sharpe": 1.02,
+                "max_drawdown": 0.18000000000000002,
+                "annual_gross_turnover": 1.0
+              }
+            }
+          ],
+          "sealed_at": "2026-10-31T10:01:00Z"
+        }
+      }
+    }
+  ]
+}

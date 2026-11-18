@@ -1,0 +1,30 @@
+{
+  "schema_version": 1,
+  "data_kind": "market",
+  "symbol": "REPLACE_WITH_SECURITY_ID",
+  "provider": "REPLACE_WITH_PROVIDER_AND_EXTRACTION_VERSION",
+  "provider_field": "REPLACE_WITH_EXACT_SOURCE_FIELD_AND_SETTINGS",
+  "retrieved_at": null,
+  "csv_sha256": null,
+  "close_column": "close",
+  "timestamp_column": "timestamp",
+  "bar_interval": "1d",
+  "periods_per_year": 252,
+  "price_basis": "total_return_adjusted",
+  "adjustment_notes": "REPLACE_WITH_DOCUMENTED_SPLIT_DIVIDEND_SPINOFF_TREATMENT",
+  "corporate_actions": {
+    "status": "unreviewed",
+    "window_start": null,
+    "window_end": null,
+    "evidence": [],
+    "events": []
+  },
+  "session_review": {
+    "status": "unreviewed",
+    "window_start": null,
+    "window_end": null,
+    "calendar": "REPLACE_WITH_CALENDAR_AND_MISSING_SESSION_CHECK",
+    "evidence": []
+  },
+  "large_move_reviews": []
+}

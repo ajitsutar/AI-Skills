@@ -1,0 +1,186 @@
+{
+  "schema_version": 1,
+  "as_of": "2026-10-24T05:19:32Z",
+  "host": {
+    "id": "robinhood-native-host-example",
+    "package_sha256": null,
+    "runtime_sha256": null
+  },
+  "requests": [
+    {
+      "asset_class": "stocks",
+      "mode": "research",
+      "scope_id": "stocks-research-example",
+      "scope_description": "Illustrative stocks research scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "stocks",
+      "mode": "paper",
+      "scope_id": "stocks-paper-example",
+      "scope_description": "Illustrative stocks paper scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "stocks",
+      "mode": "live",
+      "scope_id": "stocks-live-example",
+      "scope_description": "Illustrative stocks live scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "etfs",
+      "mode": "research",
+      "scope_id": "etfs-research-example",
+      "scope_description": "Illustrative etfs research scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "etfs",
+      "mode": "paper",
+      "scope_id": "etfs-paper-example",
+      "scope_description": "Illustrative etfs paper scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "etfs",
+      "mode": "live",
+      "scope_id": "etfs-live-example",
+      "scope_description": "Illustrative etfs live scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "options",
+      "mode": "research",
+      "scope_id": "options-research-example",
+      "scope_description": "Illustrative options research scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "options",
+      "mode": "paper",
+      "scope_id": "options-paper-example",
+      "scope_description": "Illustrative options paper scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "options",
+      "mode": "live",
+      "scope_id": "options-live-example",
+      "scope_description": "Illustrative options live scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "futures",
+      "mode": "research",
+      "scope_id": "futures-research-example",
+      "scope_description": "Illustrative futures research scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "futures",
+      "mode": "paper",
+      "scope_id": "futures-paper-example",
+      "scope_description": "Illustrative futures paper scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "futures",
+      "mode": "live",
+      "scope_id": "futures-live-example",
+      "scope_description": "Illustrative futures live scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "fx",
+      "mode": "research",
+      "scope_id": "fx-research-example",
+      "scope_description": "Illustrative fx research scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "fx",
+      "mode": "paper",
+      "scope_id": "fx-paper-example",
+      "scope_description": "Illustrative fx paper scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "fx",
+      "mode": "live",
+      "scope_id": "fx-live-example",
+      "scope_description": "Illustrative fx live scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "bonds",
+      "mode": "research",
+      "scope_id": "bonds-research-example",
+      "scope_description": "Illustrative bonds research scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "bonds",
+      "mode": "paper",
+      "scope_id": "bonds-paper-example",
+      "scope_description": "Illustrative bonds paper scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "bonds",
+      "mode": "live",
+      "scope_id": "bonds-live-example",
+      "scope_description": "Illustrative bonds live scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "crypto",
+      "mode": "research",
+      "scope_id": "crypto-research-example",
+      "scope_description": "Illustrative crypto research scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "crypto",
+      "mode": "paper",
+      "scope_id": "crypto-paper-example",
+      "scope_description": "Illustrative crypto paper scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    },
+    {
+      "asset_class": "crypto",
+      "mode": "live",
+      "scope_id": "crypto-live-example",
+      "scope_description": "Illustrative crypto live scope only. No connected host inventory, account eligibility, current deployment or operating evidence has been observed in this fixture; this does not cover every instrument or strategy."
+    }
+  ],
+  "evidence": [],
+  "documentation": [
+    {
+      "id": "equity-options-crypto",
+      "host_id": "robinhood-native-host-example",
+      "asset_classes": [
+        "stocks",
+        "options",
+        "crypto"
+      ],
+      "modes": [
+        "live"
+      ],
+      "observed_at": "2026-10-24T05:19:32Z",
+      "source_url": "https://robinhood.com/us/en/support/articles/trading-with-your-agent/",
+      "summary": "Robinhood describes external-agent long equity, options and crypto ordering. Options multi-leg orders are excluded; crypto pairs/accounts and applicable permissions are limited. This page is context, not this host capability evidence.",
+      "support": "documented"
+    },
+    {
+      "id": "etf-scope",
+      "host_id": "robinhood-native-host-example",
+      "asset_classes": [
+        "etfs"
+      ],
+      "modes": [
+        "live"
+      ],
+      "observed_at": "2026-10-24T05:19:32Z",
+      "source_url": "https://robinhood.com/us/en/support/articles/trading-with-your-agent/",
+      "summary": "The source describes equities generally. Individual ETF eligibility and the requested ETF host scope have not been observed; no blanket ETF support or denial is inferred.",
+      "support": "not_documented"
+    },
+    {
+      "id": "other-assets",
+      "host_id": "robinhood-native-host-example",
+      "asset_classes": [
+        "futures",
+        "fx",
+        "bonds"
+      ],
+      "modes": [
+        "live"
+      ],
+      "observed_at": "2026-10-24T05:19:32Z",
+      "source_url": "https://robinhood.com/us/en/support/articles/trading-with-your-agent/",
+      "summary": "This external-agent trading page does not establish futures, FX or bond order support. Other Robinhood products or website navigation do not establish the external-agent tool capability. This is not a permanent unsupported designation.",
+      "support": "not_documented"
+    }
+  ]
+}

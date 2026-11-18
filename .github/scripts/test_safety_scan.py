@@ -106,6 +106,61 @@ class PublicListingImageTests(unittest.TestCase):
                          [f'forbidden extension: {Path(name)}'])
 
 
+class GeneratedCopySafetyTests(unittest.TestCase):
+    def setUp(self):
+        self.notice_name = 'skills/ai-trading-agent/ARCH-LICENSE.txt'
+        self.notice = (safety_scan.ROOT / self.notice_name).read_bytes()
+        self.image_name = 'docs/ai-trading-agent/assets/fictional-ticker.png'
+        self.image = (safety_scan.ROOT / self.image_name).read_bytes()
+        self.copy_notice = 'plugins/ai-trading-agent/' + self.notice_name
+        self.copy_image = 'plugins/ai-trading-agent/assets/fictional-ticker.png'
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name).resolve()
+
+    def findings(self, files):
+        for name, content in files.items():
+            path = self.root / name
+            path.parent.mkdir(parents=True, exist_ok=True)
+            path.write_bytes(content)
+        with patch.object(safety_scan, 'ROOT', self.root):
+            return safety_scan.scan()
+
+    def test_identical_generated_notices_and_logos_use_existing_rules(self):
+        self.assertEqual(self.findings({
+            self.notice_name: self.notice, self.copy_notice: self.notice,
+            self.image_name: self.image, self.copy_image: self.image,
+        }), [])
+
+    def test_modified_generated_notice_does_not_inherit_exception(self):
+        extra = ('\nprivate' + '@' + 'example.invalid\n').encode()
+        result = self.findings({self.notice_name: self.notice,
+                                self.copy_notice: self.notice + extra})
+        self.assertTrue(any('personal email' in row and str(Path(self.copy_notice)) in row
+                            for row in result))
+
+    def test_matching_copies_still_undergo_secret_scanning(self):
+        content = self.notice + ('\nsk-' + 'a' * 24 + '\n').encode()
+        result = self.findings({self.notice_name: content, self.copy_notice: content})
+        for name in (self.notice_name, self.copy_notice):
+            self.assertTrue(any('OpenAI-style key' in row and str(Path(name)) in row
+                                for row in result))
+
+    def test_modified_generated_logo_is_blocked(self):
+        self.assertEqual(self.findings({self.image_name: self.image,
+                                        self.copy_image: self.image + b'\x00'}),
+                         [f'binary or non-utf8 file: {Path(self.copy_image)}'])
+
+    def test_generated_logo_requires_its_canonical_source(self):
+        self.assertEqual(self.findings({self.copy_image: self.image}),
+                         [f'binary or non-utf8 file: {Path(self.copy_image)}'])
+
+    def test_unreviewed_generated_asset_is_not_exempt(self):
+        name = 'plugins/ai-trading-agent/assets/other.png'
+        self.assertEqual(self.findings({self.image_name: self.image, name: self.image}),
+                         [f'binary or non-utf8 file: {Path(name)}'])
+
+
 class SbomIdentifierTests(unittest.TestCase):
     def test_only_consistent_structured_identifiers_are_recognized(self):
         component = {'name': 'python-dateutil', 'version': '2.9.0.post0',

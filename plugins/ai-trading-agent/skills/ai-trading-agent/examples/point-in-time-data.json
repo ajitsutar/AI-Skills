@@ -1,0 +1,36 @@
+{
+  "as_of": "2026-02-20T12:00:00Z",
+  "dataset": {
+    "schema_version": 1,
+    "dataset_id": "fictional-point-in-time-example",
+    "source": {
+      "name": "Original synthetic example; no real market observations",
+      "license": "CC0-1.0",
+      "uri": "urn:synthetic:point-in-time-data"
+    },
+    "records": [
+      {
+        "instrument_id": "fictional:EXAMPLE",
+        "asset_class": "equity",
+        "currency": "USD",
+        "field": "revenue",
+        "event_at": "2026-01-01T00:00:00Z",
+        "available_at": "2026-02-15T12:00:00Z",
+        "value": 1000000,
+        "unit": "USD",
+        "revision_id": "initial"
+      },
+      {
+        "instrument_id": "fictional:EXAMPLE",
+        "asset_class": "equity",
+        "currency": "USD",
+        "field": "revenue",
+        "event_at": "2026-01-01T00:00:00Z",
+        "available_at": "2026-03-01T12:00:00Z",
+        "value": 900000,
+        "unit": "USD",
+        "revision_id": "restatement"
+      }
+    ]
+  }
+}

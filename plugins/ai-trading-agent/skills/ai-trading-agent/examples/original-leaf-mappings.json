@@ -1,0 +1,12 @@
+[
+  {
+    "target_pointer": "/document/cfo/basis/amount_unit",
+    "source_id": "issuer-disclosure",
+    "source_pointer": "/cash_flow_statement/amount_unit"
+  },
+  {
+    "target_pointer": "/document/cfo/basis/period_end",
+    "source_id": "issuer-disclosure",
+    "source_pointer": "/cash_flow_statement/period_end"
+  }
+]

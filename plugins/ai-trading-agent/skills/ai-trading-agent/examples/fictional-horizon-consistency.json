@@ -1,0 +1,35 @@
+{
+  "request_id": "synthetic-flexible-review",
+  "route": {
+    "request_id": "synthetic-flexible-review",
+    "document": {
+      "mode": "flexible_review",
+      "as_of": "2026-07-01",
+      "entry_at": "2026-07-02",
+      "comparison_at": "2026-07-05"
+    }
+  },
+  "contexts": [
+    {
+      "id": "legacy-clock",
+      "request_id": "synthetic-flexible-review",
+      "kind": "clock_request",
+      "clock_role": "comparison_only",
+      "document": {
+        "schema_version": 1,
+        "as_of": "2026-07-01T14:00:00Z",
+        "entry_at": "2026-07-02T15:00:00Z",
+        "anchor_date": "2026-07-02",
+        "deadline_mode": "fixed_end",
+        "duration": {"unit": "calendar_days", "value": 3},
+        "early_exit_policy": "risk_exits_allowed",
+        "non_session_exit": "previous_session",
+        "exit_buffer_minutes": 10,
+        "exchange": "XNYS",
+        "strategy_route": "swing",
+        "calendar_confirmed_through": "2026-12-31",
+        "calendar_evidence": ["Synthetic declaration only; not live calendar confirmation"]
+      }
+    }
+  ]
+}

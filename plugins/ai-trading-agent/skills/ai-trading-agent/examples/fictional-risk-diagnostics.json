@@ -1,0 +1,260 @@
+{
+  "data_kind": "fictional",
+  "description": "Offline arithmetic examples; no market observations or performance evidence.",
+  "requests": [
+    {
+      "operation": "risk.empirical_tail",
+      "inputs": {
+        "document": {
+          "symbols": [
+            "A"
+          ],
+          "weights": {
+            "A": 1.0
+          },
+          "currency": "USD",
+          "notional": 1000,
+          "period_label": "one_trading_day",
+          "weight_basis": "fraction_of_supplied_notional",
+          "as_of": "2026-01-10T00:00:00Z",
+          "return_basis": "simple_total_return_decimal",
+          "confidence_levels": [
+            0.625
+          ],
+          "observations": [
+            {
+              "timestamp": "2026-01-01T00:00:00Z",
+              "returns": {
+                "A": -0.4
+              }
+            },
+            {
+              "timestamp": "2026-01-02T00:00:00Z",
+              "returns": {
+                "A": -0.2
+              }
+            },
+            {
+              "timestamp": "2026-01-03T00:00:00Z",
+              "returns": {
+                "A": 0.1
+              }
+            },
+            {
+              "timestamp": "2026-01-04T00:00:00Z",
+              "returns": {
+                "A": 0.2
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "operation": "risk.conditional_portfolio",
+      "inputs": {
+        "document": {
+          "symbols": [
+            "A",
+            "B"
+          ],
+          "weights": {
+            "A": 0.5,
+            "B": 0.5
+          },
+          "currency": "USD",
+          "period_label": "one_trading_day",
+          "correlation_ids": [
+            "A",
+            "B"
+          ],
+          "notional": 1000,
+          "weight_basis": "fraction_of_supplied_notional",
+          "as_of": "2026-01-10T00:00:00Z",
+          "forecast_origin": "2026-01-09T00:00:00Z",
+          "correlation_as_of": "2026-01-09T00:00:00Z",
+          "variance_basis": "simple_total_return_decimal",
+          "correlation_return_basis": "simple_total_return_decimal",
+          "correlation": [
+            [
+              1,
+              0.25
+            ],
+            [
+              0.25,
+              1
+            ]
+          ],
+          "variance_units": "decimal_return_squared_per_period",
+          "variance_paths": {
+            "A": [
+              0.0004,
+              0.0004
+            ],
+            "B": [
+              0.0009,
+              0.0009
+            ]
+          },
+          "model_flags": {
+            "A": [],
+            "B": [
+              "ILL_CONDITIONED_MODEL"
+            ]
+          },
+          "periods_per_year": 252,
+          "horizons": [
+            1,
+            2
+          ]
+        }
+      }
+    },
+    {
+      "operation": "portfolio.sensitivity",
+      "inputs": {
+        "document": {
+          "base": {
+            "assets": [
+              {
+                "id": "A",
+                "issuer": "A",
+                "groups": [
+                  "all"
+                ],
+                "currency": "USD",
+                "instrument_model": "cash_funded_linear",
+                "eligible": true,
+                "previous_weight": 0,
+                "min_weight": 0,
+                "max_weight": 0.6,
+                "one_way_cost": 0,
+                "impact_coefficient": 0,
+                "borrow_cost_per_period": 0,
+                "max_trade_weight": 1
+              },
+              {
+                "id": "B",
+                "issuer": "B",
+                "groups": [
+                  "all"
+                ],
+                "currency": "USD",
+                "instrument_model": "cash_funded_linear",
+                "eligible": true,
+                "previous_weight": 0,
+                "min_weight": 0,
+                "max_weight": 0.6,
+                "one_way_cost": 0,
+                "impact_coefficient": 0,
+                "borrow_cost_per_period": 0,
+                "max_trade_weight": 1
+              },
+              {
+                "id": "C",
+                "issuer": "C",
+                "groups": [
+                  "all"
+                ],
+                "currency": "USD",
+                "instrument_model": "cash_funded_linear",
+                "eligible": true,
+                "previous_weight": 0,
+                "min_weight": 0,
+                "max_weight": 0.6,
+                "one_way_cost": 0,
+                "impact_coefficient": 0,
+                "borrow_cost_per_period": 0,
+                "max_trade_weight": 1
+              }
+            ],
+            "currency": "USD",
+            "horizon_id": "P1Y",
+            "covariance_horizon_id": "P1Y",
+            "risk_estimated_at": "2026-01-01T00:00:00Z",
+            "decision_at": "2026-01-02T00:00:00Z",
+            "covariance_ids": [
+              "A",
+              "B",
+              "C"
+            ],
+            "covariance": [
+              [
+                0.04,
+                0,
+                0
+              ],
+              [
+                0,
+                0.09,
+                0
+              ],
+              [
+                0,
+                0,
+                0.16
+              ]
+            ],
+            "objective": "minimum_risk",
+            "constraints": {
+              "net_target": 0.9,
+              "gross_cap": 0.9,
+              "gross_turnover_cap": 0.9,
+              "cash_floor": 0.1,
+              "collateral_reserve": 0,
+              "risk_aversion": 1,
+              "issuer_gross_cap": 0.6,
+              "group_gross_caps": {
+                "all": 0.9
+              }
+            },
+            "scenarios": [
+              {
+                "name": "decline",
+                "returns": [
+                  -0.4,
+                  -0.4,
+                  -0.4
+                ],
+                "max_loss_fraction": 0.36
+              }
+            ]
+          },
+          "covariance_scenarios": [
+            {
+              "id": "variance_reversal",
+              "covariance": [
+                [
+                  0.16,
+                  0,
+                  0
+                ],
+                [
+                  0,
+                  0.09,
+                  0
+                ],
+                [
+                  0,
+                  0,
+                  0.04
+                ]
+              ],
+              "covariance_ids": [
+                "A",
+                "B",
+                "C"
+              ],
+              "horizon_id": "P1Y",
+              "estimated_at": "2026-01-01T00:00:00Z"
+            }
+          ],
+          "constraint_scenarios": [
+            {"id": "prespecified_stock_cap", "asset_max_weights": {"A": 0.3}},
+            {"id": "prespecified_infeasible_group_cap", "constraint_overrides": {"group_gross_caps": {"all": 0.5}}}
+          ]
+        }
+      }
+    }
+  ]
+}

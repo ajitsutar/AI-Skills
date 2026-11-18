@@ -1,0 +1,11 @@
+{
+  "currency": "USD",
+  "amount_unit": "USD millions",
+  "example_context": "Fictional offline assumptions; not observed issuer data.",
+  "operation": "wacc",
+  "market_equity": 60,
+  "market_debt": 40,
+  "cost_equity": 0.1,
+  "pretax_cost_debt": 0.05,
+  "tax_rate": 0.25
+}

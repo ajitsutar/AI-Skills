@@ -1,0 +1,18 @@
+{
+  "bins": 2,
+  "rows": [
+    {
+      "id": "label-1",
+      "model_id": "fictional-example-only",
+      "model_revision": "fixture-v1",
+      "predicted_at": "2026-01-01T12:00:00Z",
+      "label_available_at": "2026-01-02T12:00:00Z",
+      "label": "positive",
+      "probabilities": {
+        "positive": 0.8,
+        "negative": 0.1,
+        "neutral": 0.1
+      }
+    }
+  ]
+}

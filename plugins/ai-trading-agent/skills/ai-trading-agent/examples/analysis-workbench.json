@@ -1,0 +1,677 @@
+{
+  "schema_version": 1,
+  "contract": {
+    "prompt": "Compute these fictional analysis examples with the retained formulas.",
+    "purpose": "offline reproducible examples, not investment recommendations",
+    "base_currency": "USD",
+    "horizon_id": "EXAMPLE_ONLY",
+    "as_of": "2026-10-23T23:00:00Z"
+  },
+  "jobs": [
+    {
+      "id": "technical.analyze",
+      "operation": "technical.analyze",
+      "inputs": {
+        "request": {
+          "symbol": "FICTIONAL-EXAMPLE",
+          "timeframe": "5-minute synthetic bars",
+          "price_basis": "synthetic OHLCV; no corporate actions",
+          "price_unit": "USD per share",
+          "volume_unit": "shares",
+          "timestamp_basis": "bar_open",
+          "finalized_bars": true,
+          "parameters": {
+            "sma_period": 3,
+            "ema_period": 3,
+            "rsi_period": 3,
+            "macd_fast": 2,
+            "macd_slow": 4,
+            "macd_signal": 2,
+            "bollinger_period": 3,
+            "atr_period": 3,
+            "adx_period": 3,
+            "stochastic_period": 3,
+            "stochastic_smooth_k": 2,
+            "stochastic_smooth_d": 2,
+            "ichimoku_conversion": 2,
+            "ichimoku_base": 3,
+            "ichimoku_span": 4,
+            "ichimoku_displacement": 3,
+            "support_resistance_lookback": 3
+          },
+          "vwap_anchor_index": 2,
+          "fibonacci": {
+            "start_index": 0,
+            "end_index": 5,
+            "direction": "up"
+          },
+          "volume_profile": {
+            "bins": 6,
+            "start_index": 0,
+            "end_index": 11
+          },
+          "replay": {
+            "strategy": "close_above_sma",
+            "initial_cash": 10000,
+            "fee_bps": 5,
+            "slippage_bps": 10
+          },
+          "depth_snapshot": {
+            "as_of": "2026-01-06T10:00:00-05:00",
+            "bids": [
+              {
+                "price": 105.9,
+                "size": 200
+              },
+              {
+                "price": 105.8,
+                "size": 100
+              }
+            ],
+            "asks": [
+              {
+                "price": 106.1,
+                "size": 150
+              },
+              {
+                "price": 106.2,
+                "size": 100
+              }
+            ]
+          },
+          "bars": [
+            {
+              "timestamp": "2026-01-05T09:30:00-05:00",
+              "session": "2026-01-05-RTH",
+              "open": 100,
+              "high": 102,
+              "low": 99,
+              "close": 101,
+              "volume": 1000
+            },
+            {
+              "timestamp": "2026-01-05T09:35:00-05:00",
+              "session": "2026-01-05-RTH",
+              "open": 101,
+              "high": 103,
+              "low": 100,
+              "close": 102,
+              "volume": 1200
+            },
+            {
+              "timestamp": "2026-01-05T09:40:00-05:00",
+              "session": "2026-01-05-RTH",
+              "open": 102,
+              "high": 103,
+              "low": 100,
+              "close": 101,
+              "volume": 800
+            },
+            {
+              "timestamp": "2026-01-05T09:45:00-05:00",
+              "session": "2026-01-05-RTH",
+              "open": 102,
+              "high": 105,
+              "low": 101,
+              "close": 104,
+              "volume": 1800
+            },
+            {
+              "timestamp": "2026-01-05T09:50:00-05:00",
+              "session": "2026-01-05-RTH",
+              "open": 104,
+              "high": 106,
+              "low": 103,
+              "close": 105,
+              "volume": 1500
+            },
+            {
+              "timestamp": "2026-01-05T09:55:00-05:00",
+              "session": "2026-01-05-RTH",
+              "open": 105,
+              "high": 108,
+              "low": 104,
+              "close": 107,
+              "volume": 2100
+            },
+            {
+              "timestamp": "2026-01-06T09:30:00-05:00",
+              "session": "2026-01-06-RTH",
+              "open": 103,
+              "high": 104,
+              "low": 101,
+              "close": 102,
+              "volume": 2000
+            },
+            {
+              "timestamp": "2026-01-06T09:35:00-05:00",
+              "session": "2026-01-06-RTH",
+              "open": 102,
+              "high": 103,
+              "low": 100,
+              "close": 101,
+              "volume": 1600
+            },
+            {
+              "timestamp": "2026-01-06T09:40:00-05:00",
+              "session": "2026-01-06-RTH",
+              "open": 101,
+              "high": 104,
+              "low": 100,
+              "close": 103,
+              "volume": 1900
+            },
+            {
+              "timestamp": "2026-01-06T09:45:00-05:00",
+              "session": "2026-01-06-RTH",
+              "open": 104,
+              "high": 106,
+              "low": 103,
+              "close": 105,
+              "volume": 1500
+            },
+            {
+              "timestamp": "2026-01-06T09:50:00-05:00",
+              "session": "2026-01-06-RTH",
+              "open": 105,
+              "high": 108,
+              "low": 104,
+              "close": 107,
+              "volume": 1700
+            },
+            {
+              "timestamp": "2026-01-06T09:55:00-05:00",
+              "session": "2026-01-06-RTH",
+              "open": 107,
+              "high": 108,
+              "low": 105,
+              "close": 106,
+              "volume": 1100
+            }
+          ]
+        },
+        "data_available_at": "2026-10-23T23:00:00Z"
+      }
+    },
+    {
+      "id": "fundamental.calculate",
+      "operation": "fundamental.calculate",
+      "inputs": {
+        "d": {
+          "currency": "USD",
+          "amount_unit": "USD millions",
+          "example_context": "Fictional offline assumptions; not observed issuer data.",
+          "operation": "dcf",
+          "cash_flow_type": "FCFF",
+          "discount_rate_basis": "WACC",
+          "discount_rate": 0.1,
+          "terminal_growth": 0,
+          "annual_cash_flows": [
+            10,
+            10
+          ],
+          "terminal_next_cash_flow": 10,
+          "shares": 10,
+          "equity_bridge": {
+            "excess_cash": 5,
+            "nonoperating_assets": 2,
+            "debt": 20,
+            "other_claims": 3
+          }
+        }
+      }
+    },
+    {
+      "id": "sentiment.analyze",
+      "operation": "sentiment.analyze",
+      "inputs": {
+        "document": {
+          "as_of": "2026-01-01T14:00:00Z",
+          "half_life_hours": 1,
+          "entities": {
+            "ACME": [
+              "Acme"
+            ],
+            "BETA": [
+              "Beta"
+            ]
+          },
+          "required_aspects": [
+            "revenue",
+            "balance_sheet"
+          ],
+          "source_weights": {
+            "issuer": 1,
+            "wire": 1
+          },
+          "records": [
+            {
+              "id": "release-1",
+              "text": "Acme revenue beat expectations; Acme debt rises.",
+              "source": "issuer",
+              "published_at": "2026-01-01T12:00:00Z",
+              "available_at": "2026-01-01T12:00:00Z"
+            },
+            {
+              "id": "release-2",
+              "text": "Acme revenue misses expectations.",
+              "source": "wire",
+              "published_at": "2026-01-01T13:00:00Z",
+              "available_at": "2026-01-01T13:00:00Z"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "sentiment.trend",
+      "operation": "sentiment.trend",
+      "inputs": {
+        "document": {
+          "sentiment": {
+            "as_of": "2026-01-01T14:00:00Z",
+            "half_life_hours": 1,
+            "entities": {
+              "ACME": [
+                "Acme"
+              ],
+              "BETA": [
+                "Beta"
+              ]
+            },
+            "required_aspects": [
+              "revenue",
+              "balance_sheet"
+            ],
+            "source_weights": {
+              "issuer": 1,
+              "wire": 1
+            },
+            "records": [
+              {
+                "id": "release-1",
+                "text": "Acme revenue beat expectations; Acme debt rises.",
+                "source": "issuer",
+                "published_at": "2026-01-01T12:00:00Z",
+                "available_at": "2026-01-01T12:00:00Z"
+              },
+              {
+                "id": "release-2",
+                "text": "Acme revenue misses expectations.",
+                "source": "wire",
+                "published_at": "2026-01-01T13:00:00Z",
+                "available_at": "2026-01-01T13:00:00Z"
+              }
+            ]
+          },
+          "entity": "ACME",
+          "aspect": "revenue",
+          "cutoffs": [
+            "2026-01-01T12:00:00Z",
+            "2026-01-01T13:00:00Z",
+            "2026-01-01T14:00:00Z"
+          ]
+        }
+      }
+    },
+    {
+      "id": "sentiment.calibrate",
+      "operation": "sentiment.calibrate",
+      "inputs": {
+        "document": {
+          "bins": 2,
+          "rows": [
+            {
+              "id": "label-1",
+              "model_id": "fictional-example-only",
+              "model_revision": "fixture-v1",
+              "predicted_at": "2026-01-01T12:00:00Z",
+              "label_available_at": "2026-01-02T12:00:00Z",
+              "label": "positive",
+              "probabilities": {
+                "positive": 0.8,
+                "negative": 0.1,
+                "neutral": 0.1
+              }
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "sentiment.backtest",
+      "operation": "sentiment.backtest",
+      "inputs": {
+        "document": {
+          "sentiment": {
+            "as_of": "2026-01-01T14:00:00Z",
+            "half_life_hours": 1,
+            "entities": {
+              "ACME": [
+                "Acme"
+              ],
+              "BETA": [
+                "Beta"
+              ]
+            },
+            "required_aspects": [
+              "revenue",
+              "balance_sheet"
+            ],
+            "source_weights": {
+              "issuer": 1,
+              "wire": 1
+            },
+            "records": [
+              {
+                "id": "release-1",
+                "text": "Acme revenue beat expectations; Acme debt rises.",
+                "source": "issuer",
+                "published_at": "2026-01-01T12:00:00Z",
+                "available_at": "2026-01-01T12:00:00Z"
+              },
+              {
+                "id": "release-2",
+                "text": "Acme revenue misses expectations.",
+                "source": "wire",
+                "published_at": "2026-01-01T13:00:00Z",
+                "available_at": "2026-01-01T13:00:00Z"
+              }
+            ]
+          },
+          "entity": "ACME",
+          "aspect": "revenue",
+          "threshold": 0,
+          "cost_bps_per_unit_turnover": 10,
+          "periods": [
+            {
+              "decision_at": "2026-01-01T11:00:00Z",
+              "start": "2026-01-01T11:01:00Z",
+              "end": "2026-01-01T12:00:00Z",
+              "asset_return": 0.5
+            },
+            {
+              "decision_at": "2026-01-01T12:00:00Z",
+              "start": "2026-01-01T12:01:00Z",
+              "end": "2026-01-01T13:00:00Z",
+              "asset_return": 0.1
+            },
+            {
+              "decision_at": "2026-01-01T13:00:00Z",
+              "start": "2026-01-01T13:01:00Z",
+              "end": "2026-01-01T14:00:00Z",
+              "asset_return": -0.05
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "sentiment.fuse",
+      "operation": "sentiment.fuse",
+      "inputs": {
+        "document": {
+          "as_of": "2026-01-02T00:00:00Z",
+          "features": [
+            {
+              "name": "sentiment",
+              "value": 0.5,
+              "weight": 1,
+              "normalization": "explicit signed unit scale",
+              "observed_at": "2026-01-01T00:00:00Z",
+              "available_at": "2026-01-01T00:00:00Z",
+              "evidence_sha256": "0000000000000000000000000000000000000000000000000000000000000000"
+            },
+            {
+              "name": "technical",
+              "value": -0.5,
+              "weight": 1,
+              "normalization": "explicit signed unit scale",
+              "observed_at": "2026-01-01T00:00:00Z",
+              "available_at": "2026-01-01T00:00:00Z",
+              "evidence_sha256": "1111111111111111111111111111111111111111111111111111111111111111"
+            }
+          ]
+        }
+      }
+    },
+    {
+      "id": "factor.normalize",
+      "operation": "factor.normalize",
+      "inputs": {
+        "rows": [
+          {
+            "id": "A",
+            "sector": "fictional",
+            "available_at": "2026-01-01T00:00:00Z",
+            "values": {
+              "yield": 1,
+              "constant": 3
+            }
+          },
+          {
+            "id": "B",
+            "sector": "fictional",
+            "available_at": "2026-01-01T00:00:00Z",
+            "values": {
+              "yield": 2,
+              "constant": 3
+            }
+          },
+          {
+            "id": "C",
+            "sector": "fictional",
+            "available_at": "2026-01-01T00:00:00Z",
+            "values": {
+              "yield": 3,
+              "constant": 3
+            }
+          }
+        ],
+        "fields": [
+          "yield",
+          "constant"
+        ],
+        "as_of": "2026-01-02T00:00:00Z",
+        "lower": 0,
+        "upper": 1,
+        "min_group": 3
+      }
+    },
+    {
+      "id": "factor.fama_french",
+      "operation": "factor.fama_french",
+      "inputs": {
+        "rows": [
+          {
+            "timestamp": "2026-01-01T00:00:00Z",
+            "asset_return": 0.003,
+            "rf": 0.001,
+            "mkt_rf": 0.0,
+            "smb": 0.0,
+            "hml": 0.0
+          },
+          {
+            "timestamp": "2026-01-02T00:00:00Z",
+            "asset_return": 0.013000000000000001,
+            "rf": 0.001,
+            "mkt_rf": 0.01,
+            "smb": 0.0,
+            "hml": 0.0
+          },
+          {
+            "timestamp": "2026-01-03T00:00:00Z",
+            "asset_return": 0.023,
+            "rf": 0.001,
+            "mkt_rf": 0.0,
+            "smb": 0.01,
+            "hml": 0.0
+          },
+          {
+            "timestamp": "2026-01-04T00:00:00Z",
+            "asset_return": 0.033,
+            "rf": 0.001,
+            "mkt_rf": 0.01,
+            "smb": 0.01,
+            "hml": 0.0
+          },
+          {
+            "timestamp": "2026-01-05T00:00:00Z",
+            "asset_return": 0.033,
+            "rf": 0.001,
+            "mkt_rf": 0.0,
+            "smb": 0.0,
+            "hml": 0.01
+          },
+          {
+            "timestamp": "2026-01-06T00:00:00Z",
+            "asset_return": 0.043,
+            "rf": 0.001,
+            "mkt_rf": 0.01,
+            "smb": 0.0,
+            "hml": 0.01
+          },
+          {
+            "timestamp": "2026-01-07T00:00:00Z",
+            "asset_return": 0.053,
+            "rf": 0.001,
+            "mkt_rf": 0.0,
+            "smb": 0.01,
+            "hml": 0.01
+          },
+          {
+            "timestamp": "2026-01-08T00:00:00Z",
+            "asset_return": 0.063,
+            "rf": 0.001,
+            "mkt_rf": 0.01,
+            "smb": 0.01,
+            "hml": 0.01
+          }
+        ],
+        "model": "FF3",
+        "frequency": "daily",
+        "units": "decimal_return"
+      }
+    },
+    {
+      "id": "factor.style_risk",
+      "operation": "factor.style_risk",
+      "inputs": {
+        "weights": [
+          0.5,
+          0.5
+        ],
+        "exposures": [
+          [
+            1
+          ],
+          [
+            2
+          ]
+        ],
+        "factor_covariance": [
+          [
+            0.04
+          ]
+        ],
+        "specific_variances": [
+          0.01,
+          0.09
+        ]
+      }
+    },
+    {
+      "id": "factor.neutralize",
+      "operation": "factor.neutralize",
+      "inputs": {
+        "scores": [
+          2,
+          1,
+          5,
+          7
+        ],
+        "exposures": [
+          [
+            1
+          ],
+          [
+            2
+          ],
+          [
+            3
+          ],
+          [
+            4
+          ]
+        ]
+      }
+    },
+    {
+      "id": "factor.pca",
+      "operation": "factor.pca",
+      "inputs": {
+        "train": [
+          [
+            1,
+            2
+          ],
+          [
+            2,
+            4
+          ],
+          [
+            3,
+            6
+          ]
+        ],
+        "components": 1,
+        "test": [
+          [
+            4,
+            8
+          ]
+        ],
+        "standardize": true
+      }
+    },
+    {
+      "id": "factor.kmeans",
+      "operation": "factor.kmeans",
+      "inputs": {
+        "train": [
+          [
+            0,
+            0
+          ],
+          [
+            0,
+            1
+          ],
+          [
+            10,
+            10
+          ],
+          [
+            10,
+            11
+          ]
+        ],
+        "clusters": 2,
+        "test": [
+          [
+            0,
+            0.5
+          ],
+          [
+            10,
+            10.5
+          ]
+        ],
+        "seed": 7,
+        "standardize": true,
+        "max_iter": 300,
+        "tolerance": 1e-08
+      }
+    }
+  ]
+}

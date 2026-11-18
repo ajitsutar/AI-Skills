@@ -1,0 +1,7 @@
+{
+  "name": "Configure your chosen provider",
+  "url_template": "https://provider.example/v1/history/{symbol}",
+  "header_env": {
+    "X-API-Key": "MARKET_DATA_API_KEY"
+  }
+}

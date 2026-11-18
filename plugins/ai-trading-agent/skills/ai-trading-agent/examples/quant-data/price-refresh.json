@@ -1,0 +1,137 @@
+{
+  "schema_version": 1,
+  "mode": "incremental",
+  "partial_fetch_opt_in": true,
+  "current_scope": "tail",
+  "decision_at": "2026-01-06T21:00:00Z",
+  "acquired_at": "2026-01-06T22:00:00Z",
+  "expected_sessions": [
+    "2026-01-02",
+    "2026-01-05",
+    "2026-01-06"
+  ],
+  "previous": {
+    "contract": {
+      "provider": "fictional-provider",
+      "security_id": "s1",
+      "share_class_id": "common1",
+      "currency": "USD",
+      "adjustment": "raw",
+      "schema_version": 1,
+      "parser_version": "1",
+      "fields": [
+        "close",
+        "volume"
+      ],
+      "units": {
+        "close": "USD/share",
+        "volume": "shares"
+      }
+    },
+    "rows": [
+      {
+        "session": "2026-01-02",
+        "values": {
+          "close": 100,
+          "volume": 100
+        },
+        "status": "observed"
+      },
+      {
+        "session": "2026-01-05",
+        "values": {
+          "close": 102,
+          "volume": 100
+        },
+        "status": "observed"
+      }
+    ],
+    "rows_sha256": "a2c58d861a1f12509ceb3541a0b939e970fdf1796b45015efc74f5c2047e5b2f",
+    "revision": "r1"
+  },
+  "current": {
+    "contract": {
+      "provider": "fictional-provider",
+      "security_id": "s1",
+      "share_class_id": "common1",
+      "currency": "USD",
+      "adjustment": "raw",
+      "schema_version": 1,
+      "parser_version": "1",
+      "fields": [
+        "close",
+        "volume"
+      ],
+      "units": {
+        "close": "USD/share",
+        "volume": "shares"
+      }
+    },
+    "rows": [
+      {
+        "session": "2026-01-05",
+        "values": {
+          "close": 102,
+          "volume": 100
+        },
+        "status": "observed"
+      },
+      {
+        "session": "2026-01-06",
+        "values": {
+          "close": 103,
+          "volume": 100
+        },
+        "status": "observed"
+      }
+    ],
+    "rows_sha256": "ec616b205410bd8981b7a0526466a62c7b802e85189ac7ded3ad080fcf30892c",
+    "revision": "r2"
+  },
+  "sources": [
+    {
+      "id": "fixture",
+      "uri": "urn:fictional:fixture",
+      "source_role": "native_json",
+      "retrieved_at": "2026-01-06T22:00:00Z",
+      "body": {
+        "provider": "fictional-provider",
+        "security_id": "s1",
+        "contract_sha256": "3d79aff245413687f28b6379e5563dd55dccc0f45654128daf779e1ef6758bc8",
+        "prefix_start": "2026-01-02",
+        "prefix_end": "2026-01-05",
+        "prefix_rows_sha256": "a2c58d861a1f12509ceb3541a0b939e970fdf1796b45015efc74f5c2047e5b2f",
+        "hash_algorithm": "canonical-json-sha256-v1",
+        "revision": "r2",
+        "checked_at": "2026-01-06T21:30:00Z"
+      },
+      "body_sha256": "701b7cd42563918422fee5c60d18b05d1b5b223f32dfc349a488bdac106d5e2f"
+    }
+  ],
+  "prefix_proof": {
+    "source_id": "fixture",
+    "bindings": {
+      "provider": "/provider",
+      "security_id": "/security_id",
+      "contract_sha256": "/contract_sha256",
+      "prefix_start": "/prefix_start",
+      "prefix_end": "/prefix_end",
+      "prefix_rows_sha256": "/prefix_rows_sha256",
+      "hash_algorithm": "/hash_algorithm",
+      "revision": "/revision",
+      "checked_at": "/checked_at"
+    }
+  },
+  "derived_artifacts": [
+    {
+      "id": "old-signal",
+      "source_start": "2026-01-02",
+      "source_end": "2026-01-05"
+    },
+    {
+      "id": "new-signal",
+      "source_start": "2026-01-05",
+      "source_end": "2026-01-06"
+    }
+  ]
+}

@@ -1,0 +1,29 @@
+{
+  "currency": "USD",
+  "amount_unit": "USD millions",
+  "example_context": "Fictional offline assumptions; not observed issuer data.",
+  "operation": "reverse_dcf",
+  "base_cash_flow": 10,
+  "target_equity_value": 94,
+  "years": 2,
+  "growth_low": -0.5,
+  "growth_high": 0.5,
+  "valuation": {
+    "cash_flow_type": "FCFF",
+    "discount_rate_basis": "WACC",
+    "discount_rate": 0.1,
+    "terminal_growth": 0,
+    "annual_cash_flows": [
+      10,
+      10
+    ],
+    "terminal_next_cash_flow": 10,
+    "shares": 10,
+    "equity_bridge": {
+      "excess_cash": 5,
+      "nonoperating_assets": 2,
+      "debt": 20,
+      "other_claims": 3
+    }
+  }
+}

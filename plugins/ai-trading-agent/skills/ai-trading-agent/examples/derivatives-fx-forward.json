@@ -1,0 +1,17 @@
+{
+  "schema_version": 1,
+  "action": "research",
+  "operation": "fx_forward",
+  "currency": "USD",
+  "inputs": {
+    "spot_domestic_per_foreign": 1.2,
+    "domestic_currency": "USD",
+    "foreign_currency": "EUR",
+    "domestic_rate": 0.05,
+    "foreign_rate": 0.02,
+    "time_years": 1,
+    "compounding": "simple"
+  },
+  "information_cutoff": "2026-10-23T23:00:00Z",
+  "inputs_available_at": "2026-10-23T22:00:00Z"
+}

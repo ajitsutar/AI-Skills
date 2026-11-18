@@ -1,0 +1,69 @@
+{
+  "schema_version": 1,
+  "operation": "features",
+  "dataset_id": "fictional-eps",
+  "as_of": "2026-01-06T00:00:00Z",
+  "sources": [
+    {
+      "id": "fixture",
+      "uri": "urn:fictional:fixture",
+      "source_role": "native_json",
+      "retrieved_at": "2026-01-06T22:00:00Z",
+      "body": [
+        {
+          "instrument_id": "s1",
+          "asset_class": "equity",
+          "currency": "USD",
+          "field": "eps",
+          "event_at": "2025-12-31T00:00:00Z",
+          "available_at": "2026-01-05T20:00:00Z",
+          "value": 2.1,
+          "unit": "USD/share",
+          "revision_id": "original"
+        },
+        {
+          "instrument_id": "s1",
+          "asset_class": "equity",
+          "currency": "USD",
+          "field": "eps",
+          "event_at": "2025-12-31T00:00:00Z",
+          "available_at": "2026-02-05T20:00:00Z",
+          "value": 1.9,
+          "unit": "USD/share",
+          "revision_id": "restated"
+        }
+      ],
+      "body_sha256": "57280a8906b375653d69991f68d1d5b54357877f037ec5784d882a60f88fcbe5"
+    }
+  ],
+  "records": [
+    {
+      "source_id": "fixture",
+      "bindings": {
+        "asset_class": "/0/asset_class",
+        "available_at": "/0/available_at",
+        "currency": "/0/currency",
+        "event_at": "/0/event_at",
+        "field": "/0/field",
+        "instrument_id": "/0/instrument_id",
+        "revision_id": "/0/revision_id",
+        "unit": "/0/unit",
+        "value": "/0/value"
+      }
+    },
+    {
+      "source_id": "fixture",
+      "bindings": {
+        "asset_class": "/1/asset_class",
+        "available_at": "/1/available_at",
+        "currency": "/1/currency",
+        "event_at": "/1/event_at",
+        "field": "/1/field",
+        "instrument_id": "/1/instrument_id",
+        "revision_id": "/1/revision_id",
+        "unit": "/1/unit",
+        "value": "/1/value"
+      }
+    }
+  ]
+}
