@@ -7,7 +7,7 @@ These public pages and assets describe the full AI Trading Agent skill published
 - [Support](SUPPORT.md)
 - [Full skill](../../skills/ai-trading-agent/)
 
-The logo uses the fictional ticker **QSIM-DEMO** and a synthetic chart. It does not depict a real security or market history. The separate dark-mode image preserves that fictional illustration. Both images were created with OpenAI image generation for this listing.
+The logo is a text-free, fictional stock-price graph. It does not depict a real security or market history. The separate dark-mode image preserves that fictional illustration. Both images were created with OpenAI image generation for this listing.
 
 `plugin.json` contains the metadata for a separate, full-skill OpenAI plugin package. To assemble that package, copy this manifest and `assets/` to the package root, retain the repository MIT `LICENSE`, and copy the entire `skills/ai-trading-agent/` directory into `skills/ai-trading-agent/` in the package. Do not include other skills, private configuration, credentials, research outputs or release evidence. Confirm that the manifest version matches the selected full skill and revalidate the package before uploading.
 
