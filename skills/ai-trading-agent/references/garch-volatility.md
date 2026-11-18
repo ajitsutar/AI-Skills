@@ -16,6 +16,42 @@ conditional mean. Gaussian innovations remain the default; `--distribution t`
 explicitly requests standardized Student-t innovations. Percent log returns
 improve numerical scale. Do not label these variants the same model.
 
+## Interpretation of supplied results
+
+A retained volatility result can be interpreted without a price CSV or optional
+model runtime. Attribute its symbol, dates, parameters, fit/holdout diagnostics
+and eligibility flags to the supplied historical artifact. Comparing its supplied
+scalar values is a new calculation, not a new model fit, price audit, raw-return
+realized estimate or QLIKE replay. Invoke a fitter or price-history baseline only
+when the required inputs are available and that calculation serves the request.
+Keep missing inputs explicit; do not substitute another example history.
+
+For account amounts, follow the [allocation basis](portfolio-management.md#allocation-and-rebalance).
+When an allocation calculation is relevant and complete compatible inputs are
+available, `portfolio_manager.py` returns `account_basis` and
+`account_basis_summary` for inclusive equity, cash floor, targets and proposed
+debits. Interpreting a historical volatility result alone does not require new
+purchase proposals. Independently derived amounts still need their original
+denominators and source currency scope. If the record does not fit the native
+schema or execution is unavailable, disclose that limitation; do not call scratch
+arithmetic a native planner result.
+
+An amount's currency is unspecified when its applicable source does not establish
+it. Use account currency units in prose and neutral amount names in structured
+results; do not append `USD` or `_usd` to unknown-currency amounts. This also
+applies to conditional sigma-scaled and stress amounts. Preserve an explicitly
+supplied currency only within its actual source scope. A model symbol, unrelated
+source currency, numerical coincidence or legacy `dollar_budget` field does not
+supply account currency. State the selected amount base and assumed mapping for
+any illustration; scaling an unrelated series does not establish asset or
+portfolio risk.
+
+Any stress scenario must be a clearly stated supplied or illustrative assumption
+appropriate to the request. This route adds no required shock magnitude or
+portfolio scenario. Scalar comparisons, regime labels and eligibility flags
+remain advisory; they neither grant nor deny execution permission. These reporting
+instructions do not verify arbitrary authored prose.
+
 ## Portable elementary baselines
 
 When reporting constant-variance or EWMA benchmarks, use the bundled

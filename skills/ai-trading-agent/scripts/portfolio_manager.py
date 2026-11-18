@@ -23,6 +23,77 @@ def _sizing_rules(symbol, allow_fractional, quantity_rules):
     return {name: supplied[name] for name in ("quantity_increment", "min_notional", "min_quantity")}, "SUPPLIED_RULES_REQUIRE_FRESH_BROKER_REVIEW"
 
 
+def _account_basis(equity, cash, quantity, quote, weights, floor, band,
+                   max_turnover, result):
+    """Report the already validated rebalance basis without changing planning."""
+    held = sum((quantity[k] * quote[k] for k in quantity), Decimal(0))
+    residual = equity - cash - held
+    targets = {k: str(weights[k] * equity) for k in sorted(weights)}
+    target_total = sum((weights[k] * equity for k in weights), Decimal(0))
+    above_floor = max(cash - equity * floor, Decimal(0))
+    turnover_amount = equity * max_turnover
+    return {
+        "producer": "portfolio_manager.rebalance",
+        "amount_unit": "account_currency_amount",
+        "currency_status": "UNSPECIFIED",
+        "currency": None,
+        "currency_basis": "No currency input is supplied to this helper; legacy dollar field names do not establish USD or another currency.",
+        "equity_basis": "Total account equity already includes supplied cash; do not add cash to equity.",
+        "total_account_equity": str(equity),
+        "supplied_settled_unreserved_cash": str(cash),
+        "supplied_cash_fraction_of_equity": str(cash / equity),
+        "priced_supplied_holdings": str(held),
+        "unrepresented_equity_residual": str(residual),
+        "residual_status": ("UNREPRESENTED_EQUITY" if residual > 0 else
+                            "EXACTLY_RECONCILED" if residual == 0 else
+                            "SUPPLIED_COMPONENTS_EXCEED_EQUITY_WITHIN_EXISTING_TOLERANCE"),
+        "residual_basis": "Equity minus supplied cash and priced supplied holdings; positive residual is unrepresented account value, not inferred cash or an identified asset. A negative residual is retained within the planner's existing 0.01 reconciliation tolerance.",
+        "policy_denominator": "total_account_equity",
+        "policy_denominator_value": str(equity),
+        "target_weights": {k: str(weights[k]) for k in sorted(weights)},
+        "target_notionals": targets,
+        "total_supplied_target_notional": str(target_total),
+        "equity_outside_supplied_targets": str(equity - target_total),
+        "target_basis": "Target weight times total account equity; targets are policy assumptions, not purchases, fills or current holdings. Equity outside this target map is not necessarily cash.",
+        "cash_floor_fraction": str(floor),
+        "cash_floor_amount": str(equity * floor),
+        "cash_available_above_floor": str(above_floor),
+        "drift_band_fraction": str(band),
+        "drift_band_amount": str(equity * band),
+        "turnover_cap_fraction": str(max_turnover),
+        "turnover_cap_amount": str(turnover_amount),
+        "initial_planning_budget": str(min(above_floor, turnover_amount)),
+        "unused_planning_budget": result["unused_planning_budget"],
+        "proposed_notional_before_fees": str(sum((dec(p["notional_before_fees"]) for p in result["buy_candidates"]), Decimal(0))),
+        "proposed_debit_reservations": str(sum((dec(p["maximum_cash_debit"]) for p in result["buy_candidates"]), Decimal(0))),
+        "cash_remaining_before_fees": result["cash_remaining_before_fees"],
+        "cash_remaining_after_reservations": result["cash_remaining_after_reservations"],
+        "planning_basis": "Initial budget is min(max(cash - equity * cash_floor, 0), equity * max_turnover). Proposal reservations include supplied/default fee assumptions and rounding; remaining budget is not remaining cash. No sales or fills are assumed.",
+    }
+
+
+def account_basis_summary(record):
+    """Render the native account-basis values, not surrounding authored claims."""
+    targets = ", ".join(f"{k}={v}" for k, v in record["target_notionals"].items())
+    return (
+        f"Currency unspecified; amounts are account currency units. Total account equity "
+        f"{record['total_account_equity']} already includes supplied cash "
+        f"{record['supplied_settled_unreserved_cash']} (do not add cash again). "
+        f"Priced supplied holdings {record['priced_supplied_holdings']}; unrepresented equity residual "
+        f"{record['unrepresented_equity_residual']} ({record['residual_status']}); residual is not inferred cash. "
+        f"Target notionals on total account equity: {targets}; total {record['total_supplied_target_notional']}. "
+        f"Equity outside supplied targets {record['equity_outside_supplied_targets']} is not necessarily cash. "
+        f"Cash floor {record['cash_floor_fraction']} of equity = {record['cash_floor_amount']}; "
+        f"drift band {record['drift_band_fraction']} of equity = {record['drift_band_amount']}; "
+        f"turnover cap {record['turnover_cap_fraction']} of equity = {record['turnover_cap_amount']}. "
+        f"Initial planning budget {record['initial_planning_budget']}; unused budget {record['unused_planning_budget']}. "
+        f"Proposed notional before fees {record['proposed_notional_before_fees']}; "
+        f"debit reservations {record['proposed_debit_reservations']}; "
+        f"cash after reservations {record['cash_remaining_after_reservations']}. "
+        "Policy targets and planning estimates are not executed trades or observed account balances."
+    )
+
+
 def rebalance(equity, cash, holdings, targets, prices, cash_floor="0.05",
               band="0.02", min_trade="1", max_turnover="0.05", allow_sales=False,
               allow_fractional=True, quantity_rules=None, fee_per_share="0", fee_per_order="0"):
@@ -66,12 +137,16 @@ def rebalance(equity, cash, holdings, targets, prices, cash_floor="0.05",
             continue
         proposals.append(dict(sizing, symbol=symbol, side="buy", sleeve="core", quantity_rules_status=rule_status))
         budget -= dec(sizing["maximum_cash_debit"])
-    return {"buy_candidates": proposals, "sell_reviews": reviews,
+    result = {"buy_candidates": proposals, "sell_reviews": reviews,
             "skipped": skipped, "allow_fractional": allow_fractional,
             "unused_planning_budget": str(budget),
             "cash_remaining_before_fees": str(cash - sum((dec(p["notional_before_fees"]) for p in proposals), Decimal(0))),
             "cash_remaining_after_reservations": str(cash - sum((dec(p["maximum_cash_debit"]) for p in proposals), Decimal(0))),
             "next_step": "Use these allocation estimates as research; native host/broker tools own any user-requested execution"}
+    result["account_basis"] = _account_basis(equity, cash, quantity, quote, weights,
+                                              floor, band, max_turnover, result)
+    result["account_basis_summary"] = account_basis_summary(result["account_basis"])
+    return result
 
 
 def recurring_buys(plan_id, occurrence_id, account_alias, amounts, prices, available_cash,

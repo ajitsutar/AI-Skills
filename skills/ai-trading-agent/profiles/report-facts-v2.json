@@ -8561,6 +8561,218 @@
         "unit": "fraction"
       }
     },
+    "portfolio_manager.rebalance": {
+      "account_basis/amount_unit": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Native account-basis amount unit",
+        "unit": "text"
+      },
+      "account_basis/cash_available_above_floor": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "max(supplied cash minus equity-based cash floor, 0)",
+        "metric": "Supplied cash available above policy floor",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/cash_floor_amount": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "cash floor fraction multiplied by total account equity including supplied cash",
+        "metric": "Cash floor amount",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/cash_floor_fraction": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "total account equity including supplied cash",
+        "metric": "Cash floor policy fraction",
+        "unit": "fraction"
+      },
+      "account_basis/cash_remaining_after_reservations": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "supplied cash less sum of proposed debit reservations",
+        "metric": "Supplied cash less proposed debit reservations",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/cash_remaining_before_fees": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "supplied cash less sum of proposed notionals",
+        "metric": "Supplied cash less proposed notionals before fees",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/currency": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Native account-basis currency",
+        "unit": "text"
+      },
+      "account_basis/currency_basis": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Native account-basis currency basis",
+        "unit": "text"
+      },
+      "account_basis/currency_status": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Native account-basis currency status",
+        "unit": "text"
+      },
+      "account_basis/drift_band_amount": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "drift band fraction multiplied by total account equity",
+        "metric": "Drift band amount",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/drift_band_fraction": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "total account equity including supplied cash",
+        "metric": "Drift band policy fraction",
+        "unit": "fraction"
+      },
+      "account_basis/equity_basis": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Native account-basis equity basis",
+        "unit": "text"
+      },
+      "account_basis/equity_outside_supplied_targets": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "total account equity minus total supplied target notional",
+        "metric": "Equity outside supplied target map, not necessarily cash",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/initial_planning_budget": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "minimum of cash above floor and equity-based turnover cap",
+        "metric": "Initial cash-funded planning budget",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/planning_basis": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Native account-basis planning basis",
+        "unit": "text"
+      },
+      "account_basis/policy_denominator": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Native account-basis policy denominator",
+        "unit": "text"
+      },
+      "account_basis/policy_denominator_value": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "total account equity including supplied cash",
+        "metric": "Policy fraction denominator",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/priced_supplied_holdings": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Priced supplied holdings subtotal",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/producer": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Native account-basis producer",
+        "unit": "text"
+      },
+      "account_basis/proposed_debit_reservations": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "sum of proposed maximum_cash_debit estimates; not guaranteed market debits",
+        "metric": "Proposed debit reservations including rounding and fee assumptions",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/proposed_notional_before_fees": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "sum of proposed quantities times supplied reference prices",
+        "metric": "Proposed buy notionals before fees",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/residual_basis": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Native account-basis residual basis",
+        "unit": "text"
+      },
+      "account_basis/residual_status": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Native account-basis residual status",
+        "unit": "text"
+      },
+      "account_basis/supplied_cash_fraction_of_equity": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "total account equity including supplied cash",
+        "metric": "Supplied cash fraction of total account equity",
+        "unit": "fraction"
+      },
+      "account_basis/supplied_settled_unreserved_cash": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Supplied settled unreserved cash included in equity",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/target_basis": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Native account-basis target basis",
+        "unit": "text"
+      },
+      "account_basis/target_notionals/*": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "target fraction multiplied by total account equity including supplied cash",
+        "metric": "Policy target notional",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/target_weights/*": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "total account equity including supplied cash",
+        "metric": "Supplied policy target weight",
+        "unit": "fraction"
+      },
+      "account_basis/total_account_equity": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": null,
+        "metric": "Total account equity including supplied cash",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/total_supplied_target_notional": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "sum of target fractions multiplied by total account equity",
+        "metric": "Total policy target notional",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/turnover_cap_amount": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "turnover cap fraction multiplied by total account equity",
+        "metric": "Turnover cap amount",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/turnover_cap_fraction": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "total account equity including supplied cash",
+        "metric": "Turnover cap policy fraction",
+        "unit": "fraction"
+      },
+      "account_basis/unrepresented_equity_residual": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "total account equity less supplied cash and priced supplied holdings; not inferred cash",
+        "metric": "Equity minus supplied cash and priced holdings",
+        "unit": "account_currency_amount"
+      },
+      "account_basis/unused_planning_budget": {
+        "basis": "Validated standalone allocation inputs and planning result; currency unspecified, not USD. No trade, source authentication or live account observation is implied.",
+        "denominator": "initial planning budget less proposed debit reservations",
+        "metric": "Unused planning budget, not remaining cash",
+        "unit": "account_currency_amount"
+      },
+      "account_basis_summary": {
+        "basis": "Derived from the same standalone account_basis record; does not verify arbitrary authored prose or register a quant/compositor operation.",
+        "denominator": "Each amount retains its native policy or cash basis",
+        "metric": "Native account-basis summary",
+        "unit": "text"
+      }
+    },
     "release.grade_response": {
       "external_invocation_authenticated": {
         "basis": "Grade of supplied response bytes against a fictional fixture, not authenticated host equivalence.",

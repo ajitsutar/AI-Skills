@@ -38,6 +38,25 @@ fractional planning and per-occurrence contributions. The planner's target, cash
 and turnover constraints apply only to its calculation. They do not impose an
 execution gate; use [execution-handoff.md](execution-handoff.md) for actual requests.
 
+For this planner, `equity` is total account equity **including** the supplied cash;
+adding `cash` to `equity` double-counts that cash. Target weights, cash-floor,
+drift-band and turnover fractions use total equity. Use the returned
+`account_basis` and derived `account_basis_summary` to preserve those denominators
+and amounts when explaining the result. The reconciliation residual is equity
+minus supplied cash and priced supplied holdings: unrepresented value is not
+automatically cash or an identified position. The existing small reconciliation
+tolerance can leave a negative residual; reporting retains it explicitly.
+
+Distinguish policy target notionals from proposed purchases, fee/debit reservations
+and remaining cash. Equity outside a partial target map is not necessarily cash,
+and unused planning budget is not the cash balance. The helper has no currency
+input: label amounts as account currency units, currency unspecified. Legacy
+`dollar_budget` names do not establish USD. A currency declaration from another
+operation does not fill this gap. The native summary is derived from this result;
+it does not verify arbitrary authored prose. Field semantics are available under
+`portfolio_manager.rebalance` in `profiles/report-facts-v2.json`; this standalone
+producer is not thereby registered as a quant-workbench/compositor operation.
+
 Core holding decisions use thesis durability, valuation ranges, cash generation,
 balance sheet, material guidance changes and portfolio fit. Record a bear case,
 thesis-invalidating facts, expected horizon and next review trigger. Do not create
