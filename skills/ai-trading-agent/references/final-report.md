@@ -10,6 +10,18 @@ terminal objective diagnostics should become the saved answer. It executes and
 replays the existing producers and writes one exact `first-response.md`. It does
 not acquire sources, infer missing metadata or grade arbitrary prose.
 
+A `source_report` using `source_claims` with `supplied_observation_audit` and
+`mode: vqm_snapshot` automatically includes the complete typed observation audit
+in the readable report. The compositor replays the retained result, complete
+ingress, selected original snapshot and fixed packaged profile/manifest through
+the existing report-claims renderer. No separate renderer invocation or row
+selector is needed. Rejected assertions or failed replay stop completion while
+retaining the producer result and failure evidence. Ratios remain aggregate or
+conditional arithmetic; the generated region does not certify arbitrary prose,
+source authenticity or completeness of the user's request. Linked authored
+attachments remain unverified, and an appended audit does not withdraw a
+contradictory conclusion elsewhere in the answer.
+
 Use this as the whole answer only when its supported sections represent the
 requested deliverables. For a mixed source briefing that also needs unsupported
 qualitative analysis, acquisition planning or other work, keep this output as a

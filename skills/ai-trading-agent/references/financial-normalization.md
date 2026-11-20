@@ -35,6 +35,24 @@ defaults or real research. Generated files use exclusive creation to avoid
 overwriting evidence. No helper downloads sources, authenticates an account or
 places orders.
 
+If the VQM CLI fails because `exchange_calendars` is unavailable, it may also
+emit a selected-snapshot diagnostic while retaining the original exception and
+nonzero exit. This is not a computed score or ranking. Supported schema-1
+snapshots retain their raw-byte hash and packaged profile identity, distinguish
+publication and trailing-period policy, and keep share/EPS interpretations
+conditional. Full original ingress is `NOT_BOUND`. The diagnostic does not
+normalize schema 2; unsupported diagnostic inputs remain explicitly unavailable.
+Successful calculations and other native failures keep their existing behavior.
+
+For a supplied schema-1 snapshot audit that does not need a score, use the
+[direct VQM observation operation](source-claims.md#selected-vqm-snapshot-observations)
+with the complete original ingress and its fixed hash. It produces all selected
+aggregate ratio rows without a calendar dependency. Retain its result and original
+artifacts, then use the [typed observation renderer](report-claims.md#vqm-snapshot-observation-renderer)
+and saved-report audit for a fixed report region. The existing `final_report`
+`source_report` producer accepts this `source_claims` request; arbitrary authored
+interpretation remains outside the typed region's contract.
+
 ## Evidence input
 
 The `financial_normalization` object contains:

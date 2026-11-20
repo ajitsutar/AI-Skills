@@ -37,6 +37,31 @@ reader and `source_claims` accounting contract (with its own packaged dependenci
 No network, installation or external service is used. The input output-artifact
 limit is 16 MiB each; rendered/saved report limit is 128 KiB.
 
+## VQM snapshot observation renderer
+
+After the [direct source audit](source-claims.md#selected-vqm-snapshot-observations),
+retain its result and the exact selected snapshot, full original ingress,
+packaged profile and package manifest as separately hashed artifacts. Add a
+claim to the ordinary report plan:
+
+```json
+{"id":"observations","kind":"observation_audit","evidence":{"artifact":"audit_output","pointer":""},"source_artifact":"snapshot","ingress_artifact":"ingress","profile_artifact":"profile","package_manifest_artifact":"package"}
+```
+
+The renderer accepts only `vqm_snapshot` requests without an adapter. It checks
+the complete original request hash and assertion verdict, exact source/ingress
+and profile bindings, and recomputes the complete audit before emitting every
+selected row's aggregate ratios, policy/clock dispositions and unknown shares/EPS.
+Source-derived labels are JSON-escaped. Re-pinning a changed output alone cannot
+make a changed result or rejected assertion supported.
+
+Render and audit the exact saved bytes using the commands above. Additional
+authored prose remains `unverified` and produces `PARTIAL_UNAUDITED_PROSE`; neither
+an exact generated region nor byte replay certifies arbitrary prose, complete
+user-request coverage or source authenticity. The selected-snapshot diagnostic
+printed on a failed legacy VQM CLI invocation has `full_ingress: NOT_BOUND` and is
+not a substitute for this original-ingress-bound operation/result.
+
 ## Plan
 
 ```json

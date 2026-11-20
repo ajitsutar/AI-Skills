@@ -293,6 +293,63 @@ def presence(claim, evidence):
                               'unsupported_sources':unsupported}
 
 
+def observation_audit(claim, evidence, raw_artifacts):
+    """Replay selected original inputs, then render only fixed observation claims."""
+    from vqm_diagnostics import audit_vqm
+    from deterministic_rank import digest as profile_digest
+    from source_claims import canonical as request_bytes
+    exact_keys(claim, {'id', 'kind', 'evidence', 'source_artifact', 'ingress_artifact',
+                       'profile_artifact', 'package_manifest_artifact'})
+    require(evidence.get('method') == 'source-claims-1.0.0' and
+            evidence.get('operation') == 'supplied_observation_audit', 'OBSERVATION_OUTPUT_REQUIRED')
+    source_raw = raw_artifacts[claim['source_artifact']]
+    ingress_raw = raw_artifacts[claim['ingress_artifact']]
+    require(digest(ingress_raw) == evidence['manifest_sha256'], 'OBSERVATION_INGRESS_BINDING')
+    ingress = decode(ingress_raw)
+    source = evidence['source_binding']
+    require(ingress.get('schema_version') == 1 and ingress['sources'].count(source) == 1 and
+            source.get('format') == 'json' and digest(source_raw) == source['sha256'],
+            'OBSERVATION_ORIGINAL_SOURCE_BINDING')
+    request = evidence['audit_request']
+    require(request.get('operation') == 'supplied_observation_audit' and
+            request.get('source_id') == source['id'], 'OBSERVATION_REQUEST_BINDING')
+    require(set(request) <= {'operation', 'mode', 'source_id', 'assert_claims'}, 'OBSERVATION_REQUEST_FIELDS')
+    require(digest(request_bytes(request)) == evidence.get('input_sha256'), 'OBSERVATION_REQUEST_HASH_MISMATCH')
+    claimed = request.get('assert_claims', [])
+    require(isinstance(claimed, list) and all(isinstance(x, str) for x in claimed), 'INVALID_ASSERTED_CLAIMS')
+    allowed = ['selected_observation_rows_audited']
+    unsupported = [item for item in claimed if item not in allowed]
+    verdict = 'REJECTED' if unsupported else 'WITHIN_DECLARED_CONTRACT'
+    require(evidence.get('allowed_claims') == allowed and evidence.get('unsupported_claims') == unsupported and
+            evidence.get('claim_verdict') == verdict, 'OBSERVATION_ASSERTION_REPLAY_MISMATCH')
+    require(not unsupported, 'OBSERVATION_ASSERTED_CLAIMS_REJECTED')
+    require(request.get('mode') == 'vqm_snapshot', 'VQM_SNAPSHOT_MODE_REQUIRED')
+    profile_raw = raw_artifacts[claim['profile_artifact']]
+    package_raw = raw_artifacts[claim['package_manifest_artifact']]
+    binding = evidence['profile_binding']
+    require(binding['path'] == 'profiles/vqm-fundamental-v1.json' and
+            digest(profile_raw) == binding['raw_sha256'] and
+            digest(package_raw) == binding['package_manifest_sha256'] and
+            decode(package_raw)['files'][binding['path']] == binding['raw_sha256'] and
+            profile_digest(decode(profile_raw)) == binding['canonical_sha256'], 'OBSERVATION_PROFILE_BINDING')
+    replay = audit_vqm(source_raw, source['sha256'], profile_raw, binding['raw_sha256'])
+    require(quoted(replay) == quoted(evidence['audit']), 'OBSERVATION_FULL_REPLAY_MISMATCH')
+    lines = ['Selected original observations replayed; source SHA256 ' + source['sha256'] +
+             '. Declared metadata and raw arithmetic only; source authenticity, complete request coverage and arbitrary prose are not certified.']
+    lines.append('Selected profile financial-period age limit: ' + str(replay['profile_age_limit_days']) +
+                 ' days; profile raw SHA256 ' + evidence['profile_binding']['raw_sha256'] + '.')
+    for row in replay['rows']:
+        lines.append('Row ' + quoted(row['symbol']) + ' at ' + quoted(row['row_pointer']) + ': ' +
+                     row['timing_disposition'] + '; clocks/policy ' + quoted(row['timing']) +
+                     '; unsupported facts ' + quoted(row['unsupported_facts']) + '; checks ' + quoted(row['other_checks']) +
+                     '; aggregate cap/income, income/cap and conditional cap/quote ' + quoted(row['ratios']) +
+                     '; income sign ' + row['income_sign'] + '. Actual total shares and reported EPS remain unknown.')
+    lines.append('A normal price/trailing-period gap alone is not a mismatch. Timing support does not establish positive operands, class-price mapping, common-income attribution or period-weighted EPS; latest release and calendar status are not independently verified.')
+    return '\n'.join(lines), {'operation': replay['operation'], 'coverage': replay['coverage'],
+                              'original_input_replay': True, 'source_sha256': source['sha256'],
+                              'whole_request_complete': False}
+
+
 def compile_report(plan, raw_artifacts):
     """Pure entry point: exact artifact byte map, useful for independent testing."""
     exact_keys(plan, {'artifacts','segments'})
@@ -324,8 +381,9 @@ def compile_report(plan, raw_artifacts):
             seen.add(cid)
             exact_keys(claim['evidence'],{'artifact','pointer'})
             ref=claim['evidence']; selected=pointer(documents[ref['artifact']],ref['pointer'])
-            require(claim['kind'] in renderers, 'UNSUPPORTED_RENDERER')
-            body,facts=renderers[claim['kind']](claim,selected)
+            require(claim['kind'] in renderers or claim['kind'] == 'observation_audit', 'UNSUPPORTED_RENDERER')
+            body,facts=(observation_audit(claim, selected, raw_artifacts) if claim['kind'] == 'observation_audit'
+                        else renderers[claim['kind']](claim,selected))
             text='<!-- bound-claim:'+cid+' -->\n'+body+'\n<!-- /bound-claim:'+cid+' -->'
             rows.append({'id':cid,'kind':claim['kind'],'evidence':ref,'facts':facts,
                          'start':cursor,'end':cursor+len(text),'rendered_sha256':digest(text.encode())})

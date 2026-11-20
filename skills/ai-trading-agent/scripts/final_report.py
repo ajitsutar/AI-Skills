@@ -187,6 +187,34 @@ def replay_section(section, directory, manifest, pin):
             checked = report_claims.audit_saved_report(typed_plan, {'source': result_raw}, rendered['report'].encode('utf-8'))
             require(not checked['differences'], 'TYPED_REPORT_REPLAY_MISMATCH')
             body += '\n' + rendered['report']
+        elif (section['kind'] == 'source_report' and section['producer'] == 'source_claims' and
+              section['request'].get('operation') == 'supplied_observation_audit' and
+              section['request'].get('mode') == 'vqm_snapshot'):
+            import report_claims
+            # Replay the whole selected audit through the existing typed renderer.
+            # Paths come from retained source identity or fixed packaged resources;
+            # no caller-selected rows, cached text or generic-success fallback.
+            selected = result['source_binding']
+            original = source.relative(selected['path'])
+            paths = {'output': directory / 'producer/result.json',
+                     'ingress': directory / 'producer/ingress.json',
+                     'original': directory / 'producer/originals' / original,
+                     'profile': source.ROOT / 'profiles/vqm-fundamental-v1.json',
+                     'package': source.ROOT / 'PACKAGE-MANIFEST.json'}
+            raw = {key: source.read(path) for key, path in paths.items()}
+            require(raw['output'] == result_raw, 'PRODUCER_CHANGED_AFTER_REPLAY')
+            require(parse(raw['ingress'])['sources'].count(selected) == 1 and
+                    source.digest(raw['original']) == selected['sha256'], 'OBSERVATION_ORIGINAL_SOURCE_BINDING')
+            typed_plan = {'artifacts': {key: {'path': key + '.json', 'sha256': source.digest(data)}
+                                        for key, data in raw.items()},
+                          'segments': [{'claim': {'id': 'observation-assessment', 'kind': 'observation_audit',
+                              'evidence': {'artifact': 'output', 'pointer': ''},
+                              'source_artifact': 'original', 'ingress_artifact': 'ingress',
+                              'profile_artifact': 'profile', 'package_manifest_artifact': 'package'}}]}
+            rendered = report_claims.compile_report(typed_plan, raw)
+            checked = report_claims.audit_saved_report(typed_plan, raw, rendered['report'].encode('utf-8'))
+            require(not checked['differences'], 'TYPED_REPORT_REPLAY_MISMATCH')
+            body += '\n' + rendered['report']
         return body, {'kind': section['kind'], 'source_audit': audit,
                       'result_sha256': source.digest(result_raw)}
     import research_workflow as workflow

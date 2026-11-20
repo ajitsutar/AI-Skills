@@ -363,9 +363,39 @@ def analyst_corpus(request, corpus):
             'latest_selection_scope': 'Only source-bound extracted records surviving analyst helper eligibility; no claim of all real-world analysts.'}
 
 
+def supplied_observation_audit(request, corpus):
+    """Audit a complete selected JSON observation array in the original corpus."""
+    from vqm_diagnostics import audit_vqm
+    from deterministic_rank import digest as profile_digest
+    require(set(request) <= {'operation', 'mode', 'source_id', 'assert_claims'} and
+            {'operation', 'mode', 'source_id'} <= set(request), 'OBSERVATION_REQUEST_FIELDS')
+    require(request['source_id'] in corpus.sources, 'REFERENCE_OUTSIDE_PINNED_CORPUS')
+    source = corpus.sources[request['source_id']]
+    require(source['format'] == 'json', 'OBSERVATION_JSON_SOURCE_REQUIRED')
+    raw = source['raw']
+    require(request['mode'] == 'vqm_snapshot', 'VQM_SNAPSHOT_MODE_REQUIRED')
+    package = Path(__file__).resolve().parents[1]
+    profile_path = 'profiles/vqm-fundamental-v1.json'
+    profile_raw = (package / profile_path).read_bytes()
+    manifest_raw = (package / 'PACKAGE-MANIFEST.json').read_bytes()
+    package_manifest = parse(manifest_raw)
+    require(package_manifest['files'].get(profile_path) == digest(profile_raw), 'PACKAGED_PROFILE_BYTES_CHANGED')
+    profile_binding = {'path': profile_path, 'raw_sha256': digest(profile_raw),
+                       'canonical_sha256': profile_digest(parse(profile_raw)),
+                       'package_manifest_sha256': digest(manifest_raw)}
+    result = audit_vqm(raw, source['sha256'], profile_raw, digest(profile_raw))
+    return {'operation': 'supplied_observation_audit', 'audit': result,
+            'audit_request': dict(request),
+            'source_binding': {k: source[k] for k in ('id', 'path', 'sha256', 'format')},
+            'profile_binding': profile_binding,
+            'allowed_claims': ['selected_observation_rows_audited'],
+            'facts': [{'predicate': 'SELECTED_OBSERVATION_ROWS_AUDITED', 'coverage': result['coverage']}],
+            'whole_source_semantic_completeness': False}
+
+
 def audit(request, manifest, pin, root=None):
     corpus = Corpus(manifest, pin, root)
-    operations = {'presence': presence, 'accounting': accounting, 'coverage': coverage, 'analyst_corpus': analyst_corpus}
+    operations = {'presence': presence, 'accounting': accounting, 'coverage': coverage, 'analyst_corpus': analyst_corpus, 'supplied_observation_audit': supplied_observation_audit}
     require(request.get('operation') in operations, 'UNKNOWN_CLAIM_OPERATION')
     result = operations[request['operation']](request, corpus)
     claimed = request.get('assert_claims', [])

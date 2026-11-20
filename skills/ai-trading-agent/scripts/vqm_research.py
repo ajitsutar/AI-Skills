@@ -348,7 +348,23 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('snapshot', type=Path)
     args = parser.parse_args()
-    result = calculate(json.loads(args.snapshot.read_text(encoding='utf-8-sig')))
+    # Capture once; TextIOWrapper preserves read_text's codec/newline behavior.
+    import io
+    raw = args.snapshot.read_bytes()
+    with io.TextIOWrapper(io.BytesIO(raw), encoding='utf-8-sig') as stream:
+        text = stream.read()
+    try:
+        result = calculate(json.loads(text))
+    except ModuleNotFoundError as error:
+        if error.name == 'exchange_calendars':
+            try:
+                from vqm_diagnostics import diagnose_snapshot
+                diagnostic = diagnose_snapshot(raw, ROOT, error)
+                print(json.dumps(diagnostic, indent=2, default=str, allow_nan=False))
+            except Exception:
+                # Diagnostic import, validation or output failure cannot replace it.
+                pass
+        raise
     print(json.dumps(result, indent=2, allow_nan=False))
     if result['status'] != 'COMPUTED':
         raise SystemExit(2)

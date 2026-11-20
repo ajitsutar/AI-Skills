@@ -18,7 +18,7 @@ class FinalReportTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory(prefix='final-report-')
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name); self.originals = self.root / 'originals'; self.originals.mkdir()
+        self.root = Path(self.temp.name).resolve(); self.originals = self.root / 'originals'; self.originals.mkdir()
         self.manifest = self.root / 'manifest.json'; self.request = self.root / 'plan.json'; self.output = self.root / 'output'
         self.sources([('filing', 'json', {'common_cash': 17})])
         self.plan = {'sections': [{'kind': 'source_claim', 'request': {'operation': 'presence', 'terms': ['common']}}]}
@@ -669,6 +669,192 @@ class FinalReportTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError, 'STRICT_TERMINAL_PREPARATION_NOT_READY'): module.replay(self.output)
         with self.assertRaisesRegex(ValueError, 'STRICT_TERMINAL_PREPARATION_NOT_READY'): self.export()
         self.assertFalse((self.exported/'response.json').exists())
+
+
+    def vqm(self, document=None):
+        from test_vqm_observation_claims import snapshot
+        profile = json.loads((module.source.ROOT/'profiles/vqm-fundamental-v1.json').read_bytes())
+        document = document if document is not None else snapshot(profile)
+        self.sources([('snapshot', 'json', document), ('context', 'text', 'Other supplied context retained.')])
+        self.plan = {'sections': [{'kind': 'source_report', 'producer': 'source_claims',
+            'request': {'operation': 'supplied_observation_audit', 'mode': 'vqm_snapshot', 'source_id': 'snapshot'}}]}
+        self.strict()
+        return document
+
+    def vqm_result(self):
+        return json.loads((self.output/'sections/000/producer/result.json').read_bytes())
+
+    def test_vqm_canonical_projection_all_rows_and_reciprocals(self):
+        document = self.vqm()
+        for symbol, income in [('ZERO', 0), ('LOSS', -18)]:
+            row = copy.deepcopy(document['rows'][0]); row['symbol'] = symbol
+            row['facts']['net_income_ttm']['value'] = income
+            document['rows'].append(row); document['universe_symbols'].append(symbol)
+        self.vqm(document); receipt = self.compose(); self.export()
+        body = self.report(); result = self.vqm_result()
+        self.assertFalse(receipt['whole_report_semantic_pass'])
+        for row in result['audit']['rows']:
+            self.assertIn('Row ' + json.dumps(row['symbol']), body)
+            self.assertIn(row['timing_disposition'], body)
+            self.assertIn(row['income_sign'], body)
+            for name, ratio in row['ratios'].items():
+                self.assertIn(name, body); self.assertIn(ratio['status'], body)
+                if ratio.get('value') is not None: self.assertIn(json.dumps(ratio['value']), body)
+        self.assertIn('Actual total shares and reported EPS remain unknown', body)
+        self.assertIn('sections/000/producer/result.json', body)
+        self.assertEqual((self.exported/'report/first-response.md').read_bytes(), (self.output/'first-response.md').read_bytes())
+        module.verify(self.output); module.verify_response(self.exported)
+
+    def test_vqm_missing_operand_projection_retains_unknown(self):
+        document = self.vqm(); del document['rows'][0]['facts']['net_income_ttm']['value']
+        self.vqm(document); self.compose()
+        row = self.vqm_result()['audit']['rows'][0]
+        self.assertEqual(row['income_sign'], 'UNKNOWN')
+        self.assertIn(row['ratios']['aggregate_cap_over_income']['status'], self.report())
+        self.assertIn('net_income_ttm', self.report()); module.verify(self.output)
+
+    def test_vqm_invalid_duration_and_future_publication_project_native_status(self):
+        document = self.vqm(); document['rows'][0]['ttm_start'] = '2023-12-01'
+        document['sources'][0]['published_at'] = '2025-01-01T00:00:00Z'
+        self.vqm(document); self.compose()
+        self.assertIn('TTM_LENGTH_UNSUPPORTED', self.report())
+        self.assertIn('UNRESOLVED_OR_INELIGIBLE_DECLARATIONS', self.report())
+        self.assertIn('net_income_ttm', self.report()); module.verify(self.output)
+
+    def test_vqm_overage_projects_actual_policy(self):
+        document = self.vqm(); document['information_cutoff'] = '2025-03-31T20:00:00Z'
+        self.vqm(document); self.compose()
+        self.assertIn('OUTSIDE_BOUND_POLICY', self.report())
+        limit = self.vqm_result()['audit']['profile_age_limit_days']
+        self.assertIn('age limit: ' + str(limit) + ' days', self.report())
+
+    def test_vqm_rejected_assertion_fails_closed_with_original_result(self):
+        self.vqm(); self.plan['sections'][0]['request']['assert_claims'] = ['reported_eps_verified']
+        with self.assertRaisesRegex(ValueError, 'OBSERVATION_ASSERTED_CLAIMS_REJECTED'): self.compose()
+        result = self.vqm_result()
+        self.assertEqual(result['claim_verdict'], 'REJECTED')
+        self.assertEqual(result['audit_request']['assert_claims'], ['reported_eps_verified'])
+        self.assertTrue((self.output/'failure.json').exists())
+        self.assertFalse((self.output/'receipt.json').exists())
+
+    def test_vqm_supported_assertion_preserved(self):
+        self.vqm(); self.plan['sections'][0]['request']['assert_claims'] = ['selected_observation_rows_audited']
+        self.compose(); self.assertIn('Row ', self.report()); module.verify(self.output)
+
+    def test_vqm_source_label_newline_is_escaped(self):
+        document = self.vqm(); label = 'SYNTHETIC\nINJECTED_LABEL'
+        document['rows'][0]['symbol'] = label; document['universe_symbols'] = [label]
+        self.vqm(document); self.compose()
+        self.assertIn(json.dumps(label), self.report())
+        self.assertNotIn('\nINJECTED_LABEL\n', self.report())
+
+    def test_vqm_complete_ingress_tamper_rejected(self):
+        self.vqm(); self.compose()
+        path = self.output/'sections/000/producer/ingress.json'
+        doc = json.loads(path.read_bytes()); doc['sources'] = doc['sources'][:1]
+        path.write_text(json.dumps(doc), encoding='utf8'); self.resign_inventory()
+        with self.assertRaises(ValueError): module.replay(self.output)
+
+    def test_vqm_unselected_original_tamper_rejected(self):
+        self.vqm(); self.compose()
+        (self.output/'sections/000/producer/originals/context.source').write_text('Changed', encoding='utf8')
+        self.resign_inventory()
+        with self.assertRaises(ValueError): module.replay(self.output)
+
+    def test_vqm_selected_original_tamper_rejected(self):
+        self.vqm(); self.compose()
+        (self.output/'sections/000/producer/originals/snapshot.source').write_text('{}', encoding='utf8')
+        self.resign_inventory()
+        with self.assertRaises(ValueError): module.replay(self.output)
+
+    def test_vqm_retained_result_tamper_rejected(self):
+        self.vqm(); self.compose()
+        path = self.output/'sections/000/producer/result.json'; result = json.loads(path.read_bytes())
+        result['audit']['rows'][0]['ratios']['aggregate_cap_over_income']['value'] = '999'
+        path.write_text(json.dumps(result), encoding='utf8'); self.resign_inventory()
+        with self.assertRaises(ValueError): module.replay(self.output)
+
+    def test_vqm_retained_request_assertion_tamper_rejected(self):
+        self.vqm(); self.compose()
+        path = self.output/'sections/000/producer/original-request.json'; doc = json.loads(path.read_bytes())
+        doc['producer_request']['assert_claims'] = ['reported_eps_verified']
+        path.write_text(json.dumps(doc), encoding='utf8'); self.resign_inventory()
+        with self.assertRaisesRegex(ValueError, 'SECTION_REQUEST_DIFFERS_FROM_PLAN'): module.replay(self.output)
+
+    def test_vqm_unsafe_source_path_rejected(self):
+        self.vqm(); doc = json.loads(self.manifest.read_bytes()); doc['sources'][0]['path'] = '../outside.json'
+        self.manifest.write_text(json.dumps(doc), encoding='utf8'); self.pin = module.source.digest(self.manifest.read_bytes())
+        with self.assertRaisesRegex(ValueError, 'INGRESS_SOURCE_PATH_ESCAPE'): self.compose()
+
+    def test_vqm_profile_tamper_rejected_without_disk_mutation(self):
+        self.vqm(); self.compose()
+        profile = module.source.ROOT/'profiles/vqm-fundamental-v1.json'; original = Path.read_bytes
+        def read(path):
+            raw = original(path)
+            if path == profile:
+                doc = json.loads(raw); doc['max_financial_period_age_days'] += 1
+                return json.dumps(doc).encode()
+            return raw
+        with mock.patch.object(Path, 'read_bytes', read):
+            with self.assertRaises(ValueError): module.replay(self.output)
+
+    def test_vqm_package_tamper_rejected_without_disk_mutation(self):
+        self.vqm(); self.compose()
+        package = module.source.ROOT/'PACKAGE-MANIFEST.json'; original = Path.read_bytes
+        def read(path):
+            raw = original(path)
+            if path == package:
+                doc = json.loads(raw); doc['files']['profiles/vqm-fundamental-v1.json'] = '0'*64
+                return json.dumps(doc).encode()
+            return raw
+        with mock.patch.object(Path, 'read_bytes', read):
+            with self.assertRaises(ValueError): module.replay(self.output)
+
+    def test_vqm_generated_region_omission_rejected(self):
+        self.vqm(); self.compose(); path = self.output/'first-response.md'
+        path.write_text('\n'.join(line for line in self.report().splitlines() if not line.startswith('Row ')), encoding='utf8')
+        self.resign_inventory()
+        with self.assertRaises(ValueError): module.verify(self.output)
+
+    def test_vqm_exported_number_tamper_rejected(self):
+        self.vqm(); self.compose(); self.export(); path = self.exported/'report/first-response.md'
+        raw = path.read_text(encoding='utf8'); changed = raw.replace('ARITHMETIC_ONLY', 'CERTIFIED_EPS')
+        self.assertNotEqual(raw, changed); path.write_text(changed, encoding='utf8')
+        with self.assertRaises(ValueError): module.verify_response(self.exported)
+
+    def test_vqm_renderer_failure_not_silently_suppressed(self):
+        import report_claims
+        self.vqm()
+        with mock.patch.object(report_claims, 'compile_report', side_effect=ValueError('SYNTHETIC_RENDER_FAILURE')):
+            with self.assertRaisesRegex(ValueError, 'SYNTHETIC_RENDER_FAILURE'): self.compose()
+        self.assertTrue((self.output/'sections/000/producer/result.json').exists())
+        self.assertTrue((self.output/'failure.json').exists())
+        self.assertFalse((self.output/'receipt.json').exists())
+
+    def test_vqm_changed_bound_profile_is_projected_without_fixed_age(self):
+        from test_vqm_observation_claims import snapshot
+        root = module.source.ROOT; original = Path.read_bytes
+        profile = json.loads(original(root/'profiles/vqm-fundamental-v1.json'))
+        profile['max_financial_period_age_days'] = 45
+        profile_raw = json.dumps(profile).encode()
+        package = json.loads(original(root/'PACKAGE-MANIFEST.json'))
+        package['files']['profiles/vqm-fundamental-v1.json'] = module.source.digest(profile_raw)
+        overrides = {root/'profiles/vqm-fundamental-v1.json': profile_raw,
+                     root/'PACKAGE-MANIFEST.json': json.dumps(package).encode()}
+        def read(path): return overrides[path] if path in overrides else original(path)
+        with mock.patch.object(Path, 'read_bytes', read):
+            self.vqm(snapshot(profile)); self.compose()
+            self.assertIn('age limit: 45 days', self.report())
+            self.assertIn('OUTSIDE_BOUND_POLICY', self.report())
+            module.verify(self.output)
+
+    def test_vqm_typed_saved_audit_mismatch_blocks_completion(self):
+        import report_claims
+        self.vqm()
+        with mock.patch.object(report_claims, 'audit_saved_report', return_value={'differences': ['changed']}):
+            with self.assertRaisesRegex(ValueError, 'TYPED_REPORT_REPLAY_MISMATCH'): self.compose()
+        self.assertTrue((self.output/'failure.json').exists())
+        self.assertFalse((self.output/'receipt.json').exists())
 
 
 if __name__ == '__main__': unittest.main(verbosity=2)

@@ -295,5 +295,188 @@ class NormalizationTests(unittest.TestCase):
         with self.assertRaisesRegex(ValueError,'result hash mismatch'):verify_bundle(bundle)
 
 
+class VqmFailureDiagnosticTests(unittest.TestCase):
+    def setUp(self):
+        import tempfile
+        self.temp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.temp.cleanup)
+        self.root = Path(self.temp.name).resolve()
+        self.path = self.root / 'selected snapshot.json'
+        self.doc = snapshot()
+        self.path.write_text(json.dumps(self.doc), encoding='utf8')
+
+    @staticmethod
+    def missing(name='exchange_calendars'):
+        return ModuleNotFoundError("No module named '" + name + "'", name=name)
+
+    def invoke(self):
+        import contextlib, io
+        from unittest.mock import patch
+        import vqm_research as vqm
+        stream = io.StringIO(); error = None
+        with patch.object(sys, 'argv', ['vqm_research.py', str(self.path)]), contextlib.redirect_stdout(stream):
+            try: vqm.main()
+            except (Exception, SystemExit) as exc: error = exc
+        return stream.getvalue(), error
+
+    def direct(self, document=None, profile_doc=None):
+        import vqm_diagnostics as diagnostic
+        from vqm_research import profile
+        raw = json.dumps(self.doc if document is None else document).encode()
+        policy_raw = json.dumps(profile() if profile_doc is None else profile_doc).encode()
+        return diagnostic.audit_vqm(raw, diagnostic.sha(raw), policy_raw, diagnostic.sha(policy_raw))
+
+    def test_cli_computed_success_output_matches_accepted_baseline(self):
+        # The unchanged legacy CLI serialized calculate's result with these options.
+        expected = json.dumps(calculate(json.loads(self.path.read_text(encoding='utf-8-sig'))), indent=2, allow_nan=False) + '\n'
+        actual, error = self.invoke()
+        self.assertIsNone(error); self.assertEqual(actual, expected)
+
+    def test_calculate_api_and_results_unchanged_without_diagnostic_import(self):
+        from unittest.mock import patch
+        expected = calculate(self.doc)
+        with patch.dict(sys.modules, {'vqm_diagnostics': None}):
+            self.assertEqual(calculate(copy.deepcopy(self.doc)), expected)
+            text, error = self.invoke()
+        self.assertIsNone(error); self.assertEqual(json.loads(text), expected)
+
+    def test_cli_noncomputed_status_exit2_and_output_unchanged(self):
+        from unittest.mock import patch
+        import vqm_research as vqm
+        result = {'status': 'INSUFFICIENT_DATA', 'details': ['synthetic missing input']}
+        with patch.object(vqm, 'calculate', return_value=result), patch.dict(sys.modules, {'vqm_diagnostics': None}):
+            text, error = self.invoke()
+        self.assertEqual(text, json.dumps(result, indent=2, allow_nan=False) + '\n')
+        self.assertIsInstance(error, SystemExit); self.assertEqual(error.code, 2)
+
+    def test_missing_calendar_retains_nonzero_and_original_exception(self):
+        from unittest.mock import patch
+        import vqm_research as vqm
+        failure = self.missing()
+        with patch.object(vqm, 'session_grid', side_effect=failure): text, error = self.invoke()
+        self.assertIs(error, failure); self.assertIsNone(json.loads(text)['score'])
+
+    def test_missing_calendar_outputs_selected_snapshot_profile_diagnostic(self):
+        from unittest.mock import patch
+        import vqm_research as vqm
+        with patch.object(vqm, 'session_grid', side_effect=self.missing()): text, error = self.invoke()
+        out = json.loads(text)
+        self.assertEqual(out['status'], 'SELECTED_SNAPSHOT_AUDIT_ONLY_SCORING_FAILED')
+        self.assertEqual(out['audit']['coverage']['rows_audited'], len(self.doc['rows']))
+        self.assertEqual(out['profile_binding']['canonical_sha256'], self.doc['profile_sha256'])
+
+    def test_diagnostic_import_failure_preserves_original_calendar_error(self):
+        from unittest.mock import patch
+        import vqm_research as vqm
+        failure = self.missing()
+        with patch.object(vqm, 'session_grid', side_effect=failure), patch.dict(sys.modules, {'vqm_diagnostics': None}): text, error = self.invoke()
+        self.assertEqual(text, ''); self.assertIs(error, failure)
+
+    def test_diagnostic_generation_or_write_failure_preserves_original_error(self):
+        from unittest.mock import patch
+        import vqm_research as vqm
+        import vqm_diagnostics as diagnostic
+        for mode in ['generation', 'write']:
+            failure = self.missing()
+            target = patch.object(diagnostic, 'diagnose_snapshot', side_effect=ValueError('synthetic diagnostic failure')) if mode == 'generation' else patch('builtins.print', side_effect=OSError('synthetic output failure'))
+            with patch.object(vqm, 'session_grid', side_effect=failure), target: _, error = self.invoke()
+            self.assertIs(error, failure)
+
+    def test_unrelated_missing_dependency_never_enters_diagnostic_branch(self):
+        from unittest.mock import patch
+        import vqm_research as vqm
+        import vqm_diagnostics as diagnostic
+        failure = self.missing('unrelated_optional_module')
+        with patch.object(vqm, 'calculate', side_effect=failure), patch.object(diagnostic, 'diagnose_snapshot') as spy: text, error = self.invoke()
+        self.assertIs(error, failure); self.assertEqual(text, ''); spy.assert_not_called()
+
+    def test_invalid_profile_error_remains_native_and_no_audit_claim(self):
+        self.doc['profile_sha256'] = '0' * 64
+        self.path.write_text(json.dumps(self.doc), encoding='utf8')
+        text, error = self.invoke()
+        self.assertEqual(text, ''); self.assertIsInstance(error, ValueError)
+        self.assertEqual(str(error), 'PROFILE_HASH_MISMATCH')
+
+    def test_malformed_json_unicode_and_bom_newline_parsing_matches_baseline(self):
+        from unittest.mock import patch
+        import vqm_research as vqm
+        for raw in [b'{\r\n"a":', b'\xff', b'\xef\xbb\xbf{\r\n"a":1\r}\r\n']:
+            self.path.write_bytes(raw)
+            try: expected = json.loads(self.path.read_text(encoding='utf-8-sig')); expected_error = None
+            except Exception as exc: expected = None; expected_error = exc
+            with patch.object(vqm, 'calculate', return_value={'status': 'COMPUTED'}) as calculation: _, actual_error = self.invoke()
+            if expected_error is not None:
+                self.assertIs(type(actual_error), type(expected_error)); self.assertEqual(str(actual_error), str(expected_error)); calculation.assert_not_called()
+            else: self.assertIsNone(actual_error); calculation.assert_called_once_with(expected)
+
+    def test_schema2_missing_calendar_diagnostic_explicitly_unsupported(self):
+        from unittest.mock import patch
+        import vqm_research as vqm
+        self.path.write_text(json.dumps(normalized_snapshot()), encoding='utf8')
+        failure = self.missing()
+        with patch.object(vqm, 'session_grid', side_effect=failure): text, error = self.invoke()
+        out = json.loads(text)
+        self.assertIs(error, failure); self.assertEqual(out['status'], 'SELECTED_SNAPSHOT_AUDIT_UNAVAILABLE')
+        self.assertIsNone(out['audit']); self.assertIn('SCHEMA1', out['diagnostic_error']['message'])
+
+    def test_schema1_snapshot_byte_hash_and_packaged_profile_entry_bound(self):
+        import hashlib
+        import vqm_diagnostics as diagnostic
+        raw = self.path.read_bytes(); out = diagnostic.diagnose_snapshot(raw, ROOT, self.missing())
+        self.assertEqual(out['snapshot_raw_sha256'], hashlib.sha256(raw).hexdigest())
+        self.assertEqual(out['profile_binding']['raw_sha256'], json.loads((ROOT / 'PACKAGE-MANIFEST.json').read_bytes())['files']['profiles/vqm-fundamental-v1.json'])
+        with self.assertRaisesRegex(ValueError, 'INPUT_BYTE_HASH_MISMATCH'): diagnostic.audit_vqm(raw, '0' * 64, b'{}', diagnostic.sha(b'{}'))
+
+    def test_changed_packaged_profile_fails_diagnostic_without_hiding_native_error(self):
+        from unittest.mock import patch
+        import vqm_research as vqm
+        (self.root / 'profiles').mkdir()
+        (self.root / 'profiles/vqm-fundamental-v1.json').write_bytes((ROOT / 'profiles/vqm-fundamental-v1.json').read_bytes() + b' ')
+        (self.root / 'PACKAGE-MANIFEST.json').write_bytes((ROOT / 'PACKAGE-MANIFEST.json').read_bytes())
+        failure = self.missing()
+        with patch.object(vqm, 'session_grid', side_effect=failure), patch.object(vqm, 'ROOT', self.root): text, error = self.invoke()
+        self.assertEqual(text, ''); self.assertIs(error, failure)
+
+    def test_alternate_bound_age_policy_and_future_publication_are_distinct(self):
+        from vqm_research import profile
+        p = profile(); p['max_financial_period_age_days'] = 20; d = copy.deepcopy(self.doc); d['profile_sha256'] = digest(p)
+        self.assertEqual(self.direct(d, p)['rows'][0]['timing']['age_status'], 'OUTSIDE_BOUND_POLICY')
+        d = copy.deepcopy(self.doc)
+        for source in d['sources']:
+            if source['kind'] == 'financial': source['published_at'] = '2099-01-01T00:00:00Z'
+        self.assertIn('FUTURE_SOURCE', self.direct(d)['rows'][0]['facts']['net_income_ttm']['native_error'])
+
+    def test_zero_denominator_and_negative_income_stay_typed_not_eps(self):
+        for income in [0, -3]:
+            d = copy.deepcopy(self.doc); d['rows'][0]['facts']['net_income_ttm']['value'] = income
+            row = self.direct(d)['rows'][0]
+            self.assertEqual(row['income_sign'], 'ZERO' if income == 0 else 'NEGATIVE')
+            self.assertIsNone(row['reported_eps']); self.assertIsNone(row['actual_total_shares'])
+            if income == 0: self.assertEqual(row['ratios']['aggregate_cap_over_income']['status'], 'UNDEFINED_ZERO_DENOMINATOR')
+        d['rows'][0]['facts']['close_price']['value'] = 0
+        self.assertEqual(self.direct(d)['rows'][0]['ratios']['conditional_share_equivalent']['status'], 'UNDEFINED_ZERO_DENOMINATOR')
+
+    def test_universe_membership_and_declared_class_scope_preserved(self):
+        result = self.direct(); self.assertEqual(len(result['rows']), len(self.doc['universe_symbols']))
+        self.assertTrue(all(row['actual_total_shares'] is None for row in result['rows']))
+        d = copy.deepcopy(self.doc); d['rows'].pop()
+        with self.assertRaisesRegex(ValueError, 'COMPLETE_UNIVERSE_ROWS_REQUIRED'): self.direct(d)
+
+    def test_snapshot_only_diagnostic_never_claims_full_ingress_or_score(self):
+        import vqm_diagnostics as diagnostic
+        out = diagnostic.diagnose_snapshot(self.path.read_bytes(), ROOT, self.missing())
+        self.assertEqual(out['full_ingress'], 'NOT_BOUND'); self.assertIsNone(out['score']); self.assertIsNone(out['ranking'])
+        self.assertFalse(out['source_authenticity_verified']); self.assertFalse(out['whole_answer_verified'])
+
+    def test_cli_owned_file_paths_with_real_child_process_and_no_implicit_outputs(self):
+        import os, subprocess
+        env = dict(os.environ); env.pop('PYTHONPATH', None); env.pop('PYTHONHOME', None)
+        before = set(self.root.iterdir())
+        result = subprocess.run([sys.executable, '-S', '-B', str(ROOT / 'scripts/vqm_research.py'), str(self.path)], cwd=self.root, env=env, capture_output=True)
+        self.assertEqual(result.returncode, 1); self.assertIn(b"No module named 'exchange_calendars'", result.stderr)
+        self.assertEqual(json.loads(result.stdout)['full_ingress'], 'NOT_BOUND')
+        self.assertEqual(set(self.root.iterdir()), before)
+
+
 if __name__=='__main__':
     unittest.main()

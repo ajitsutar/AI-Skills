@@ -31,6 +31,32 @@ result. Use those facts in the final answer. `WITHIN_DECLARED_CONTRACT` means no
 requested claim exceeded that operation's contract; it is not a correctness
 grade, source authentication or a statement that unavailable calculations ran.
 
+## Selected VQM snapshot observations
+
+For a supplied VQM schema-1 snapshot, use the direct operation without running
+the calendar, momentum or scoring pipeline:
+
+```json
+{"operation":"supplied_observation_audit","mode":"vqm_snapshot","source_id":"snapshot"}
+```
+
+Select the JSON source from the complete original ingress manifest using the
+normal invocation above. All ingress members are verified; selecting a snapshot
+does not justify replacing that manifest with a smaller one. The operation binds
+the selected raw bytes and the packaged profile's raw, canonical and manifest
+hashes. It audits every declared universe row and returns aggregate cap/income,
+income/cap and conditional cap/quote arithmetic, publication/period/freshness
+dispositions, and unresolved share/EPS basis. It does not construct reported EPS
+or certify total shares, source authenticity, scoring or complete request coverage.
+Provider mode and every `adapter` field, including null, are unsupported.
+
+The only allowed assertion is `selected_observation_rows_audited`; the complete
+request and any rejected assertions remain bound to the result. Use the
+[observation renderer](report-claims.md#vqm-snapshot-observation-renderer)
+to replay the original artifacts into fixed report statements, then audit the
+saved report. The existing `final_report` `source_report` producer can invoke this
+same `source_claims` request without a new producer or service.
+
 ## Exact references
 
 A JSON scalar reference is `{"source_id":"filing","pointer":"/shares/value"}`.
