@@ -260,6 +260,23 @@ An expected input rejection demonstrates a guard, not a successful investment.
 Cross-model consistency, independent source acquisition and strategy performance
 are three different validation claims.
 
+## Strategy trial evidence
+
+Use `validation.promotion` for the aligned trial return series. Its
+`evidence_scope` reports which observations enter the test, their actual and
+declared dates and the source of the selected implementation. For a supplied
+implementation, use the selected trial's optional `strategy_implementation`
+descriptor with `strategy_id`, `execution_rule`, `known_at`, `implementation_sha256`
+and `source_evidence` containing `source_text` and its UTF-8 SHA-256. Preserve
+the trial family's `strategy_version` when supplied. A matching source digest
+establishes byte identity. Separate run evidence is needed to show that code
+generated the returns. The enclosing CLI implementation digest identifies the
+analysis helper. If only test returns were supplied, state explicitly which
+development, validation and forward observations are missing from the request.
+A pre-start freeze and a declaration about test use leave selection history
+unverified. Include any separately retained stage or provenance evidence in
+the final assessment and identify what it independently verifies.
+
 The legacy `validation.promotion` operation name describes an evidence assessment,
 not live activation. All workbench findings are advisory and impose no execution
 gates, price-drift thresholds or additional approvals.

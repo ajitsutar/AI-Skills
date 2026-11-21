@@ -1,10 +1,10 @@
 {
   "schema_version": 1,
-  "skill_version": "5.13.23",
-  "input_fingerprint_sha256": "10ae738e918baa70ae232becec7434eeb5b23498cd07b576945c1c2abe9b2ab1",
+  "skill_version": "5.13.26",
+  "input_fingerprint_sha256": "1a7e94655e09ce66972bfc152fabbdf5b55eb56b217fb19ec5eaeda6df6bc64f",
   "input_file_count": 416,
   "catalog_sha256": "24a9c716ba5ec1713f1eae03c8c9e5943c860e7c08eed4a594b1adb4f98180f6",
-  "readme_sha256": "cac399c7a038116e0588fc6318fc2624a76d20f767aefc35bb454a29d0911dac",
+  "readme_sha256": "e4266938bd15d8b99ccbab3f427167a7c64ed04fe3fdc714dcf0f84a18939563",
   "examples_sha256": "fc2240af3d09bc64e14acac1ca945388e9eaaed9c2b28d875a8f698f51da0a39",
   "section_count": 55,
   "example_count": 401,

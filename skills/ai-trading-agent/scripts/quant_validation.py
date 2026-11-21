@@ -10,6 +10,7 @@ import re
 import numpy as np
 from scipy.stats import norm
 
+from forward_evidence import implementation_evidence
 from quant_common import cli, integer, require, scalar, series, timestamp, vector
 
 
@@ -217,7 +218,37 @@ def promotion_evidence(evidence, criteria):
         reasons.append('MULTIPLE_TESTING_CRITERION_FAILED')
     if bootstrap['mean_percentile_ci95'][0] <= 0:
         reasons.append('BLOCK_BOOTSTRAP_LOWER_BOUND_NOT_POSITIVE')
+    selected_trial = next(trial for trial in trials if trial['id'] == selected)
+    code = implementation_evidence(selected_trial.get('strategy_implementation'))
+    used_for_selection = evidence.get('test_was_used_for_selection')
+    holdout_status = 'UNTOUCHED_STATUS_UNVERIFIED'
+    if used_for_selection is True:
+        holdout_status = 'DECLARED_USED_FOR_SELECTION'
+    elif used_for_selection is False:
+        holdout_status = 'DECLARED_UNUSED_FOR_SELECTION_UNVERIFIED'
+    scope = {
+        'stages': {
+            'development': 'NO_OBSERVATIONS_EVALUATED_BY_THIS_CALCULATION',
+            'validation': 'NO_OBSERVATIONS_EVALUATED_BY_THIS_CALCULATION',
+            'test': {
+                'observations_per_trial': len(reference),
+                'first_observation': reference[0].isoformat(),
+                'last_observation': reference[-1].isoformat(),
+                'declared_start': evidence['test_start'],
+                'declared_end': evidence['test_end'],
+                'parameters_frozen_at': evidence['parameters_frozen_at'],
+                'selection_history': holdout_status,
+            },
+            'forward_paper': 'NO_OBSERVATIONS_EVALUATED_BY_THIS_CALCULATION',
+        },
+        'selected_strategy_version': evidence.get('strategy_version'),
+        'selected_strategy_implementation': code,
+        'declared_trial_registry_sha256': evidence['trial_registry_sha256'],
+        'declared_input_data_hashes': list(hashes),
+        'upstream_hash_verification': 'PREIMAGES_NOT_CHECKED_BY_THIS_CALCULATION',
+    }
     return {'quantitative_criteria_passed': not reasons, 'reasons': reasons,
+            'evidence_scope': scope,
             'selected_trial': selected, 'hac': outputs[selected], 'holm': family, 'bootstrap': bootstrap,
             'execution_authorized': False,
             'limitation': 'Predeclared criteria and full trial records required. Statistical acceptance is not alpha proof or live authorization.'}

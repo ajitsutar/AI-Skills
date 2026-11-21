@@ -42,6 +42,28 @@ def intraday():
 
 
 class StrategyResearchTests(unittest.TestCase):
+    def test_decision_close_and_modeled_fill_are_separate_for_each_rule(self):
+        rows = daily([10, 10, 10, 12, 10, 8, 8])
+        dual = research.dual_sma(rows, AS_OF, fast=2, slow=3, delay_bars=1)
+        first = dual['orders'][0]
+        self.assertEqual(first['signal_index'], 3)
+        self.assertEqual(first['decision_at'], rows[3]['timestamp'])
+        self.assertEqual(first['due_index'] - first['signal_index'], 2)
+        single = strategy_lab.replay(research.checked_bars(rows, AS_OF, daily=True),
+                                     'sma_trend', lookback=2)
+        breakout = research.opening_range(intraday(), AS_OF)['result']
+        self.assertEqual(single['trades'][0]['signal_time'], rows[3]['timestamp'])
+        self.assertEqual(single['trades'][0]['entry_time'], rows[4]['session_open'])
+        self.assertEqual(breakout['trades'][0]['signal_time'], breakout['trades'][0]['entry_time'])
+        self.assertGreater(breakout['trades'][0]['entry_bar_end'], breakout['trades'][0]['signal_time'])
+        for replay, offset in [(dual, 2), (single, 1), (breakout, 1)]:
+            self.assertEqual(replay['execution_basis'], {
+                'signal_price': 'close_of_completed_decision_bar',
+                'entry_price_reference': 'eligible_bar_open',
+                'entry_offset_from_signal_bars': offset,
+                'fill_evidence': 'modeled_from_supplied_bars',
+                'broker_execution_records_used': False})
+
     def test_dual_sma_is_long_cash_and_two_sided_fees_reconcile(self):
         rows = daily([10, 10, 10, 12, 10, 8, 8])
         result = research.dual_sma(rows, AS_OF, fast=2, slow=3, cost_per_side_bps=10)

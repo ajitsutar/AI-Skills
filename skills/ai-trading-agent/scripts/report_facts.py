@@ -182,7 +182,20 @@ TAIL = {
     'observations': ('Input return count', 'count', None, 'supplied return series'),
     'confidence': ('Tail confidence', 'fraction', None, 'declared empirical tail confidence'),
     'effective_tail_observations': ('Effective empirical tail observations', 'count', None, '(1-confidence) * observations')}
+STATUSES.update({
+    'NO_OBSERVATIONS_EVALUATED_BY_THIS_CALCULATION', 'UNTOUCHED_STATUS_UNVERIFIED',
+    'DECLARED_USED_FOR_SELECTION', 'DECLARED_UNUSED_FOR_SELECTION_UNVERIFIED',
+    'PREIMAGES_NOT_CHECKED_BY_THIS_CALCULATION',
+})
 SIMPLE = {
+    'validation.promotion': {
+        'evidence_scope/stages/development': ('Development observations evaluated', 'status', None, 'aligned test-return calculation'),
+        'evidence_scope/stages/validation': ('Validation observations evaluated', 'status', None, 'aligned test-return calculation'),
+        'evidence_scope/stages/forward_paper': ('Forward-paper observations evaluated', 'status', None, 'aligned test-return calculation'),
+        'evidence_scope/stages/test/observations_per_trial': ('Test observations per trial', 'count', None, 'aligned supplied return series'),
+        'evidence_scope/stages/test/selection_history': ('Evidence of untouched test selection', 'status', None, 'selection history supplied with trial returns'),
+        'evidence_scope/upstream_hash_verification': ('Trial registry and upstream data hash verification', 'status', None, 'declared hashes in the trial family'),
+    },
     'validation.hac': {
         'mean': ('Mean input-period return', 'return_fraction', None, 'arithmetic mean of supplied returns'),
         'standard_error_hac': ('HAC standard error of mean', 'return_fraction', None, 'Bartlett/Newey-West; supplied lag count'),

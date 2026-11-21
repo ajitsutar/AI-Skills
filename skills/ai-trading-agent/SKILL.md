@@ -4,7 +4,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 ---
 
 # AI Trading Agent
-Package version: **5.13.23 - November 19, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
+Package version: **5.13.26 - November 20, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
 `approval` or `autonomous`: respectively simulate only, require order approval,
@@ -166,7 +166,6 @@ record. Bind the original whole record and its source fields; do not manually
 rebuild a reduced list that drops liabilities, dated flows, unknown precision,
 classification or liquidity. Their computed reports carry those facts into the
 answer. Use the lower-level helpers for other schemas with an explicit mapping.
-
 ## Recommendations and research
 
 For large shared-input calculation runs, use the documented
@@ -303,7 +302,6 @@ An analyst-news shortlist is discretionary and cannot be presented as the public
 VQM winner. A stock outside the requested universe is a separately labeled
 comparison, not a replacement pick. Unscored sector coverage is not a negative
 investment judgment. Explain disagreements without forcing matching answers.
-
 ## Portfolio and quantitative work
 
 For calculations, reconcile material values from the current request, its context
@@ -387,6 +385,8 @@ and [strategy-playbook.md](references/strategy-playbook.md). Match signals, even
 liquidity and costs to the holding period. Do not force intraday setups through a
 long-term value screen or relabel a short-term thesis as a core holding. Backtests,
 stops and target scenarios are analytical assumptions, not guaranteed execution.
+
+When evaluating observed strategy trials, carry the evidence coverage into the user-facing assessment alongside the statistical result. For development, validation, test and forward paper, identify the observations actually supplied and whether the test was used for selection. Explain what the strategy source, version and hash establish. State explicitly when the strategy code, version or digest is unavailable. Verify retained market data and the trial registry against their own declared hashes when original bytes are available. Reconcile separate artifacts with the trial calculation's [evidence scope](references/quant-workbench.md#strategy-trial-evidence).
 
 For quantitative and multi-asset work, load
 [institutional-manager.md](references/institutional-manager.md),

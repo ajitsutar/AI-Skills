@@ -96,6 +96,15 @@ def signal(history, strategy, lookback=20, opening_bars=3, bar_minutes=5):
     return None
 
 
+def completed_bar_execution(entry_offset):
+    """Describe the decision and entry clocks of the bundled close-signal replays."""
+    return {"signal_price": "close_of_completed_decision_bar",
+            "entry_price_reference": "eligible_bar_open",
+            "entry_offset_from_signal_bars": entry_offset,
+            "fill_evidence": "modeled_from_supplied_bars",
+            "broker_execution_records_used": False}
+
+
 def replay(bars, strategy, initial_cash=100000, risk_fraction=0.001,
            capital_fraction=0.05, slippage_bps=5, fee_per_share=0.005,
            lookback=20, opening_bars=3, bar_minutes=5, trade_start=0):
@@ -190,6 +199,7 @@ def replay(bars, strategy, initial_cash=100000, risk_fraction=0.001,
             "buy_hold_return": benchmark_value / initial_cash - 1,
             "benchmark_caveat": "Full-capital buy-and-hold, entry friction, marked terminal value; different exposure, no dividends",
             "open_position": position, "events": sorted(set(events)), "trades": trades, "equity_curve": curve,
+            "execution_basis": completed_bar_execution(1),
             "execution_time_resolution": "Entry at modeled bar open; exit_time labels the containing bar end, not an observed tick",
             "assumptions": {"slippage_bps": slippage_bps, "fee_per_share": fee_per_share,
                             "capital_fraction": capital_fraction, "risk_fraction": risk_fraction,

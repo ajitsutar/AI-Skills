@@ -39,7 +39,13 @@ class CostedBarReplayTests(unittest.TestCase):
     def test_signal_availability_delays_fill(self):
         data = fixture()
         data['signals'][0]['available_at'] = '2026-01-02T12:00:00Z'
-        self.assertEqual(simulate(data)['fills'][0]['at'], '2026-01-03T09:30:00Z')
+        result = simulate(data)
+        self.assertEqual(result['fills'][0]['at'], '2026-01-03T09:30:00Z')
+        self.assertEqual(result['execution_basis'], {
+            'signal_source': 'supplied_timestamped_signal',
+            'entry_price_reference': 'eligible_open_after_source_close_and_availability',
+            'fill_evidence': 'modeled_from_supplied_bars',
+            'broker_execution_records_used': False})
 
     def test_same_timestamp_source_close_cannot_fill(self):
         data = fixture()

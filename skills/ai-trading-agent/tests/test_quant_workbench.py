@@ -496,6 +496,43 @@ class ManagerTests(unittest.TestCase):
              'max_realized_to_forecast_volatility': 1.5, 'max_cost_bps': 20, 'max_reconciliation_difference': .01})
         self.assertIn('INSUFFICIENT_MONITOR_HISTORY', out['reasons'])
 
+    def test_selected_strategy_code_and_holdout_declarations(self):
+        import hashlib
+
+        campaign = json.loads((ROOT / 'examples' / 'fictional-quant-campaign.json').read_bytes())
+        job = next(job for job in campaign['jobs'] if job['operation'] == 'validation.promotion')
+        inputs = job['inputs']
+        evidence = inputs['evidence']
+        old = validation.promotion_evidence(**inputs)
+        selected = next(trial for trial in evidence['trials'] if trial['id'] == evidence['selected_trial'])
+        other = next(trial for trial in evidence['trials'] if trial is not selected)
+        source = 'def position(): return 1'
+        pin = hashlib.sha256(source.encode('utf-8')).hexdigest()
+        implementation = {
+            'strategy_id': 'trend', 'execution_rule': 'next completed bar', 'known_at': evidence['parameters_frozen_at'],
+            'implementation_sha256': pin, 'source_evidence': {'source_text': source, 'sha256': pin},
+        }
+        other['strategy_implementation'] = implementation
+        evidence['strategy_version'] = 'research-2'
+        evidence['test_was_used_for_selection'] = True
+        run = workbench.OPERATIONS['validation.promotion']
+        result = run(**inputs)
+        scope = result['evidence_scope']
+        self.assertEqual(scope['selected_strategy_implementation']['status'], 'NOT_ESTABLISHED')
+        self.assertEqual(scope['selected_strategy_version'], 'research-2')
+        self.assertEqual(scope['stages']['test']['selection_history'], 'DECLARED_USED_FOR_SELECTION')
+        selected['strategy_implementation'] = copy.deepcopy(implementation)
+        evidence['test_was_used_for_selection'] = False
+        result = run(**inputs)
+        scope = result['evidence_scope']
+        self.assertEqual(scope['selected_strategy_implementation']['status'], 'SOURCE_BYTES_BOUND')
+        self.assertEqual(scope['selected_strategy_implementation']['implementation_sha256'], pin)
+        self.assertEqual(scope['stages']['test']['selection_history'], 'DECLARED_UNUSED_FOR_SELECTION_UNVERIFIED')
+        for key in ('quantitative_criteria_passed', 'hac', 'holm', 'bootstrap', 'reasons', 'execution_authorized'):
+            self.assertEqual(result[key], old[key])
+        selected['strategy_implementation']['source_evidence']['source_text'] += ' '
+        self.assertEqual(run(**inputs)['evidence_scope']['selected_strategy_implementation']['status'], 'NOT_ESTABLISHED')
+
     def test_recomputed_promotion_and_missing_trial(self):
         t0 = datetime(2020, 1, 1, tzinfo=timezone.utc)
         evidence = {'units': 'net_excess_return_decimal', 'all_variants_disclosed': True,
@@ -506,7 +543,23 @@ class ManagerTests(unittest.TestCase):
                     'return': .01 if i%2 else .02} for i in range(100)]}]}
         criteria = {'minimum_observations': 60, 'hac_lags': 2, 'max_holm_p': .05,
                     'bootstrap_block_length': 5, 'bootstrap_replications': 100, 'bootstrap_seed': 42}
-        self.assertTrue(validation.promotion_evidence(evidence, criteria)['quantitative_criteria_passed'])
+        result = validation.promotion_evidence(evidence, criteria)
+        self.assertTrue(result['quantitative_criteria_passed'])
+        scope = result['evidence_scope']
+        stages = scope['stages']
+        self.assertEqual(set(stages), {'development', 'validation', 'test', 'forward_paper'})
+        for stage in ('development', 'validation', 'forward_paper'):
+            self.assertEqual(stages[stage], 'NO_OBSERVATIONS_EVALUATED_BY_THIS_CALCULATION')
+        self.assertEqual(stages['test']['observations_per_trial'], 100)
+        self.assertEqual(stages['test']['last_observation'], (t0 + timedelta(days=99)).isoformat())
+        self.assertEqual(stages['test']['declared_end'], evidence['test_end'])
+        self.assertEqual(stages['test']['selection_history'], 'UNTOUCHED_STATUS_UNVERIFIED')
+        self.assertIsNone(scope['selected_strategy_version'])
+        self.assertEqual(scope['selected_strategy_implementation']['status'], 'NOT_ESTABLISHED')
+        self.assertEqual(scope['declared_trial_registry_sha256'], 'f' * 64)
+        self.assertEqual(scope['declared_input_data_hashes'], ['a' * 64])
+        self.assertEqual(scope['upstream_hash_verification'], 'PREIMAGES_NOT_CHECKED_BY_THIS_CALCULATION')
+        self.assertFalse(result['execution_authorized'])
         evidence['all_variants_disclosed'] = False
         with self.assertRaises(ValueError):
             validation.promotion_evidence(evidence, criteria)

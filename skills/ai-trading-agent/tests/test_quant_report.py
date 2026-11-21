@@ -33,6 +33,22 @@ def no_sources(path, index):
 
 
 class QuantReportTests(unittest.TestCase):
+    def test_trial_scope_display_preserves_private_strategy_labels(self):
+        campaign = json.loads((ROOT / 'examples' / 'fictional-quant-campaign.json').read_bytes())
+        job = next(job for job in campaign['jobs'] if job['operation'] == 'validation.promotion')
+        job['inputs']['evidence']['strategy_version'] = 'private-strategy-version-for-test'
+        campaign['jobs'] = [job]
+        report = runner.build(json.dumps(campaign).encode(), no_sources)
+        text = report['report.md'].decode()
+        for label in ('Development observations evaluated', 'Validation observations evaluated',
+                      'Forward-paper observations evaluated', 'Test observations per trial',
+                      'Evidence of untouched test selection', 'Trial registry and upstream data hash verification'):
+            self.assertIn(label, text)
+        for value in ('UNTOUCHED_STATUS_UNVERIFIED', 'NO_OBSERVATIONS_EVALUATED_BY_THIS_CALCULATION',
+                      'PREIMAGES_NOT_CHECKED_BY_THIS_CALCULATION', 'NOT_ESTABLISHED'):
+            self.assertIn(value, text)
+        self.assertNotIn('private-strategy-version-for-test', text)
+
     def test_one_path_preserves_raw_contract_parameters_and_exact_facts(self):
         original = document()
         # Byte identity includes formatting/BOM, separately from semantic hashes.
