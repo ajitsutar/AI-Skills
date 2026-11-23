@@ -4,7 +4,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 ---
 
 # AI Trading Agent
-Package version: **5.13.38 - November 23, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
+Package version: **5.13.39 - November 23, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
 `approval` or `autonomous`: respectively simulate only, require order approval,
@@ -484,7 +484,7 @@ Follow [model-independent research](references/model-independent-research.md).
 
 - [Examples from beginner to quant](EXAMPLE-PROMPTS.md).
 - [Personal setup](references/personal-setup.md), [broker handoff](references/broker-integration.md), [host integration](references/host-execution-integration.md).
-- [Small-account research](references/small-account-research.md), [fractional planning](references/fractional-shares.md), [cash and settlement analysis](references/settled-cash-planning.md).
+- [Small-account research](references/small-account-research.md), [fractional planning](references/fractional-shares.md), [cash and settlement analysis](references/settled-cash-planning.md). For a supplied trade schedule, pass the source to `planning.cash_plan` and report each fill, settlement date, availability and floor gap on its stated basis.
 - [Data and analytics](references/data-and-analytics.md), [shared strategy](references/shared-default-strategy.md), [validation methods](references/strategy-evaluation.md).
 - [Research memory](references/research-memory.md), [model-independent research](references/model-independent-research.md), [research provenance](references/research-run-methodology.md).
 - [Documentation maintenance](references/maintaining-the-skill.md): update the current README and review/regenerate the whole prompt catalog whenever the package changes.

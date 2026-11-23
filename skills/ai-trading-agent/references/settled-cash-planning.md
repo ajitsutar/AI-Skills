@@ -57,6 +57,14 @@ denominator; see [portfolio projection](portfolio-projection.md). Use
 lags; see [planning comparison](planning-comparison.md). A date alone does not
 establish an intraday cutoff or prove that a same-day transfer can meet a deadline.
 
+## Comparing funded trade schedules
+
+Pass the original single-currency trade schedule to `planning.cash_plan` when it specifies opening `settled_cash`, `reservations`, `floor`, timed `events` with IDs, signed cash effects and confirmation, a listed business calendar, and a positive settlement lag (numeric `settlement_lag_business_days` or an explicit supported rule). The operation returns confirmed-only and applicable hypothetical buy, sale and combined fill paths. Keep the source cash amounts and dates intact. For other account conventions or known posting times, describe the actual stages explicitly and use the ordinary posted-event ladder.
+
+Show each modeled buy's commitment date and its distinct settlement date. The fill encumbers available cash; settlement debits the settled balance and releases that trade's matching encumbrance. The second posting has zero further effect on availability. For a sale show the fill and the calculated settlement date, then qualify when the broker will make the credit usable. Preserve both orderings if a withdrawal falls on that date. Use the supplied trading calendar and state its timezone basis.
+
+Read `settled`, `reserved`, `available_before_floor`, `signed_floor_headroom` and `floor_gap` on their named bases. Headroom already subtracts the advisory floor. Its negative part is the gap; comparing that headroom with the floor again overstates the shortage. Separate the gap at the endpoint from the worst gap during the path.
+
 ## Report and handoff
 
 Report liquidity shortfalls and alternatives as advice. The skill neither pauses

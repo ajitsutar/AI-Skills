@@ -43,7 +43,9 @@ Strategy delivery checks the original response declaration and identifies incomp
 
 Draft mandate budgets distinguish proposed limits and comparators from supplied constraints.
 
-Version **5.13.38** includes [production research operations](references/research-operations.md)
+Funded trade schedules distinguish fill commitments, settlement postings and once-applied liquidity floors.
+
+Version **5.13.39** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private

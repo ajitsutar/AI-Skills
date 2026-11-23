@@ -389,6 +389,9 @@ def _date_ambiguous_cash_plan_exact(document):
 
 def cash_plan(document):
     """Exact timestamp path, or explicit calendar-date ordering bounds."""
+    if 'settled_cash' in document and 'settled_balances' not in document:
+        from trade_cash_plan import trade_cash_plan
+        return trade_cash_plan(document)
     if any(_cash_date_only(row.get('available_at')) for row in document['events']):
         return _date_ambiguous_cash_plan(document)
     names = ('as_of', 'settled_balances', 'reservations', 'events', 'floors')
