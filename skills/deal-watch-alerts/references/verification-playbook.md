@@ -72,8 +72,8 @@ For Slickdeals, forums, newsletters, and similar sources:
 
 1. Search for relevant posts using item identity and key attributes.
 2. Reject expired, dead, wrong-variant, or discussion-only posts.
-3. Open the outbound merchant link.
-4. Verify the final merchant offer using the selected-offer rule.
+3. Identify the outbound merchant without following an unknown or disallowed destination. Route the link to that domain's sole assigned owner; a skipped or unassigned domain is a reporting gap, not permission to follow it.
+4. The merchant owner rechecks eligibility, opens the eligible destination and verifies the final merchant offer using the selected-offer rule. Checking the aggregator does not count as checking the merchant.
 5. Attribute the deal to the merchant in the stable key; include aggregator context in notes.
 
 ## Price Handling

@@ -16,8 +16,6 @@ Resolve bundled resources relative to the directory containing this `SKILL.md`, 
 1. Parse or create the watch configuration.
    - Read `references/config-schema.md` when creating, updating, or normalizing configurable parameters.
    - Require item identity, required attributes, price threshold, notification channels, and duplicate-memory location. A retailer list is optional unless the watch restricts which sources may be used.
-   - On each run, use the running model's knowledge of the product category, condition and market to choose additional sources worth checking. For example, a manufacturer's certified outlet may be a better lead for a refurbished laptop than a general marketplace. Use current search or manufacturer directories to confirm the merchant's identity and relevance; model knowledge is a discovery aid, not evidence of a current offer.
-   - Include the user's required sources and honor their priorities. Treat examples and nonexclusive source lists as starting points, not a ceiling. If the user or watch specifies an allowlist, stay within it. Skip excluded, disabled or paused sources, including via referrals. Keep discovery within the run's access and time limits; it does not authorize new accounts or permanent changes to the watch.
    - For unattended browser checks, configure an isolated profile/session, overlap policy, timeouts, cleanup, and per-source checkpoint path. Never silently inherit the user's everyday browser profile.
    - Treat thresholds as inclusive by default unless the user says "below" or provides a strict comparator.
 
@@ -26,28 +24,34 @@ Resolve bundled resources relative to the directory containing this `SKILL.md`, 
    - Treat every prior `alerts_sent[].deal_key` as already notified.
    - If memory is inaccessible, fall back to in-thread or user-provided memory and report that limitation.
 
-3. Check the required and discovered sources.
+3. Discover sources on **every run, before freezing worker assignments**.
+   - Start with required sources and their priorities. In discovery mode, identify other merchants suited to the item, condition and region. For a refurbished item, consider manufacturer outlets, specialist refurbishers and relevant marketplaces such as eBay when permitted. Confirm identity and relevance through permitted current search or directories. Neither a fixed seed list nor yesterday's plan completes discovery.
+   - Normalize merchant domains and deduplicate seeds, discoveries and aliases. Apply any allowlist, exclusions, disabled sources and current pauses before visiting or assigning a domain, including via referrals. Do not broaden a restricted watch. If access or time limits prevent discovery, record the gap; do not change the saved configuration.
+   - Freeze a run plan with one owner per eligible domain and concrete work for that owner: targets, listing pages or search queries, and the evidence needed. One worker may own several domains; a solo runner owns them all. Only then dispatch the searches. An assignment is not a search result.
+
+4. Check the required and discovered sources.
    - Read `references/verification-playbook.md` before doing live verification.
    - Prefer primary product pages over snippets, search pages, cached titles, or aggregator summaries.
-   - For deal aggregators, open the linked merchant page and verify the final offer there.
+   - Route active aggregator leads to the eligible merchant's assigned owner for final-offer verification. Recheck eligibility at handoff; do not follow paused, excluded or unassigned destinations. Record unassigned leads as coverage gaps.
    - Checkpoint after each source. Treat blank documents, browser error URLs, bot challenges, authentication prompts, and navigation failures as `unverifiable`, not as zero results. Restart an isolated worker after a page failure when safe and continue other sources.
 
-4. Decide whether each candidate qualifies.
+5. Decide whether each candidate qualifies.
    - Verify all required fields on the same selected offer at the same time.
    - Reject hidden, ambiguous, stale, out-of-stock, contradictory, or unselected-variant evidence.
    - Compare the visible item price before tax. Include shipping separately if shown.
 
-5. Notify only for new qualifying deals.
+6. Notify only for new qualifying deals.
    - Read `references/notification-playbook.md` before sending email, SMS, webhook, or chat alerts.
    - Atomically `claim` the deal immediately before notification. If it is duplicate or already claimed, do not send.
    - Post the full buy link in chat whenever any external alert is sent.
    - Keep SMS gateway messages short and URL-free unless the user explicitly permits links.
    - Commit after confirmed delivery to any authorized channel and record every channel's status. Release only when every attempted channel proves that no notification was accepted. If delivery is partial or ambiguous, commit a partial success or retain the claim respectively; never fail open or retry automatically. Expiration alone never makes a claim safe to release. Use the deal key as a provider idempotency key when the channel supports one.
 
-6. Report the result.
+7. Report the result and source coverage.
+   - For each domain, report **checked** only for completed live target searches or listing checks, **skipped** with the policy reason, or **incomplete** with the remaining targets and reason (including unstarted, blocked or interrupted work). Identify gaps in discovery itself. A directory lookup, planned query or assigned worker is not evidence that a merchant's offers were checked.
    - If a new deal qualifies, start with `BUY SIGNAL` and include item, verified attributes, price, condition evidence, seller/store, direct buy link, notification status, and memory status.
    - If only duplicate deals qualify, say `Already alerted`, include current price/status and link, and say notification skipped as duplicate.
-   - If none qualify, say no qualifying deal and include the best visible current price/status per target when available.
+   - If none qualify, say no qualifying offer was verified in the coverage achieved; include a current price only when verified.
 
 ## Verification Standard
 
