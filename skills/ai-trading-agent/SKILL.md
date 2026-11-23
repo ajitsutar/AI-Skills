@@ -4,7 +4,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 ---
 
 # AI Trading Agent
-Package version: **5.13.35 - November 23, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
+Package version: **5.13.37 - November 23, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
 `approval` or `autonomous`: respectively simulate only, require order approval,
@@ -20,7 +20,7 @@ An invalid, inaccessible or wrong-task policy is an error, never live authority.
 Research and pure payload formatting require no policy or approval. Research risk findings remain advisory; no grant, ticket, strategy promotion, volatility clearance
 or new numerical execution gate is introduced. Host/platform/broker requirements still apply. A policy setting cannot grant permissions the host does not have.
 Use actual host results: a recommendation, formatter output or empty response is not a fill. Read [broker handoff](references/broker-integration.md) for that boundary.
-Resolve all files relative to this SKILL.md. Keep the entire standalone folder; uploading only this file omits the implementation. Keep personal evidence and research archives outside the installed package. Run `scripts/research_preflight.py` when diagnosing research dependencies or package integrity. Missing components limit the calculations you can truthfully claim, not permission to execute.
+When a research request names a local JSON record, open its literal selection before choosing tools by running `scripts/research_preflight.py --request PROMPT.txt --source-root INPUTS --source DOCUMENT.json`. Use the returned record as the scope. For a new single-instrument long/cash research design or forward-paper protocol, add the [executable economics schema](references/strategy-registration.md#executable-return-and-execution-conventions) and repeat with `--scoped-design CHOICES.json --private-output OUTPUT` to run the [strategy-answer workflow](references/strategy-evaluation.md#prospective-strategy-design) against that original selection. Resolve all files relative to this SKILL.md. Keep the entire standalone folder; uploading only this file omits the implementation. Keep personal evidence and research archives outside the installed package. Run `scripts/research_preflight.py` when diagnosing research dependencies or package integrity. Missing components limit the calculations you can truthfully claim, not permission to execute.
 For supplied tax-aware lot comparisons, use the [source-bound tax-lot report](references/tax-lot-report.md) to preserve signed holding-period components, source units and proposal-specific retained quantities in the delivered answer. Its calendar convention is analytical, and purchase flags are not legal tax findings.
 
 ## Start with the request and its evidence
@@ -37,6 +37,8 @@ For event-driven U.S.-equity research, use [production research operations](refe
 For public investor portfolios, disclosure refreshes, or inverse recommendations, use the [portfolio-following subskill](subskills/portfolio-following/SKILL.md).
 It distinguishes public reported baskets from private or app-specific allocations, supports long-only inverse signals and source-aware rebalance proposals, and
 refreshes on demand unless the user explicitly requests recurring monitoring.
+
+For a prospective strategy research contract or forward-paper protocol, use the [strategy-answer workflow](references/strategy-evaluation.md#prospective-strategy-design) even without a return series. Bind the original response declaration at intake using the [registration instructions](references/strategy-registration.md#original-response-declarations). For a structured response, run `research_contracts.py deliver-strategy OUTPUT --metadata HOST.json --private-output NEW` and submit its `files/first-response.md` and `files/response.json`. A retained declaration is checked during delivery and final file verification. For an older export, pass the original declaration with `--response-contract PROTOCOL` to both commands. Supply every requested field in the host metadata except the generated rows and answer hash. The checker reads a `response.json containing field_a, field_b and field_c` clause or a JSON object with a `required` list. If the host copies the outputs, verify the actual destination files before submission.
 
 For backtesting, portfolio optimization, historical-data readiness or release quality, use [quantitative research assurance](references/quant-research-assurance.md).
 It routes to source-bound identity/readiness and optional price refresh, holdings and tax/settlement accounting, Student-t GARCH and tail diagnostics, independent allocation checks, durable experiment records and reproducible release evidence. Carry strategy readiness and unresolved data qualifications into every reported
@@ -413,7 +415,6 @@ For supplied volatility results alongside an account, use [supplied-result inter
 Preserve source currency and equity denominators in prose and structured amounts, including independent sigma/stress arithmetic; missing currency stays unspecified.
 Legacy dollar fields do not establish USD. Use `account_basis` when an allocation calculation is relevant and complete compatible inputs are available.
 Historical-result interpretation alone does not require purchase proposals or a model refit.
-
 ## Portable quantitative extensions
 
 This is a self-contained skill (Option A), with no separate backend, client,
@@ -425,7 +426,6 @@ cointegration, QuantLib European pricing or VADER, read
 `quant_workbench.py` frozen-input workflow. Missing optional dependencies limit
 only their specific operations; do not fabricate results or silently substitute
 a different model. An upload alone does not establish Muse/Claude runtime support.
-
 ## Technical, fundamental and sentiment toolkits
 
 For cross-asset research, paper scenarios or production-readiness questions, read

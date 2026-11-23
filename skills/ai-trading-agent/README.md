@@ -31,13 +31,17 @@ Source-first analyst reports deliver explicit range width, IQR and the quartile 
 
 The package is a self-contained skill for supported hosts such as Muse, Claude and Instinct. It requires no local backend or background service. Bundled commands run only when invoked in a host that supports them; host tools, execution and data access remain capability-dependent. A backend is outside this architecture unless explicitly requested.
 
-Promotion reports distinguish supplied test returns from independently verified strategy and holdout evidence. Bar replays identify when a close can inform a decision and which fills are simulated.
+Prospective strategy protocols distinguish the selected strategy from its surrounding planning data. Promotion reports distinguish supplied test returns from independently verified strategy and holdout evidence. Bar replays identify when a close can inform a decision and which fills are simulated.
+
+Strategy design reports render the selected source record and verify the delivered answer against the retained design.
 
 Equity and futures scenario reports identify which position inputs support each calculation and which historical records a settlement ledger still needs.
 
 The replay reconciles closed-trade profit and the signed contribution of any position still open at the final mark.
 
-Version **5.13.35** includes [production research operations](references/research-operations.md)
+Strategy delivery checks the original response declaration and identifies incomplete executable designs.
+
+Version **5.13.37** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private

@@ -162,4 +162,9 @@ def check():
 
 
 if __name__ == '__main__':
-    print(json.dumps(check(), indent=2))
+    import sys
+    if any(arg == '--request' or arg.startswith('--request=') for arg in sys.argv[1:]):
+        from research_record import main
+        main()
+    else:
+        print(json.dumps(check(), indent=2))

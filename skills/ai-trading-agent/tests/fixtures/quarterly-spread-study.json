@@ -1,0 +1,15 @@
+{
+  "accounts": {"holding_period": "eight years", "cost": 999},
+  "studies": [
+    {
+      "name": "seasonal freight spread",
+      "universe": ["PORT-NORTH", "PORT-SOUTH"],
+      "decision": "quarterly on release of audited volumes",
+      "holding_rule": "until the next scheduled release",
+      "comparators": {"hedged": "equal-weight freight basket"},
+      "variants": ["base spread", "lagged spread"],
+      "simulation_interval": ["2031-01-01", "2032-01-01"]
+    }
+  ],
+  "unrelated_order": {"cost": 37, "exit": "fixed price example"}
+}

@@ -1,7 +1,7 @@
 """Offline request bindings, evidence inventory, horizon routing and method audit.
 
 CLI: research_contracts.py OPERATION INPUT.json --source-root DIR --private-output DIR
-Operations: bind-request, inventory-evidence, route-horizon, audit-ranking, schema.
+Operations: bind-request, inventory-evidence, route-horizon, audit-ranking, plan-strategy, strategy-answer, schema.
 Replay a private receipt: research_contracts.py verify EXPORT_DIRECTORY
 The caller explicitly selects roles, pointers and methods. No prompt intent,
 source authenticity, acquisition completeness or execution permission is inferred.
@@ -14,6 +14,7 @@ import copy
 from datetime import date
 import hashlib
 import json
+import math
 from pathlib import Path
 import re
 import tempfile
@@ -458,12 +459,120 @@ def audit_ranking(document, source_root):
                     'limits': 'Matching declarations and profile bytes do not prove the scorer ran, intrinsic undervaluation or forecast quality.'})
 
 
+def plan_strategy(document, source_root):
+    """Keep one supplied strategy separate from prospective choices and missing observations."""
+    which = document['strategy_source']
+    sources, values = inventory_sources(document, source_root)
+    source_id, path = which['source_id'], which['pointer']
+    require(source_id in values, 'STRATEGY_SOURCE_BYTES_REQUIRED')
+    selected = pointer(values[source_id], path)
+    require(isinstance(selected, dict) and selected, 'STRATEGY_RECORD_REQUIRED')
+    mode = document['design_kind']
+    require(mode in ('research_contract', 'forward_paper'), 'STRATEGY_DESIGN_KIND')
+    required = ['benchmark', 'variant_treatment', 'evaluation_window', 'execution_convention']
+    if mode == 'forward_paper':
+        required += ['variant_decision_record', 'quote_order_fill_reconciliation']
+    else:
+        required += ['development_validation_split']
+
+    terms = document.get('design_terms', {})
+    require(isinstance(terms, dict), 'DESIGN_TERMS_OBJECT_REQUIRED')
+    resolved, missing = {}, []
+    for name in required:
+        term = terms.get(name)
+        if term is None:
+            missing.append(name)
+            continue
+        require(isinstance(term, dict), 'DESIGN_TERM_OBJECT_REQUIRED')
+        if 'record_pointer' in term:
+            require(set(term) == {'record_pointer'}, 'SOURCE_TERM_HAS_ADDED_VALUES')
+            # All field pointers are relative to the selected record, never its enclosing file.
+            value = pointer(selected, term['record_pointer'])
+            basis = 'supplied'
+        else:
+            require(set(term) == {'proposal'}, 'EXPLICIT_PROPOSAL_REQUIRED')
+            value, basis = term['proposal'], 'proposed'
+        require(isinstance(value, (str, list, dict)) and bool(value) and
+                (not isinstance(value, str) or bool(value.strip())), 'EMPTY_DESIGN_TERM')
+        resolved[name] = {'basis': basis, 'value': value}
+        if basis == 'supplied':
+            resolved[name]['record_pointer'] = term['record_pointer']
+    require(not (set(terms) - set(required)), 'UNRECOGNIZED_DESIGN_TERM')
+
+    decisions = document.get('proposed_decision_rules', [])
+    require(isinstance(decisions, list), 'DECISION_RULE_LIST_REQUIRED')
+    assessed = set()
+    for rule in decisions:
+        require(isinstance(rule, dict) and rule.get('purpose') in ('performance', 'risk', 'operations'),
+                'DECISION_RULE_PURPOSE')
+        require(all(isinstance(rule.get(k), str) and rule[k].strip()
+                    for k in ('measure', 'units', 'measurement_window', 'on_failure', 'if_unmeasurable')),
+                'MEASURABLE_DECISION_RULE_REQUIRED')
+        threshold = rule.get('threshold')
+        require(type(threshold) in (int, float) and math.isfinite(threshold) and
+                rule.get('comparison') in ('<', '<=', '>', '>=', '=='), 'DECISION_RULE_COMPARISON')
+        assessed.add(rule['purpose'])
+    purposes = ['performance', 'risk'] if mode == 'research_contract' else ['performance', 'risk', 'operations']
+    missing.extend('decision_rule.' + purpose for purpose in purposes if purpose not in assessed)
+    return envelope('PROSPECTIVE_STRATEGY_DESIGN', document, {
+        'design_kind': mode, 'source_id': source_id, 'source_pointer': path,
+        'source_sha256': next(row['actual_sha256'] for row in sources if row['id'] == source_id),
+        'supplied_strategy': selected, 'design_terms': resolved, 'proposed_decision_rules': decisions,
+        'missing_design_fields': missing, 'design_status': 'INCOMPLETE' if missing else 'DRAFT_FOR_REVIEW',
+        'limits': 'No outcomes evaluated. Completeness checks the declared structure only. '
+                  'A designated window or a drafted rule does not verify prior registration or an untouched sample.'})
+
+
+def strategy_answer(document, source_root):
+    from strategy_design_answer import controls
+    original = document
+    request_binding = None
+    if 'original_request' in document:
+        from research_record import bound_design
+        selection, request_binding = bound_design(document, source_root)
+        document = dict(document, strategy_source=selection)
+    # One declaration governs selection in both representations. Legacy
+    # plan-strategy accepts its original variant_treatment field unchanged.
+    terms = dict(document.get('design_terms', {}))
+    require('variant_treatment' not in terms, 'USE_STRUCTURED_VARIANT_POLICY')
+    terms['variant_treatment'] = {'proposal': document['answer_controls']['variants']['mode']}
+    draft = plan_strategy(dict(document, design_terms=terms), source_root)['result']
+    answer_controls = document['answer_controls']
+    if 'strategy_registration' in document:
+        from strategy_registration import apply_registration
+        answer_controls = apply_registration(document, draft, pointer)
+    require(not draft['missing_design_fields'], 'COMPLETE_DECLARED_DESIGN_REQUIRED')
+    draft['answer_controls'] = controls(answer_controls, draft['proposed_decision_rules'])
+    primary = draft['answer_controls']['variants']['primary']
+    if 'record_pointer' in primary:
+        value = pointer(draft['supplied_strategy'], primary['record_pointer'])
+        require(value is not None, 'MISSING_PRIMARY_SPECIFICATION')
+        draft['primary_specification'] = {'basis': 'supplied', 'record_pointer': primary['record_pointer'], 'value': value}
+    else:
+        draft['primary_specification'] = {'basis': 'proposed', 'value': primary['proposal']}
+    draft['source_path'] = next(s['path'] for s in document['sources'] if s['id'] == draft['source_id'])
+    if draft['design_kind'] == 'forward_paper':
+        from forward_reconciliation import protocol
+        draft['forward_reconciliation'] = protocol()
+    if request_binding is not None:
+        draft['original_request_binding'] = request_binding
+    if 'clock_fields' in document:
+        from strategy_clock_scope import selected_clocks
+        require(request_binding is not None and 'strategy_registration' in draft, 'ORIGINAL_REGISTERED_STRATEGY_REQUIRED')
+        draft['clock_scope'] = selected_clocks(draft['supplied_strategy'], request_binding,
+                                              draft['strategy_registration']['evaluation'],
+                                              document['clock_fields'], pointer)
+    return envelope('SOURCE_BOUND_STRATEGY_ANSWER', original, draft)
+
+
 OPERATIONS = {'bind-request': bind_request, 'inventory-evidence': inventory_evidence,
-              'route-horizon': route_horizon, 'audit-ranking': audit_ranking}
+              'route-horizon': route_horizon, 'audit-ranking': audit_ranking, 'plan-strategy': plan_strategy,
+              'strategy-answer': strategy_answer}
 
 
 def schema():
-    return {'schema_version': 1, 'operations': [*OPERATIONS, 'verify'],
+    from strategy_registration import registration_schema
+    return {'schema_version': 1, 'operations': [*OPERATIONS, 'verify', 'deliver-strategy'],
             'source_contract': {'allowlist': ['inputs.json'], 'sources': [{'id': 'input', 'path': 'inputs.json',
                 'sha256': 'EXACT_FILE_SHA256', 'format': 'json', 'role': 'actual_user_request'}]},
             'bind_request_fields': {'prompt_binding': {'source_id': 'prompt', 'pointer': ''},
@@ -471,6 +580,25 @@ def schema():
                     'target': 'account_equity', 'usage': 'selected', 'required_role': 'observed_account',
                     'record_pointer': '/account', 'record_identity': {'pointer': '/account/id', 'expected': 'account-A'},
                     'metadata_pointers': {'observed_at': '/account/observed_at'}}]},
+            'plan_strategy': {'design_kind': ['research_contract', 'forward_paper'],
+                              'strategy_source': {'source_id': 'input', 'pointer': '/chosen_record'},
+                              'design_terms': 'Use record_pointer relative to the selected record, or proposal. See references/strategy-evaluation.md.',
+                              'proposed_decision_rules': ['purpose', 'measure', 'units', 'measurement_window',
+                                                          'comparison', 'threshold', 'on_failure', 'if_unmeasurable']},
+            'strategy_answer': {'base': 'plan_strategy',
+                'registered_request_schema': registration_schema(),
+                'preferred_registration': 'For a selected single-instrument long/cash record use --scoped-design with registered_request_schema.executable_design. Link the selected record, cash accrual, comparator, fill economics, activity floor and forward quality thresholds. Use --registered-design to replay prior comparator/calendar/estimator choices.',
+                'legacy_scope': 'Open prose does not validate comparator inputs or a committed estimator.',
+                'answer_controls': {
+                'session_basis': 'Data calendar and bar eligibility', 'warmup': 'Required history and first eligible decision',
+                'initial_state': 'Initial position, regime and tie handling',
+                'variants': {'mode': 'fixed_primary', 'primary': {'record_pointer': '/variants/0'}},
+                'sample': {'minimum_observations': 30, 'observation_unit': 'paired observations',
+                           'minimum_events': 5, 'event_unit': 'completed decisions', 'rationale': 'Replace illustrative floors with justified minima'},
+                'uncertainty': {'performance_rule': 0, 'confidence': 0.95, 'method': 'Predeclared interval estimator',
+                                'dependence_treatment': 'Define dependence model and tuning choices'}},
+                'structured_delivery': 'deliver-strategy OUTPUT --metadata HOST.json --private-output NEW writes NEW/files/first-response.md and NEW/files/response.json',
+                'readback': 'verify OUTPUT --answer FINAL.md --rows FINAL.json checks provided text and rows; add --metadata HOST.json for the generated envelope'},
             'inventory_extra_fields': ['as_of', 'expected_acquisition_receipt_ids', 'acquisition_coverage', 'checks'],
             'check_kinds': ['primary_source', 'primary_freshness', 'research_handoff', 'pe_claim', 'revision', 'scenario_checks'],
             'horizon_fields': ['mode', 'as_of', 'entry_at', 'comparison_at', 'fixed_spec (fixed_exit only)',
@@ -517,10 +645,19 @@ def write_files(directory, files):
             stream.write(raw)
 
 
-def export_run(operation, raw, source_root, output):
+def export_run(operation, raw, source_root, output, original_contract=None):
     """Evaluate a frozen byte snapshot, then retain it in an exclusive directory."""
     require(operation in OPERATIONS, 'UNKNOWN_OPERATION')
     document = parse_document(raw)
+    if operation == 'strategy-answer':
+        from strategy_intake import mentions_fields, packaged_request
+        package = packaged_request(source_root)
+        require(not package or not any(mentions_fields(raw) for raw in package),
+                'USE_ORIGINAL_REQUEST_ENTRY_FOR_PACKAGED_STRATEGY_DESIGNS')
+        if original_contract is not None:
+            from response_contract import declared_fields
+            declared_fields(original_contract)
+            require('original_request' in document, 'DELIVERY_CONTRACT_REQUIRES_BOUND_ORIGINAL_REQUEST')
     saved, absent = retained_sources(document, source_root)
     output = binding_json.local_path(output)
     require(not output.is_relative_to(ROOT), 'PRIVATE_OUTPUT_OUTSIDE_SKILL_REQUIRED')
@@ -531,60 +668,237 @@ def export_run(operation, raw, source_root, output):
         write_files(snapshot, saved)
         report = OPERATIONS[operation](document, snapshot)
     files = {'request.json': raw, 'report.json': (binding_json.encode(report) + '\n').encode('utf-8')}
+    if operation == 'strategy-answer':
+        from strategy_design_answer import render
+        files['answer.md'] = render(report['result']).encode('utf-8')
+        files['answer-rows.json'] = (binding_json.encode([report['result']]) + '\n').encode('utf-8')
     files.update({'source-bytes/' + name: content for name, content in saved.items()})
-    manifest = {'schema_version': 1, 'operation': operation, 'absent_source_paths': absent,
+    receipt_version = 2 if operation == 'strategy-answer' and 'forward_reconciliation' in report['result'] else 1
+    if original_contract is not None:
+        require(operation == 'strategy-answer', 'RESPONSE_DECLARATION_FOR_STRATEGY_ONLY')
+        files['response-contract.txt'] = original_contract
+        receipt_version = 3
+    manifest = {'schema_version': receipt_version, 'operation': operation, 'absent_source_paths': absent,
                 'files': {name: hashlib.sha256(content).hexdigest() for name, content in files.items()},
                 'source_authenticity_verified': False, 'execution_gates': []}
     files['receipt.json'] = (json.dumps(manifest, sort_keys=True, indent=2) + '\n').encode('utf-8')
     output.mkdir(mode=0o700)
     (output / 'source-bytes').mkdir(mode=0o700)
+    if operation == 'strategy-answer':
+        from strategy_registration import STRICT, LEGACY
+        manifest['registration_scope'] = STRICT if 'strategy_registration' in document else LEGACY
+        files['receipt.json'] = (json.dumps(manifest, sort_keys=True, indent=2) + '\n').encode('utf-8')
     write_files(output, files)
     return report
 
 
-def verify(directory):
+def strategy_response(markdown, typed_rows, metadata_raw):
+    """Retain host declarations as JSON values. The replay owns the answer hash and rows."""
+    metadata = binding_json.strict_json(metadata_raw)
+    require(isinstance(metadata, dict) and not {'rows', 'first_response_sha256'}.intersection(metadata),
+            'HOST_METADATA_OBJECT_WITHOUT_GENERATED_FIELDS_REQUIRED')
+    if len(typed_rows) == 1 and isinstance(typed_rows[0], dict) and 'clock_scope' in typed_rows[0]:
+        from strategy_clock_scope import limitations
+        expected = limitations(typed_rows[0])
+        require('limitations' not in metadata or metadata['limitations'] in ([], expected),
+                'SCOPED_STRATEGY_LIMITATIONS_ARE_GENERATED_USE_EXECUTION_LIMITATIONS_FOR_HOST_DISCLOSURES')
+        metadata = dict(metadata, limitations=expected)
+    envelope = dict(metadata, first_response_sha256=hashlib.sha256(markdown).hexdigest(), rows=typed_rows)
+    return (binding_json.encode(envelope) + '\n').encode('utf-8')
+
+
+def delivery_path(value):
+    """Require local canonical paths with no symlink or Windows reparse component."""
+    from supplied_research import safe
+    path = Path(value).absolute()
+    require('://' not in str(value) and not str(path).startswith(('\\\\', '//')), 'LOCAL_PATH_REQUIRED')
+    require('..' not in Path(value).parts and safe(path) == path, 'CANONICAL_DELIVERY_PATH_REQUIRED')
+    return path
+
+
+def verify(directory, answer=None, rows=None, metadata=None, response_contract=None):
     """Verify local byte consistency and replay installed helpers, never imports."""
+    if response_contract is not None:
+        require(metadata is not None, 'RESPONSE_CONTRACT_REQUIRES_METADATA_READBACK')
+    if metadata is not None:
+        require(answer is not None and rows is not None, 'METADATA_READBACK_REQUIRES_STRATEGY_PAIR')
+        root = delivery_path(directory)
+        for supplied in (answer, rows, metadata):
+            delivery_path(supplied)
+        for member in root.rglob('*'):
+            delivery_path(member)
     root = binding_json.local_path(directory)
     receipt = parse_document(source_path(root, 'receipt.json').read_bytes())
-    require(receipt.get('schema_version') == 1 and receipt.get('operation') in OPERATIONS, 'RECEIPT_SCHEMA_INVALID')
+    version = receipt.get('schema_version')
+    require(type(version) is int and version in (1, 2, 3) and receipt.get('operation') in OPERATIONS,
+            'RECEIPT_SCHEMA_INVALID')
     files = receipt.get('files')
+    expects_answer = receipt['operation'] == 'strategy-answer'
+    outputs = {'request.json', 'report.json'}
+    if version == 3:
+        require(expects_answer, 'BOUND_ORIGINAL_STRATEGY_RECEIPT_REQUIRED')
+        outputs.add('response-contract.txt')
+    if expects_answer:
+        outputs.update(('answer.md', 'answer-rows.json'))
+    require((answer is None and rows is None) or expects_answer, 'STRATEGY_ANSWER_RECEIPT_REQUIRED')
     require(isinstance(files, dict) and 'request.json' in files and 'report.json' in files, 'RECEIPT_FILES_REQUIRED')
     for name, expected in files.items():
-        require(name in ('request.json', 'report.json') or name.startswith('source-bytes/'), 'RECEIPT_PATH_UNSUPPORTED')
+        require(name in outputs or name.startswith('source-bytes/'), 'RECEIPT_PATH_UNSUPPORTED')
         path = source_path(root, name)
         require(isinstance(expected, str) and re.fullmatch('[a-f0-9]{64}', expected), 'RECEIPT_HASH_INVALID')
         require(hashlib.sha256(path.read_bytes()).hexdigest() == expected, 'RETAINED_BYTES_MISMATCH')
     document = parse_document((root / 'request.json').read_bytes())
     saved, absent = retained_sources(document, root / 'source-bytes')
     require(sorted(absent) == sorted(receipt.get('absent_source_paths', [])), 'SOURCE_PRESENCE_MISMATCH')
-    require(set(files) == {'request.json', 'report.json'} | {'source-bytes/' + n for n in saved}, 'SOURCE_INVENTORY_MISMATCH')
+    require(set(files) == outputs | {'source-bytes/' + n for n in saved}, 'SOURCE_INVENTORY_MISMATCH')
     actual_files = {p.relative_to(root).as_posix() for p in root.rglob('*') if p.is_file()}
     require(actual_files == set(files) | {'receipt.json'}, 'UNLISTED_RETAINED_FILE')
     expected_report = binding_json.strict_json((root / 'report.json').read_bytes())
     report = OPERATIONS[receipt['operation']](document, root / 'source-bytes')
+    forward = expects_answer and report['result']['design_kind'] == 'forward_paper'
+    require(version != 2 or forward, 'FORWARD_RECEIPT_REQUIRED')
+    if version == 3:
+        from response_contract import declared_fields
+        retained_contract = source_path(root, 'response-contract.txt').read_bytes()
+        required_fields = declared_fields(retained_contract)
+        require('original_request_binding' in report['result'], 'ORIGINAL_REQUEST_REPLAY_REQUIRED')
+        if response_contract is not None:
+            require(delivery_path(response_contract).read_bytes() == retained_contract, 'ORIGINAL_RESPONSE_DECLARATION_CHANGED')
+    if forward and version == 1:
+        # Earlier receipts predate register-level reconciliation. Replay their original projection.
+        del report['result']['forward_reconciliation']
     replay_json = binding_json.strict_json(binding_json.encode(report).encode('utf-8'))
     require(not binding_json.differences(replay_json, expected_report), 'REPLAY_REPORT_MISMATCH')
-    return {'status': 'RETAINED_BYTES_AND_REPLAY_CONSISTENT', 'operation': receipt['operation'],
-            'file_count': len(files), 'source_authenticity_verified': False, 'execution_gates': []}
+    checks = {'retained_export': True}
+    if expects_answer:
+        from strategy_design_answer import render
+        projection = render(report['result']).encode('utf-8')
+        require((root / 'answer.md').read_bytes() == projection, 'STRATEGY_ANSWER_REPLAY_MISMATCH')
+        typed = binding_json.encode([report['result']])
+        require((root / 'answer-rows.json').read_bytes() == (typed + '\n').encode('utf-8'), 'STRATEGY_ROWS_REPLAY_MISMATCH')
+        if answer is not None:
+            answer_path = binding_json.local_path(answer)
+            require(answer_path.read_bytes() == projection, 'FINAL_STRATEGY_ANSWER_DIFFERS')
+            checks['markdown'] = 'export_member' if answer_path.is_relative_to(root) else 'provided_file'
+        if rows is not None:
+            rows_path = binding_json.local_path(rows)
+            final_raw = rows_path.read_bytes()
+            final = binding_json.strict_json(final_raw)
+            payload = final['rows'] if isinstance(final, dict) else final
+            require(binding_json.encode(payload) == typed, 'FINAL_STRATEGY_ROWS_DIFFER')
+            checks['rows'] = 'export_member' if rows_path.is_relative_to(root) else 'provided_file'
+        if metadata is not None:
+            from supplied_research import read
+            declared = read(delivery_path(metadata))
+            require(final_raw == strategy_response(projection, [report['result']], declared),
+                    'FINAL_STRATEGY_ENVELOPE_DIFFERS')
+            checks['declared_metadata_sha256'] = hashlib.sha256(declared).hexdigest()
+            if version == 3 or response_contract is not None:
+                from response_contract import audit
+                checks['response_contract'] = audit(retained_contract if version == 3 else read(delivery_path(response_contract)), final)
+                if version == 3:
+                    require(current_strategy_design(report['result']), 'SCOPED_INCOMPLETE_REGISTER_EXECUTABLE_ECONOMICS_AND_SELECTED_CLOCKS')
+    result = {'status': 'RETAINED_BYTES_AND_REPLAY_CONSISTENT', 'operation': receipt['operation'],
+              'file_count': len(files), 'checks': checks, 'submission_observed': False,
+              'source_authenticity_verified': False, 'execution_gates': []}
+    if expects_answer:
+        from strategy_registration import STRICT, LEGACY
+        scope = STRICT if 'strategy_registration' in document else LEGACY
+        require(receipt.get('registration_scope', LEGACY) == scope, 'STRATEGY_REGISTRATION_SCOPE_MISMATCH')
+        result['registration_scope'] = scope
+        if version == 3:
+            result['delivery_scope'] = ('current_registered_strategy' if current_strategy_design(report['result'])
+                                        else 'scoped_incomplete')
+            result['required_response_fields'] = required_fields
+    if expects_answer and answer is None and rows is None:
+        result['next_for_structured_delivery'] = 'deliver-strategy EXPORT --metadata HOST.json --private-output NEW'
+    return result
+
+
+def current_strategy_design(row):
+    registration = row.get('strategy_registration', {})
+    economics = registration.get('economics', {})
+    return bool(row.get('original_request_binding') and 'clock_scope' in row and economics and
+                (row['design_kind'] != 'forward_paper' or economics.get('execution_quality')))
+
+
+def deliver_strategy(directory, metadata, output, response_contract=None):
+    """Verify both staged files, reserve the destination exclusively and publish the pair together."""
+    from supplied_research import read, write
+    root, metadata, output = map(delivery_path, (directory, metadata, output))
+    require(not output.exists() and not output.is_relative_to(ROOT) and not output.is_relative_to(root)
+            and not root.is_relative_to(output) and not metadata.is_relative_to(output),
+            'NEW_DISJOINT_PRIVATE_DELIVERY_REQUIRED')
+    require(parse_document(read(root / 'receipt.json')).get('operation') == 'strategy-answer',
+            'STRATEGY_ANSWER_RECEIPT_REQUIRED')
+    markdown = read(root / 'answer.md')
+    rows = binding_json.strict_json(read(root / 'answer-rows.json'))
+    envelope = strategy_response(markdown, rows, read(metadata))
+    if response_contract is not None:
+        from response_contract import audit
+        original_contract = read(delivery_path(response_contract))
+        expected_contract = audit(original_contract, binding_json.strict_json(envelope))
+    pair = {'first-response.md': markdown, 'response.json': envelope}
+    # Same-filesystem rename publishes both closed files inside the new, owned directory.
+    with tempfile.TemporaryDirectory(dir=output.parent) as temporary:
+        staged = Path(temporary).resolve() / 'files'
+        for name, raw in pair.items():
+            write(staged, name, raw)
+        audit = verify(root, staged / 'first-response.md', staged / 'response.json', metadata, response_contract)
+        if response_contract is not None:
+            require(audit['checks']['response_contract'] == expected_contract, 'RESPONSE_CONTRACT_CHANGED')
+        output.mkdir(mode=0o700)
+        final = output / 'files'
+        staged.rename(final)
+    for name, raw in pair.items():
+        require(read(final / name) == raw, 'PUBLISHED_STRATEGY_PAIR_DIFFERS')
+    if 'delivery_scope' not in audit:
+        audit['delivery_scope'] = ('provided_contract_checked_during_delivery' if response_contract is not None
+                                   else 'scoped_incomplete_original_delivery_contract_unbound')
+    audit['local_files_sha256'] = {'files/' + name: hashlib.sha256(raw).hexdigest() for name, raw in pair.items()}
+    return audit
 
 
 def main():
     p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument('operation', choices=[*OPERATIONS, 'schema', 'verify']); p.add_argument('input', nargs='?')
+    p.add_argument('operation', choices=[*OPERATIONS, 'schema', 'verify', 'deliver-strategy']); p.add_argument('input', nargs='?')
     p.add_argument('--source-root'); p.add_argument('--private-output')
+    p.add_argument('--answer', help='Verify the exact response file against a strategy-answer receipt')
+    p.add_argument('--rows', help='Verify a JSON row list or the rows in a response envelope')
+    p.add_argument('--metadata', help='Host JSON declarations for the strategy response envelope')
+    p.add_argument('--response-contract', help='Original response field declaration or required-key JSON file')
     args = p.parse_args()
+    if args.response_contract is not None and args.operation not in ('deliver-strategy', 'verify'):
+        p.error('--response-contract is supported by deliver-strategy and verify')
     if args.operation == 'schema':
         print(json.dumps(schema(), indent=2)); return
     try:
         if args.operation == 'verify':
             require(args.input is not None, 'EXPORT_DIRECTORY_REQUIRED')
-            verify(args.input)
+            audit = verify(args.input, args.answer, args.rows, args.metadata, args.response_contract)
+            if audit['operation'] == 'strategy-answer':
+                print(json.dumps(audit, sort_keys=True))
             return
+        if args.operation == 'deliver-strategy':
+            require(args.input and args.metadata and args.private_output and not any((args.source_root, args.answer, args.rows)),
+                    'DELIVERY_REQUIRES_EXPORT_METADATA_AND_NEW_PRIVATE_OUTPUT')
+            print(json.dumps(deliver_strategy(args.input, args.metadata, args.private_output, args.response_contract), sort_keys=True))
+            return
+        require(args.metadata is None, 'METADATA_REQUIRES_STRATEGY_DELIVERY_OR_VERIFY')
+        require(args.answer is None and args.rows is None, 'ANSWER_VERIFICATION_ONLY')
         require(args.input is not None and args.private_output is not None, 'INPUT_AND_PRIVATE_OUTPUT_REQUIRED')
         require(args.source_root is not None or args.operation == 'route-horizon', 'SOURCE_ROOT_REQUIRED')
         raw = binding_json.local_path(args.input).read_bytes()
         export_run(args.operation, raw, args.source_root, args.private_output)
-    except (ValueError, KeyError, IndexError, TypeError, OSError, RuntimeError):
+        if args.operation == 'strategy-answer':
+            receipt = parse_document((Path(args.private_output) / 'receipt.json').read_bytes())
+            print(json.dumps({'operation': args.operation, 'registration_scope': receipt['registration_scope'],
+                              'delivery_scope': 'scoped_incomplete_original_delivery_contract_unbound'}))
+    except (ValueError, KeyError, IndexError, TypeError, OSError, RuntimeError) as exc:
+        if str(exc) == 'USE_ORIGINAL_REQUEST_ENTRY_FOR_PACKAGED_STRATEGY_DESIGNS':
+            p.exit(2, 'Use research_preflight.py --request with the original prompt, source root and design choices.\n')
+        if str(exc).startswith(('SCOPED_INCOMPLETE_', 'MISSING_REQUIRED_RESPONSE_FIELDS')):
+            p.exit(2, 'Delivery incomplete. Check the original response fields and the registered executable economics.\n')
         p.exit(2, 'Research receipt unavailable: inspect local schema, bindings and output path. Native execution permissions unchanged.\n')
 
 

@@ -8,6 +8,84 @@ costs, benchmark and decision thresholds. Never retrofit thresholds to the resul
 This protocol governs research and performance claims only. Its findings are
 advisory and never conditions for native host or broker execution.
 
+## Prospective strategy design
+
+When the original request contains one literal local JSON reference, begin at `research_preflight.py --request PROMPT.txt --source-root INPUTS --source DOCUMENT.json`. It reads the selected record before the assistant chooses methods. File names are relative to INPUTS; use an explicit allowlist and retain the original prompt bytes. For example, a reference of `studies.json#/cohorts/0` selects the first cohort. Bare references run to whitespace and keep punctuation inside the key. Use backticks or angle brackets for paths or keys with spaces, surrounding markup or ambiguous sentence punctuation. A missing or ambiguous selector needs clarification. This operation does not infer intent from keywords. For a new single-instrument long/cash design, add the [typed registration and executable economics](strategy-registration.md#executable-return-and-execution-conventions) to the four choice fields (`design_kind`, `design_terms`, `proposed_decision_rules`, `answer_controls`) and repeat with `--scoped-design CHOICES.json --private-output OUTPUT`. This dispatches to the renderer and replays the original selector and source hashes during verification. Proposals still require substantive review. The scoped readback binds decision, holding period and horizon to fields in the selected record. Optionally map those roles to nested record-relative pointers in `CHOICES.clock_fields`. Omit missing roles. An enclosing or sibling field does not establish a second user mandate. A separately requested horizon needs its own source. Generic `route-horizon` evaluates caller declarations and cannot establish that the user selected one of those siblings.
+
+In this mode the delivered response generates its strategy `limitations` from the selected report. Omit that field in the host metadata. Keep genuine runtime and collection disclosures in `execution_limitations` or the host's designated runtime field. Preserve other case-specific evidence gaps in the strategy design itself. The earlier `--executable-design` interface remains available for existing callers and replay.
+
+For a final research design or forward-paper answer with an already bound structured selection, run `scripts/research_contracts.py strategy-answer REQUEST.json --source-root INPUTS --private-output OUTPUT`. Keep the original source bytes intact and select the record named by the request. Use the exact source ID, digest and record pointer. Treat fields in its parent and siblings as outside scope. Separate observations and assumptions from proposals. A source binding verifies the selected bytes. A reviewer still needs to judge the meaning of a proposal and whether it conflicts with a supplied rule.
+
+For new research and paper protocols use the [typed strategy registration](strategy-registration.md). It gives each comparator input an explicit origin, commits to one uncertainty estimator, and separates historical development from the evaluation window. Free-text designs accepted by the legacy interface have an open-prose registration scope.
+
+Start with the request fields below and the `strategy_answer` controls shown by `research_contracts.py schema`. For this operation omit the legacy `design_terms.variant_treatment`. Specify one structured variant policy:
+
+- `fixed_primary` takes `primary` as either a selected-record-relative `record_pointer` or a labeled `proposal`. Only that primary can pass; report alternatives as descriptive sensitivities.
+- `development_selection` also requires a predeclared `selection_measure`, `tie_break`, `multiplicity_adjustment` and `lock_before`. State precisely how the winner is chosen and which untouched observations may decide the outcome.
+
+Declare the initial position and regime, eligible-session/time-zone convention, and actual warm-up history. Derive a first actionable timestamp only from verified observations and an eligible calendar. Set a justified number of paired observations and completed events, with their units. Link a one-sided confidence bound to a zero-based directional performance-rule index. Specify the estimator, confidence level, dependence treatment and its parameters. Gates and thresholds are design proposals until frozen before observations. Sparse data or an unavailable bound is inconclusive. The forward-paper answer includes the proposed journal fields for decision, quote, order, execution and balance reconciliation.
+
+For a structured response, put the destination's required host declarations in a JSON object (`HOST.json`). Include applicable runtime details, limitations and evidence references. The helper supplies `rows` and `first_response_sha256`. Use `{}` if no host fields are required. Generate the final files from the selected strategy:
+
+```text
+python scripts/research_contracts.py deliver-strategy OUTPUT --metadata HOST.json --private-output NEW
+```
+
+Choose a fresh private directory name under an existing local parent. On success submit the exact `NEW/files/first-response.md` and `NEW/files/response.json`. The command verifies the pair against the replay, checks the preserved metadata values and prints local file hashes. If the destination requires another location, copy both files unchanged and run `research_contracts.py verify OUTPUT --answer FINAL.md --rows FINAL.json --metadata HOST.json` on the actual copies. For a text-only response use `OUTPUT/answer.md` unchanged and verify the destination with `--answer FINAL.md`. To change strategy content, correct the request and generate a new export. Plain `verify OUTPUT` checks the retained export only. The checks establish local consistency. Host declarations, strategy quality and receipt by the recipient require separate evidence.
+
+### Checking a forward-paper execution journal
+
+Each new forward-paper answer includes a typed reconciliation policy for expected decision slots, intended orders and independent executions. Apply the policy before evaluating execution-quality tolerances. For example, a documented failure to fill is a measurable outcome. An intended order missing from the disposition journal leaves its outcome unknown.
+
+For an observed variant and window, run `python scripts/forward_reconciliation.py REGISTERS.json`. Give `decisions`, `orders` and `fills` a `reference` and `accounted` list. Use unique decision IDs, then `[decision_id, intended_order_id]` and `[intended_order_id, execution_id]` pairs. Use `null` for an unknown parent or unavailable list, and `[]` for a verified empty list. Build each reference population independently of the journal being checked. Count each intended order once across partial fills. Keep separate records for the primary strategy and each sensitivity.
+
+Supply `unresolved_exceptions` as a list of open exception IDs after checking quantities, prices, quotes, fees, cash and positions against separate originals. Use `null` while that check is unavailable. The helper compares identity sets and reports distinct matched fill parents. Inspect the actual numbers, criteria and study-specific sample requirement separately.
+
+When asked to write a contract, make the design choices the request delegates. If
+the input selects a record, anchor supplied facts to that exact file and pointer.
+An account goal, example trade, fee schedule or risk budget elsewhere in a document
+needs an explicit relationship before it can change the selected strategy. Keep
+the signal clock, holding period and evaluation dates separate. State how ties,
+warm-up, order timing, costs, missing observations and exits are handled. Preserve
+supplied variants and identify the primary rule and how alternatives affect the
+decision. State the basis for any new choice and retain genuine conflicts for review.
+
+Use `scripts/research_contracts.py plan-strategy REQUEST.json --source-root INPUTS
+--private-output OUTPUT` to record the design. Use the existing source allowlist and
+SHA-256 contract from `schema`. Set `strategy_source` to the source ID and JSON
+pointer of the requested record. In `design_terms`, use `{"record_pointer":"/field"}`
+to reuse a value within it or `{"proposal":"specific proposed convention"}` to
+add a choice. Supply benchmark, variant_treatment, evaluation_window and
+execution_convention. Name the comparator and match dates, currency, reinvestment
+and cost basis. Keep the complete original strategy in view alongside these terms.
+
+For `design_kind=research_contract`, supply development_validation_split. Designate
+chronological development and validation folds and a final evaluation window,
+including leakage controls. Specify the variant-selection or multiplicity policy.
+Date the proposal. If part of a planned evaluation interval has already elapsed,
+state what evidence would establish independence and how an exposed interval will
+be treated. Missing observations limit empirical claims while a proposal remains feasible.
+
+For `design_kind=forward_paper`, supply variant_decision_record and
+quote_order_fill_reconciliation. Record each variant's inputs, decision time and
+action, including no-signal decisions. Link timestamped bid/ask, size and freshness,
+order arrival/acknowledgement, partial or missed fills, fees, latency, and the final
+cash and position reconciliation. Specify the reference price and quantity for
+shortfall and separate modeled costs from observed costs. State what independently
+retained evidence and review would support consideration of live use.
+
+For each proposed decision rule supply purpose, measure, units, measurement_window,
+comparison, numeric threshold, on_failure and if_unmeasurable. For example a design
+may **propose** that mean paired net active return, in percentage points per
+observation over the designated holdout, must exceed zero, with a confidence bound
+and drawdown tolerance appropriate to the strategy. Justify the chosen values
+and precommit uncertainty and sample-adequacy treatment. A research contract
+needs performance and risk rules. A forward protocol needs performance, risk and
+operational rules, such as a specified maximum proportion of unlinked fills.
+Report missing design fields and data separately. This operation checks the
+structure of an authored proposal. It does not grade a strategy or establish
+that the rules were precommitted or that a paper trade occurred.
+
 ## Two experiments, two claims
 
 1. **Fixed-hold cohorts:** form a portfolio at each predeclared monthly origin;
