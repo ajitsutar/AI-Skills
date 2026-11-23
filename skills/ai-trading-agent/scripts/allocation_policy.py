@@ -323,12 +323,66 @@ def _result(document, source, by_symbol, selected, selection_basis, budget, weig
     return result
 
 
+def draft_mandate(document):
+    """Check proposed long-only capital budgets and a strategic comparator, without requiring prices."""
+    require(set(document) <= {'operation', 'sleeves'} and document.get('operation') == 'draft_mandate',
+            'Use operation draft_mandate with a list of sleeves.')
+    sleeves = document.get('sleeves')
+    require(isinstance(sleeves, list) and sleeves, 'Declare the permitted sleeves, including a cash sleeve if used.')
+    terms = ('minimum_pct', 'target_pct', 'maximum_pct', 'benchmark')
+    approved_keys = {'name', 'user_terms', *terms}
+    names = set()
+    rows = []
+    gaps = []
+    targets = []
+    for sleeve in sleeves:
+        require(isinstance(sleeve, dict) and set(sleeve) <= approved_keys, 'Unknown sleeve fields.')
+        name = sleeve.get('name')
+        require(isinstance(name, str) and name.strip() and name.strip().casefold() not in names,
+                'Each sleeve needs a distinct name.')
+        names.add(name.strip().casefold())
+        user_terms = sleeve.get('user_terms', [])
+        require(isinstance(user_terms, list) and all(t in terms for t in user_terms) and
+                len(user_terms) == len(set(user_terms)), 'Identify supplied terms individually.')
+        values = {}
+        sources = {}
+        for term in terms:
+            if term in ('minimum_pct', 'maximum_pct') and term not in sleeve and term not in user_terms:
+                continue
+            value = sleeve.get(term)
+            if value is None or (isinstance(value, str) and value.strip().upper() in
+                                 {'', 'TBD', 'UNDECIDED', 'NOT SPECIFIED', 'NOT_EVALUATED', 'UNKNOWN', 'UNSPECIFIED'}):
+                require(term not in user_terms, 'A user-supplied term needs its actual value.')
+                gaps.append({'sleeve': name, 'missing_term': term})
+                continue
+            if term == 'benchmark':
+                require(isinstance(value, str) and value.strip(), 'Give the investable comparator or reference specification.')
+                values[term] = value.strip()
+            else:
+                number = decimal(str(value) if type(value) is float else value, term)
+                require(0 <= number <= 100, 'Capital percentages must lie between zero and one hundred.')
+                values[term] = str(number)
+            sources[term] = 'user_supplied' if term in user_terms else 'proposed_for_review'
+        bounds = [Decimal(values[t]) for t in terms[:3] if t in values]
+        require(bounds == sorted(bounds), 'A sleeve target or bound contradicts its other supplied terms.')
+        if 'target_pct' in values:
+            targets.append(Decimal(values['target_pct']))
+        rows.append({'name': name, 'terms': values, 'term_basis': sources})
+    if len(targets) == len(sleeves):
+        require(sum(targets) == 100, 'Funded capital targets must sum to 100%, including any cash.')
+    return {'status': 'DRAFT_INCOMPLETE' if gaps else 'DRAFT_FOR_REVIEW', 'risk_measure': 'capital_weight_pct', 'scope': 'sleeve capital budgets and benchmark blend',
+            'sleeves': rows, 'missing_terms': gaps, 'benchmark_weights': [] if gaps else [
+                {'reference': r['terms']['benchmark'], 'weight_pct': r['terms']['target_pct']} for r in rows],
+            'observed_performance': None, 'broker_support_verified': False, 'advisory_only': True}
+
+
 def main():
-    parser = argparse.ArgumentParser(description=__doc__)
+    parser = argparse.ArgumentParser(description=__doc__, epilog='Use a candidate-set document for position sizing, or operation draft_mandate for proposed sleeve budgets and benchmarks. See references/allocation-policy.md.')
     parser.add_argument('input', type=Path)
     args = parser.parse_args()
     document = json.loads(args.input.read_text(encoding='utf-8-sig'))
-    print(json.dumps(allocate(document), indent=2, allow_nan=False))
+    result = draft_mandate(document) if isinstance(document, dict) and document.get('operation') == 'draft_mandate' else allocate(document)
+    print(json.dumps(result, indent=2, allow_nan=False))
 
 
 if __name__ == '__main__':

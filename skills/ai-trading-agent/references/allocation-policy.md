@@ -22,6 +22,20 @@ permit or block live actions, create an execution approval workflow, or submit a
 order. Native host and broker tools own any user-requested execution. No skill
 execution gates are introduced.
 
+## Drafting capital budgets and benchmarks
+
+When asked to design a mandate, retain the user's explicit restrictions. For the design choices they delegated, give a concrete, internally feasible proposal and label it as yours. An unspecified risk appetite can justify an alternative or a question for adoption. It does not prevent drafting an illustrative policy. If asked only to document existing terms or explicitly told to leave choices open, preserve those gaps.
+
+For a fully funded long-only policy, list each permitted sleeve, its strategic target and applicable concentration limits, with targets totaling 100% including cash. Explain the risk measure: a capital concentration band is not a bound on drawdown or volatility. Where the request calls for a different risk measure, give an appropriate limit and its units. Choose a replicable comparator or describe its construction for each sleeve. Match exposure, currency, duration, credit or liquidity as relevant, and give the composite weighting rule. A benchmark specification needs no realized return, security quote or verified trading route. State which data would be needed to measure performance and which terms need the investor's confirmation.
+
+For that capital-budget form of mandate, run `python scripts/allocation_policy.py draft.json` before delivering the terms. Start from the permitted sleeves in the request. Supply a target and a benchmark for each sleeve, plus any applicable minimum or maximum; `user_terms` identifies only values actually supplied by the user. All other entered terms remain proposals. This two-sleeve example shows the units and attribution.
+
+```json
+{"operation":"draft_mandate","sleeves":[{"name":"Liquidity reserve","minimum_pct":5,"target_pct":10,"maximum_pct":20,"benchmark":"Base-currency three-month government bill total return","user_terms":["minimum_pct"]},{"name":"Global shares","minimum_pct":80,"target_pct":90,"maximum_pct":95,"benchmark":"Broad global equity total-return index translated into the portfolio currency"}]}
+```
+
+Use an incomplete result to identify requested design terms still missing. Preserve any genuinely unavailable observations or unresolved user-only decisions as such. A sound draft does not imply calibrated risk estimates, investor adoption, or broker execution support.
+
 ## Selection and allocation contract
 
 Selection precedence is explicit and fixed:

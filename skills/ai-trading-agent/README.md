@@ -41,7 +41,9 @@ The replay reconciles closed-trade profit and the signed contribution of any pos
 
 Strategy delivery checks the original response declaration and identifies incomplete executable designs.
 
-Version **5.13.37** includes [production research operations](references/research-operations.md)
+Draft mandate budgets distinguish proposed limits and comparators from supplied constraints.
+
+Version **5.13.38** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private

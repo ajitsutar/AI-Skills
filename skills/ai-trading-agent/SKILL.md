@@ -4,7 +4,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 ---
 
 # AI Trading Agent
-Package version: **5.13.37 - November 23, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
+Package version: **5.13.38 - November 23, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
 `approval` or `autonomous`: respectively simulate only, require order approval,
@@ -54,7 +54,7 @@ Before authoring a final answer, follow the [final claims and scenario review](r
 Retain source/result pointers, audit conditional claims and funding alternatives, and bind source opening conventions and event scope before scenario projections.
 
 For supplied-data research, read the full current request and inventory its allowed files before selecting a calculation. Preserve its universe, horizon, objective,
-source scope and requested comparisons. An example configuration is not the user's mandate. When acquisition is excluded, work from the retained bytes and report
+source scope and requested comparisons. An example configuration is not the user's mandate. When asked to draft policy, label your proposed risk budgets and comparators separately from supplied constraints. Use the [mandate draft workflow](references/allocation-policy.md#drafting-capital-budgets-and-benchmarks) for funded sleeve budgets and benchmark weights. When acquisition is excluded, work from the retained bytes and report
 what is missing; do not invoke a download command to fill that gap.
 
 Carry supplied decision context through to the answer: the purpose of the money, recurring contributions, liquidity needs, constraints and any loss scenario the

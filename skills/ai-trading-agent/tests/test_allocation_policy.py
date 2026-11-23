@@ -272,5 +272,32 @@ class AllocationPolicyTests(unittest.TestCase):
         self.assertTrue(all(r['requested_weight'] is None for r in result['rows']))
 
 
+class DraftMandateTests(unittest.TestCase):
+    def test_mixed_stated_and_proposed_terms_remain_distinct(self):
+        result = allocation.draft_mandate({'operation': 'draft_mandate', 'sleeves': [
+            {'name': 'Domestic rates', 'minimum_pct': '30', 'target_pct': 42.5, 'maximum_pct': '70',
+             'benchmark': 'Three-to-five-year domestic sovereign total return', 'user_terms': ['minimum_pct']},
+            {'name': 'Global shares', 'target_pct': 57.5, 'benchmark': 'Unhedged global total return'}]})
+        self.assertEqual(result['status'], 'DRAFT_FOR_REVIEW')
+        self.assertEqual(result['sleeves'][0]['term_basis']['minimum_pct'], 'user_supplied')
+        self.assertEqual(result['sleeves'][0]['term_basis']['target_pct'], 'proposed_for_review')
+        self.assertEqual([r['weight_pct'] for r in result['benchmark_weights']], ['42.5', '57.5'])
+        self.assertIsNone(result['observed_performance'])
+        self.assertFalse(result['broker_support_verified'])
+
+    def test_open_question_is_retained_without_a_fictitious_policy(self):
+        result = allocation.draft_mandate({'operation': 'draft_mandate', 'sleeves': [
+            {'name': 'Cash equivalents', 'target_pct': 100, 'benchmark': 'UNDECIDED'}]})
+        self.assertEqual(result['status'], 'DRAFT_INCOMPLETE')
+        self.assertEqual(result['missing_terms'], [{'sleeve': 'Cash equivalents', 'missing_term': 'benchmark'}])
+        self.assertEqual(result['benchmark_weights'], [])
+
+    def test_conflicting_targets_or_attribution_do_not_form_a_mandate(self):
+        for change in ({'target_pct': '70'}, {'minimum_pct': 101}, {'maximum_pct': 50},
+                       {'benchmark': None, 'user_terms': ['benchmark']}, {'user_terms': ['not-a-term']}):
+            with self.subTest(change=change), self.assertRaises(ValueError):
+                allocation.draft_mandate({'operation':'draft_mandate', 'sleeves': [
+                    dict({'name':'Domestic shares','target_pct':100,'benchmark':'Domestic equity total return'}, **change)]})
+
 if __name__ == '__main__':
     unittest.main()
