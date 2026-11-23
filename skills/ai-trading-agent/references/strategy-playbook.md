@@ -29,6 +29,26 @@ entry uses the open at the signal index plus one plus the declared bar delay.
 Distinguish close-driven entries from independently modeled stop, target and
 scheduled exits.
 
+For a daily single-SMA replay, use the returned `rule_summary` to explain the
+actual lookback, next-bar entry cap, gap-stop price, signal-exit timing and
+meaning of the exit timestamps. Distinguish the modeled loss budget from the
+capital allocated to the purchase. Gaps can cross the stop. Use the returned
+after-cost account return for the same dates as the passive comparator.
+
+When explaining a replay's gain or loss, read `pnl_attribution` alongside the
+return. Compare the signed contribution from closed trades with the final
+open position's mark less its fee-inclusive cost basis. Quote the amounts
+and check that they reconcile to the change in account equity before
+describing either part as the main source. A position still open at the end
+has no modeled sale or exit fee. If the reconciliation fails, report the
+residual and leave the explanation unresolved.
+
+For walk-forward results, take the signed extremes from `fold_return_summary`.
+Its numeric returns are fractions and its `return_range_text` is already in
+percent. Include every complete window. A fold with zero closed trades can
+still gain or lose on the terminal mark of an open position. Check any stated
+range against the fold rows before quoting it.
+
 A costed-bar replay receives a supplied signal and simulates its fill at an
 eligible open. Spread, liquidity and delay estimates from that replay describe
 the model. To report actual latency, match timestamped decisions to order

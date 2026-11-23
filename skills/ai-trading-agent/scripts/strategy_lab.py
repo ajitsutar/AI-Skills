@@ -17,6 +17,10 @@ from pathlib import Path
 from risk_engine import timestamp
 
 
+SMA_STOP_BARS = 5
+SMA_ENTRY_LIMIT_MULTIPLIER = 1.005
+
+
 @dataclass(frozen=True)
 class Bar:
     end: object
@@ -85,10 +89,10 @@ def signal(history, strategy, lookback=20, opening_bars=3, bar_minutes=5):
         current_mean = sum(b.close for b in history[-lookback:]) / lookback
         previous_mean = sum(b.close for b in history[-lookback - 1:-1]) / lookback
         if bar.close > current_mean and history[-2].close <= previous_mean:
-            stop = min(b.low for b in history[-5:])
+            stop = min(b.low for b in history[-SMA_STOP_BARS:])
             if stop < bar.close:
                 return {"action": "enter", "stop": stop, "target": None,
-                        "entry_limit": bar.close * 1.005, "setup": strategy}
+                        "entry_limit": bar.close * SMA_ENTRY_LIMIT_MULTIPLIER, "setup": strategy}
         if bar.close < current_mean:
             return {"action": "exit", "setup": strategy}
     else:
@@ -191,7 +195,30 @@ def replay(bars, strategy, initial_cash=100000, risk_fraction=0.001,
     benchmark_qty = math.floor(initial_cash / (bars[trade_start].open * (1 + slip) + fee_per_share))
     benchmark_cash = initial_cash - benchmark_qty * (bars[trade_start].open * (1 + slip) + fee_per_share)
     benchmark_value = benchmark_cash + benchmark_qty * bars[-1].close
-    return {"strategy": strategy, "final_equity": curve[-1]["equity"],
+    # Trades already include both executed fees. An open lot has incurred only its entry fee.
+    realized_pnl = math.fsum(trade["pnl"] for trade in trades)
+    open_pnl = position["quantity"] * bars[-1].close - position["cost"] if position else 0.0
+    equity_change = curve[-1]["equity"] - initial_cash
+    residual = equity_change - math.fsum((realized_pnl, open_pnl))
+    # Allow accumulated floating-point rounding over entry and exit cash postings.
+    tolerance = (2 * len(trades) + 4) * math.ulp(peak)
+    reconciled = abs(residual) <= tolerance
+    attribution = {
+        "closed_trade_net_pnl": realized_pnl,
+        "end_open_marked_pnl": open_pnl,
+        "account_equity_change": equity_change,
+        "reconciliation_residual": residual,
+        "rounding_tolerance": tolerance,
+        "reconciled": reconciled,
+        "summary": (
+            f"Closed trades contributed {realized_pnl:+,.2f}. The final open-position contribution was "
+            f"{open_pnl:+,.2f} at the final close. Account equity changed by {equity_change:+,.2f}."
+            if reconciled else
+            f"The trade contributions differ from the account equity change by {residual:+.8g}. "
+            "Attribution is unresolved."
+        ),
+    }
+    result = {"strategy": strategy, "final_equity": curve[-1]["equity"],
             "return": curve[-1]["equity"] / initial_cash - 1, "max_drawdown": max_dd,
             "closed_trades": len(trades), "win_rate": len(wins) / len(trades) if trades else None,
             "profit_factor": sum(wins) / sum(losses) if losses else None,
@@ -199,6 +226,7 @@ def replay(bars, strategy, initial_cash=100000, risk_fraction=0.001,
             "buy_hold_return": benchmark_value / initial_cash - 1,
             "benchmark_caveat": "Full-capital buy-and-hold, entry friction, marked terminal value; different exposure, no dividends",
             "open_position": position, "events": sorted(set(events)), "trades": trades, "equity_curve": curve,
+            "pnl_attribution": attribution,
             "execution_basis": completed_bar_execution(1),
             "execution_time_resolution": "Entry at modeled bar open; exit_time labels the containing bar end, not an observed tick",
             "assumptions": {"slippage_bps": slippage_bps, "fee_per_share": fee_per_share,
@@ -207,6 +235,23 @@ def replay(bars, strategy, initial_cash=100000, risk_fraction=0.001,
                             "broker_settlement_calendar_modeled": False,
                             "settled_cash_reserve_modeled": False},
             "validated_for_live": False}
+    if strategy == "sma_trend":
+        result["rule_summary"] = (
+            f"With {lookback} warmup bars, bar {lookback + 1} is the first possible decision. "
+            f"On a positive-volume completed bar, the close must cross above its trailing {lookback}-close "
+            "mean from a previous close at or below its own mean. The entry attempt lasts one bar. "
+            f"That bar must have positive volume. Its opening price plus {slippage_bps:g} bps "
+            f"of modeled buy slippage must exceed the fixed stop and be at most {SMA_ENTRY_LIMIT_MULTIPLIER:g} "
+            f"times the signal close. The stop is the lowest available low among the last {SMA_STOP_BARS} "
+            "completed bars through the signal. The helper rounds shares down after applying both the "
+            f"{100 * risk_fraction:g}% modeled per-trade risk budget and {100 * capital_fraction:g}% purchase "
+            f"budget to cash, with a fee of {fee_per_share:g} per share on each executed side. "
+            "A close below its mean queues a modeled sale for the following bar's open if volume is positive. "
+            "Otherwise, a stop touched on a positive-volume bar sells at the lower of the stop and that "
+            "bar's open, less sell slippage. Exit timestamps identify containing bar ends. Remaining "
+            "shares are marked at the final close."
+        )
+    return result
 
 
 def walk_forward(bars, strategy, train_bars=60, test_bars=20, **kwargs):
@@ -223,7 +268,24 @@ def walk_forward(bars, strategy, train_bars=60, test_bars=20, **kwargs):
         folds.append({"train_end": bars[start - 2].end.isoformat(), "test_start": bars[start].end.isoformat(),
                       "test_end": bars[start + test_bars - 1].end.isoformat(),
                       **{k: result[k] for k in ("return", "max_drawdown", "closed_trades", "buy_hold_return")}})
-    return {"folds": folds, "selection": "fixed_rules_no_parameter_optimization", "fold_capital_resets": True}
+    # Closed-trade counts exclude positions still open at the terminal mark.
+    # Derive the range from every completed window, before display rounding.
+    returns = [fold["return"] for fold in folds]
+    minimum = min(returns, default=None)
+    maximum = max(returns, default=None)
+    summary = {
+        "complete_folds": len(folds),
+        "minimum_return": minimum,
+        "maximum_return": maximum,
+        "negative_returns": sum(value < 0 for value in returns),
+        "zero_returns": returns.count(0),
+        "positive_returns": sum(value > 0 for value in returns),
+        "return_range_text": (
+            f"{minimum * 100:+.6g}% to {maximum * 100:+.6g}%" if folds else "No complete test windows"
+        ),
+    }
+    return {"folds": folds, "selection": "fixed_rules_no_parameter_optimization",
+            "fold_capital_resets": True, "fold_return_summary": summary}
 
 
 def main():

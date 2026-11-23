@@ -35,7 +35,9 @@ Promotion reports distinguish supplied test returns from independently verified 
 
 Equity and futures scenario reports identify which position inputs support each calculation and which historical records a settlement ledger still needs.
 
-Version **5.13.32** includes [production research operations](references/research-operations.md)
+The replay reconciles closed-trade profit and the signed contribution of any position still open at the final mark.
+
+Version **5.13.35** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
