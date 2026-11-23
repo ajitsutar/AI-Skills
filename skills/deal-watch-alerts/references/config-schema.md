@@ -2,7 +2,7 @@
 
 Use this reference when creating or updating a reusable deal-watch configuration. YAML is convenient for humans; JSON is better for scripts. Keep secrets, phone numbers, and email addresses out of committed examples unless the user explicitly wants them stored.
 
-## Required Top-Level Fields
+## Example Watch Configuration
 
 ```yaml
 watch_name: "short-human-name"
@@ -37,6 +37,7 @@ memory:
     - "variant"
     - "condition"
     - "seller"
+source_scope: "discover"  # Use "only_listed" for an explicit allowlist.
 sources:
   - name: "Amazon"
     type: "retailer"
@@ -100,6 +101,8 @@ notifications:
 - `memory.strip_tracking_parameters`: must be a boolean. It removes fragments and common ad/tracking query parameters from fallback URL identity while preserving meaningful query parameters.
 - `memory.key_fields`: non-empty list of fields that define the same offer. `price` is handled by the lower-price policy and is ignored here; `currency` is always added. The configured fields must produce at least one populated non-currency identity value. Add `shipping` or `availability` only when a change should define a materially different offer.
 - `memory.required_key_fields`: optional subset of `key_fields` that must be populated before computing, claiming, or committing an alert key. Use it for seller, condition, selected variant, and other evidence whose absence could otherwise create an unstable key. Omit only fields genuinely optional for that watch.
+- `source_scope`: use `discover` by default; save `only_listed` when the user restricts the watch to named sites. An existing restriction still applies if this field is absent.
+- `sources`: optional seeds in discovery mode; required in allowlist mode. Include enabled user-required entries and skip disabled or paused sources in either mode. The sample entries are examples, not a universal retailer list.
 - `sources[].type`: use `retailer`, `marketplace`, `deal_aggregator`, `search`, or `api`.
 - `sources[].urls`: direct product, search, or saved-filter URLs. Prefer direct product URLs when variants matter.
 - `sources[].search_queries`: exact search queries to use when direct URLs fail or when discovery is needed.

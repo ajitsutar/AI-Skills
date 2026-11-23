@@ -15,7 +15,9 @@ Resolve bundled resources relative to the directory containing this `SKILL.md`, 
 
 1. Parse or create the watch configuration.
    - Read `references/config-schema.md` when creating, updating, or normalizing configurable parameters.
-   - Require item identity, required attributes, price threshold, sites, notification channels, and duplicate-memory location.
+   - Require item identity, required attributes, price threshold, notification channels, and duplicate-memory location. A retailer list is optional unless the watch restricts which sources may be used.
+   - On each run, use the running model's knowledge of the product category, condition and market to choose additional sources worth checking. For example, a manufacturer's certified outlet may be a better lead for a refurbished laptop than a general marketplace. Use current search or manufacturer directories to confirm the merchant's identity and relevance; model knowledge is a discovery aid, not evidence of a current offer.
+   - Include the user's required sources and honor their priorities. Treat examples and nonexclusive source lists as starting points, not a ceiling. If the user or watch specifies an allowlist, stay within it. Skip excluded, disabled or paused sources, including via referrals. Keep discovery within the run's access and time limits; it does not authorize new accounts or permanent changes to the watch.
    - For unattended browser checks, configure an isolated profile/session, overlap policy, timeouts, cleanup, and per-source checkpoint path. Never silently inherit the user's everyday browser profile.
    - Treat thresholds as inclusive by default unless the user says "below" or provides a strict comparator.
 
@@ -24,7 +26,7 @@ Resolve bundled resources relative to the directory containing this `SKILL.md`, 
    - Treat every prior `alerts_sent[].deal_key` as already notified.
    - If memory is inaccessible, fall back to in-thread or user-provided memory and report that limitation.
 
-3. Check each configured source.
+3. Check the required and discovered sources.
    - Read `references/verification-playbook.md` before doing live verification.
    - Prefer primary product pages over snippets, search pages, cached titles, or aggregator summaries.
    - For deal aggregators, open the linked merchant page and verify the final offer there.
