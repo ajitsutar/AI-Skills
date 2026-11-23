@@ -21,6 +21,25 @@ Classify a source as `unverifiable` rather than `no_match` when any of these app
 
 Never use an unverifiable source as evidence that no offer exists. Preserve the failure reason in the report and checkpoint.
 
+## Source Intake
+
+Before browser setup, the parent can run the offline [source planner](../scripts/plan_sources.py)
+from the skill folder (illustrative hostnames):
+
+```sh
+python -B scripts/plan_sources.py --seed shop-demo.com --discover maker-demo.com --alias outlet.shop-demo.com=shop-demo.com --pause maker-demo.com
+```
+
+Supply vetted first-party merchant hosts; the helper does not search, infer ownership,
+resolve DNS, browse, or read/write ledgers. Repeat flags as needed. Case, a trailing dot,
+and the `www.` prefix normalize automatically; declare other aliases explicitly instead
+of guessing registrable domains. Pass disabled sources with `--exclude` and all current
+pauses with `--pause`; both cover descendants and declared aliases. For `only_listed`,
+pass `--only-listed` (seeds only) or supply an exact allowlist with repeated `--allow`.
+Assign each `eligible` domain to one owner and report each `skipped` reason. Neither
+list establishes actual coverage or an offer. Hostname syntax is not proof of public
+routability or merchant identity; existing redirect, isolation and verification gates apply.
+
 ## Evidence Order
 
 1. Direct retailer or marketplace product page for the selected offer.
