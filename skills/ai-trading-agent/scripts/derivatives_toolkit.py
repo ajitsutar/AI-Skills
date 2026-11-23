@@ -256,9 +256,13 @@ def bond_cashflows(d):
             'cashflow_completeness':'caller_asserted_not_independently_verified'}
 
 
+FUTURES_PNL_FIELDS = ('signed_contracts', 'multiplier', 'price_unit', 'entry_at', 'entry_price',
+                     'settlements', 'fees', 'settlement_method', 'rounding', 'currency_decimals',
+                     'terminal_state')
+
+
 def futures_pnl(d):
-    exact(d,('signed_contracts','multiplier','price_unit','entry_at','entry_price','settlements',
-             'fees','settlement_method','rounding','currency_decimals','terminal_state'))
+    exact(d, FUTURES_PNL_FIELDS)
     quantity=integer(d,'signed_contracts',-1000000000,1000000000)
     if quantity==0:
         raise ValueError('NONZERO_POSITION_REQUIRED')

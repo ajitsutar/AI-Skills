@@ -33,6 +33,28 @@ Never describe it as a superficially similar supported type. Analytical support
 does not imply that the native host or broker offers the corresponding transaction.
 The skill neither adds broker capabilities nor imposes local execution restrictions.
 
+## Mapping a position to research capabilities
+
+For equity or futures position mapping, use the per-position
+`equity_and_futures_capabilities` returned by `risk.scenarios` when a
+scenario is supplied. Report the current mark, the computed scenario and
+the separate research data each position requires. A settlement ledger
+must trace its historical entry price/time and settlement observations to
+their own source fields. The mark describes the current position. A shock
+describes a hypothetical move. Neither supplies a historical transaction.
+Report explicit fields, justified conversions, missing inputs and conflicts
+from `observed_settlement.field_basis`. A zero fee, zero entry price or negative
+entry price can be a supplied value. Presence alone does not validate it.
+For a separate supplied settlement record, identify that record and its
+position/contract, then validate its full envelope with the derivatives helper.
+
+Use issuer identity, financial statements and dated price/FX sources for
+equity valuation. Historical research needs adjusted returns, corporate
+actions and aligned risk factors. Futures carry/roll work needs the
+contract identity, maturity, curve and trading conventions. Cash funding or
+margin analysis needs separate collateral and actual settlement terms.
+Use the broker's own instrument-specific permissions for live requests.
+
 ## Mandatory scenario details
 
 Distinguish direct price/FX scenarios from identified market, sector, issuer,

@@ -69,6 +69,12 @@ The two-year annual example with 1000 par, 50 then 1050 paid on exact 365-day in
 
 ## Fixed futures position: `futures_pnl`
 
+An existing position's current mark is a scenario input. Use a separately
+sourced historical entry for `entry_price`. Only convert signed scenario
+quantity to `signed_contracts` when its direction, contract units and valid
+integer size agree. A hypothetical price change provides no observed
+settlements. Carry forward missing entries explicitly in an input inventory.
+
 Exact inputs: `signed_contracts` (nonzero integer from -1 billion to 1 billion; long positive), `multiplier` (positive underlying units per contract, or currency per price point where the price unit is a point), `price_unit` (such as `USD/barrel` or `USD/point`), `entry_at`, `entry_price`, `settlements` (1–10000 `{at,price}` objects), `fees` (nonnegative total currency amount), `settlement_method: "variation_margin"`, `rounding` (`unrounded_research` or `per_contract_half_up`), `currency_decimals` (integer 0–8), and `terminal_state` (`open`, `closed`, `cash_settled`, or `physical_delivery_pending`). Envelope currency must match the price unit prefix. Entry and settlement prices can be positive, zero or **negative**. Entry and settlement timestamps must be explicit aware instants. First settlement can share the entry instant; subsequent instants must strictly increase. Every entry/settlement instant must be at or before `inputs_available_at`, hence at or before the information cutoff. This operation is a supplied observed settlement ledger, not a projected scenario path; date-only values and future observations are rejected. Future **contractual bond cashflow dates** are allowed because they are projections, not settlement-price observations.
 
 For a constant position, each variation payment is quantity times the difference between successive per-contract monetary values. Sum of the ledger is gross P&L; net P&L subtracts supplied total fees once. `per_contract_half_up` uses an isolated 50-digit Decimal context with explicit exponent bounds and traps, then decimal arithmetic to round `price*multiplier` separately at each mark before differencing, with ties away from zero; `unrounded_research` applies no monetary rounding and ignores `currency_decimals` numerically while retaining it in the contract. Verify the actual contract's rounding rule before reconciliation: special notional-product rounding is unsupported.

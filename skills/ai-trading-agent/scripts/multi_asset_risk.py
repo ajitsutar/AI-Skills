@@ -8,6 +8,7 @@ from __future__ import annotations
 import math
 from scipy.stats import norm
 
+from derivatives_toolkit import FUTURES_PNL_FIELDS
 from quant_common import cli, require, scalar
 
 
@@ -48,6 +49,70 @@ def fixed_cashflow_bond(cashflows, zero_rates, spread=0, callable=False):
     return {'dirty_model_price': price, 'continuous_parallel_duration': duration,
             'continuous_parallel_convexity': convexity, 'dv01': price*duration*.0001,
             'limitation': 'Amounts per supplied bond unit; continuous zero rates; no credit default/prepayment unless separately stressed.'}
+
+
+def futures_ledger_inputs(position, pointer):
+    """Identify field provenance only. The observed-settlement operation validates values and times."""
+    fields = {}
+    for field in FUTURES_PNL_FIELDS:
+        value = position.get(field)
+        if value is None or value == '' or value == [] or value == {}:
+            fields[field] = {'status': 'missing'}
+        else:
+            fields[field] = {'status': 'explicit_unvalidated', 'source': pointer + '/' + field}
+    # Scenario quantity is signed in contracts. A current mark carries no historical entry meaning.
+    quantity = position['quantity']
+    qty_compatible = (type(quantity) in (int, float) and quantity != 0
+                      and -1_000_000_000 <= quantity <= 1_000_000_000
+                      and int(quantity) == quantity)
+    if 'signed_contracts' in position and position['signed_contracts'] is not None:
+        explicit = position['signed_contracts']
+        if type(explicit) is not int or not qty_compatible or explicit != quantity:
+            fields['signed_contracts'] = {'status': 'conflicting_or_invalid',
+                                          'sources': [pointer + '/signed_contracts', pointer + '/quantity']}
+    elif qty_compatible:
+        fields['signed_contracts'] = {'status': 'derived_from_signed_quantity',
+                                      'source': pointer + '/quantity', 'value': int(quantity)}
+    return {'operation': 'derivatives.calculate', 'method': 'futures_pnl',
+            'field_basis': fields,
+            'missing_fields': [key for key, row in fields.items() if row['status'] == 'missing'],
+            'invalid_fields': [key for key, row in fields.items() if row['status'] == 'conflicting_or_invalid'],
+            'calculated': False,
+            'scope': 'Input presence in the position only. An observed ledger requires its own validated '
+                     'currency, point unit, availability and cutoff, entry and settlement observations.'}
+
+
+def position_capabilities(positions):
+    rows = []
+    for index, position in enumerate(positions):
+        kind = position['kind']
+        if kind not in ('equity', 'future'):
+            continue
+        pointer = '/positions/' + str(index)
+        row = {'id': position['id'], 'kind': kind, 'source': pointer,
+               'mark_source': pointer + '/mark', 'computed_operation': 'risk.scenarios',
+               'execution_authorized': False}
+        if kind == 'equity':
+            row.update(valuation='Supplied spot mark translated by supplied FX, with direct price/FX stresses.',
+                       further_research=[
+                           {'purpose': 'Issuer fundamentals and independent valuation',
+                            'required': 'Issuer and venue, dated financials, dated price/FX sources and valuation assumptions. '
+                                        'data.sec_extract can extract supplied SEC company facts for applicable issuers.'},
+                           {'purpose': 'Historical risk and factor research',
+                            'required': 'Corporate actions and adjusted return history. validation.factors also needs '
+                                        'aligned dated factor observations and factor definitions.'}])
+        else:
+            row.update(valuation='Modeled linear P&L on the change in contract points. Reference notional is unfunded.',
+                       observed_settlement=futures_ledger_inputs(position, pointer),
+                       further_research=[
+                           {'purpose': 'Contract pricing, carry and roll',
+                            'required': 'Identify the underlying, contract month, expiry/first notice and settlement '
+                                        'terms; obtain dated quotes, term structure and contract-specific carry inputs.'},
+                           {'purpose': 'Liquidity and funding',
+                            'required': 'Margin requirements, available collateral and cash, settlement timing, '
+                                        'tick conventions, bid/ask and depth. The scenario does not calculate a margin call.'}])
+        rows.append(row)
+    return rows
 
 
 def scenario_book(positions, scenarios, nav, base_currency):
@@ -109,7 +174,8 @@ def scenario_book(positions, scenarios, nav, base_currency):
         loss = sum(x['pnl_base'] for x in impacts)
         results.append({'name': scenario['name'], 'pnl_base': loss, 'pnl_fraction': loss/equity,
                         'post_scenario_nav': equity+loss, 'positions': impacts})
-    return {'scenarios': results, 'execution_authorized': False, 'nav_reconciled': False,
+    return {'scenarios': results, 'equity_and_futures_capabilities': position_capabilities(positions),
+            'execution_authorized': False, 'nav_reconciled': False,
             'limitation': 'Model P&L, not liquidation bids or margin calculation. NAV/collateral must be reconciled separately. No automatic offset of cash demands or option assignment. Direct price/FX P&L does not establish market, sector or issuer factor attribution, or absence of unmodeled rate or volatility exposure. Missing factor mappings, sensitivities or shocks remain unquantified; no zero-risk or instrument-level inapplicability conclusion follows.'}
 
 
