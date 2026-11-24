@@ -45,7 +45,11 @@ Draft mandate budgets distinguish proposed limits and comparators from supplied 
 
 Funded trade schedules distinguish fill commitments, settlement postings and once-applied liquidity floors.
 
-Version **5.13.39** includes [production research operations](references/research-operations.md)
+Intraday briefs distinguish reported halts, scheduled resumptions, confirmed activity and quote timestamps.
+
+The source-bound snapshot intraday brief produces and replays its complete readable and structured delivery, including setup, displayed liquidity and dated venue evidence.
+
+Version **5.13.42** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private

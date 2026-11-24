@@ -183,20 +183,93 @@ def review(request, root):
     return result
 
 
+def brief_observations(request, root):
+    """Render source-attributed halt facts for an authored brief from mixed event and quote files."""
+    keys(request, ('events', 'quotes', 'symbol'), ('events', 'quotes', 'symbol'), 'HALT_BRIEF_REQUEST_FIELDS')
+    symbol = text(request['symbol'], 'SOURCE_SYMBOL_REQUIRED')
+    events = source_document(request['events'], root)
+    tape = source_document(request['quotes'], root)
+    require(isinstance(events, dict) and isinstance(events.get('observations'), list)
+            and len(events['observations']) <= MAX_MESSAGES, 'EVENT_OBSERVATIONS_REQUIRED')
+    require(isinstance(tape, dict) and isinstance(tape.get('quotes'), list)
+            and len(tape['quotes']) <= MAX_MESSAGES, 'QUOTE_COLLECTION_REQUIRED')
+    cutoff = exact_clock(tape.get('scenario_clock'), 'AS_OF')
+    quote_times = []
+    for i, quote in enumerate(tape['quotes']):
+        require(isinstance(quote, dict) and isinstance(quote.get('symbol'), str), 'QUOTE_IDENTITY_REQUIRED')
+        if quote['symbol'] == symbol and exact_clock(quote.get('quote_time'), 'QUOTE') <= cutoff:
+            quote_times.append({'pointer': f'/quotes/{i}', 'quote_time': quote['quote_time']})
+    halts, other_observations = [], []
+    for i, event in enumerate(events['observations']):
+        require(isinstance(event, dict) and isinstance(event.get('symbol'), str), 'EVENT_IDENTITY_REQUIRED')
+        if event['symbol'] != symbol:
+            continue
+        published = exact_clock(event.get('published_at'), 'PUBLICATION')
+        if published > cutoff:
+            continue
+        location = f'/observations/{i}'
+        if event.get('event_kind') != 'exchange_halt':
+            other_observations.append(location)
+            continue
+        halted = exact_clock(event.get('halt_time'), 'HALT_EVENT')
+        require(halted <= published, 'REPORTED_HALT_AFTER_PUBLICATION')
+        reason = text(event.get('reason'), 'SOURCE_REASON_REQUIRED')
+        fields = {'source_pointer': location, 'published_at': event['published_at'],
+                  'halt_time': event['halt_time'], 'reason': reason}
+        sentences = [f"The source reported a halt for {symbol} at {event['halt_time']} ({reason})."]
+        for activity in ('quote', 'trade'):
+            scheduled = event.get(activity + '_resume_at')
+            actual = event.get(activity + '_resumed_at')
+            if scheduled is not None:
+                require(exact_clock(scheduled, 'SCHEDULE') >= halted, 'SCHEDULE_BEFORE_HALT')
+                sentences.append(f"The source scheduled {activity} resumption for {scheduled}.")
+            if actual is not None:
+                require(halted <= exact_clock(actual, 'REPORTED_RESUMPTION') <= published,
+                        'REPORTED_RESUMPTION_OUTSIDE_HALT_PUBLICATION_INTERVAL')
+                sentences.append(f"The source reports actual {activity} resumption at {actual}.")
+            else:
+                sentences.append(f"Actual {activity} resumption is unconfirmed in this record.")
+            fields[activity + '_resume_at'] = scheduled
+            fields[activity + '_resumed_at'] = actual
+        fields['statement'] = ' '.join(sentences)
+        halts.append(fields)
+    halts.sort(key=lambda row: exact_clock(row['published_at'], 'PUBLICATION'))
+    quote_times.sort(key=lambda row: exact_clock(row['quote_time'], 'QUOTE'))
+    statements = [row['statement'] for row in halts]
+    if not halts:
+        statements.append(f"No eligible exchange-halt observation for {symbol} appears in this collection.")
+    if quote_times:
+        statements.append(f"The latest supplied {symbol} quote through the cutoff is timestamped {quote_times[-1]['quote_time']}.")
+    statements.append('Quote timestamps alone establish neither resumption nor a continuing halt. Current exchange and broker status require separate evidence.')
+    return {'method': 'halt-observation-brief-1', 'symbol': symbol, 'as_of': tape['scenario_clock'],
+            'sources': {'events': request['events'], 'quotes': request['quotes']},
+            'halt_observations': halts, 'eligible_quote_times': quote_times,
+            'other_eligible_symbol_observation_pointers': other_observations,
+            'current_exchange_status': None, 'broker_tradability': None,
+            'statement': ' '.join(statements)}
+
+
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('request')
     parser.add_argument('source_root')
     parser.add_argument('output')
+    parser.add_argument('--brief-observations', action='store_true',
+                        help='Render the halt-status passage and fields for a supplied intraday brief.')
     args = parser.parse_args(argv)
-    result = review(decode(Path(args.request).read_bytes()), args.source_root)
+    request = decode(Path(args.request).read_bytes())
+    result = brief_observations(request, args.source_root) if args.brief_observations else review(request, args.source_root)
     # Exclusive creation preserves any earlier result, including a failed attempt.
     with Path(args.output).open('x', encoding='utf-8', newline='\n') as handle:
         json.dump(result, handle, indent=2)
         handle.write('\n')
-    print(json.dumps({'method': METHOD, 'output': args.output,
-                      'publication_selected_message_id': result['publication_view']['selected_message_id'],
-                      'observed_selected_message_id': result['observed_view']['selected_message_id']}))
+    summary = {'method': result['method'], 'output': args.output}
+    if args.brief_observations:
+        summary['statement'] = result['statement']
+    else:
+        summary.update(publication_selected_message_id=result['publication_view']['selected_message_id'],
+                       observed_selected_message_id=result['observed_view']['selected_message_id'])
+    print(json.dumps(summary))
     return 0
 
 

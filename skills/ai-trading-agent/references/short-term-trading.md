@@ -25,9 +25,70 @@ alone does not establish a five-minute model. Any optional intraday volatility
 diagnostic is advice, not a condition for handing off an order.
 
 State earnings, halt, liquidity, gap and overnight risks. A stop can fill beyond
-its level and an exchange halt can prevent an intended exit. A DAY order does not
+its level and an exchange halt can prevent an intended exit. When comparing a halt
+observation with a later quote, use the [halt-observation brief](halt-review.md#halt-observations-in-an-intraday-brief).
+Carry the dated halt, separate resumption evidence and limits into the setup summary.
+A DAY order does not
 close a filled position at the end of the day. The skill does not impose an earnings
 blackout, fixed loss threshold or a universal spread cap.
+
+## Delivering a snapshot-based intraday brief
+
+For a brief naming individual stocks, use the following native delivery path
+when the source set contains a self-contained regular session, one or more
+dated two-sided quotes, mixed published events, listed-security metadata and
+prior daily closes/volume. It produces the complete first response, including
+evidence limits, catalysts and earnings, quote age/spread, historical liquidity
+and setup assessment. Historical figures and displayed sizes cannot establish
+execution capacity. A dated halt supplies no current-status assertion.
+For each symbol the pair includes a catalyst assessment at the cutoff. Publication on the supplied local session date is the stated freshness convention. Calendar and venue updates, pending
+news, earlier developments and unclassified events retain their own evidence roles.
+An explicitly reported earnings release time (`earnings_released_at`) differs from
+a calendar's scheduled release time. A reported development supplies no proof of
+price impact, and missing source coverage cannot establish market-wide absence.
+
+Prepare a request with `symbols` (every security named in the original prompt)
+and `sources`. Under `sources`, bind the unchanged `prompt`, `scope`, `session`,
+`universe`, `quotes`, `events` and CSV `history` as separate objects containing
+their original relative `path` and `sha256`. Bind a supplied original `context`
+as well. If the host declares response fields in a separate document, bind its
+unchanged bytes as `sources.response_contract` using the same path/hash format.
+The helper also recognizes declarations in the original prompt and an inventory-bound
+adjacent package protocol. Supply the required host observations in `metadata`:
+`case_id`, optional `run_id`, a `runtime_model_metadata` object with actual or
+unknown runtime details, and an `evidence_paths` list naming retained artifacts.
+The renderer generates the per-symbol `rows` (also retained as `symbols`), source
+hashes, and `limitations` from the evidence. Host metadata cannot replace them.
+
+```text
+python -B scripts/intraday_brief.py build request.json source-root output-directory
+python -B scripts/intraday_brief.py verify request.json source-root output-directory
+```
+
+Use a fresh output directory for build. Deliver the emitted `first-response.md`
+and `response.json` unchanged. For copies, run verify against the directory
+containing the actual delivered pair. Verification rebuilds both files from their bound
+sources and checks their exact bytes, including the final setup text. A separate
+freehand setup recap can introduce a status claim the source does not make.
+For a host requiring a short handoff, link the verified files.
+
+The session carries its local open/close with UTC offsets, time zone, date and
+`scenario_clock`. The quote file has the same clock, a `quotes` array with symbol,
+currency, bid/ask and `quote_time`, and optional `bid_size_shares`, `ask_size_shares`
+and `book_depth_levels`. The universe has a dated `as_of` and `rows`. The history
+has `symbol`, `session_date`, `unadjusted_close_usd` and `shares_volume`. The
+events file has `observations` with symbol, kind (`event_kind`) and `published_at`.
+The renderer retains source text, announced earnings and windows. For
+`exchange_halt`, it uses the [halt-observation fields](halt-review.md#halt-observations-in-an-intraday-brief).
+A separate `exchange_status` observation carries a source-reported `status` and
+`status_as_of`. Keep publication time distinct from the time of that status.
+
+Inspect the supplied files and request for additional material evidence, such
+as trade prints, bars, broker state, depth in other units, a specified strategy
+or requested live verification. This snapshot profile does not evaluate those
+tasks. Use the applicable broader research workflow when needed and preserve the
+source-bound halt, quote-size, historical-volume and current-status distinctions
+in every delivered setup and structured outcome.
 
 ## Sizing and cash planning
 

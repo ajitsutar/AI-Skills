@@ -86,3 +86,36 @@ and does not certify source authenticity or arbitrary report prose. Existing
 normalized news triage remains the route for acquired records with real
 availability and observation timestamps; do not manufacture those clocks to
 fit raw notices into that schema.
+
+## Halt observations in an intraday brief
+
+A mixed event file can document a halt without having the message IDs of an
+exchange notice feed. For an original document with a top-level `observations`
+array and a tape containing `quotes` and a timezone-aware `scenario_clock`,
+run the brief mode on the original bytes for the requested symbol:
+
+```text
+python -B scripts/halt_review.py --brief-observations request.json source-root result.json
+```
+
+Supply `{"symbol":"SYMBOL","events":{"path":"events.json","sha256":"…"},"quotes":{"path":"quotes.json","sha256":"…"}}`
+with the actual relative paths and SHA-256 values. The helper considers each
+symbol-matched `exchange_halt` observation published through the tape cutoff.
+It preserves the reported `halt_time`, reason, publication time, original row
+pointer and matching quote timestamps. Optional `quote_resume_at` and
+`trade_resume_at` describe schedules. Only source fields explicitly reporting
+actual activity (`quote_resumed_at`, `trade_resumed_at`) describe an observed
+resumption in that record. Check the original source's field meanings before
+using this schema.
+
+Use the generated `statement` as the halt passage and its source-bound fields
+in the structured brief. Carry the same evidence into every setup, summary
+and decision. A quote can follow the reported halt while its position relative
+to an actual resumption remains unknown. Check other eligible event pointers
+for separate status evidence and retain its source and time. When the source
+uses a different schema, apply the same distinctions directly to its original
+records. Attribute any later confirmation to its own source and timestamp.
+For a supported [complete intraday brief](short-term-trading.md#delivering-a-snapshot-based-intraday-brief), use the full-brief renderer to carry these facts through setup assessment and liquidity disclosure.
+An elapsed schedule, an empty notice search, or an indicative quote cannot
+establish current venue status or broker availability. The helper supplies the
+halt passage only. The rest of the brief still needs its other requested inputs.

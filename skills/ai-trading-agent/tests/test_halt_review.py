@@ -16,7 +16,7 @@ class HaltReviewTests(unittest.TestCase):
     def setUp(self):
         self.temp = tempfile.TemporaryDirectory()
         self.addCleanup(self.temp.cleanup)
-        self.root = Path(self.temp.name)
+        self.root = Path(self.temp.name).resolve()
         common = {'halt_event_time': '2033-05-04T08:09:00Z',
                   'feed_dateline': '2033-05-04T00:00:00Z', 'reason': 'pending_update',
                   'quote_resume_at': None, 'trade_resume_at': None}
@@ -246,6 +246,63 @@ class HaltReviewTests(unittest.TestCase):
         result = subprocess.run(command, capture_output=True, text=True, timeout=30)
         self.assertNotEqual(result.returncode, 0)
         self.assertEqual(out.read_bytes(), before)
+
+    def brief_request(self, events, quotes):
+        request = {'symbol': 'EXAMPLE'}
+        for name, doc in [('events', {'observations': events}),
+                          ('quotes', {'scenario_clock': self.scope['as_of'], 'quotes': quotes})]:
+            path = self.root/(name + '.json')
+            path.write_text(json.dumps(doc), encoding='utf-8')
+            request[name] = {'path': path.name, 'sha256': hr.digest(path.read_bytes())}
+        return request
+
+    def test_brief_fresh_quote_after_reported_halt_and_future_update(self):
+        halt = {'symbol':'EXAMPLE', 'event_kind':'exchange_halt', 'reason':'news',
+                'halt_time':'2033-05-04T08:10:00Z', 'published_at':'2033-05-04T08:11:00Z'}
+        future = dict(halt, published_at='2033-05-04T08:35:00Z', trade_resumed_at='2033-05-04T08:32:00Z')
+        quote = {'symbol':'EXAMPLE', 'quote_time':'2033-05-04T08:29:59Z'}
+        request = self.brief_request([future, dict(halt, symbol='OTHER'), halt], [quote])
+        path = self.root/'brief.json'
+        path.write_text(json.dumps(request), encoding='utf-8')
+        result = self.root/'result.json'
+        cli = subprocess.run([sys.executable,'-B',hr.__file__,'--brief-observations',str(path),
+                              str(self.root),str(result)], check=True, capture_output=True, text=True)
+        out = json.loads(result.read_bytes())
+        self.assertEqual(out['statement'], json.loads(cli.stdout)['statement'])
+        self.assertEqual([x['source_pointer'] for x in out['halt_observations']], ['/observations/2'])
+        row = out['halt_observations'][0]
+        self.assertIsNone(row['quote_resumed_at'])
+        self.assertIsNone(row['trade_resumed_at'])
+        self.assertIsNone(out['current_exchange_status'])
+        self.assertIsNone(out['broker_tradability'])
+        self.assertIn('Actual trade resumption is unconfirmed', out['statement'])
+        self.assertIn(quote['quote_time'], out['statement'])
+        with self.assertRaisesRegex(ValueError, 'SOURCE_HASH_MISMATCH'):
+            hr.brief_observations(dict(request, quotes=dict(request['quotes'], sha256='0'*64)), self.root)
+
+    def test_brief_scheduled_and_reported_resumptions_have_independent_meanings(self):
+        halt = {'symbol':'EXAMPLE', 'event_kind':'exchange_halt', 'reason':'update',
+                'halt_time':'2033-05-04T08:10:00Z', 'published_at':'2033-05-04T08:25:00Z',
+                'quote_resume_at':'2033-05-04T08:21:00Z','trade_resume_at':'2033-05-04T08:24:00Z',
+                'quote_resumed_at':'2033-05-04T08:22:00Z'}
+        separate = {'symbol':'EXAMPLE','event_kind':'status_update','published_at':'2033-05-04T08:26:00Z'}
+        out = hr.brief_observations(self.brief_request([halt,separate],[]), self.root)
+        self.assertEqual(out['other_eligible_symbol_observation_pointers'], ['/observations/1'])
+        self.assertEqual(out['halt_observations'][0]['quote_resumed_at'], halt['quote_resumed_at'])
+        self.assertIn('reports actual quote resumption at ' + halt['quote_resumed_at'], out['statement'])
+        self.assertIn('scheduled trade resumption for ' + halt['trade_resume_at'], out['statement'])
+        self.assertIsNone(out['halt_observations'][0]['trade_resumed_at'])
+        self.assertIsNone(out['current_exchange_status'])
+        inconsistent = dict(halt, trade_resumed_at='2033-05-04T08:29:00Z')
+        with self.assertRaisesRegex(ValueError,'OUTSIDE_HALT_PUBLICATION_INTERVAL'):
+            hr.brief_observations(self.brief_request([inconsistent],[]),self.root)
+
+    def test_brief_no_eligible_halt_is_scoped_to_source(self):
+        future = {'symbol':'EXAMPLE','quote_time':'2033-05-04T08:40:00Z'}
+        out = hr.brief_observations(self.brief_request([], [future]), self.root)
+        self.assertEqual(out['halt_observations'], [])
+        self.assertEqual(out['eligible_quote_times'], [])
+        self.assertIsNone(out['current_exchange_status'])
 
 
 if __name__ == '__main__':

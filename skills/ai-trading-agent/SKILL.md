@@ -4,7 +4,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 ---
 
 # AI Trading Agent
-Package version: **5.13.39 - November 23, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
+Package version: **5.13.42 - November 24, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
 `approval` or `autonomous`: respectively simulate only, require order approval,
@@ -382,7 +382,7 @@ Source-bound assumed basis stays out of primary comparisons; retain incompatible
 or unknown metadata and use labeled conditional sensitivities. For cash bridges,
 keep each `cash_metrics` formula/component identity even when distinct measures have equal values.
 
-For day/swing research, use [short-term-trading.md](references/short-term-trading.md)
+For a named-symbol intraday brief using supplied quote, volume, calendar and event snapshots, build and verify the [complete source-bound intraday brief](references/short-term-trading.md#delivering-a-snapshot-based-intraday-brief) with the original response-field declaration and required host metadata. Deliver its verified Markdown and native JSON, including rows and evidence limitations. For other source shapes, carry the [source-bound halt passage](references/halt-review.md#halt-observations-in-an-intraday-brief) through the authored brief. Attribute each halt to its reported time. Establish actual quote and trade resumptions separately before placing a quote before or after them. A claim that the halt continues needs status evidence for the stated time. For day/swing research, use [short-term-trading.md](references/short-term-trading.md)
 and [strategy-playbook.md](references/strategy-playbook.md). Match signals, events,
 liquidity and costs to the holding period. Do not force intraday setups through a
 long-term value screen or relabel a short-term thesis as a core holding. Backtests,
