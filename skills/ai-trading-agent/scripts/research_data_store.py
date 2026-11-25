@@ -60,8 +60,12 @@ def safe_path(root, relative):
     target = root.joinpath(*rel.parts)
     current = target
     for _ in range(len(target.parts) + 1):
-        if current.exists() or current.is_symlink():
+        try:
             info = current.lstat()
+        except FileNotFoundError:
+            # Another capture may have just released this lock. Check its ancestors too.
+            pass
+        else:
             if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & 0x400:
                 raise ValueError('REDIRECTED_STORAGE_PATH')
         if current.parent == current:

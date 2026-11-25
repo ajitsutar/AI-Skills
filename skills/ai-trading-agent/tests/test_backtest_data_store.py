@@ -167,6 +167,26 @@ class StorageTests(unittest.TestCase):
             self.store.prune_to([a['request_id']], 'archives/scoped.zip', delete=True)
         self.assertEqual(unrelated.read_text(), 'keep')
 
+    def test_path_check_tolerates_another_capture_releasing_the_dispatch_lock(self):
+        guard = self.store.path('locks/dispatch.lock')
+        guard.mkdir()
+        original_lstat = Path.lstat
+        inspected = []
+
+        def release_during_inspection(path):
+            if path == guard and guard not in inspected:
+                guard.rmdir()
+            inspected.append(path)
+            return original_lstat(path)
+
+        with patch.object(Path, 'lstat', release_during_inspection):
+            self.assertEqual(self.store.path('locks/dispatch.lock'), guard)
+        self.assertIn(guard, inspected)
+        self.assertIn(guard.parent, inspected)
+        self.assertFalse(guard.exists())
+        with self.store.lock('after-release'):
+            self.assertTrue(self.store.path('locks/after-release.lock').is_dir())
+
     def test_capture_and_maintenance_exclusion_and_concurrent_dedup(self):
         with self.store.lock('maintenance'):
             with self.assertRaisesRegex(ValueError, 'ACTIVE'): self.capture()

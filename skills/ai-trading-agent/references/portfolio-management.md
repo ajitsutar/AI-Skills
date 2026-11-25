@@ -163,3 +163,46 @@ portfolio attribution; show any explicit common-basis assumption separately.
 cash-flow convention. Exact time-weighted return for intraday flows requires a
 valuation at each flow; accounting_tools.time_weighted_return implements that flow-timed calculation. Neither helper computes money-weighted IRR, taxes or dividends
 missing from input values. Never count a deposit as trading profit.
+## Marked position review
+
+For a supplied journal containing `positions`, `realized_trades` and `pending_orders`,
+run `python scripts/marked_position_review.py build REQUEST SOURCE_ROOT NEW_OUTPUT`.
+Run it again with `verify` against the delivered Markdown and JSON. The request
+contains `journal` with a relative `path` and the SHA-256 of its exact bytes.
+When applicable, list additional request/context files in `supporting_sources`
+using the same path/hash form to verify and retain their identities in the result.
+Each open long uses a symbol, quantity, per-share basis, current mark and as-of time.
+Each closed long uses quantity, buy and sell prices, and total fees if known.
+Pending buys use quantity, status and limit price. Attribute fills only when the
+order's own evidence identifies them. Report fees separately from filled principal.
+
+For each independent `events[].broker_snapshot`, report the snapshot ID, status,
+requested and cumulative filled quantities, average price, and fee. Use its own
+`side` (buy or sell). Keep its cash flows out of realized P&L and other orders.
+The gross filled notional is the cumulative filled quantity times a positive
+average price. A zero filled quantity has zero gross notional. An absent quantity
+or a positive fill without a usable positive price leaves the notional unknown.
+Keep any reported fee visible, including a reported zero.
+
+For a positive fill with known gross notional and a reported cumulative fee,
+a buy has signed cash flow of minus notional minus fee. A sell has signed cash
+flow of notional minus fee. Positive is a credit and negative a debit. Use the
+snapshot's `currency`, or its `price_currency` and `fee_currency` when stated
+separately. Identify any assumed common unit and leave net cash flow unresolved
+for explicitly different currencies. If side is missing or unrecognized,
+report gross notional and fee separately throughout the assessment. Leave the
+net fill cash flow unresolved when the fee is unknown. These calculations
+describe the reported fill and cannot establish settlement or account cash.
+
+For an exit scenario, add an entry in `exit_scenarios` with `symbol`, `quantity`,
+`fill_price` and optional `exit_fees`. Price each scenario independently against
+the supplied position. Unspecified fees leave net realized P&L unknown. For
+example, changing a sell fill by one unit changes gross P&L by the number of
+shares sold. The remaining shares keep their own marked P&L. Use the same
+quantities, prices, fees and conditions in narrative, recommendations and tables.
+Only use additional prose that stays consistent with the verified outputs.
+
+Use optional report metadata for the caller's case/run identifiers, runtime
+description and evidence paths when requested. For other position types, lot
+methods or order types use the corresponding specialist calculations. A basis-to-mark
+subtotal alone cannot establish whole-session performance.

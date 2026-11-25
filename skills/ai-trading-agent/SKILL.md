@@ -4,7 +4,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 ---
 
 # AI Trading Agent
-Package version: **5.13.42 - November 24, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
+Package version: **5.13.47 - November 25, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
 `approval` or `autonomous`: respectively simulate only, require order approval,
@@ -353,8 +353,8 @@ calculation does not establish investment suitability or a live order outcome.
 For custom calculations and simulations, follow the [accounting reconciliation
 guidance](references/quant-research.md#costs-capacity-and-performance) when reporting results.
 
-Use [portfolio-management.md](references/portfolio-management.md) for allocation,
-contributions, concentration, ETF overlap, scenarios, taxes and performance.
+Use [portfolio-management.md](references/portfolio-management.md) for allocation, contributions, concentration, ETF overlap, scenarios, taxes and performance.
+For marked longs, closed trades and pending buys, use the [marked position review](references/portfolio-management.md#marked-position-review) to price exits and distinguish actual fills from order limits. In calculations and prose, use each snapshot's own side for cash flow. An unidentified side leaves gross notional and reported fees separate.
 Treat supplied cash floors, sleeve weights, drift bands and limits as planning
 inputs; do not turn sample settings into user instructions or execution gates.
 Fractional quantities and native dollar amounts support small budgets when the

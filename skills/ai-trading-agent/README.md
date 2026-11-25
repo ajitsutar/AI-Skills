@@ -45,11 +45,13 @@ Draft mandate budgets distinguish proposed limits and comparators from supplied 
 
 Funded trade schedules distinguish fill commitments, settlement postings and once-applied liquidity floors.
 
+The [marked position review](references/portfolio-management.md#marked-position-review) reports gross fill notional and fees from each broker snapshot. It calculates signed net cash flow when that snapshot supports a buy or sell and the price and fee can be compared.
+
 Intraday briefs distinguish reported halts, scheduled resumptions, confirmed activity and quote timestamps.
 
 The source-bound snapshot intraday brief produces and replays its complete readable and structured delivery, including setup, displayed liquidity and dated venue evidence.
 
-Version **5.13.42** includes [production research operations](references/research-operations.md)
+Version **5.13.47** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
