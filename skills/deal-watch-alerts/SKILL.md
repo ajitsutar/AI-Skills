@@ -24,16 +24,18 @@ Resolve bundled resources relative to the directory containing this `SKILL.md`, 
    - Treat every prior `alerts_sent[].deal_key` as already notified.
    - If memory is inaccessible, fall back to in-thread or user-provided memory and report that limitation.
 
-3. Discover sources on **every run, before freezing worker assignments**.
-   - Start with required sources and their priorities. In discovery mode, identify other merchants suited to the item, condition and region. For a refurbished item, consider manufacturer outlets, specialist refurbishers and relevant marketplaces such as eBay when permitted. Confirm identity and relevance through permitted current search or directories. Neither a fixed seed list nor yesterday's plan completes discovery.
-   - Normalize merchant domains and deduplicate seeds, discoveries and aliases. Apply any allowlist, exclusions, disabled sources and current pauses before visiting or assigning a domain, including via referrals. Do not broaden a restricted watch. If access or time limits prevent discovery, record the gap; do not change the saved configuration.
-   - Freeze a run plan with one owner per eligible domain and concrete work for that owner: targets, listing pages or search queries, and the evidence needed. One worker may own several domains; a solo runner owns them all. Only then dispatch the searches. An assignment is not a search result.
+3. Generate sources live on **every watch run**, before freezing assignments.
+   - **Gate first.** Keep eligible required seeds and their priorities. Seeds in discovery mode are a floor, not a ceiling. For `only_listed` or an equivalent user restriction, search only within eligible listed sources; do not run an open-web discovery pass. Apply exclusions, disabled sources and current pauses before any lookup, visit, assignment or referral, including known aliases and blocked subdomains. An empty allowlist admits nothing; an unrestricted watch with no seeds starts with discovery.
+   - **Query the item, not a roster.** For each distinct target/market in discovery mode, run a permitted, merchant-neutral live search: e.g. `"<exact SKU>" <condition> <market>` when an identifier is known, or `"<item or event>" <distinguishing attributes> <region>` otherwise. Use edition, material, dimensions, dates, quantity, delivery or pickup as relevant; do not invent identifiers. A prior plan or a list of familiar stores is not a search. If discovery is unavailable, record which searches were missed and continue eligible seed checks where possible.
+   - **Adapt to each result set.** Extract candidate hosts and the public result or directory entry that connects each to this target. For new stock, look for merchants or authorized dealers; for used or unusual variants, try specialists, refurbishers or marketplace seller listings. A deal aggregator can surface an active promotion; Reddit sale communities or local classifieds can surface public seller listings when resale, geography and pickup fit. Choose channels per query, not all channels every time. Ignore buyback quotes, generic storefronts and discussion as inventory evidence.
+   - **Bound expansion.** Default to one follow-up query per target/market within the run budget: refine noisy results with the missing attribute or local terminology; broaden sparse results with a corroborated model alias or a relevant channel term. Search terms may broaden, qualification must not. Stop earlier when results repeat or coverage is sufficient. Note the query, useful new hosts, and why expansion stopped; do not silently drop targets when time runs out.
+   - **Rank and freeze.** After required seeds, prioritize leads with current exact-variant for-sale pages in the right market and condition over partial matches, then directory or referral leads. Record the actual evidence link and reason per proposed host; familiarity or a snippet price is not a ranking basis for offers. Normalize and deduplicate hosts with the [source intake procedure](references/verification-playbook.md#source-intake). Freeze eligible domains, one owner per domain (one runner may own all), targets and concrete queries or pages. Keep skips and unreached work visible; do not change saved settings.
 
 4. Check the required and discovered sources.
    - Read `references/verification-playbook.md` before doing live verification.
    - Prefer primary product pages over snippets, search pages, cached titles, or aggregator summaries.
-   - Route active aggregator leads to the eligible merchant's assigned owner for final-offer verification. Recheck eligibility at handoff; do not follow paused, excluded or unassigned destinations. Record unassigned leads as coverage gaps.
-   - Checkpoint after each source. Treat blank documents, browser error URLs, bot challenges, authentication prompts, and navigation failures as `unverifiable`, not as zero results. Restart an isolated worker after a page failure when safe and continue other sources.
+   - Open relevant deal posts and check active status before routing anything. Reject expired, sold or ambiguous posts. Route an identifiable eligible destination to its assigned owner; never follow an unknown, restricted or paused destination, even through a referral. Queue eligible unassigned leads with their evidence for the next separately planned wave or run; do not change ownership mid-wave.
+   - Checkpoint after each source. A blank page, challenge, sign-in prompt or navigation failure is `unverifiable`, not zero results. Stop the affected source on a challenge or denial, honor its pause across referrals and continue other eligible sources while isolation and access integrity hold. Do not use another path, session or worker to bypass a block.
 
 5. Decide whether each candidate qualifies.
    - Verify all required fields on the same selected offer at the same time.
@@ -63,7 +65,7 @@ Before any `BUY SIGNAL` or external alert, explicitly verify:
 - selected seller/store
 - selected item price and currency
 - availability or add-to-cart/buy capability
-- direct buy URL or stable product ID
+- directly opened final merchant or seller listing URL (a stable product ID can also identify the offer for duplicate memory)
 
 Do not combine a price from one condition, seller, date, size, or variant with attributes from another. If changing any selector changes another required attribute, re-check the final selected offer.
 
@@ -92,6 +94,7 @@ If a plausible legacy alert cannot be canonicalized under the current key policy
 
 - `references/config-schema.md`: configurable watch fields, defaults, and examples.
 - `references/verification-playbook.md`: live-site verification procedure and rejection rules.
+- [Discovery evaluation cases](references/discovery-evaluations.md): offline dry runs for reviewing discovery and coverage decisions.
 - `references/notification-playbook.md`: safe chat, email, SMS gateway, and webhook notification rules.
 - `scripts/deal_memory.py`: atomic JSON memory helper for canonical keys, duplicate checks, notification claims, and sent-alert recording.
 

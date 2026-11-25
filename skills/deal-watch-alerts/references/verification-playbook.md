@@ -87,10 +87,10 @@ Condition evidence: Store policy for Refurbished Good says screen has no scratch
 
 ## Deal Aggregators
 
-For Slickdeals, forums, newsletters, and similar sources:
+For deal aggregators, forums, newsletters, and similar sources:
 
 1. Search for relevant posts using item identity and key attributes.
-2. Reject expired, dead, wrong-variant, or discussion-only posts.
+2. Confirm the post is active. Reject expired, dead, wrong-variant, discussion-only or unclear posts. A public sale post can itself be the direct seller listing only if it proves the same selected-offer facts and an available purchase path; do not message the seller to fill gaps.
 3. Identify the outbound merchant without following an unknown or disallowed destination. Route the link to that domain's sole assigned owner; a skipped or unassigned domain is a reporting gap, not permission to follow it.
 4. The merchant owner rechecks eligibility, opens the eligible destination and verifies the final merchant offer using the selected-offer rule. Checking the aggregator does not count as checking the merchant.
 5. Attribute the deal to the merchant in the stable key; include aggregator context in notes.
