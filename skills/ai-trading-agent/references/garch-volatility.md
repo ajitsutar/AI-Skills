@@ -254,3 +254,7 @@ Forecast output adds cumulative horizon sigma and annualized average sigma,
 distinct from the existing next-period annualized sigma. These quantities assume
 zero cross-period innovation covariance. Portfolio aggregation and current-weight
 tail diagnostics are documented in [risk diagnostics](risk-diagnostics.md).
+
+## When the requested operation depends on GARCH
+
+Run `python scripts/research_preflight.py --require-garch` before promising a fit or GARCH-sized allocation. If it exits nonzero, identify the failing prerequisite and leave that requested result unavailable. Use the pinned runtime when supported by the host. A separately requested realized-volatility baseline has its own method and output.

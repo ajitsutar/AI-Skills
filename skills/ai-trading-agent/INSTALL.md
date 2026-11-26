@@ -110,3 +110,7 @@ and [arch license](ARCH-LICENSE.txt) in copies and ZIPs. MIT covers the
 repository-authored skill code and documentation; dependencies, reports and market
 data retain their own terms. [PROVENANCE.md](PROVENANCE.md) records the source audit
 and the user-confirmed personal-Codex origin of the historical predecessor.
+
+## Verify the portable skill after installation
+
+Keep the release directory intact, including `SKILL.md` and `PACKAGE-MANIFEST.json`. The installer verifies the source and its staged copy before publishing the destination. Run `python scripts/research_preflight.py` inside the installed directory and inspect `package_integrity`. If it reports a mismatch, compare the installed bytes with the verified release and reinstall to a new destination. A host that requires a wrapper can place its host-specific instructions outside this directory and point them at the packaged skill. Rehashing an edited entry point would remove the comparison with the original release.

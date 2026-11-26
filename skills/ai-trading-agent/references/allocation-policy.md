@@ -248,3 +248,7 @@ workbench contract currency and intended horizon consistent with the retained
 allocation document. Existing frozen research/quant bundles remain immutable;
 create a new input/result for the new policy implementation. A checksum establishes
 replay identity, not source truth or investment performance.
+
+## Sizing discretionary paper selections
+
+When a discretionary screen supplies ranks or gate margins without calibrated expected returns and uncertainty, use equal initial weights among eligible selections as the baseline. A high score, an analyst rating and a narrow price range do not supply a return forecast. Freeze the investable sleeve, maximum name weight and residual cash rule before selection. For equal weights with a name cap, each position receives the smaller of the sleeve divided by the number selected and the per-name limit expressed in the same account units. Leave the remainder in cash. With a 100% sleeve and a 25% cap, three qualifiers receive 25% each and 25% stays in cash. With zero qualifiers the sleeve stays in cash. Record the selected universe, calculations and costs. Use an explicit user weighting policy when one was supplied. Model-based sizing requires its own documented inputs and calibration.

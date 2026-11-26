@@ -212,6 +212,40 @@ def configured_json_provider(config, symbol, output):
     return {k: v for k, v in result.items() if k != "data"}
 
 
+def vendor_finalist(symbol, output_dir, revenue_trend_proxy=None):
+    from public_research_fetch import frame, NetworkPolicyError, require_network, request_call
+    from vendor_observations import normalize
+    require_network()
+    import yfinance as yf
+    symbol = safe_symbol(symbol)
+    out = Path(output_dir).resolve()
+    if out.is_relative_to(Path(__file__).resolve().parents[1]):
+        raise ValueError('PRIVATE_OUTPUT_OUTSIDE_SKILL_REQUIRED')
+    out.mkdir(parents=True, exist_ok=False)
+    ticker = yf.Ticker(symbol)
+    raw = {'symbol': symbol, 'source': 'Yahoo Finance via yfinance', 'provider_version': yf.__version__,
+           'retrieved_at': {}, 'component_errors': {}}
+    fields = ('currency', 'marketCap', 'regularMarketPrice', 'debtToEquity',
+              'revenueQuarterlyGrowth', 'revenueGrowth')
+    for key in ('info', 'growth_estimates', 'recommendations'):
+        try:
+            value = request_call(getattr(ticker, 'get_' + key))
+            raw[key] = {k: value.get(k) for k in fields} if key == 'info' else frame(value)
+        except NetworkPolicyError:
+            raise
+        except Exception as exc:
+            # Provider-specific exceptions share no narrower base across versions.
+            # The run boundary above remains authoritative for all components.
+            raw['component_errors'][key] = type(exc).__name__
+            raw[key] = {} if key == 'info' else []
+        raw['retrieved_at'][key] = utc_now()
+    raw = clean_json(raw)
+    write_json(out / 'vendor-input.json', raw)
+    result = normalize(raw, revenue_trend_proxy)
+    write_json(out / 'vendor-observations.json', result)
+    return result
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     sub = parser.add_subparsers(dest="command", required=True)
@@ -227,11 +261,18 @@ def main():
     custom.add_argument("config", type=Path)
     custom.add_argument("symbol")
     custom.add_argument("output", type=Path)
+    finalist = sub.add_parser("vendor-finalist", help="Capture and normalize named Yahoo finalist observations")
+    finalist.add_argument("symbol")
+    finalist.add_argument("output_dir", type=Path)
+    from vendor_observations import REVENUE_PROXIES
+    finalist.add_argument("--revenue-trend-proxy", choices=tuple(REVENUE_PROXIES))
     args = parser.parse_args()
     if args.command == "sec-facts":
         result = sec_companyfacts(args.cik, args.output)
     elif args.command == "history":
         result = yahoo_history(args.symbol, args.start, args.end, args.output_dir)
+    elif args.command == "vendor-finalist":
+        result = vendor_finalist(args.symbol, args.output_dir, args.revenue_trend_proxy)
     else:
         result = configured_json_provider(json.loads(args.config.read_text(encoding="utf-8-sig")), args.symbol, args.output)
     print(json.dumps(result, indent=2, allow_nan=False))

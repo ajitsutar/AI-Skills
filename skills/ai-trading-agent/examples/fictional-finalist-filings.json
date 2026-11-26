@@ -1,0 +1,13 @@
+{
+  "information_cutoff": "2025-08-20T20:00:00Z",
+  "concepts": [
+    {"name": "assets", "namespace": "us-gaap", "tag": "Assets", "unit": "USD"},
+    {"name": "operating_income", "namespace": "us-gaap", "tag": "OperatingIncomeLoss", "unit": "USD"}
+  ],
+  "issuers": [
+    {"issuer_id": "FICTIONAL-ONE", "cik": "0000000001", "adapter": "corporate",
+     "ttm_start": "2024-07-01", "financial_period_end": "2025-06-30"},
+    {"issuer_id": "FICTIONAL-TWO", "cik": "0000000002", "adapter": "bank",
+     "ttm_start": "2024-07-01", "financial_period_end": "2025-06-30"}
+  ]
+}

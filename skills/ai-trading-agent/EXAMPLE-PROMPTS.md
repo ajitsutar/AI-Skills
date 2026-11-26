@@ -2,7 +2,7 @@
 
 <!-- Generated from references/example-prompts.json with scripts/release_docs.py. -->
 
-401 examples across 55 workflows, from first-time investing to quantitative research.
+405 examples across 56 workflows, from first-time investing to quantitative research.
 
 Start any prompt with **Use the ai-trading-agent skill.** Replace
 bracketed inputs with your own data. Choose a section below; you do not need to
@@ -74,6 +74,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 | [Source-bound insider and institution disclosure delivery](#source-bound-insider-and-institution-disclosure-delivery) | Researchers reviewing supplied transaction rows and institutional snapshots | 2 |
 | [Ordinary research with review and correction](#ordinary-research-with-review-and-correction) | Investors and researchers asking complete questions without managing internal tools | 5 |
 | [Research updates, options evidence and host setup](#research-updates-options-evidence-and-host-setup) | Researchers refreshing earlier work or assessing event evidence on their chosen host | 6 |
+| [Screen and mark a paper equity portfolio](#screen-and-mark-a-paper-equity-portfolio) | Researchers using free sources and retained observations | 4 |
 
 ## Keep readable and structured research consistent
 
@@ -1952,6 +1953,27 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 ### 401. Recover from unavailable tools or sources
 
 > Complete the supported parts of this research with the tools and supplied files available here. Diagnose the missing dependency or source access, choose a supported fallback, and preserve the failed attempt and remaining limitations. Do not claim another host or unavailable capability has been tested.
+
+
+## Screen and mark a paper equity portfolio
+
+**Audience:** Researchers using free sources and retained observations. Guides: [paper screening and pricing](references/paper-screening-and-pricing.md), [analyst research](references/analyst-research.md), [news and guidance](references/news-and-guidance.md), [financial normalization](references/financial-normalization.md), [strategy playbook](references/strategy-playbook.md).
+
+### 402. Audit a low-risk paper shortlist
+
+> Repeat this lowest-expected-shortfall screen as of the supplied cutoff. Show names with empty earnings calendars, pending deals, shell-company status or pinned prices before ranking. Check conflicting provider recommendations and negative-base revisions. Show which names remain eligible and why.
+
+### 403. Reconcile a missing paper mark
+
+> Using the retained closes and status checks, reconstruct the common selection anchor and the paper marks. Show carried prices with their prior bar dates, unresolved halts, and later corrections. Keep the original as-of valuation alongside the revision.
+
+### 404. Review finalists from mixed sources
+
+> Batch the finalists, retain provider-specific analyst consensus, import the supplied news and compare material flags with the visible source text. Report which issuer metrics are verified against filings, which are vendor observations, and whether eight quarters support a TTM comparison.
+
+### 405. Compare exit rules and risk inputs
+
+> Freeze equal-weight sizing with the supplied cap and costs. Compare the supplied mean-reversion exits and sector-rotation rules on identical holdouts. For requested GARCH and daily French factors, check dependencies, source vintage and aligned sessions before reporting model results.
 
 ## Keeping this catalog current
 

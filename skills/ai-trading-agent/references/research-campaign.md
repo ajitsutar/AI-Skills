@@ -206,6 +206,12 @@ Use `scripts/research_report_checks.py` on the report's numeric claims:
 
 - Derive P/E from the displayed price and exact EPS period/basis. Do not call
   vendor forwardPE that quotient. Next fiscal year is not automatically NTM.
+- At selection and rebalance use the [executable earnings exclusion](evidence-semantics.md#earnings-exclusions-for-a-paper-screen)
+  for an adopted event gate and the [corporate-action and range screen](screening-and-value-traps.md#a-lowest-es-or-low-volatility-equity-screen)
+  before lowest-ES ranking. Retain excluded names and their reasons.
+- Use the [provider EPS and recommendation signal](analyst-research.md#screen-a-finalist-list-for-provider-eps-revisions-and-rating-mix)
+  for adopted 30/90-day revisions and a non-vacuous favorable recommendation mix.
+
 - Numeric EPS revisions compare the same fiscal bucket now and 90 days earlier.
   Analyst target changes, ratings and company guidance are separate measures.
   With a nonpositive base, retain the signed change and no percentage.
@@ -290,3 +296,6 @@ This default is exchange-listed equities, not every security traded in the U.S.:
 OTC, funds, preferreds and other instrument types require an explicitly appropriate
 scope and workflow. There is no fixed top-N or mandatory finalist list length.
 
+## Repeating a paper stock screen
+
+Before ranking or rebalancing, freeze the universe, information cutoff, event window, holding period, expenses, and source fallbacks. Check the [common anchor and daily marking policy](paper-screening-and-pricing.md). Resolve incomplete calendars, review pending corporate actions and price pinning before a low-risk rank, then apply the requested [analyst checks](analyst-research.md) and [filing review](financial-normalization.md). Carry each exclusion and source limitation into the decision record. An earlier common price date does not move the decision timestamp, the forward event window, or the information available at selection.

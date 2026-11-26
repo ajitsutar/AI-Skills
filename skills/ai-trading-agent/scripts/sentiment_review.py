@@ -146,8 +146,9 @@ def review(triage, document):
                          'automatic_language': originals[0].get('language'),
                          'automatic_language_by_event': {key: row.get('language') for key, row in zip(keys, originals)},
                          'source_context_by_event': {key: {field: row.get(field) for field in
-                             ('recency_basis', 'issuer_sentiment_usable_for_research', 'flags',
+                             ('recency_basis', 'issuer_sentiment_usable_for_research', 'flags', 'review_events', 'issuers',
                               'source_refresh_status', 'evidence_kind', 'source_kind',
+                              'search_provider', 'search_query',
                               'published_at', 'updated_at', 'first_seen_at', 'available_at')}
                              for key, row in zip(keys, originals)},
                          'reviewer_interpretation': item['interpretation'],

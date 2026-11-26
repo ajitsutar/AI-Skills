@@ -51,7 +51,7 @@ Intraday briefs distinguish reported halts, scheduled resumptions, confirmed act
 
 The source-bound snapshot intraday brief produces and replays its complete readable and structured delivery, including setup, displayed liquidity and dated venue evidence.
 
-Version **5.13.47** includes [production research operations](references/research-operations.md)
+Version **5.14.0** includes [production research operations](references/research-operations.md)
 for configured supervised research: immutable workflow registration, bounded
 public-file collection, restart reconciliation, traceable event briefs, freshness
 reporting and retained-record verification. The operating commands use private
@@ -590,3 +590,7 @@ For supplied tax-aware sale comparisons, the [tax-lot report](references/tax-lot
 keeps exact signed gain components, an explicit analytical calendar convention and
 selected versus remaining quantities together in verified generated artifacts.
 Unknown tax treatment, currency and external account facts remain scoped.
+
+## Paper stock screens and rebalances
+
+A missing close, a pending takeover and an empty earnings calendar each change how a paper screen should treat a stock. Run the checks on the original selection and each rebalance. Keep provider observations, filing-verified amounts and portfolio marks distinguishable in the report. Start with [paper screening and pricing](references/paper-screening-and-pricing.md).

@@ -339,7 +339,8 @@ def fetch_row(identity, grid, folder, prior=None, reusable=None, source_checks=N
                 raise ValueError('EMPTY_PROVIDER_RESPONSE:' + key)
             if key == 'info':
                 allowed = ('currency', 'financialCurrency', 'marketCap', 'enterpriseValue',
-                    'regularMarketPrice', 'regularMarketTime', 'sector', 'industry', 'forwardPE', 'quoteType')
+                    'regularMarketPrice', 'regularMarketTime', 'sector', 'industry', 'forwardPE', 'quoteType',
+                    'debtToEquity', 'revenueGrowth', 'revenueQuarterlyGrowth')
                 value = {k: value.get(k) for k in allowed}
                 result.update(sector=value.get('sector'), industry=value.get('industry'))
                 if (result.get('security_type') == 'unresolved_security_type'

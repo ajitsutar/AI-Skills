@@ -9,6 +9,10 @@ decide whether guidance increased, decreased, was withdrawn, or remains current.
 
 ## Assistant-operated route
 
+For multi-issuer screens, use the [batch filing workflow](financial-normalization.md#research-a-set-of-finalists).
+It accepts nightly archives, resolves the original documents for each CIK and
+records verified and unverified outcomes across the complete request.
+
 1. Resolve the issuer and accession with available native sources or the existing
    SEC research helpers. Open the specific filing and its exhibit index. Record
    filing acceptance, report/event period and retrieval time separately. A filing

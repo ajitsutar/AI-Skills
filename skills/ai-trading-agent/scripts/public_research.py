@@ -140,6 +140,7 @@ def raw_metrics(row, prices, grid, cutoff):
 
     close = positive(number(prices[grid[-1]]['Close']), 'close')
     cap = positive(number(info.get('marketCap')), 'market_cap')
+    require(info.get('regularMarketPrice') is not None, 'MISSING_NUMBER:regularMarketPrice:CAP_RESCALING_UNAVAILABLE')
     reference_price = positive(number(info.get('regularMarketPrice')), 'reference_price')
     bridged_cap = cap * close / reference_price
     debt = nonnegative(stock('TotalDebt'), 'debt')

@@ -122,6 +122,54 @@ personal broker research or authenticated material in a public skill repository.
 An evidence hash proves byte consistency, not publisher authenticity or accurate
 interpretation; the reviewer must verify attribution, numbers and definitions.
 
+## Screen a finalist list for provider EPS revisions and rating mix
+
+Run `python scripts/paper_screen.py revisions REQUEST.json` with a decision
+timestamp `as_of` and a `candidates` array. Example candidate:
+
+```json
+{"symbol":"EXM","issuer_id":"EXM-common","provider":"example feed",
+ "source_ref":"saved-trends-and-current-book","observed_at":"2034-05-15T20:00:00Z",
+ "currency":"USD","eps_basis":"provider adjusted per common share","period":"+1y",
+ "fiscal_period_end":"2035-12-31","eps_trend":[{"period":"+1y",
+ "current":2.3,"30daysAgo":2.2,"90daysAgo":2.0}],
+ "recommendations":[{"index":0,"period":"0m","strongBuy":0,"buy":4,"hold":2,
+ "sell":1,"strongSell":0}]}
+```
+
+Use the same retained provider EPS bucket, view date, currency, per-share
+definition and actual fiscal endpoint. A rolling label alone does not identify
+the same fiscal period across separately acquired snapshots. The helper returns
+signed current-minus-prior changes and percentages only on positive prior
+estimates. The increasing-revision screen requires both changes to be positive.
+If a single retained snapshot supplies changes for a named bucket but lacks an
+absolute period end or EPS basis, show the signed vendor-bucket calculation
+and leave the comparable revision gate unresolved. Numeric strings in retained
+vendor tables are accepted only when they represent the required finite value.
+The current book is selected by its named period. Buy plus strong buy must be
+positive and at least the hold count. Retain sell and strong sell counts.
+A sell-only or empty book cannot pass. One distribution cannot establish a
+time trend. Evaluate other adopted strategy conditions separately.
+
+## Scaled provider consensus
+
+`python scripts/paper_screen.py provider-consensus REQUEST.json --manifest SOURCES.json --manifest-sha256 SHA256 --source-root ORIGINALS`
+scans a frozen issuer list at one cutoff, for example
+`{"issuers":["EXM","XYZ"],"as_of":"2034-05-15T21:00:00Z"}`. Use a pinned
+[original-source manifest](analyst-sources.md) and retained structured JSON
+files with a root `provider_consensus` array. Each record supplies issuer,
+provider, snapshot `as_of`, source publication and observation timestamps and
+URL, named target statistics, counts, currency, price basis and target horizon
+as in the single-issuer provider schema. Optional `methodology` is retained
+verbatim; absent methodology stays unknown. The batch output also retains
+partial target observations with missing target dimensions or constituent
+counts explicitly listed in `unknown_target_dimensions`. Same-record `recommendations` uses
+the named fields above. Ratings-only records can omit target dimensions when
+they supply a complete dated book. Missing issuers and rejected observations
+remain visible. Each output row retains its file digest and JSON pointer under
+`PROVIDER_CONSENSUS_NOT_INDEPENDENT`. The procedure preserves each provider
+separately and produces no independent consensus or predicted return.
+
 ## Forward targets and consensus
 
 Interpret the user's requested forward target separately from the backward-looking

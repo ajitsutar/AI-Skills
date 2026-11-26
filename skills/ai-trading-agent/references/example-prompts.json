@@ -2274,6 +2274,36 @@
           "prompt": "Complete the supported parts of this research with the tools and supplied files available here. Diagnose the missing dependency or source access, choose a supported fallback, and preserve the failed attempt and remaining limitations. Do not claim another host or unavailable capability has been tested."
         }
       ]
+    },
+    {
+      "id": "paper-stock-screen-rebalance",
+      "title": "Screen and mark a paper equity portfolio",
+      "audience": "Researchers using free sources and retained observations",
+      "guides": [
+        "references/paper-screening-and-pricing.md",
+        "references/analyst-research.md",
+        "references/news-and-guidance.md",
+        "references/financial-normalization.md",
+        "references/strategy-playbook.md"
+      ],
+      "prompts": [
+        {
+          "title": "Audit a low-risk paper shortlist",
+          "prompt": "Repeat this lowest-expected-shortfall screen as of the supplied cutoff. Show names with empty earnings calendars, pending deals, shell-company status or pinned prices before ranking. Check conflicting provider recommendations and negative-base revisions. Show which names remain eligible and why."
+        },
+        {
+          "title": "Reconcile a missing paper mark",
+          "prompt": "Using the retained closes and status checks, reconstruct the common selection anchor and the paper marks. Show carried prices with their prior bar dates, unresolved halts, and later corrections. Keep the original as-of valuation alongside the revision."
+        },
+        {
+          "title": "Review finalists from mixed sources",
+          "prompt": "Batch the finalists, retain provider-specific analyst consensus, import the supplied news and compare material flags with the visible source text. Report which issuer metrics are verified against filings, which are vendor observations, and whether eight quarters support a TTM comparison."
+        },
+        {
+          "title": "Compare exit rules and risk inputs",
+          "prompt": "Freeze equal-weight sizing with the supplied cap and costs. Compare the supplied mean-reversion exits and sector-rotation rules on identical holdouts. For requested GARCH and daily French factors, check dependencies, source vintage and aligned sessions before reporting model results."
+        }
+      ]
     }
   ]
 }

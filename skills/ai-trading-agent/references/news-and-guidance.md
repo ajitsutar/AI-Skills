@@ -275,6 +275,58 @@ time and an explicit refresh status, without counting it as refreshed sentiment.
 Raw response bytes and hashes stay in local run archives; do not publish them in
 GitHub or shared ZIPs without applicable rights.
 
+### Restricted hosts and rate limits
+
+Direct polling requires a publicly routable DNS answer. Some hosts provide
+approved egress through their own search tools while resolving network requests
+inside the Python sandbox to a non-public proxy address. In that case use the
+host-managed route to collect observations and import them offline. The direct
+adapter reports `HOST_APPROVED_EGRESS_OR_OFFLINE_SEARCH_IMPORT` on a non-public
+answer. Proxy URLs, environment credentials and redirect targets are never trusted
+as alternate direct destinations.
+
+For an optional GDELT source, place a configured, independently verified free
+publisher or issuer RSS source after it and add `"fallback_for": "gdelt"` to the
+RSS row, using the actual primary source ID. A rate limit, access failure or
+unhandled redirect activates that row in the same pass. The alternate retains
+its own ID, scope and polling interval. The primary's failed receipt stays visible.
+Future explicitly requested passes retry after the later of the provider's
+Retry-After deadline or local exponential backoff (up to a day for local backoff).
+One successful alternate cannot establish equivalent issuer or time coverage.
+
+For a search result with a calendar dateline but no time, supply the optional `published_date` in YYYY-MM-DD format and leave `published_at` absent. The observed time controls when the evidence first becomes available. Different titles retained from the same landing page remain separate discovery observations. Give the matcher reviewed company display names, aliases and the listings directory name. In a targeted search capture, a matching uppercase ticker in a financial headline can corroborate the subject. A query alone leaves attribution unresolved. Explicit third-party earnings forecast revisions require author review before treating them as corporate guidance.
+
+A dateline later than the latest civil date possible at first observation
+(UTC+14) flags the capture and excludes it from event triage. A possible
+local date near midnight retains day precision and its actual capture time.
+
+Use the supported import entry point for actual native-search results:
+
+```text
+python scripts/news_sources.py import-search search-capture.json imported-news.json
+python scripts/news_analysis.py triage imported-news.json news-watch.json 2026-10-12T15:00:00Z triage.json
+```
+
+A fictional capture shows the input shape. Record when the search was actually
+observed. Set an unknown publication time to null, and include each failed search
+with its reason. Use a new output path.
+
+```json
+{"schema_version":1,"searches":[
+  {"source_id":"search_one","provider":"host search","query":"Example Fabrication outlook",
+   "observed_at":"2026-10-12T14:00:00Z","status":"observed","results":[
+    {"title":"Example Fabrication lowers outlook","url":"https://issuer.example/release",
+     "snippet":"The issuer lowered its forecast.","published_at":null}]},
+  {"source_id":"search_two","provider":"second source","query":"Example Fabrication",
+   "observed_at":"2026-10-12T14:02:00Z","status":"unavailable","reason":"provider rate limited","results":[]}
+]}
+```
+
+Use `empty` with zero results for an actual empty search. A query names the
+search scope only. Imported titles and snippets retain their access level and
+observation clock as review leads. Confirm the issuer and the claim from accessible
+article or primary evidence before attributing a guidance change or legal outcome.
+
 ## Time, duplicates and sentiment
 
 Preserve publication, update, event, provider-observation and first-local-observation
@@ -352,6 +404,14 @@ with source URLs, access level, dates and the relevant evidence. Group paraphras
 syndications by underlying event in addition to exact-headline deduplication.
 Several reports repeating one target change do not create independent bullish
 votes. Show counterevidence and distinguish analyst sentiment from retail opinion.
+
+For short ticker symbols, supply reviewed company-name aliases and trading venue
+labels such as `NYSE:ABC`. Cashtags also work. Bare short symbols remain
+ambiguous. Multiword aliases tolerate punctuation and a trailing legal form.
+Guidance cuts and withdrawals, pending legal proceedings, law-firm solicitations
+and investor alerts each warrant reading the original context. Classification is
+a review hint: an investigation notice is evidence that the notice was issued,
+and a motion headline needs an actual court outcome before inferring a ruling.
 
 Use `scripts/sentiment_review.py TRIAGE.json REVIEW.json OUTPUT.json` to retain
 the supplied interpretations, requested-dimension coverage and evidence references.

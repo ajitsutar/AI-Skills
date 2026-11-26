@@ -169,6 +169,87 @@ def difference(before, after):
             'formula': '(after - before) / before * 100', 'units_inferred': False}
 
 
+def recommendation_gate(rows):
+    """Current provider mix, not proof of improvement over a prior vintage."""
+    matches = [r for r in rows if r.get('period') == '0m']
+    if len(matches) != 1:
+        return {'status': 'UNRESOLVED', 'reason': 'UNIQUE_CURRENT_RATING_BOOK_REQUIRED'}
+    keys = ('strongBuy', 'buy', 'hold', 'sell', 'strongSell')
+    counts = {k: matches[0].get(k) for k in keys}
+    # CSV and retained vendor exports often serialize integer counts as text.
+    counts = {k: int(v) if isinstance(v, str) and re.fullmatch(r'[0-9]{1,12}', v) else v
+              for k, v in counts.items()}
+    if not all(type(n) is int and n >= 0 for n in counts.values()):
+        return {'status': 'UNRESOLVED', 'reason': 'INCOMPLETE_OR_INVALID_COUNTS', 'counts': counts}
+    favorable = counts['buy'] + counts['strongBuy']
+    return {'status': 'PASS' if favorable >= 1 and favorable >= counts['hold'] else 'FAIL',
+            'counts': counts, 'favorable': favorable, 'unfavorable': counts['sell'] + counts['strongSell'],
+            'time_trend_verified': False}
+
+
+def estimate_revision_signal(document):
+    """Compare provider EPS vintages in one absolute fiscal bucket; keep signs."""
+    from paper_screen import symbols, available, day, named
+    cutoff = stamp(document['as_of'])
+    output = []
+    for row in symbols(document):
+        result = {'symbol': row['symbol'], 'issuer_id': row.get('issuer_id'), 'provider': row.get('provider'),
+                  'source_ref': row.get('source_ref'), 'observed_at': row.get('observed_at'),
+                  'currency': row.get('currency'), 'eps_basis': row.get('eps_basis'),
+                  'period': row.get('period'), 'fiscal_period_end': row.get('fiscal_period_end'),
+                  'deltas': {}, 'revision_status': 'UNRESOLVED', 'recommendation': {'status': 'UNRESOLVED'}}
+        output.append(result)
+        if not available(row, cutoff) or not all(named(row.get(k)) for k in ('provider', 'issuer_id')):
+            result['reason'] = 'MISSING_OR_FUTURE_SOURCE'
+            continue
+        recs = row.get('recommendations', [])
+        if isinstance(recs, list) and all(isinstance(r, dict) for r in recs):
+            result['recommendation'] = recommendation_gate(recs)
+        if not named(row.get('period')):
+            result['reason'] = 'ESTIMATE_BUCKET_REQUIRED'
+            continue
+        if row.get('fiscal_period_end') is not None:
+            try:
+                day(row['fiscal_period_end'])
+            except (ValueError, TypeError):
+                result['reason'] = 'INVALID_FISCAL_PERIOD_END'
+                continue
+        trends = row.get('eps_trend', [])
+        if not isinstance(trends, list) or not all(isinstance(r, dict) for r in trends):
+            result['reason'] = 'TREND_ROWS_REQUIRED'
+            continue
+        matches = [r for r in trends if r.get('period') == row['period']]
+        if len(matches) != 1 or any(matches[0].get(k) is not None and row.get(k) is not None
+                                    and matches[0][k] != row[k] for k in ('fiscal_period_end', 'currency', 'eps_basis')):
+            result['reason'] = 'NONUNIQUE_OR_MISMATCHED_FISCAL_BUCKET'
+            continue
+        trend = matches[0]
+        for key in ('30daysAgo', '90daysAgo'):
+            if trend.get(key) is None or trend.get('current') is None:
+                result['deltas'][key] = {'status': 'UNAVAILABLE'}
+                continue
+            try:
+                values = [Decimal(v) if isinstance(v, str) and
+                          re.fullmatch(r'[+-]?(?:[0-9]+(?:\.[0-9]*)?|\.[0-9]+)(?:[eE][+-]?[0-9]+)?', v)
+                          else v for v in (trend[key], trend['current'])]
+                diff = difference(*values)
+            except (ValueError, TypeError, ArithmeticError):
+                result['deltas'][key] = {'status': 'INVALID_ESTIMATE_VALUE'}
+                continue
+            if number(values[0]) <= 0:
+                diff.update(percent_change=None, percent_status='UNDEFINED_NONPOSITIVE_BASE')
+            result['deltas'][key] = {**diff, 'status': 'OBSERVED_PROVIDER_REVISION'}
+        changes = list(result['deltas'].values())
+        if all(d['status'] == 'OBSERVED_PROVIDER_REVISION' for d in changes):
+            result['both_deltas_positive'] = all(Decimal(d['delta']) > 0 for d in changes)
+            if all(named(row.get(k)) for k in ('fiscal_period_end', 'eps_basis', 'currency')):
+                result['revision_status'] = 'PASS' if result['both_deltas_positive'] else 'FAIL'
+            else:
+                result['reason'] = 'SIGNED_VENDOR_BUCKET_CHANGE_ONLY_UNRESOLVED_ESTIMATE_DIMENSIONS'
+    return {'as_of': document['as_of'], 'candidates': output,
+            'limitation': 'Provider snapshots for a declared fiscal bucket. The 30/90-day and recommendation checks are components only; evaluate other adopted strategy rules separately.'}
+
+
 def compare(before, after, metric, initiation_conflict, dimensions=None):
     a, b = before['fields'], after['fields']
     dims = dimensions or DIMENSIONS[metric]

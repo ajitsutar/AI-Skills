@@ -4,7 +4,7 @@ Configured endpoints only; article links are evidence, never fetched automatical
 Local response archives are for replay, not redistribution of publisher content.
 """
 import argparse
-from datetime import datetime, timezone, timedelta
+from datetime import date, datetime, timezone, timedelta
 from email.utils import parsedate_to_datetime
 import hashlib
 from html import unescape
@@ -15,6 +15,7 @@ import os
 from pathlib import Path
 import re
 import socket
+import sys
 import time
 from urllib.parse import urlparse, urljoin
 import uuid
@@ -47,6 +48,23 @@ def stamp(value):
 
 def iso(value):
     return stamp(value).isoformat().replace('+00:00', 'Z')
+
+
+def date_only_issue(value, observed):
+    """Check a civil publication day without assigning a publisher timezone or hour."""
+    if value is None:
+        return None
+    try:
+        day = date.fromisoformat(value)
+        if day.isoformat() != value:
+            return 'INVALID_PUBLICATION_DATE'
+    except (TypeError, ValueError):
+        return 'INVALID_PUBLICATION_DATE'
+    # UTC+14 is the furthest-ahead civil time zone. A later day is impossible
+    # at capture even if the publisher's local timezone was never supplied.
+    if day > stamp(observed).astimezone(timezone(timedelta(hours=14))).date():
+        return 'PUBLICATION_DATE_AFTER_OBSERVATION'
+    return None
 
 
 def digest(value):
@@ -161,6 +179,9 @@ PARSERS = {'rss': parse_feed, 'sec_submissions': parse_sec, 'gdelt': parse_gdelt
 def normalize(row, source, observed, seen):
     now = stamp(observed)
     flags = []
+    date_issue = date_only_issue(row.get('published_date'), now)
+    if date_issue:
+        flags.append(date_issue)
     times = {}
     for key in ('published_at', 'updated_at', 'provider_seen_at', 'event_at'):
         try:
@@ -207,9 +228,75 @@ def validate_url(url):
         raise ValueError('Public HTTPS endpoint required, without credentials')
     if re.search(r'(api.?key|token|secret|password|authorization)=', u.query, re.I):
         raise ValueError('Credential query parameters unsupported by public adapter')
-    for address in socket.getaddrinfo(u.hostname, 443, type=socket.SOCK_STREAM):
+    addresses = socket.getaddrinfo(u.hostname, 443, type=socket.SOCK_STREAM)
+    if not addresses:
+        raise ValueError('No public endpoint addresses returned')
+    for address in addresses:
         if not ipaddress.ip_address(address[4][0]).is_global:
-            raise ValueError('Private/local network endpoints forbidden')
+            raise PublicEgressUnavailable('Private/local network endpoints forbidden')
+
+
+class PublicEgressUnavailable(ValueError):
+    """Local resolution cannot establish a public destination for the direct adapter."""
+
+
+def import_search_observations(document):
+    """Convert an explicit host search capture into news-analysis records without network I/O."""
+    if document.get('schema_version') != 1 or not isinstance(document.get('searches'), list) or not document['searches']:
+        raise ValueError('Search import requires schema_version 1 and nonempty searches')
+    report = {'schema': 1, 'records': [], 'sources': [], 'coverage': 'DECLARED_SEARCHES_ONLY',
+              'input_sha256': digest(json.dumps(document, sort_keys=True)), 'execution_authorized': False}
+    ids = set()
+    for search in document['searches']:
+        source_id = search['source_id']
+        if not re.fullmatch(r'[a-z0-9_-]{1,80}', source_id) or source_id in ids:
+            raise ValueError('Unique search source_id required')
+        ids.add(source_id)
+        provider, query = search['provider'], search['query']
+        if not all(isinstance(v, str) and v.strip() for v in (provider, query)):
+            raise ValueError('Actual provider and query required')
+        checked = iso(search['observed_at'])
+        status, results = search['status'], search['results']
+        statuses = {'observed': 'SEARCH_RESULTS_IMPORTED', 'empty': 'EMPTY_SEARCH', 'unavailable': 'SEARCH_UNAVAILABLE'}
+        if status not in statuses or not isinstance(results, list) or (status == 'observed') != bool(results):
+            raise ValueError('Search status and supplied results disagree')
+        receipt = {'source_id': source_id, 'search_provider': provider, 'search_query': query,
+                   'checked_at': checked, 'status': statuses[status], 'result_count': len(results)}
+        if status == 'unavailable':
+            if not isinstance(search.get('reason'), str) or not search['reason'].strip():
+                raise ValueError('Unavailable search needs a reason')
+            receipt['reason'] = search['reason']
+        known = {}
+        for item in results:
+            url = urlparse(item['url'])
+            if url.scheme not in ('http', 'https') or not url.hostname or url.username is not None or url.password is not None:
+                raise ValueError('Search result needs a public article reference without credentials')
+            title, snippet = item['title'], item.get('snippet', '')
+            if not isinstance(title, str) or not title.strip() or not isinstance(snippet, str):
+                raise ValueError('Search result needs an observed title and optional text snippet')
+            publication = item.get('published_at')
+            if publication is not None:
+                publication = iso(publication)
+            updated = item.get('updated_at')
+            if updated is not None:
+                updated = iso(updated)
+            dateline = item.get('published_date')
+            if dateline is not None:
+                if date.fromisoformat(dateline).isoformat() != dateline:
+                    raise ValueError('Search result calendar dateline must use YYYY-MM-DD')
+            row = {'title': title, 'summary': snippet, 'url': item['url'], 'published_at': publication,
+                   'published_date': dateline,
+                   'source_item_id': digest(json.dumps([item['url'], title], ensure_ascii=False)),
+                   'updated_at': updated, 'search_provider': provider, 'search_query': query,
+                   'evidence_kind': 'SEARCH_SNIPPET' if snippet else 'SEARCH_HEADLINE_ONLY',
+                   'source_refresh_status': 'SEARCH_IMPORT'}
+            record = normalize(row, {'id': source_id, 'source_kind': 'aggregator'}, checked, known)
+            if record['event_id'] not in known:
+                known[record['event_id']] = checked
+                report['records'].append(record)
+        receipt['unique_count'] = len(known)
+        report['sources'].append(receipt)
+    return report
 
 
 def fetch(source, prior, user_agent):
@@ -263,12 +350,16 @@ def poll(config, state_path, run_dir, transport=fetch, clock=None, sleeper=time.
     if len(ua) < 10 or (any(s['adapter'] == 'sec_submissions' and s.get('enabled', True) for s in sources) and
                          ('@' not in ua or '.invalid' in ua or 'example.com' in ua)):
         raise ValueError('Identify application; SEC requires a real contact User-Agent')
+    declared = set()
     for source in sources:
         if source.get('source_kind') not in SOURCE_KINDS:
             raise ValueError('Unknown source_kind; use the documented catalog categories')
         if source['adapter'] not in PARSERS:
             raise ValueError('Unsupported adapter: ' + source['adapter'])
+        if 'fallback_for' in source and source['fallback_for'] not in declared:
+            raise ValueError('A fallback must follow its configured primary source')
         interval(source)
+        declared.add(source['id'])
     state_path = Path(state_path)
     state_path.parent.mkdir(parents=True, exist_ok=True)
     lock = state_path.with_name(state_path.name + '.lock')
@@ -292,10 +383,19 @@ def poll(config, state_path, run_dir, transport=fetch, clock=None, sleeper=time.
             receipt = {'source_id': source['id'], 'url': source['url'], 'checked_at': iso(now),
                        'source_kind': source['source_kind'], 'poll_seconds': interval(source),
                        'last_success_at': previous.get('last_success_at')}
+            if 'fallback_for' in source:
+                receipt['fallback_for'] = source['fallback_for']
             if not source.get('enabled', True):
                 receipt['status'] = 'DISABLED'
                 report['sources'].append(receipt)
                 continue
+            if 'fallback_for' in source:
+                primary = next(s for s in report['sources'] if s['source_id'] == source['fallback_for'])
+                state_at_primary = primary.get('previous_status') if primary['status'] == 'NOT_DUE' else primary['status']
+                if state_at_primary not in ('RATE_LIMITED', 'ACCESS_DENIED', 'FAILED', 'HTTP_ERROR', 'REDIRECT_REQUIRES_CONFIG'):
+                    receipt['status'] = 'FALLBACK_NOT_NEEDED'
+                    report['sources'].append(receipt)
+                    continue
             if previous.get('next_poll_at') and now < stamp(previous['next_poll_at']):
                 receipt.update(status='NOT_DUE', previous_status=previous.get('status'), next_poll_at=previous['next_poll_at'])
                 report['records'].extend(dict(r, new_revision=False, source_refresh_status='NOT_DUE') for r in previous.get('cached_records', []))
@@ -341,6 +441,8 @@ def poll(config, state_path, run_dir, transport=fetch, clock=None, sleeper=time.
                     wait = max(wait, delay_seconds(headers.get('retry-after'), now), min(86400, wait * 2 ** min(current['failures'], 8)))
             except Exception as exc:
                 receipt.update(status='FAILED', error_type=type(exc).__name__)
+                if isinstance(exc, PublicEgressUnavailable):
+                    receipt['next_route'] = 'HOST_APPROVED_EGRESS_OR_OFFLINE_SEARCH_IMPORT'
                 # Avoid exception URLs/headers possibly exposing endpoint secrets.
                 current['failures'] = int(current.get('failures', 0)) + 1
                 wait = max(wait, min(86400, wait * 2 ** min(current['failures'], 8)))
@@ -361,6 +463,18 @@ def poll(config, state_path, run_dir, transport=fetch, clock=None, sleeper=time.
 
 
 def main():
+    if sys.argv[1:2] == ['import-search']:
+        p = argparse.ArgumentParser(description=import_search_observations.__doc__)
+        p.add_argument('capture')
+        p.add_argument('output')
+        args = p.parse_args(sys.argv[2:])
+        raw = Path(args.capture).read_bytes()
+        report = import_search_observations(json.loads(raw))
+        report['input_file_sha256'] = digest(raw)
+        with Path(args.output).open('x', encoding='utf-8') as handle:
+            json.dump(report, handle, indent=2)
+            handle.write('\n')
+        return
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('config')
     p.add_argument('state')

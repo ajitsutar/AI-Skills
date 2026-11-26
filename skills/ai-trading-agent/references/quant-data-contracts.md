@@ -242,3 +242,7 @@ after membership exit, recent-IPO lookbacks, source/metadata corruption, null
 volume, overlap corrections, source-contract changes, missing native prefix
 proof and immutable results. They validate operations, not the historical S&P900
 dataset or a profitable strategy.
+
+## Missing closes in a paper study
+
+Use the [common anchor and daily mark contracts](paper-screening-and-pricing.md). Never fill missing selection returns with a prior close. When marking an existing paper position, retain its last real bar and the status review for the missing session. Keep later provider revisions alongside the originally reported valuation.

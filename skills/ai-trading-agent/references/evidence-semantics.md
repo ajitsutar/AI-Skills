@@ -400,3 +400,39 @@ returned scope receipt when describing the result; prose written after computati
 cannot change which opening balances or events the helper used. See
 [dated projection scope](portfolio-projection.md#bind-the-whole-supplied-portfolio-context-first).
 
+## Earnings exclusions for a paper screen
+
+For a strategy that explicitly requires a clear earnings window, run
+`python scripts/paper_screen.py calendar REQUEST.json` at selection and every
+rebalance. The same input is accepted by the calendar preflight. A blocked
+symbol stays out of that research queue. This does not change account policy.
+
+```json
+{"as_of":"2034-11-10T22:00:00Z","window_start":"2034-11-12","window_end":"2034-11-25",
+ "candidates":[{"symbol":"EXM","vendor":{"upstream":"feed-A","source_ref":"saved-calendar-A",
+ "observed_at":"2034-11-10T20:00:00Z","past_dates":[],"vendor_calendar":{"Earnings Date":[]}},
+ "confirmation":{"upstream":"issuer","source_ref":"saved-issuer-calendar",
+ "observed_at":"2034-11-10T21:00:00Z","next_dates":[],"window_reviewed_clear":true,
+ "coverage":{"from":"2034-11-12","through":"2034-11-25"}}}]}
+```
+
+Record date coverage only when the source actually covers the full requested
+window. A history of previously reported dates alone supplies no such coverage.
+A vendor history plus a specifically identified next earnings date or range
+wholly beyond the window also clears that vendor check at the recorded cutoff.
+An empty vendor history requires an explicit clear confirmation from another
+upstream source. An announcement or possible event range intersecting the
+window blocks that selection, including ranges whose endpoints straddle it.
+Missing or ambiguous dates, late evidence, and syndication of the same feed
+cannot establish independent clearance. `next_dates` may instead be supplied
+in the retained vendor's `vendor_calendar["Earnings Date"]` array. Use an exact
+day, month or year as supplied, retaining calendar precision.
+
+For optional current Yahoo acquisition (yfinance and the existing online policy
+required), run `python scripts/paper_screen.py acquire-calendar SYMBOLS.json`
+with `{"candidates":[{"symbol":"EXM"}]}`. Save the JSON output outside the
+skill. It returns actual retrieval times, available reported-history dates,
+projected dates and per-name errors. Add the requested window and documented
+coverage/secondary evidence before running the check. A current fetch cannot
+establish an earlier decision vintage. A missing feed remains missing.
+

@@ -10,6 +10,7 @@ from unittest.mock import MagicMock, patch
 
 sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'scripts'))
 import news_sources as ns
+import news_analysis as na
 
 
 NOW = datetime(2026, 10, 12, 15, 0, tzinfo=timezone.utc)
@@ -22,6 +23,73 @@ RSS = b'''<rss version="2.0"><channel><item><title>Demo raises guidance</title>
 
 
 class NewsParsingTests(unittest.TestCase):
+    def test_host_search_import_is_offline_partial_and_observation_bound(self):
+        result = {'title': 'Arc Beam (NYSE:ABC) cuts full-year forecast',
+                  'url': 'https://issuer.example/news', 'snippet': 'The outlook was trimmed.'}
+        search = {'source_id': 'desk', 'provider': 'host search', 'query': 'ABC news',
+                  'observed_at': ns.iso(NOW), 'status': 'observed', 'results': [result, result]}
+        denied = dict(search, source_id='secondary', status='unavailable', reason='rate limit', results=[])
+        empty = dict(search, source_id='empty', status='empty', results=[])
+        with patch.object(ns.socket, 'getaddrinfo', side_effect=AssertionError('offline only')):
+            imported = ns.import_search_observations({'schema_version': 1, 'searches': [search, denied, empty]})
+        self.assertEqual([r['status'] for r in imported['sources']],
+                         ['SEARCH_RESULTS_IMPORTED', 'SEARCH_UNAVAILABLE', 'EMPTY_SEARCH'])
+        self.assertEqual(len(imported['records']), 1)
+        row = imported['records'][0]
+        self.assertEqual(row['evidence_kind'], 'SEARCH_SNIPPET')
+        self.assertEqual(row['first_seen_at'], ns.iso(NOW))
+        self.assertIsNone(row['published_at'])
+        self.assertEqual(row['search_provider'], 'host search')
+        config = {'issuer_aliases': {'ABC': []}}
+        self.assertFalse(na.analyze(imported, config, NOW - timedelta(seconds=1))['records'])
+        analysis = na.analyze(imported, config, NOW)
+        self.assertEqual(analysis['records'][0]['issuers'], ['ABC'])
+        self.assertIn('GUIDANCE_CUT_HINT', analysis['records'][0]['review_events'])
+        self.assertFalse(analysis['unique_headline_cluster_counts'])
+        self.assertEqual(len(analysis['source_gaps_or_unpolled']), 2)
+        for bad in [dict(search, results=[]), dict(empty, results=[result]), dict(denied, reason=''),
+                    dict(search, results=[dict(result, published_at='yesterday')])]:
+            with self.subTest(status=bad['status']), self.assertRaises((TypeError, ValueError)):
+                ns.import_search_observations({'schema_version': 1, 'searches': [bad]})
+
+    def test_non_public_proxy_resolution_suggests_native_route_without_network(self):
+        answers = [(socket.AF_INET, socket.SOCK_STREAM, 6, '', ('198.18.158.7', 443))]
+        with patch.object(ns.socket, 'getaddrinfo', return_value=answers):
+            with self.assertRaises(ns.PublicEgressUnavailable):
+                ns.validate_url('https://issuer.example/news')
+
+    def test_search_result_day_precision_and_shared_landing_page(self):
+        item = {'title': 'Issuer reports quarterly results', 'published_date': '2026-10-10', 'url': 'https://issuer.example/news'}
+        query = {'source_id': 'host', 'provider': 'host search', 'query': 'Issuer updates', 'observed_at': ns.iso(NOW),
+                 'status': 'observed', 'results': [item, dict(item, title='Issuer appoints director'), item]}
+        report = ns.import_search_observations({'schema_version': 1, 'searches': [query]})
+        rows = na.analyze(report, {}, NOW)['records']
+        self.assertEqual(len(rows), 2)
+        self.assertTrue(all(r['published_at'] is None and r['published_date'] == '2026-10-10' for r in rows))
+        bad = dict(query, results=[dict(item, published_date='2026-02-30')])
+        with self.assertRaises(ValueError):
+            ns.import_search_observations({'schema_version': 1, 'searches': [bad]})
+
+    def test_day_only_future_at_first_observation_is_excluded_even_on_later_replay(self):
+        search = {'source_id': 'host', 'provider': 'host search', 'query': 'DEMO',
+                  'observed_at': ns.iso(NOW), 'status': 'observed', 'results': [
+            {'title': 'DEMO cuts outlook', 'url': 'https://example.test/a', 'published_date': '2026-10-14'},
+            {'title': 'DEMO Q3 update', 'url': 'https://example.test/b', 'published_date': '2026-10-13'}]}
+        report = ns.import_search_observations({'schema_version': 1, 'searches': [search]})
+        impossible, possible = report['records']
+        self.assertIn('PUBLICATION_DATE_AFTER_OBSERVATION', impossible['flags'])
+        self.assertNotIn('PUBLICATION_DATE_AFTER_OBSERVATION', possible['flags'])
+        # A directly supplied report can omit flags set during normalization.
+        impossible['flags'] = []
+        for as_of in (NOW, NOW + timedelta(days=2)):
+            out = na.analyze(report, {}, as_of)
+            self.assertEqual(out['excluded'][0]['reason'], 'PUBLICATION_DATE_AFTER_OBSERVATION')
+            self.assertEqual([r['event_id'] for r in out['records']], [possible['event_id']])
+            self.assertIsNone(out['records'][0]['published_at'])
+            self.assertEqual(out['records'][0]['first_seen_at'], ns.iso(NOW))
+        impossible['published_date'] = '2026-02-30'
+        self.assertEqual(na.analyze(report, {}, NOW)['excluded'][0]['reason'], 'INVALID_PUBLICATION_DATE')
+
     def test_timestamp_formats_are_utc_and_timezone_is_mandatory(self):
         self.assertEqual(ns.iso('2026-10-12T08:00:00-07:00'), ns.iso(NOW))
         self.assertEqual(ns.iso('Mon, 12 Oct 2026 08:00:00 -0700'), ns.iso(NOW))
@@ -185,6 +253,37 @@ class NewsParsingTests(unittest.TestCase):
 
 
 class NewsPollingTests(unittest.TestCase):
+    def test_rate_limited_primary_uses_independent_source_and_honors_both_clocks(self):
+        primary = dict(SOURCE, id='discovery', adapter='gdelt', source_kind='aggregator')
+        alternate = dict(SOURCE, id='wire', fallback_for='discovery')
+        self.config['sources'] = [primary, alternate]
+        attempts = []
+        def transport(source, previous, user_agent):
+            attempts.append(source['id'])
+            if source['id'] == 'wire':
+                return 200, {}, RSS
+            if attempts.count('discovery') == 1:
+                return 429, {'Retry-After': '2400'}, b'quota'
+            return 200, {}, b'{"articles":[]}'
+        def poll(number):
+            return ns.poll(self.config, self.state, self.root / str(number), transport,
+                           clock=lambda: self.now, sleeper=lambda _: None)
+        first = poll(1)
+        self.assertEqual(attempts, ['discovery', 'wire'])
+        self.assertEqual([s['status'] for s in first['sources']], ['RATE_LIMITED', 'PARSED'])
+        self.assertEqual(first['records'][0]['source_id'], 'wire')
+        self.now += timedelta(seconds=400)
+        second = poll(2)
+        self.assertEqual(attempts, ['discovery', 'wire', 'wire'])
+        self.assertEqual(second['sources'][0]['previous_status'], 'RATE_LIMITED')
+        self.now += timedelta(seconds=2000)
+        third = poll(3)
+        self.assertEqual(attempts, ['discovery', 'wire', 'wire', 'discovery'])
+        self.assertEqual([s['status'] for s in third['sources']], ['EMPTY_VALID', 'FALLBACK_NOT_NEEDED'])
+        self.config['sources'].reverse()
+        with self.assertRaisesRegex(ValueError, 'follow'):
+            poll(4)
+
     def test_unknown_source_kind_cannot_silently_skip_specialized_handling(self):
         self.config['sources'][0]['source_kind'] = 'EXCHANGE_PRIMARY'
         with self.assertRaisesRegex(ValueError, 'source_kind'):

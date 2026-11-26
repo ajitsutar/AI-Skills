@@ -14,6 +14,89 @@ mappings, then delegate to this same normalizer. Missing mappings are mapping
 work; do not substitute a model-written TTM formula or invent source verification.
 The normalization input itself is schema 1; snapshot schema 2 embeds that input.
 
+## Research a set of finalists
+
+Run one request for the entire finalist set. Replace the fictional CIKs, dates,
+and adapters with the approved issuer mapping and cutoff. Include explicit tag
+and unit selectors that occur in the filings relevant to the mandate. Originals
+can contain other supported tags. Use supplied SEC nightly archives or acquire
+them once with an explicitly selected private output directory. These downloads
+can occupy several gigabytes. The identifying SEC User-Agent belongs in the
+private runtime variable `AI_TRADING_SEC_USER_AGENT`. A retained archive and
+retained originals permit offline replay. [SEC bulk archive documentation](https://www.sec.gov/search-filings/edgar-application-programming-interfaces)
+
+A partial bulk download preserves each completed archive and its receipt. To
+retry, supply the missing archive separately or choose a fresh private output
+directory. File creation is exclusive. Review the provider response before
+starting a new acquisition after denial.
+
+```text
+python scripts/finalist_filings.py fetch-bulk PRIVATE_BULK
+python scripts/finalist_filings.py finalists.json PRIVATE_BULK/companyfacts.zip PRIVATE_BULK/submissions.zip PRIVATE_RUN --fetch-documents
+```
+
+The [fictional request](../examples/fictional-finalist-filings.json) shows the
+input shape. The default selects the eight most recent eligible accessions
+containing requested facts for each CIK. Amendments count toward that bound.
+Set an issuer's `accessions` list to select specific eligible filings when
+dates, restatements, or coverage require a different set. The companyfacts API
+supplies discovery rows. The submissions index supplies the accession, form,
+filing date, and official primary-document location. A filing known only by date
+enters the selection on the following New York calendar day. The current bulk
+archives can omit historical or subsequently corrected rows. Preserve the
+actual archive receipts and describe any limits on reconstructing the cutoff.
+
+Each external CIK directory holds the discovered candidates, specific filing
+bytes and extraction receipts when available, replayable normalization input,
+field results, and a review. `batch-review.json` preserves one outcome for
+every valid requested issuer, including unavailable originals. A provider denial
+halts subsequent network requests. To replay retained originals, replace
+`--fetch-documents` with `--originals PRIVATE_ORIGINALS` and arrange files as
+`CIK##########/ACCESSION/INDEXED_FILENAME`. For each source independently
+matched to the primary, record `reviewed_originals[ACCESSION]` with its exact
+SEC `url`, byte `sha256`, and `evidence`. A candidate-only pass omits both
+options.
+
+The issuer flag becomes `FILING_VERIFIED` only after the selected originals
+match their sourcing route and every adapter field and the latest-public-period
+review are ready. Include `latest_public_period_review` and any necessary
+`reviewed_transcriptions` in the issuer request using the normalization schema
+described below. Cite actual filing sections and accounting-basis evidence.
+Inspect individual field gaps before ranking. Store vendor-only results on a
+separate basis labeled `VENDOR_APPROXIMATION_NOT_FILING_VERIFIED`.
+
+## Revenue trends and vendor fields
+
+For a strict year-over-year TTM revenue rule, retain at least eight complete,
+consecutive fiscal quarters or two independently reconciled adjacent full-year
+windows. Check fiscal endpoints, unit/currency, consolidation and publication
+cutoff before dividing current TTM revenue by prior TTM revenue and subtracting
+one. Record both sums and their source IDs. Stop on missing quarters, mixed
+bases, or a nonpositive denominator. Four to six quarters leave this rule
+unevaluated unless there is an admissible full-year reconciliation.
+
+If the mandate expressly permits a proxy, name the field when freezing the rule.
+Use `--revenue-trend-proxy revenueQuarterlyGrowth` or
+`--revenue-trend-proxy revenueGrowth` on the vendor helper. Only the named field
+can contribute to the proxy. An absent quarterly field remains unavailable even
+when general revenue growth is populated. Report the provider period if known,
+the observed fraction, and `VENDOR_APPROXIMATION_NOT_FILING_VERIFIED`. The
+proxy always records `strict_ttm_gate_satisfied: false`.
+
+```text
+python scripts/research_data.py vendor-finalist SYMBOL PRIVATE_VENDOR
+python scripts/vendor_observations.py PRIVATE_VENDOR/vendor-input.json --revenue-trend-proxy revenueGrowth
+```
+
+At capture, preserve the source snapshot, component retrieval times, provider
+version and errors. Replaying a current vendor observation as earlier knowledge
+requires independent availability evidence. The adapter keeps reported values
+and units, divides `debtToEquity` percent by 100, requires
+`regularMarketPrice` and `marketCap` for rescaling, selects company growth
+from the `+1y` row, and reads analyst counts from the explicit `0m` period.
+Missing fields leave the corresponding gate unevaluated. The bundled contract
+fixture exercises both normal and string-serialized values for offline preflight.
+
 ## Run the pipeline
 
 From the skill directory, with a user-chosen output directory outside the skill:

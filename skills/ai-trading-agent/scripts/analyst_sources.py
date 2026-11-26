@@ -273,7 +273,7 @@ def _provider_candidate(pointer, obj):
             or re.search(r'/provider_consensus/\d+$', pointer) is not None)
 
 
-def _provider_record(obj, sid, pointer, source, cutoff, root):
+def _provider_record(obj, sid, pointer, source, cutoff, root, *, ratings_only=False, batch=False):
     """Canonical same-record declarations, never a parser of surrounding prose."""
     from analyst_evidence import number
     from news_analysis import evidence
@@ -294,18 +294,25 @@ def _provider_record(obj, sid, pointer, source, cutoff, root):
                 values[key] = value
                 bindings[key] = {'source_ref': {'source_id': sid, 'pointer': pointer + '/source/' + key},
                                  'role': key, 'transform': 'IDENTITY'}
-    for key in ('provider', 'as_of') + DIMENSIONS + SOURCE_METADATA:
+    dimensions = ('issuer',) if ratings_only or batch else DIMENSIONS
+    for key in ('provider', 'as_of') + dimensions + SOURCE_METADATA:
         require(isinstance(values.get(key), str) and bool(values[key].strip()), 'PROVIDER_UNKNOWN:' + key)
-    require(any(values.get(k) is not None for k in PROVIDER_STATISTICS), 'PROVIDER_STATISTIC_REQUIRED')
-    require(any(values.get(k) is not None for k in PROVIDER_COUNTS), 'PROVIDER_COUNT_REQUIRED')
+    if not ratings_only:
+        require(any(values.get(k) is not None for k in PROVIDER_STATISTICS), 'PROVIDER_STATISTIC_REQUIRED')
+        if not batch:
+            require(any(values.get(k) is not None for k in PROVIDER_COUNTS), 'PROVIDER_COUNT_REQUIRED')
+    if batch:
+        for key in DIMENSIONS:
+            require(values.get(key) is None or isinstance(values[key], str) and values[key].strip(),
+                    'INVALID_PROVIDER_DIMENSION:' + key)
     for key in PROVIDER_STATISTICS:
-        if key in values:
+        if key in values and (not batch or values[key] is not None):
             if isinstance(values[key], Decimal):
                 values[key] = analyst_numbers(values[key])
                 bindings[key]['transform'] = 'DECIMAL'
             number(values[key], True)
     for key in PROVIDER_COUNTS:
-        if key in values:
+        if key in values and (not batch or values[key] is not None):
             require(type(values[key]) is int and values[key] > 0, 'POSITIVE_INTEGER_PROVIDER_COUNT_REQUIRED')
     if 'upstream' in values:
         require(isinstance(values['upstream'], str) and bool(values['upstream'].strip()), 'PROVIDER_UPSTREAM_INVALID')
@@ -515,6 +522,80 @@ def _latest(records, cutoff, issuer):
             'excluded_other_issuer_record_ids': sorted(other_issuer),
             'requested_issuer': issuer,
             'scope': 'Requested issuer only; unknown issuer or issue dates remain unresolved. Missing publication/observation clocks do not prove availability. No cross-dimension aggregation.'}
+
+
+def provider_consensus_batch(request, manifest_path, expected_manifest_sha256, source_root=None):
+    """Group same-record provider observations across a frozen issuer roster."""
+    from analyst_revisions import recommendation_gate
+    from analyst_evidence import number
+
+    issuers = request['issuers']
+    require(isinstance(issuers, list) and issuers and all(isinstance(i, str) and i.strip() for i in issuers)
+            and len(set(issuers)) == len(issuers), 'NONEMPTY_UNIQUE_ISSUER_ROSTER_REQUIRED')
+    cutoff = stamp(request['as_of'])
+    corpus = Corpus(manifest_path, expected_manifest_sha256, source_root)
+    pools = {i: [] for i in issuers}
+    gaps = []
+    for sid, source in sorted(corpus.sources.items()):
+        document = source.get('document')
+        rows = document.get('provider_consensus') if isinstance(document, dict) else None
+        if not isinstance(rows, list):
+            gaps.append({'source_id': sid, 'reason': 'PROVIDER_CONSENSUS_ARRAY_REQUIRED'})
+            continue
+        for index, obj in enumerate(rows):
+            pointer = '/provider_consensus/' + str(index)
+            ref = {'source_id': sid, 'pointer': pointer}
+            try:
+                require(isinstance(obj, dict) and isinstance(obj.get('issuer'), str), 'PROVIDER_ISSUER_REQUIRED')
+                if obj['issuer'] not in pools:
+                    gaps.append({'source_ref': ref, 'reason': 'ISSUER_OUTSIDE_REQUESTED_ROSTER'})
+                    continue
+                # The canonical target extractor validates same-record dimensions, clocks,
+                # source bytes, target/count types and snapshot provenance. Batch metadata
+                # remains tied to the very same JSON object.
+                target_record = {k: v for k, v in obj.items() if k not in ('methodology', 'recommendations')}
+                ratings_only = 'recommendations' in obj and not any(obj.get(k) is not None for k in PROVIDER_STATISTICS)
+                record = _provider_record(target_record, sid, pointer, source, cutoff, corpus.root,
+                                          ratings_only=ratings_only, batch=True)
+                low, high = record.get('minimum'), record.get('maximum')
+                for k in PROVIDER_STATISTICS:
+                    value = record.get(k)
+                    if value is not None:
+                        number(value, True)
+                        require((low is None or low <= value) and (high is None or value <= high),
+                                'INVALID_PROVIDER_TARGET_RANGE')
+                method = obj.get('methodology')
+                require(method is None or isinstance(method, str) and method.strip(), 'INVALID_PROVIDER_METHODOLOGY')
+                # Do not duplicate an entire retained multi-issuer document for every row.
+                record['source'] = {k: v for k, v in record['source'].items() if k != 'verbatim_excerpt'}
+                record['methodology'] = method
+                record['methodology_status'] = 'RECORDED' if method else 'UNKNOWN'
+                if method:
+                    record['bindings']['methodology'] = {'source_ref': {'source_id': sid,
+                        'pointer': pointer + '/methodology'}, 'role': 'methodology', 'transform': 'IDENTITY'}
+                record['unknown_target_dimensions'] = ([] if ratings_only else
+                    [k for k in DIMENSIONS if record.get(k) is None] +
+                    ([] if any(record.get(k) is not None for k in PROVIDER_COUNTS) else ['constituent_count']))
+                if 'recommendations' in obj:
+                    counts = obj['recommendations']
+                    require(isinstance(counts, dict), 'INVALID_PROVIDER_RECOMMENDATIONS')
+                    record['recommendations'] = counts
+                    record['bindings']['recommendations'] = {'source_ref': {'source_id': sid,
+                        'pointer': pointer + '/recommendations'}, 'role': 'recommendations', 'transform': 'IDENTITY'}
+                    record['recommendation_check'] = recommendation_gate([counts])
+                    if ratings_only:
+                        require(record['recommendation_check']['status'] != 'UNRESOLVED',
+                                'RATINGS_ONLY_BOOK_REQUIRES_COUNTS_AND_CURRENT_PERIOD')
+                record['status'] = 'PROVIDER_CONSENSUS_NOT_INDEPENDENT'
+                pools[obj['issuer']].append(record)
+            except (ValueError, KeyError, TypeError, ArithmeticError, OSError) as exc:
+                gaps.append({'source_ref': ref, 'issuer': obj.get('issuer') if isinstance(obj, dict) else None,
+                             'reason': str(exc)})
+    missing = [k for k, v in pools.items() if not v]
+    return {'status': 'INCOMPLETE' if missing or gaps else 'REPORTED_OBSERVATIONS',
+            'label': 'PROVIDER_CONSENSUS_NOT_INDEPENDENT', 'as_of': request['as_of'],
+            'manifest_sha256': expected_manifest_sha256, 'by_issuer': pools, 'missing_issuers': missing,
+            'unresolved': gaps, 'independent_consensus_computed': False, 'return_forecast': None}
 
 
 def analyze(request, manifest_path, expected_manifest_sha256, source_root=None):

@@ -64,3 +64,13 @@ but no bundled replay should be described as implementing them unless it does.
 
 Execution, monitoring and any scheduled activity belong to the actual connected
 host and broker. Read [execution-handoff.md](execution-handoff.md).
+
+## Testing exits in daily mean reversion
+
+Freeze a baseline and a small set of alternatives before examining holdout outcomes. For a screen entering on 14-session Wilder RSI below 30, compare the original RSI-above-60 exit with an RSI-above-50 exit, a fixed maximum holding period and a close at least 15% below entry. These are research variants. Specify strict versus inclusive thresholds, holding-session count, gaps and exit precedence. A close-based signal can fill only at a subsequent eligible price. A carried mark cannot trigger an exit. Price any overnight gap, spread, fees and delisting proceeds explicitly.
+
+Compare variants on the same entries and same eligible sessions. Keep an untouched chronological holdout, count every variant tried, and report net returns, drawdown, turnover, number of exits and censored positions. A short window that motivated a variant is development data. Repeated tuning on it cannot validate a replacement exit.
+
+## Reducing turnover in sector rotation
+
+A 21-session sector ranking reacts to past prices and can reverse between scheduled rebalances. A candidate rule can require agreement between trailing 21- and 63-session rankings before admitting a replacement, plus a minimum number of completed holding sessions. Freeze rank cutoff, ties, rebalance frequency, holding period and precedence for a mandatory event exit. Specify whether disagreement retains an eligible incumbent or leaves the sleeve in cash. Use the same total-return convention and common session for every sector. Compare turnover, costs, drawdown and net performance against the original single-window rule on matching out-of-sample windows before adopting it.

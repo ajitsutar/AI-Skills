@@ -6,23 +6,53 @@ import json
 import math
 from pathlib import Path, PureWindowsPath
 import re
-from news_sources import digest, stamp, iso, save_json
+from news_sources import date_only_issue, digest, stamp, iso, save_json
 
-METHOD = 'news-language-triage-1.2.0'
+METHOD = 'news-language-triage-1.3.0'
 # Original small rule set, not a copied proprietary lexicon or trained classifier.
 POSITIVE = {'beat', 'beats', 'exceeded', 'exceeds', 'growth', 'record', 'upgrade', 'upgrades', 'improve', 'improved', 'improves'}
 NEGATIVE = {'miss', 'misses', 'missed', 'decline', 'declines', 'downgrade', 'downgrades', 'loss', 'losses', 'default', 'fraud', 'bankruptcy', 'recall', 'breach'}
 NEGATORS = {'no', 'not', 'never', 'without', 'unlikely'}
 EVENTS = {
-    'GUIDANCE_RAISE_HINT': r'\b(raise\w*|increas\w*|lift\w*)\b.{0,50}\b(guidance|outlook|forecast)\b',
-    'GUIDANCE_CUT_HINT': r'\b(cut\w*|lower\w*|reduc\w*)\b.{0,50}\b(guidance|outlook|forecast)\b',
-    'GUIDANCE_WITHDRAWAL_HINT': r'\b(withdraw\w*|suspend\w*)\b.{0,50}\b(guidance|outlook|forecast)\b',
+    'GUIDANCE_RAISE_HINT': (
+        r'\b(?:rais(?:e[ds]?|ing)|increas(?:e[ds]?|ing)|lift(?:s|ed|ing)?)\b'
+        r"(?:[\s-]+(?!and\b|but\b|on\b)[\w'-]+){0,7}\s+(?:guidance|outlook|forecasts?)\b"
+        r'|\b(?:higher|raised|increased)\s+(?:guidance|outlook|forecasts?)\b'
+        r'|\b(?:guidance|outlook|forecasts?|guide)\s+(?:(?:was|has been|low end)\s+)?(?:raised|increased)\b'),
+    'GUIDANCE_CUT_HINT': (
+        r'\b(?:cuts?|cutting|lower(?:s|ed|ing)?|reduc(?:es?|ed|ing)|trim(?:s|med|ming)?)\b'
+        r'(?:[\s-]+(?!costs?\b|jobs?\b|and\b|but\b)[\w-]+){0,7}\s+(?:guidance|outlook|forecasts?)\b'
+        r'|\b(?:guidance|outlook|forecasts?)\s+(?:(?:has been|is|was|now|revised)\s+){0,2}'
+        r'(?:cut|lower(?:ed)?|reduced|trimmed|downward|downwards)\b'
+        r'|\b(?:FY\s*\d{2,4}|earnings|annual|revenue|EPS)\s+guide\s+(?:down|lower|cut|trimmed)\b'),
+    'GUIDANCE_WITHDRAWAL_HINT': (
+        r'\b(?:withdraw(?:s|n|ing)?|withdrew|suspend(?:s|ed|ing)?|pull(?:s|ed|ing)?)\b'
+        r'(?:[\s-]+(?!and\b|but\b)[\w-]+){0,7}\s+(?:guidance|outlook|forecasts?)\b'
+        r'|\b(?:guidance|outlook|forecasts?)\s+(?:(?:has been|is|was|remains)\s+)?'
+        r'(?:withdrawn|suspended|pulled)\b'),
     'GUIDANCE_REAFFIRMATION_HINT': r'\b(reaffirm\w*|reiterat\w*|maintain\w*)\b.{0,50}\b(guidance|outlook|forecast)\b',
-    'GUIDANCE_REVIEW': r'\b(guidance|outlook|forecast|investor day|business update)\b',
+    'GUIDANCE_REVIEW': r'\b(guidance|outlook|forecast|investor day|business update)\b|\b(?:FY\s*\d{2,4}|earnings|annual|revenue|EPS)\s+guide\b',
     'PREANNOUNCEMENT_REVIEW': r'\b(preliminary|pre.?announce\w*)\b',
     'FINANCING_REVIEW': r'\b(offering|dilution|convertible|refinanc\w*)\b',
-    'MATERIAL_RISK_REVIEW': r'\b(halt\w*|bankruptcy|litigation|recall|breach|restat\w*)\b',
+    'MATERIAL_RISK_REVIEW': (
+        r'\b(?:halt\w*|bankruptcy|litigation|recall|breach|restat\w*|investor alert|'
+        r'securities class[- ]action|shareholder investigation|motion to dismiss|'
+        r'fraud investigation|derivative lawsuit|corporate wrongdoing)\b'
+        r'|\b(?:law firm|shareholder rights firm)\b[^.!?;\n]{0,75}\binvestigat\w*\b'
+        r'|\binvestigat\w*\b[^.!?;\n]{0,55}\b(?:securities claims?|on behalf of (?:shareholders|investors))\b'),
 }
+
+def review_events(text):
+    # An explicitly attributed forecast revision can belong to an analyst. Keep
+    # the review and avoid labeling that excerpt an issuer guidance action.
+    external = re.compile(r'\b(?i:earnings (?:forecast|estimate)s? (?:cut|lowered|raised|revised) by)\s+'
+                          r'(?:[A-Z][a-z]+|(?i:analysts?|a broker))\b')
+    guidance_text = external.sub(' ', text)
+    events = [key for key, pattern in EVENTS.items() if
+              re.search(pattern, guidance_text if key in ('GUIDANCE_RAISE_HINT', 'GUIDANCE_CUT_HINT') else text, re.I)]
+    if external.search(text):
+        events.append('FORECAST_AUTHOR_REVIEW')
+    return sorted(events)
 
 
 def sentiment(text):
@@ -59,10 +89,41 @@ def issuers(record, aliases):
         found.add(record['exchange_fields']['IssueSymbol'])
     for ticker, names in aliases.items():
         # Bare tickers such as A, IT, ALL and CAT are too ambiguous.
-        if re.search(r'\$' + re.escape(ticker) + r'\b', text, re.I):
+        marked = r'(?:\$|\b(?:NASDAQ|NYSE(?:\s+American|\s+Arca)?|AMEX|OTCQX|OTCQB)\s*:\s*)'
+        if re.search(marked + re.escape(ticker) + r'(?!\w|[.-]\w)', text, re.I):
             found.add(ticker)
-        if any(re.search(r'(?<!\w)' + re.escape(name) + r'(?!\w)', text, re.I) for name in names if len(name) >= 4):
+        # Search captures can refer to an issuer only by a ticker-led earnings or
+        # stock headline. Require both uppercase textual financial context and a
+        # matching token in the recorded query. A query cannot name the subject alone.
+        query = record.get('search_query') or record.get('import_query') or ''
+        targeted = (record['source_kind'] == 'aggregator' and
+                    re.search(r'(?<![\w.-])' + re.escape(ticker) + r'(?![\w.-])', query))
+        ticker_heading = (r'^' + re.escape(ticker) + r'\s+(?i:stock\b|Q[1-4]\b|shareholders?\b|investors?\b|'
+                          r'(?:beats?|misses|raises?|cuts?)\s+(?:quarterly|annual|FY\d{2,4}|20\d{2})\b)')
+        issuer_tag = (r'\(' + re.escape(ticker) + r'\)|(?<![\w.-])' + re.escape(ticker) +
+                      r'(?=\s+(?i:stock)\b)|^' + re.escape(ticker) + r'(?=\s+[-–—]\s+|\s+(?i:announces|reports)\b)')
+        if targeted and len(ticker) >= 2 and (re.search(ticker_heading, text) or re.search(issuer_tag, text)):
             found.add(ticker)
+        for name in names:
+            if (targeted and name.startswith(ticker + ' ') and
+                    re.search(r'(?<!\w)' + re.escape(ticker) + r"['’]s\b", text)):
+                found.add(ticker)
+            # Directory descriptions append share class and security type to the
+            # legal issuer name. Remove the instrument suffix before matching.
+            issuer_name = re.split(r'(?:\s*-\s*|\s+)(?:class [a-z0-9]+ )?(?:(?:common|ordinary) (?:stock|shares?)\b|'
+                                   r'american depositary shares?\b)', name, maxsplit=1, flags=re.I)[0]
+            issuer_name = re.sub(r'\s+S\.A(?:\.B)?\.\s+de\s+C\.V\.?$', '', issuer_name, flags=re.I)
+            words = re.findall(r'\w+', issuer_name)
+            if not words or len(''.join(words)) < 4:
+                continue
+            # Match a shortened multiword name when its last token is a legal suffix.
+            # A shortened single word requires corroborating targeted search context.
+            if (len(words) >= 3 or (targeted and len(words) == 2 and len(words[0]) >= 4)) and words[-1].lower() in {
+                    'inc', 'corp', 'corporation', 'ltd', 'plc', 'llc', 'incorporated'}:
+                words = words[:-1]
+            if re.search(r'(?<!\w)' + r'[\s.,&\-]+'.join(map(re.escape, words)) + r'(?!\w)', text, re.I):
+                found.add(ticker)
+                break
     return sorted(found)
 
 
@@ -76,6 +137,10 @@ def analyze(report, config, as_of, lookback_hours=72):
         # availability claim cannot override publication or observation evidence.
         try:
             availability_times = [stamp(record.get('available_at')), stamp(record.get('first_seen_at'))]
+            date_issue = date_only_issue(record.get('published_date'), availability_times[1])
+            if date_issue:
+                rejected.append({'event_id': record['event_id'], 'reason': date_issue})
+                continue
             availability_times.extend(stamp(record[key]) for key in
                                       ('published_at', 'updated_at', 'provider_seen_at', 'event_at')
                                       if record.get(key) is not None)
@@ -103,7 +168,7 @@ def analyze(report, config, as_of, lookback_hours=72):
             continue
         text = record['title'] + ' ' + record.get('summary', '')
         names = issuers(record, config.get('issuer_aliases', {}))
-        review = sorted(k for k, pattern in EVENTS.items() if re.search(pattern, text, re.I))
+        review = review_events(text)
         language = sentiment(text)
         if record['evidence_kind'] == 'FILING_METADATA_ONLY':
             language = sentiment('')
@@ -131,7 +196,8 @@ def analyze(report, config, as_of, lookback_hours=72):
         label = next(iter(labels)) if len(labels) == 1 else 'MIXED'
         totals.setdefault(issuer, {}).setdefault(label, 0)
         totals[issuer][label] += 1
-    gaps = [s for s in report['sources'] if s['status'] not in ('PARSED', 'EMPTY_VALID', 'UNCHANGED')]
+    gaps = [s for s in report['sources'] if s['status'] not in
+            ('PARSED', 'EMPTY_VALID', 'UNCHANGED', 'SEARCH_RESULTS_IMPORTED', 'FALLBACK_NOT_NEEDED')]
     return {'method': METHOD, 'as_of': iso(cutoff), 'lookback_hours': lookback_hours,
             'implementation_sha256': digest(Path(__file__).read_bytes()),
             'input_sha256': digest(json.dumps(report, sort_keys=True)),

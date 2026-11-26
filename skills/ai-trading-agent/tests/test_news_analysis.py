@@ -25,6 +25,59 @@ def report(rows):
 
 
 class NewsTriageTests(unittest.TestCase):
+    def test_guidance_and_legal_headline_reproductions(self):
+        # Invented examples of the reported wording, not original publisher material.
+        cases = [
+            ('Fictional issuer reduces FY27 earnings forecast', 'GUIDANCE_CUT_HINT'),
+            ('Fictional issuer outlook was trimmed', 'GUIDANCE_CUT_HINT'),
+            ('Fictional tutor signals FY29 guide down', 'GUIDANCE_CUT_HINT'),
+            ('Example issuer annual outlook has been raised', 'GUIDANCE_RAISE_HINT'),
+            ('Shareholders request records for derivative lawsuit', 'MATERIAL_RISK_REVIEW'),
+            ('Fictional vendor awards disputed in fraud investigation', 'MATERIAL_RISK_REVIEW'),
+            ('Fictional issuer withdrew full-year guidance', 'GUIDANCE_WITHDRAWAL_HINT'),
+            ('Post-merger guidance remains suspended', 'GUIDANCE_WITHDRAWAL_HINT'),
+            ('Shareholder rights firm investigates deal terms', 'MATERIAL_RISK_REVIEW'),
+            ('Investor alert: counsel announces shareholder investigation', 'MATERIAL_RISK_REVIEW'),
+            ('Court denies motion to dismiss securities class action', 'MATERIAL_RISK_REVIEW')]
+        for title, expected in cases:
+            with self.subTest(title=title):
+                reviewed = na.analyze(report([record(title)]), {}, AS_OF)['records'][0]
+                self.assertIn(expected, reviewed['review_events'])
+                self.assertIsNone(reviewed['language']['return_prediction'])
+        unchanged = na.analyze(report([record('Issuer cuts costs and maintains guidance')]), {}, AS_OF)
+        self.assertNotIn('GUIDANCE_CUT_HINT', unchanged['records'][0]['review_events'])
+        external = na.review_events('Quarterly earnings forecast cut by Example Brokerage')
+        self.assertIn('FORECAST_AUTHOR_REVIEW', external)
+        self.assertNotIn('GUIDANCE_CUT_HINT', external)
+        self.assertNotIn('GUIDANCE_RAISE_HINT', na.review_events('Profits increase on foreign exchange gains; guidance unchanged'))
+
+    def test_directory_alias_and_targeted_short_ticker_financial_heading(self):
+        aliases = {'XY': ['Arc Beam, Inc. - Class A Common Stock'], 'QR': ['Quartz, Inc. - Common Shares'],
+                   'AJ': ['AJ Holdings Class A Common Stock']}
+        r = {'source_kind': 'aggregator', 'scope_issuers': [], 'title': 'Arc-Beam signs supplier deal'}
+        self.assertEqual(na.issuers(r, aliases), ['XY'])
+        for title, query, expected in [('XY Q3 earnings miss', 'XY outlook', ['XY']),
+                                       ('XY Q3 earnings miss', 'QR outlook', []),
+                                       ('Reports quote a quarterly guide', 'XY outlook', []),
+                                       ('XY visited a market', 'XY outlook', []),
+                                       ('Quartz announces results', 'QR outlook', ['QR']),
+                                       ("AJ's expansion draws attention", 'AJ FY results', ['AJ']),
+                                       ("XY's expansion draws attention", 'XY FY results', [])]:
+            with self.subTest(title=title, query=query):
+                self.assertEqual(na.issuers(dict(r, title=title, search_query=query), aliases), expected)
+
+    def test_short_ticker_candidates_require_specific_context(self):
+        aliases = {'ABC': ['Arc Beam Technologies, Inc.'], 'AB': [], 'CAT': ['Cat Corporation']}
+        r = record('Arc-Beam Technologies guidance revised downward')
+        r['scope_issuers'] = []
+        self.assertEqual(na.issuers(r, aliases), ['ABC'])
+        for title, expected in [('NYSE American: ABC cuts outlook', ['ABC']),
+                                ('Nasdaq:ABC.A lowers outlook', []),
+                                ('ABC and a stray cat appear', []),
+                                ('Rival (NYSE:AB) buys from Arc Beam Technologies', ['AB', 'ABC'])]:
+            with self.subTest(title=title):
+                self.assertEqual(na.issuers(dict(r, title=title), aliases), expected)
+
     def test_base_form_negation_retains_opposing_margin_clause(self):
         result = na.sentiment('Demand improved. Margin did not improve.')
         self.assertEqual(result['label'], 'MIXED')

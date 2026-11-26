@@ -183,3 +183,38 @@ Do not label a screen complete merely because every candidate was assigned Watch
 For a ten-year thesis use rolling event and fundamental reviews; for a forced exit
 show the value/price mechanism and scenario outcomes within that specific window.
 Holding-period research does not submit orders or impose execution conditions.
+
+## A lowest-ES or low-volatility equity screen
+
+Use `python scripts/paper_screen.py low-es REQUEST.json` before applying a
+lowest-expected-shortfall ranking at selection or rebalance. Freeze the
+64 ordered exchange sessions (64 closes give 63 daily returns), the decision
+`as_of` timestamp, its `calendar_ref`, and any strict `max_beta` threshold.
+The request's `candidates` array contains each `symbol`, the `source_ref`
+and `observed_at` of its bars, a common comparable `price_basis`, and
+`bars` with `date`, `close`, `volume`, and optional boolean `carried`.
+Align the supplied sessions to the latest completed exchange close as of the
+decision. The actual series capture must fall between that close and the
+decision, inclusive. For a shortened session or an exchange other than the
+ordinary New York 16:00 session, supply its actual `session_close_at` or keyed
+`session_closes` and `session_timezone`. A missing capture clock, or one before
+the last required close, leaves eligibility unresolved. Missing, carried or zero-volume bars leave the name outside this
+comparison. Use split-consistent prices on one common return basis.
+
+For every name also supply `issuer_profile` and `deal_news` reviews. Each
+needs a same-decision-day `observed_at`, source locator in `source_ref`, and
+one status from `no_indicator`, `unknown`, `pending_merger`,
+`pending_acquisition`, `tender_offer` or `spac`. Inspect corporate-action
+announcements and issuer identity; low beta alone cannot clear the reviews.
+Carry an available vendor `industry` in the issuer review. A reported
+`Shell Companies` classification triggers further review even when a
+generic status says `no_indicator`. A reviewer who verifies an operating
+company can record a dated, sourced `classification_review` with
+`status: operating_company` and its `rationale`.
+A pending deal, tender, SPAC or unknown review removes the name from this
+research ranking. A 63-session high-to-low close range below 1% of the median
+close also removes it, even when trading volume is positive; that diagnostic
+alone establishes no cause. If a beta maximum is adopted, supply a comparable
+benchmark `beta` and `beta_ref`. The helper applies these screens before
+ordering remaining names by 63-return empirical 95% loss ES, with symbol as
+the deterministic tie-breaker. Report exclusions and the remaining count.

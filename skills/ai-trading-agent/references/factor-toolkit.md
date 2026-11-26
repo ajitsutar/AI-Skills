@@ -72,3 +72,9 @@ third-party source code, datasets or model weights were copied.
 
 Deep recurrent models, RL and proprietary risk-model replication are not required for this
 workflow and are not bundled. Method complexity does not establish predictive advantage.
+
+## Daily French factors from a retained download
+
+From the [Kenneth French Data Library](https://mba.tuck.dartmouth.edu/pages/faculty/ken.french/data_library.html), choose the U.S. daily CSV for the Fama/French 3 Factors or the Fama/French 5 Factors (2x3). Extract the CSV locally, retain the original bytes and record their SHA-256, the download URL and actual acquisition time. A revised file downloaded today supports a retrospective analysis. For a point-in-time study, use a vintage known to have been available by its decision cutoff.
+
+Run `python scripts/french_daily_factors.py daily.csv study.json`. In the study JSON supply `model` (FF3 or FF5), `source_url`, `sha256`, offset-aware `retrieved_at` and `as_of`, ISO `through_session`, and `asset_returns` with unique ascending rows such as `{"session":"2026-04-02","asset_return":0.012}`. Supply a complete return history for the asset in decimal total returns. The helper converts the library's percentage units and subtracts RF once inside the regression. It checks the vintage, last required session and every supplied asset session. A missing observation blocks the fit. If you run a separate market-only regression, identify the benchmark and label the single-factor result.

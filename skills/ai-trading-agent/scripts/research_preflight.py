@@ -4,7 +4,8 @@ import importlib.metadata
 import hashlib
 import json
 import re
-from pathlib import Path
+import stat
+from pathlib import Path, PurePosixPath
 
 ROOT = Path(__file__).resolve().parents[1]
 CAPABILITY_FILES = {
@@ -92,14 +93,36 @@ def active_package_versions(text):
     return labels
 
 
-def package_integrity():
+def direct_release_member(path, verified_directories):
+    directories = []
+    for member in (path, *path.parents):
+        if member in verified_directories:
+            verified_directories.update(directories)
+            return True
+        info = member.lstat()
+        if stat.S_ISLNK(info.st_mode) or getattr(info, 'st_file_attributes', 0) & stat.FILE_ATTRIBUTE_REPARSE_POINT:
+            return False
+        if member != path:
+            directories.append(member)
+    return False
+
+
+def package_integrity(root=None):
+    root = Path(ROOT if root is None else root).resolve()
     try:
-        manifest = json.loads((ROOT / 'PACKAGE-MANIFEST.json').read_text(encoding='utf-8'))
+        manifest_path = root / 'PACKAGE-MANIFEST.json'
+        verified_directories = {root}
+        for required in (manifest_path, root / 'VERSION', root / 'SKILL.md'):
+            if not direct_release_member(required, verified_directories):
+                return {'status': 'INVALID', 'errors': ['MISSING_OR_UNSAFE:' + required.name]}
+        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+        if not isinstance(manifest['files'], dict):
+            raise ValueError('Expected package member hashes')
         errors = []
-        version = (ROOT / 'VERSION').read_text(encoding='utf-8').strip()
+        version = (root / 'VERSION').read_text(encoding='utf-8').strip()
         if manifest['version'] != version:
             errors.append('VERSION_MISMATCH')
-        labels = active_package_versions((ROOT / 'SKILL.md').read_text(encoding='utf-8-sig'))
+        labels = active_package_versions((root / 'SKILL.md').read_text(encoding='utf-8-sig'))
         if not labels:
             errors.append('SKILL_PACKAGE_VERSION_MISSING')
         if len(labels) > 1:
@@ -108,14 +131,26 @@ def package_integrity():
             errors.append('SKILL_PACKAGE_VERSION_INVALID')
         if any(label is not None and label != version for label in labels):
             errors.append('SKILL_PACKAGE_VERSION_MISMATCH')
+        for required in ('SKILL.md', 'VERSION'):
+            if required not in manifest['files']:
+                errors.append('MISSING_MANIFEST_ENTRY:' + required)
         for name, expected in manifest['files'].items():
-            path = (ROOT / name).resolve()
-            if ROOT.resolve() not in path.parents or not path.is_file():
+            relative = PurePosixPath(name)
+            path = root / relative
+            if (not relative.parts or relative.as_posix() != name or relative.is_absolute()
+                    or '..' in relative.parts or '\\' in name or ':' in name or name == manifest_path.name
+                    or root not in path.parents or not path.is_file()
+                    or not direct_release_member(path, verified_directories)):
                 errors.append('MISSING_OR_UNSAFE:' + name)
-            elif hashlib.sha256(path.read_bytes()).hexdigest() != expected:
+                continue
+            if hashlib.sha256(path.read_bytes()).hexdigest() != expected:
                 errors.append('HASH_MISMATCH:' + name)
-        return {'status': 'VERIFIED' if not errors else 'INVALID', 'errors': errors,
-                'manifest_sha256': hashlib.sha256((ROOT / 'PACKAGE-MANIFEST.json').read_bytes()).hexdigest()}
+        result = {'status': 'VERIFIED' if not errors else 'INVALID', 'errors': errors,
+                  'manifest_sha256': hashlib.sha256(manifest_path.read_bytes()).hexdigest()}
+        if 'HASH_MISMATCH:SKILL.md' in errors:
+            result['recovery'] = ('Restore the exact published skill from a trusted release. '
+                                  'Keep any host wrapper outside the verified inner package.')
+        return result
     except (OSError, ValueError, KeyError, TypeError):
         return {'status': 'INVALID', 'errors': ['PACKAGE_MANIFEST_UNAVAILABLE_OR_INVALID']}
 
@@ -161,10 +196,45 @@ def check():
             'limitations': 'Import checks are not execution evidence, market-data entitlement, performance validation or broker readiness'}
 
 
+def task_preflight(capabilities, *, require_garch=False, anchor=None, calendar=None, vendor=False):
+    findings = {}
+    if require_garch:
+        ready = (capabilities['volatility'] == 'AVAILABLE'
+                 and capabilities['package_integrity']['status'] == 'VERIFIED')
+        findings['garch'] = {'status': 'READY' if ready else 'BLOCKED',
+                             'required_dependencies': ['arch', 'numpy', 'pandas', 'scipy', 'statsmodels']}
+    if anchor is not None:
+        from paper_pricing import common_anchor
+        findings['anchor'] = common_anchor(anchor)
+    if calendar is not None:
+        from paper_screen import calendar_completeness
+        findings['calendar'] = calendar_completeness(calendar)
+    if vendor:
+        from vendor_observations import contract_check
+        findings['vendor_schema'] = contract_check()
+    blocked = [name for name, result in findings.items() if result['status'] not in ('READY', 'PASS')]
+    return {'status': 'BLOCKED' if blocked else 'READY', 'blocked': blocked, 'checks': findings}
+
+
 if __name__ == '__main__':
     import sys
     if any(arg == '--request' or arg.startswith('--request=') for arg in sys.argv[1:]):
         from research_record import main
         main()
-    else:
+    elif len(sys.argv) == 1:
         print(json.dumps(check(), indent=2))
+    else:
+        import argparse
+        parser = argparse.ArgumentParser(description=__doc__)
+        parser.add_argument('--require-garch', action='store_true')
+        parser.add_argument('--anchor-check', type=Path)
+        parser.add_argument('--calendar-check', type=Path)
+        parser.add_argument('--vendor-schema', action='store_true')
+        flags = parser.parse_args()
+        def read_input(path):
+            return json.loads(path.read_text(encoding='utf-8-sig')) if path else None
+        result = task_preflight(check(), require_garch=flags.require_garch,
+                                anchor=read_input(flags.anchor_check),
+                                calendar=read_input(flags.calendar_check), vendor=flags.vendor_schema)
+        print(json.dumps(result, indent=2, allow_nan=False))
+        sys.exit(0 if result['status'] == 'READY' else 2)

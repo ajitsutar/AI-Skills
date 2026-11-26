@@ -1,5 +1,7 @@
 # Reproducible technical analysis
 
+For lowest-ES screens, [review deals, SPACs and narrow traded ranges before ranking](screening-and-value-traps.md#a-lowest-es-or-low-volatility-equity-screen).
+
 Use `scripts/technical_toolkit.py` for supplied, finalized OHLCV bars. It computes indicators, explicit swing geometry, a bar-based volume-profile approximation, a supplied order-book snapshot imbalance, an SVG price chart, and a long/flat next-open research replay. It does not acquire market data, supply live depth, submit trades, or establish that an indicator predicts returns.
 
 ## Run and input contract

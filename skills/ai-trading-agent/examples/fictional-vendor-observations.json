@@ -1,0 +1,16 @@
+{
+  "fixture": "Fictional schema illustration for a dated provider snapshot",
+  "info": {
+    "currency": "USD", "debtToEquity": 37.625, "regularMarketPrice": null,
+    "marketCap": 400000000, "revenueQuarterlyGrowth": null, "revenueGrowth": 0.08,
+    "earningsGrowth": 1.3
+  },
+  "growth_estimates": [
+    {"period": "0y", "stockTrend": -0.04, "indexTrend": 0.01},
+    {"period": "+1y", "stockTrend": "0.12", "indexTrend": "0.02"}
+  ],
+  "recommendations": [
+    {"index": 0, "period": "-1m", "strongBuy": 1, "buy": 1, "hold": 0, "sell": 0, "strongSell": 0},
+    {"index": "1", "period": "0m", "strongBuy": "6", "buy": "3", "hold": "0", "sell": "4", "strongSell": "2"}
+  ]
+}
