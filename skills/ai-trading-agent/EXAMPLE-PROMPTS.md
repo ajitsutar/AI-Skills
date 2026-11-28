@@ -1697,7 +1697,7 @@ Read the linked workflow for each section and the [README](README.md) for scope.
 
 ### 351. Resume a bounded historical download
 
-> Capture [DATA REQUESTS] in the explicit local storage root [ROOT], keeping immutable compressed responses and source metadata. Set disk and request-size limits. Resume the same frozen run from its completed captures without redownloading them, and report missing or incomplete data separately.
+> Capture [DATA REQUESTS] in the explicit local storage root [ROOT], keeping immutable compressed responses and source metadata. Set disk and request-size limits. After a collector interruption, resume the same frozen run, reuse verified captures, and show which locks were recovered or still block progress. Reconcile requested, acquired and scored counts, identify genuine provider gaps, and tell me whether the resulting ranking is usable.
 
 ### 352. Opt into portable reuse without stale history
 

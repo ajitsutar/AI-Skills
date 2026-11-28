@@ -9,6 +9,7 @@ from __future__ import annotations
 
 import argparse
 from concurrent.futures import ThreadPoolExecutor, as_completed
+from contextlib import ExitStack
 from datetime import datetime, timedelta, timezone
 import importlib.metadata
 import hashlib
@@ -23,12 +24,12 @@ import xml.etree.ElementTree as ET
 from zipfile import ZipFile
 from zoneinfo import ZoneInfo
 
-from public_research import (digest, profile, incomplete_components,
+from public_research import (digest, profile, incomplete_components, legacy_store_lock_failure,
                              history as validate_history, number, positive, nonnegative)
 from listed_universe import DIRECTORIES, build_universe
 from trading_calendar import sessions
 from incremental_research import PartialFetch
-from research_data_store import Store
+from research_data_store import Store, StoreLockError
 
 _request_lock = threading.Lock()
 _next_request = 0.0
@@ -357,7 +358,7 @@ def fetch_row(identity, grid, folder, prior=None, reusable=None, source_checks=N
                 result['component_acquisition'][key].update(
                     capture_request_id=captured['request_id'], capture_raw_sha256=captured['raw_sha256'],
                     source_role=captured['request']['source_role'])
-        except NetworkPolicyError:
+        except (NetworkPolicyError, StoreLockError):
             raise
         except Exception as exc:
             result['errors'].append({'component': key, 'error': type(exc).__name__ + ':' + str(exc)})
@@ -407,11 +408,28 @@ def argument_parser():
         help='Opt in to fetching info/full history before statements; skip fresh statements only for the native missing-session exclusion, retaining all universe members')
     parser.add_argument('--component-store', action='store_true',
         help='Durably gzip each decoded provider component under the explicit output root; same-contract resume avoids refetch after later processing fails')
+    parser.add_argument('--legacy-writers-stopped', action='store_true',
+        help='For component-store resume: confirm all older collectors using this store have stopped, allowing recovery of eligible old ownerless locks')
     parser.add_argument('--min-free-bytes', type=int, default=256 * 1024 * 1024,
         help='Reserve for optional component storage; no automatic drive fallback')
     parser.add_argument('--max-component-bytes', type=int, default=512 * 1024 * 1024)
     parser.add_argument('--workers', type=int, default=4, choices=range(1, 5))
     return parser
+
+
+def resume_code_transition(original, current):
+    """Accept the exact reviewed store-recovery repair without changing the frozen store identity."""
+    old = original.get('acquisition_code_sha256')
+    if old is None and 'acquisition_code_sha256' not in original:
+        return None  # Historical contracts predate acquisition-code recording.
+    if old == current:
+        return None
+    if original.get('component_store') is True:
+        spec = Path(__file__).resolve().parents[1] / 'profiles/component-store-resume-compatibility.json'
+        transition = json.loads(spec.read_text(encoding='utf-8'))
+        if old == transition['from'] and current == transition['to']:
+            return {'reason': 'REVIEWED_COMPONENT_STORE_RECOVERY', 'from': old, 'to': current}
+    raise ValueError('RESUME_ACQUISITION_CODE_MISMATCH: use saved collector or start a new run')
 
 
 def main():
@@ -421,6 +439,8 @@ def main():
         require_network()  # Before directories, calendars, contracts or providers.
     if args.resume and (args.partial_fetch or args.reuse_from or args.reuse_manifest or args.freshness_receipt):
         raise ValueError('RESUME_AND_NEW_RUN_SOURCE_CHECKS_ARE_DISTINCT')
+    if args.legacy_writers_stopped and not (args.resume and args.component_store and not args.universe_only):
+        raise ValueError('LEGACY_WRITERS_CONFIRMATION_REQUIRES_COMPONENT_STORE_RESUME')
     if not args.partial_fetch and (args.reuse_from or args.reuse_manifest):
         raise ValueError('PARENT_REUSE_REQUIRES_EXPLICIT_PARTIAL_FETCH')
     decision = datetime.fromisoformat(args.decision_at.replace('Z', '+00:00'))
@@ -439,7 +459,8 @@ def main():
     prompt = args.prompt_file.read_text(encoding='utf-8-sig').strip()
     contract = {'profile': profile(), 'profile_sha256': digest(profile()), 'defined_at': now(),
         'acquisition_code_sha256': {name: hashlib.sha256(Path(__file__).with_name(name).read_bytes().replace(b'\r\n', b'\n')).hexdigest()
-            for name in ('public_research_fetch.py', 'listed_universe.py', 'incremental_research.py', 'research_data_store.py')},
+            for name in ('public_research_fetch.py', 'listed_universe.py', 'incremental_research.py',
+                         'public_research.py', 'research_data_store.py', 'store_locking.py')},
         'decision_at': args.decision_at, 'price_date': grid[-1]['date'], 'prompt': prompt,
         'prompt_sha256': digest(prompt), 'hold': args.hold, 'acquisition': 'independent_fresh_network_pull',
         'network_mode': mode,
@@ -464,9 +485,9 @@ def main():
             raise ValueError('RESUME_CONTRACT_MISMATCH:collection_mode')
         if old_contract.get('component_store', False) != contract['component_store']:
             raise ValueError('RESUME_CONTRACT_MISMATCH:component_store')
-        if ('acquisition_code_sha256' in old_contract
-                and old_contract['acquisition_code_sha256'] != contract['acquisition_code_sha256']):
-            raise ValueError('RESUME_ACQUISITION_CODE_MISMATCH: use saved collector or start a new run')
+        transition = resume_code_transition(old_contract, contract['acquisition_code_sha256'])
+        if transition:
+            attempt_context['collector_code_transition'] = transition
         for key in ('profile_sha256', 'price_date', 'prompt_sha256', 'hold'):
             if old_contract[key] != contract[key]:
                 raise ValueError('RESUME_CONTRACT_MISMATCH:' + key)
@@ -477,6 +498,9 @@ def main():
         universe = json.loads((folder / 'universe.json').read_text(encoding='utf-8'))
         # Recover finished per-security checkpoints even if a long collection was interrupted.
         prior, corrupt = recover_checkpoints(folder, universe)
+        if contract.get('component_store'):
+            attempt_context['prior_store_lock_failure_securities'] = sum(
+                legacy_store_lock_failure(row) is not None for row in prior.values())
         attempt = len(list(folder.glob('retry-*'))) + 1
         output_folder = folder / ('retry-%03d' % attempt)
         output_folder.mkdir(exist_ok=False); (output_folder / 'raw').mkdir()
@@ -502,12 +526,20 @@ def main():
     if args.component_store:
         component_store = Store(folder / 'component-store', 'public-research-fetch:' + digest(contract),
             create=not (folder / 'component-store').exists(), min_free_bytes=args.min_free_bytes,
-            max_capture_bytes=args.max_component_bytes)
+            max_capture_bytes=args.max_component_bytes, legacy_writers_stopped=args.legacy_writers_stopped)
     if args.partial_fetch or args.freshness_receipt:
         checks = PartialFetch(args.reuse_from, args.reuse_manifest, args.freshness_receipt,
                               output_folder, args.decision_at,
                               baseline_only=not args.partial_fetch)
-    with ThreadPoolExecutor(max_workers=args.workers) as pool:
+    with ExitStack() as resources:
+        if component_store is not None:
+            def report_lock_recovery():
+                recovery = component_store.recovery_summary()
+                attempt_context['component_store_lock_recovery'] = recovery
+                save(output_folder / 'component-store-lock-recovery.json', recovery)
+                print('Component store locks reclaimed:', recovery['count'], json.dumps(recovery['keys']), flush=True)
+            resources.callback(report_lock_recovery)
+        pool = resources.enter_context(ThreadPoolExecutor(max_workers=args.workers))
         futures = []
         for identity in universe['rows']:
             old = prior.get(identity['symbol'])
@@ -517,10 +549,18 @@ def main():
                 reusable = checks.choose(identity, contract['profile_sha256'], now()) if args.partial_fetch else None
                 futures.append(pool.submit(fetch_row, identity, grid, output_folder, old,
                                            reusable, checks, args.history_first, component_store, digest(contract)))
-        for future in as_completed(futures):
-            rows.append(future.result())
-            if len(rows) % 25 == 0 or len(rows) == len(universe['rows']):
-                print('Acquired', len(rows), '/', len(universe['rows']), flush=True)
+        try:
+            for future in as_completed(futures):
+                rows.append(future.result())
+                if len(rows) % 25 == 0 or len(rows) == len(universe['rows']):
+                    print('Acquired', len(rows), '/', len(universe['rows']), flush=True)
+        except StoreLockError as exc:
+            for pending in futures:
+                pending.cancel()
+            save(output_folder / 'component-store-blocked.json', {
+                'status': 'BLOCKED', 'observed_at': now(), 'error_type': type(exc).__name__,
+                'reason': str(exc), 'contract_sha256': digest(contract)})
+            raise
     attempt_context['provider_jobs_submitted'] = len(futures)
     attempt_context['complete_checkpoints_reused'] = len(universe['rows']) - len(futures)
     snapshot = {'schema_version': 1, 'profile_sha256': contract['profile_sha256'],

@@ -15,10 +15,18 @@ import os
 from pathlib import Path, PurePosixPath
 import shutil
 import stat
+import sys
 import tempfile
 import time
 import uuid
 import zipfile
+
+from store_locking import (StoreLockError, StoreLockBusy, StoreLockExists, StoreLockLimit,
+                           dead_reason, dispatch_fence, local_process)
+
+# An old empty lock has no verifiable writer identity. Both age and explicit
+# confirmation that all old writers have stopped are required for recovery.
+LEGACY_MIN_AGE_SECONDS = 24 * 60 * 60
 
 CHUNK = 1024 * 1024
 MARKER = 'RESEARCH-STORE.json'
@@ -116,11 +124,15 @@ def validate_request(request):
 
 class Store:
     def __init__(self, root, owner, *, create=False, min_free_bytes=256 * CHUNK,
-                 max_capture_bytes=512 * CHUNK, max_active_captures=4):
+                 max_capture_bytes=512 * CHUNK, max_active_captures=4, legacy_writers_stopped=False):
         if not owner or not isinstance(owner, str):
             raise ValueError('EXPLICIT_OWNER_REQUIRED')
         self.root = Path(root).absolute()
         safe_path(self.root.parent, self.root.name)
+        if type(legacy_writers_stopped) is not bool:
+            raise ValueError('BOOLEAN_LEGACY_WRITER_CONFIRMATION_REQUIRED')
+        self.legacy_writers_stopped = legacy_writers_stopped
+        self._reclamations = []
         self.owner = owner
         self.min_free_bytes = int(min_free_bytes)
         self.max_capture_bytes = int(max_capture_bytes)
@@ -146,31 +158,244 @@ class Store:
         if shutil.disk_usage(self.root).free < self.min_free_bytes + 2 * CHUNK * self.max_active_captures:
             raise OSError('STORAGE_RESERVE_REACHED')
 
+    def recovery_summary(self):
+        records = list(self._reclamations)
+        return {'count': len(records), 'keys': [row['key'] for row in records], 'records': records}
+
+    def _retire_lock(self, path, files, defer_release=None):
+        # Move the entire name out of the admission namespace in one operation.
+        # A kill while clearing retired metadata can never produce an empty active lock.
+        retired = self.path('attempts/.retired-lock-' + uuid.uuid4().hex)
+        try:
+            path.rename(retired)
+        except PermissionError as exc:
+            # Windows can deny renaming a directory while a scanner reads a
+            # child. Only its live owner may publish a voluntary release.
+            if defer_release is None or getattr(exc, 'winerror', None) not in (5, 32, 33):
+                raise
+            defer_release()
+            return
+        for member in files:
+            (retired / member.name).unlink()
+        retired.rmdir()
+
+    def _defer_release(self, record):
+        # A crash during writing leaves only an unpublished file under attempts.
+        marker = self.path('locks/' + record['key'] + '.lock/released.json')
+        if marker.exists():
+            raise StoreLockBusy('STORE_LOCK_RELEASE_MARKER_CONFLICT')
+        staged = self.path('attempts/.new-release-' + uuid.uuid4().hex)
+        atomic_json(staged, dict(record, release_state='RELEASED_BY_OWNER'))
+        try:
+            staged.rename(marker)
+        finally:
+            staged.unlink(missing_ok=True)
+        print(json.dumps({'lock_release_pending': record['key']}), file=sys.stderr, flush=True)
+
+    def _recover(self, key, reason, pid, age, remove):
+        token = uuid.uuid4().hex
+        receipt = self.path('attempts/lock-recovery-' + token + '.json')
+        event = {'status': 'RECOVERY_INTENT', 'store_id': self.identity['store_id'],
+                 'key': key, 'pid': pid, 'age_seconds': None if age is None else max(0, round(age, 3)),
+                 'reason': reason, 'observed_at': utc(), 'receipt': receipt.name}
+        atomic_json(receipt, event)
+        remove()
+        event.update(status='RECLAIMED')
+        atomic_json(receipt, event, replace=True)
+        self._reclamations.append(event)
+        print(json.dumps({'lock_recovery': event}, sort_keys=True), file=sys.stderr, flush=True)
+
+    def _recover_legacy(self, path, key):
+        if not self.legacy_writers_stopped:
+            return False
+        try:
+            members = list(path.iterdir())
+            age = time.time() - path.stat().st_mtime
+        except FileNotFoundError:
+            return False
+        if members or age < LEGACY_MIN_AGE_SECONDS:
+            return False
+        self._recover(key, 'QUIESCED_LEGACY_LOCK', None, age, path.rmdir)
+        return True
+
+    def _owner_record(self, key, nonce):
+        pid, host, scope, start = local_process()
+        return {'schema_version': 1, 'store_id': self.identity['store_id'], 'key': key,
+                'nonce': nonce, 'owner': self.owner, 'pid': pid, 'hostname': host,
+                'process_scope': scope, 'process_start': start, 'started_at': utc()}
+
+    def _read_owner(self, path, key):
+        info = path.lstat()
+        if (not stat.S_ISREG(info.st_mode) or getattr(info, 'st_file_attributes', 0) & 0x400
+                or info.st_size > 16384 + len(json.dumps(self.owner))):
+            return None
+        try:
+            record = json.loads(path.read_bytes())
+            if (not isinstance(record, dict) or record.get('schema_version') != 1
+                    or record.get('store_id') != self.identity['store_id'] or record.get('key') != key
+                    or record.get('owner') != self.owner or type(record.get('pid')) is not int
+                    or not 0 < record['pid'] <= 2**31-1 or not isinstance(record.get('hostname'), str)
+                    or not isinstance(record.get('process_scope'), dict) or not record['process_scope']
+                    or not isinstance(record.get('nonce'), str) or len(record['nonce']) != 32
+                    or any(c not in '0123456789abcdef' for c in record['nonce'])
+                    or ('process_start' not in record or record['process_start'] is not None
+                        and not isinstance(record['process_start'], str))):
+                return None
+            age = (datetime.now(timezone.utc) - stamp(record['started_at'])).total_seconds()
+        except (KeyError, AttributeError, ValueError, TypeError, OverflowError):
+            return None
+        return record, age
+
     @contextmanager
-    def lock(self, key):
-        path = self.path('locks/' + key + '.lock')
+    def _dispatch(self):
+        marker = self.path(MARKER)
         guard = self.path('locks/dispatch.lock')
         deadline = time.monotonic() + 5
-        while True:
+        with dispatch_fence(marker, deadline):
+            record = self._owner_record('dispatch', uuid.uuid4().hex)
+            staged = self.path('attempts/.new-dispatch-' + record['nonce'])
+            created = False
             try:
-                guard.mkdir(); break
-            except FileExistsError:
-                if time.monotonic() >= deadline:
-                    raise RuntimeError('STORE_DISPATCH_BUSY')
-                time.sleep(.01)
+                with staged.open('x', encoding='utf-8') as stream:
+                    created = True
+                    json.dump(record, stream, allow_nan=False)
+                    stream.flush()
+                    os.fsync(stream.fileno())
+                while True:
+                    try:
+                        info = guard.lstat()
+                    except FileNotFoundError:
+                        # New writers serialize under the OS fence. A file rename
+                        # cannot replace a directory, even if a legacy mkdir wins here.
+                        try:
+                            staged.rename(guard)
+                            break
+                        except (FileExistsError, IsADirectoryError):
+                            pass
+                        except PermissionError:
+                            if not guard.exists():
+                                raise
+                    else:
+                        if stat.S_ISDIR(info.st_mode) and not getattr(info, 'st_file_attributes', 0) & 0x400:
+                            if self._recover_legacy(guard, 'dispatch'):
+                                continue
+                        elif stat.S_ISREG(info.st_mode):
+                            abandoned = self._read_owner(guard, 'dispatch')
+                            if abandoned:
+                                row, age = abandoned
+                                self._recover('dispatch', 'DISPATCH_FENCE_RELEASED', row['pid'], age, guard.unlink)
+                                continue
+                    if time.monotonic() >= deadline:
+                        raise StoreLockBusy('STORE_DISPATCH_BUSY')
+                    time.sleep(.01)
+                try:
+                    yield
+                finally:
+                    current = self._read_owner(guard, 'dispatch')
+                    if not current or current[0]['nonce'] != record['nonce']:
+                        raise StoreLockBusy('STORE_DISPATCH_IDENTITY_CHANGED')
+                    guard.unlink()
+            finally:
+                if created:
+                    staged.unlink(missing_ok=True)
+
+    def _recover_owner(self, path, key, process, requested_key):
+        owner_file = path / 'owner.json'
         try:
-            active = [p.name for p in self.path('locks').iterdir() if p != guard]
+            owner = self._read_owner(owner_file, key)
+        except FileNotFoundError:
+            return self._recover_legacy(path, key)
+        if not owner:
+            return False
+        record, age = owner
+        release_file = path / 'released.json'
+        try:
+            release = self._read_owner(release_file, key)
+        except FileNotFoundError:
+            pass
+        else:
+            if (not release or release[0] != dict(record, release_state='RELEASED_BY_OWNER')
+                    or set(path.iterdir()) != {owner_file, release_file}):
+                return False
+            try:
+                self._retire_lock(path, (owner_file, release_file))
+            except PermissionError as exc:
+                # A reader can pin this lease on Windows. It still occupies one
+                # slot; independent captures may use the remaining capacity.
+                if (getattr(exc, 'winerror', None) in (5, 32, 33)
+                        and key != requested_key and 'maintenance' not in (key, requested_key)):
+                    return False
+                raise StoreLockBusy('STORE_RELEASED_LOCK_RETIREMENT_BLOCKED: ' + str(exc)) from exc
+            return True
+        pid, host, scope, _ = process
+        reason = dead_reason(record, host, scope, pid)
+        if not reason or set(path.iterdir()) != {owner_file}:
+            return False
+        self._recover(key, reason, record['pid'], age, lambda: self._retire_lock(path, (owner_file,)))
+        return True
+
+    def _enter_lock(self, key, path, nonce):
+        with self._dispatch():
+            process = local_process()
+            active = set()
+            for other in path.parent.iterdir():
+                if other.name == 'dispatch.lock':
+                    continue
+                other_key = other.name.removesuffix('.lock')
+                try:
+                    info = other.lstat()
+                    if (other.name.endswith('.lock') and stat.S_ISDIR(info.st_mode)
+                            and not getattr(info, 'st_file_attributes', 0) & 0x400
+                            and self._recover_owner(other, other_key, process, key)):
+                        continue
+                except FileNotFoundError:
+                    # A collector can retire its own lock during the scan.
+                    if not other.exists():
+                        continue
+                active.add(other.name)
             if (key == 'maintenance' and active) or 'maintenance.lock' in active:
-                raise ValueError('CAPTURE_OR_MAINTENANCE_ACTIVE')
+                raise StoreLockLimit('CAPTURE_OR_MAINTENANCE_ACTIVE')
             if key != 'maintenance' and len(active) >= self.max_active_captures:
-                raise ValueError('ACTIVE_CAPTURE_LIMIT')
-            path.mkdir()  # Atomic same-request exclusion; independent captures allowed.
-        finally:
-            guard.rmdir()
+                raise StoreLockLimit('ACTIVE_CAPTURE_LIMIT')
+            if path.name in active:
+                raise StoreLockExists('CAPTURE_KEY_ACTIVE')
+            record = self._owner_record(key, nonce)
+            # An interrupted write lives under attempts; an admission path is
+            # published only after its complete owner record exists.
+            with tempfile.TemporaryDirectory(dir=self.path('attempts'), prefix='.new-lock-') as stage:
+                staged = Path(stage) / 'lock'
+                staged.mkdir()
+                atomic_json(staged / 'owner.json', record)
+                staged.rename(path)
+
+    @contextmanager
+    def lock(self, key):
+        if not isinstance(key, str) or not key or key == 'dispatch' or key in ('.', '..') or any(c in key for c in '/\\:'):
+            raise StoreLockLimit('INVALID_STORE_LOCK_KEY')
+        nonce = uuid.uuid4().hex
+        try:
+            path = self.path('locks/' + key + '.lock')
+            self._enter_lock(key, path, nonce)
+        except StoreLockError:
+            raise
+        except (OSError, ValueError) as exc:
+            raise StoreLockBusy('STORE_LOCK_ADMISSION_FAILED: ' + str(exc)) from exc
         try:
             yield
         finally:
-            path.rmdir()
+            try:
+                # Admission cannot replace a live lock. Retire this exact lease
+                # independently so a paused dispatcher cannot strand it.
+                owner_file = self.path('locks/' + key + '.lock/owner.json')
+                current = self._read_owner(owner_file, key)
+                if (not current or current[0]['nonce'] != nonce or current[0]['pid'] != os.getpid()
+                        or set(path.iterdir()) != {owner_file}):
+                    raise StoreLockBusy('STORE_LOCK_IDENTITY_CHANGED')
+                self._retire_lock(path, (owner_file,), lambda: self._defer_release(current[0]))
+            except StoreLockError:
+                raise
+            except (OSError, ValueError) as exc:
+                raise StoreLockBusy('STORE_LOCK_RELEASE_FAILED: ' + str(exc)) from exc
 
     def read_record(self, key):
         if len(key) != 64 or any(c not in '0123456789abcdef' for c in key):
@@ -565,6 +790,8 @@ def read_parquet_batches(path, batch_size=65536, max_batch_bytes=64 * CHUNK):
 def main():
     p = argparse.ArgumentParser(description=__doc__)
     p.add_argument('--root', type=Path, required=True); p.add_argument('--owner', required=True)
+    p.add_argument('--legacy-writers-stopped', action='store_true',
+                   help='Confirm all legacy writers using this store are stopped; recover empty locks at least 24 hours old')
     sub = p.add_subparsers(dest='command', required=True)
     sub.add_parser('init')
     c = sub.add_parser('capture-file'); c.add_argument('--request', type=Path, required=True)
@@ -573,7 +800,8 @@ def main():
     a = sub.add_parser('archive'); a.add_argument('--name', required=True); a.add_argument('--keys', type=Path)
     r = sub.add_parser('prune'); r.add_argument('--retain-keys', type=Path, required=True)
     r.add_argument('--archive', required=True); r.add_argument('--delete', action='store_true')
-    args = p.parse_args(); store = Store(args.root, args.owner, create=args.command == 'init')
+    args = p.parse_args(); store = Store(args.root, args.owner, create=args.command == 'init',
+                                        legacy_writers_stopped=args.legacy_writers_stopped)
     if args.command == 'init': result = store.identity
     elif args.command == 'capture-file':
         def chunks():
@@ -583,6 +811,8 @@ def main():
     elif args.command == 'verify': result = store.verify(json.loads(args.previous.read_text()) if args.previous else None)
     elif args.command == 'archive': result = store.archive('archives/' + args.name, json.loads(args.keys.read_text()) if args.keys else None)
     else: result = store.prune_to(json.loads(args.retain_keys.read_text()), args.archive, delete=args.delete)
+    if store._reclamations:
+        result = {**result, 'lock_recovery': store.recovery_summary()}
     print(json.dumps(result, indent=2, allow_nan=False))
 
 

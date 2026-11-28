@@ -4,7 +4,7 @@ description: Investment recommendations, reproducible equity and multi-asset res
 ---
 
 # AI Trading Agent
-Package version: **5.14.0 - November 26, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
+Package version: **5.14.5 - November 27, 2026**. The skill is self-contained and portable across supported hosts, including Muse, Claude and Instinct. Bundle its instructions and helpers; use the chosen host's available tools and execution environment. Do not install or require a local backend, server, daemon or background service unless the user explicitly requests one. Check host capabilities and report unsupported operations instead of assuming identical support.
 This skill researches investments, explains evidence and prepares host actions. Every execution task, including each scheduled task, has its own private persistent policy bound to its stable `task_id`; there is no global execution policy. New task policies default to `paper`. Read that task's policy and verify its identity
 against the current host task before actions; see [execution modes](references/execution-modes.md). Its `mode` is `paper`,
 `approval` or `autonomous`: respectively simulate only, require order approval,
@@ -233,7 +233,7 @@ choose another drive or a synced folder merely because it has more space. A
 same-contract download resume is distinct from reuse in a new research run.
 For lengthy public collections, use `--component-store` to checkpoint completed
 components before downstream processing. This preserves the fresh-fetch default
-and permits same-contract recovery without silently enabling cross-run reuse.
+and permits same-contract recovery. If a store error interrupts acquisition, resume the frozen run and verify coverage before using its rankings.
 Large new public-VQM runs can optionally use
 [history-first acquisition](references/research-campaign.md#optional-history-first-acquisition)
 to avoid financial requests for a documented missing-history exclusion. It keeps

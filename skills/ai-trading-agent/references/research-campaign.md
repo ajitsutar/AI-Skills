@@ -110,6 +110,9 @@ Use `--universe-only` to inspect membership without requesting financial data; t
 does **not** constitute a completed stock screen. `--resume` retains the frozen
 universe and completed per-security checkpoints, including after an interrupted
 collection. An explicit changed universe on resume is rejected; start a new run.
+If collection stopped on a component-store lock, resume the frozen run, inspect
+its recovery receipt, and reconcile requested, acquired and scored counts before
+using a ranking. See [component-store recovery](backtest-data-storage.md).
 New-date runs collect all components by default. Explicit user opt-in can use
 [partial-fetch](partial-fetch.md) with a supplied verified parent bundle and
 current retained source-index checks. It never silently discovers a host's cache

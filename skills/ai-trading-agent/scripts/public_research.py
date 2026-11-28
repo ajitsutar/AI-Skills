@@ -186,6 +186,14 @@ def incomplete_components(row):
     return missing
 
 
+def legacy_store_lock_failure(row):
+    """5.14.0 stored lock-admission errors inside ordinary component error rows."""
+    messages = {'ValueError:ACTIVE_CAPTURE_LIMIT', 'RuntimeError:STORE_DISPATCH_BUSY',
+                'ValueError:CAPTURE_OR_MAINTENANCE_ACTIVE'}
+    return next((error for error in row.get('errors', []) if error.get('error') in messages
+                 and error.get('component') in {'info', 'history', 'income', 'balance', 'cashflow'}), None)
+
+
 def blocking_components(row, grid):
     """Financial failures cannot change a documented history-ineligible result."""
     missing = incomplete_components(row)
@@ -219,6 +227,12 @@ def _calculate(snapshot, count):
     require(len(symbols) == len(set(symbols)) > 0, 'UNIVERSE_INVALID')
     rows = snapshot['rows']
     require(len(rows) == len(symbols) and {r['symbol'] for r in rows} == set(symbols), 'UNIVERSE_COVERAGE_MISMATCH')
+    if snapshot.get('contract', {}).get('component_store') is True:
+        for row in rows:
+            failure = legacy_store_lock_failure(row)
+            if failure:
+                raise ValueError('STORE_LOCK_FAILURE_IN_SNAPSHOT: ' + row['symbol'] + ' ' +
+                                 failure['component'] + ' ' + failure['error'] + '; resume acquisition before ranking')
     transport_errors = sum(any('RateLimit' in e.get('error', '') or 'PROVIDER_PAUSED' in e.get('error', '')
         or 'Too Many Requests' in e.get('error', '') for e in r.get('errors', [])
         if e.get('component') in {'info', 'income', 'balance', 'cashflow', 'history'}) for r in rows)

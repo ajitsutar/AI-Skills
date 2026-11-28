@@ -1,0 +1,16 @@
+{
+  "from": {
+    "incremental_research.py": "e212824f793f985ac8f970b31eda62d5b88dfe179c1209c8eb9acd2a026591cd",
+    "listed_universe.py": "77bda29382d8f7e252cbc9ddc7c05fdb8751ceda258cd6e53e6a60dbd6f8ec09",
+    "public_research_fetch.py": "8de8a128d43ac4a7682115ca03ce4d4cc0e4dc4205c29fb4accf51089a2b69c1",
+    "research_data_store.py": "3f7252c02dd0d040566055bc373dafd703892ea41d2e40602b53965db4392a25"
+  },
+  "to": {
+    "incremental_research.py": "e212824f793f985ac8f970b31eda62d5b88dfe179c1209c8eb9acd2a026591cd",
+    "listed_universe.py": "77bda29382d8f7e252cbc9ddc7c05fdb8751ceda258cd6e53e6a60dbd6f8ec09",
+    "public_research.py": "a4766449bedcb874d31db17dca84a452c361e684aecee2a4fc2fab4ecee077d9",
+    "public_research_fetch.py": "1ddd7283476954b6a61b8fd9fee43972c1ffc46f77cc13c40b8b8d8cdb808c64",
+    "research_data_store.py": "0b2be3737b6d67ab6157df43d1b974152583aa6c0706520d471eeb0a67ffc7f4",
+    "store_locking.py": "ca04f462d71b1862f1f51e9810c6cfa1850154edcf696b43ae4f5a149869da8d"
+  }
+}

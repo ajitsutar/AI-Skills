@@ -45,8 +45,28 @@ Capture checks free space before calling the producer, during writes and after
 compression. Maximum bytes and simultaneous captures are explicit; it never switches
 drives or retries indefinitely. Different requests can capture concurrently up to
 the bound, while a same-request lock prevents duplicate work. Archive/prune operations
-exclude active captures. A hard process kill can leave a lock: inspect ownership and
-the prior process before explicitly removing a stale lock; the API never guesses.
+exclude active captures. A killed collector can leave locks behind. On the next
+capture or maintenance operation, the store checks recorded owners before counting
+locks. It can reclaim a provably dead local owner's lock and reports the recovered
+keys. A live owner keeps its lock even during a long request. A lock from another
+host or with uncertain ownership can still block work.
+
+Older stores can contain empty lock directories with no owner record. For a
+same-contract public collection, use the original command with `--resume`
+and `--component-store`. If old ownerless locks still block progress, first confirm
+that every writer using that store has stopped, including writers on other hosts.
+Only then repeat with `--legacy-writers-stopped`. A legacy directory must also
+be at least 24 hours old to qualify. Use a filesystem that supports process locks
+and atomic rename within the store. The run writes reclaimed keys and counts to
+`component-store-lock-recovery.json` in the attempt directory. A blocked
+collection writes `component-store-blocked.json`. Resolve the reported lock
+condition and resume before treating its output as rankable.
+
+A frozen capture from the published 5.14.0 collector can resume across this
+repair when its recorded code hashes match the bundled compatibility profile.
+The collector keeps the original decision time and store identity and verifies
+the requested price session, prompt and holding period.
+Custom collector builds require their own verified compatibility evidence.
 
 Gzip responses are content-addressed and deduplicated by raw hash. Identity and
 vintage records stay separate even if their bytes happen to match. GOOG and GOOGL,
