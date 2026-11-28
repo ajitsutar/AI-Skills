@@ -22,6 +22,78 @@ Choose a runtime directory outside the installed skill, create that parent, and
 use a new output filename. Never overwrite a frozen bundle or substitute synthetic
 input for a real market request.
 
+## Verifying an archived or regenerated bundle
+
+Read the supplied generation and verification records before attributing the
+delivered file to a producer. Record the bytes and path of each source receipt
+you use. For a workbench bundle, check its embedded input, contract and result
+against their canonical JSON digests. Compare any separately supplied frozen
+input to the embedded document and the bundle's file bytes to the expected
+SHA-256 from the relevant receipt. With the current skill environment, run
+
+```text
+python scripts/quant_bundle_evidence.py ARCHIVE.bundle.json --frozen-input INPUT.json --receipt-sha256 EXPECTED_FILE_SHA256
+```
+
+Supply only available options. The external input must represent the same
+stage as the embedded document. If preparation changed the raw input, verify
+the raw file against its own receipt and record the transformation to the
+prepared input separately. Report the actual and recorded hashes and any
+missing or mismatching evidence. The file hash covers exact bytes. The input,
+contract and result hashes cover their respective decoded JSON values.
+
+When provenance identifies a replacement, report both artifact identifiers.
+For each generation or verification observation give its source receipt,
+operation, reported version or implementation, target artifact digest and
+observed outcome. Match the recorded target digest to the relevant bundle.
+If a generation log omits that digest, identify the separate record that
+connects it to the predecessor, or describe the link as unverified. An old
+filename or successful command alone does not identify the replacement.
+Record a predecessor whose bytes are unavailable as receipt-reported. Use the
+replacement's own verification record and compare any shared input to its
+declared digest. Conflicting evidence stays visible. When a single bundle is
+supplied with no replacement history, report only the available observations.
+
+Keep the native `quant_workbench.py verify` result with its actual environment.
+It performs numerical replay under a matching implementation. For a requested
+cross-version comparison, use `run` with the frozen input and a fresh output
+path in the current environment. Compare job identities, dispositions and
+decisions exactly and numerical outputs under the stated tolerances. Label
+that result as a current-version comparison and preserve any historical
+implementation mismatch and unresolved provenance in the delivered answer.
+
+Compare stored and freshly generated workbench bundles with
+`python scripts/quant_bundle_compare.py STORED.json CURRENT.json --absolute 1e-8 --relative 1e-7`.
+Use the agreed tolerances and add `--stored-sha256` and `--current-sha256` when
+you have independent file digests. The output identifies both files, their
+canonical input, contract and result digests, implementation and environment.
+Check `same_input` and `same_contract` before reporting a like-for-like comparison.
+The comparison reads stored results. To establish that the current run occurred,
+retain its actual run and verification receipts.
+
+Review added and removed jobs, fields and array entries alongside comparisons of
+common job IDs. Within a job, array positions retain their original meaning.
+Boolean flags, reasons and decisions are compared exactly. Supply
+`--exact-field NAME` for additional discrete numerical decisions or identifiers
+in the agreed job schema. Numerical leaves use `math.isclose` with
+`abs(a-b) <= max(absolute, relative * max(abs(a), abs(b)))`. Report the count
+of nonzero deltas and the largest raw absolute difference, its job, JSON pointer
+and both values, even when every numeric result meets tolerance. Changes in
+structure, categorical outputs and exact decisions remain separate findings.
+An empty set of common numbers has no maximum. A completed comparison can
+contain material differences.
+
+Label each quoted verifier output with the command, artifact digest, producer
+version and source of the recorded stdout. Check the stdout file's own digest
+against its receipt when one is supplied. Two commands can print identical
+bytes. Attribute each observed stream using its command and target artifact
+as well as its digest. A predecessor's stdout belongs in
+the predecessor row even when the replacement was verified successfully by a
+separate receipt. If the replacement's stdout is missing, attribute only the
+outcome its own receipt records. Retain any current strict-verifier mismatch
+and any successful verification of the freshly generated bundle as two further
+observations. Apply the same labels in the final answer and its structured data.
+
 ## Envelope and operations
 
 Input: `{schema_version:1, contract:{prompt,purpose,base_currency,horizon_id,as_of}, jobs:[...]}`.
